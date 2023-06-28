@@ -28,6 +28,9 @@ allprojects { projIt ->
     apply plugin: 'maven-publish'
     apply plugin: 'fabric-loom'
 
+    version = rootProject.mod_version
+    group = rootProject.maven_group
+
     java {
         // Must be added before the split source sets are setup.
         withSourcesJar()
@@ -227,6 +230,12 @@ javadoc {
         links("https://docs.oracle.com/en/java/javase/17/docs/api/")
         // Disable the crazy super-strict doclint tool in Java 8
         addStringOption("Xdoclint:none", "-quiet")
+
+        tags(
+                'apiNote:a:API Note:',
+                'implSpec:a:Implementation Requirements:',
+                'implNote:a:Implementation Note:'
+        )
     }
 
     allprojects.each {
@@ -236,6 +245,7 @@ javadoc {
 
     classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
     include("**/api/**")
+    include("de/ambertation/**")
     failOnError true
 }
 
@@ -255,6 +265,7 @@ configurations {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 

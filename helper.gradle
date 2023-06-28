@@ -191,7 +191,7 @@ task nextVersion() {
         def rootFabricFile = rootProject.file("src/main/resources/fabric.mod.json")
         def rootFabricFileJson = slurper.parseText(rootFabricFile.text)
         allprojects.each { proj ->
-            if (proj.name == 'WunderLib') {
+            if (proj.name == 'WunderLib' || proj.name == 'bclib-legacy') {
                 return
             }
             println "Updating Verion in ${proj}"
@@ -206,30 +206,46 @@ task nextVersion() {
 
             fabricFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(fabricJson))
         }
-
     }
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
-task release(dependsOn: [remapJar, sourcesJar, javadocJar]) {
+task github(dependsOn: [build, remapJar, sourcesJar, javadocJar]) {
+    def slurper = new groovy.json.JsonSlurper()
+    def apiKey = new File(projectDir, "../GITHUB_TOKEN")
+
     onlyIf {
-        env.GITHUB_TOKEN
+        apiKey.exists()
     }
 
     doLast {
-        def github = GitHub.connectUsingOAuth(env.GITHUB_TOKEN as String)
-        def repository = github.getRepository("quiqueck/BCLib")
+        apiKey = apiKey.text
+        def changes = new File(projectDir, "CHANGES.md")
+        if (changes.exists()) {
+            changes = changes.getText('UTF-8')
+        } else {
+            changes = ""
+        }
+
+        def github = GitHub.connectUsingOAuth(apiKey as String)
+        def repository = github.getRepository("quiqueck/" + archivesBaseName)
 
         def releaseBuilder = new GHReleaseBuilder(repository, version as String)
         releaseBuilder.name("${archivesBaseName}-${version}")
-        releaseBuilder.body("A changelog can be found at https://github.com/quiqueck/BCLib/commits")
-        releaseBuilder.commitish("main")
+        releaseBuilder.body(changes)
+        releaseBuilder.commitish("1.20")
 
         def ghRelease = releaseBuilder.create()
         ghRelease.uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"), "application/java-archive");
         ghRelease.uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources.jar"), "application/java-archive");
         ghRelease.uploadAsset(file("${project.buildDir}/libs/${archivesBaseName}-${version}-javadoc.jar"), "application/java-archive");
+
+        subprojects.each { sub ->
+            ghRelease.uploadAsset(file("${sub.buildDir}/libs/${sub.archivesBaseName}-${version}.jar"), "application/java-archive");
+            ghRelease.uploadAsset(file("${sub.buildDir}/libs/${sub.archivesBaseName}-${version}-sources.jar"), "application/java-archive");
+        }
+
     }
 }

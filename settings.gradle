@@ -47,7 +47,7 @@ rootProject.name = 'WorldWeaver'
 //}
 
 //include 'bclib-legacy'
-include 'wover-core-api-v1'
-include 'wover-event-api-v1'
+include 'wover-core-api'
+include 'wover-event-api'
 include 'WunderLib'
 project(':WunderLib').buildFileName = './wunderlib-include.gradle'

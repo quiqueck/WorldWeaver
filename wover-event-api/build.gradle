@@ -1,7 +1,7 @@
-archivesBaseName = "wover-core-api-v1"
+archivesBaseName = "wover-event-api"
 
 dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
-moduleDependencies(project, ['WunderLib'])
+moduleDependencies(project, ['wover-core-api', 'WunderLib'])
