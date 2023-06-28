@@ -17,12 +17,16 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.events.impl.WoverEventsMod"
+      "org.betterx.wover.WoverEventMod"
     ],
     "client": [
-      "org.betterx.wover.client.events.impl.WoverEventsModClient"
+      "org.betterx.wover.client.WoverEventModClient"
     ]
   },
+  "mixins": [
+    "wover.event.mixins.common.json",
+    "wover.event.mixins.client.json"
+  ],
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": [

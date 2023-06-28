@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.betterx.wover.events.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "LevelStorageAccessMixin",
+    "MinecraftServerMixin",
+    "WorldDimensionDataMixin",
+    "WorldLoaderMixin",
+    "WorldStemMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
