@@ -3,7 +3,10 @@ package org.betterx.wover.core.api;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * A logger for a mod. This class is a wrapper around {@link de.ambertation.wunderlib.general.Logger} and
+ * provides some additional functionality like caching loggers for a given mod id
+ */
 public final class Logger extends de.ambertation.wunderlib.general.Logger {
     private static final Map<String, Logger> cache = new HashMap<>();
 
@@ -25,4 +28,32 @@ public final class Logger extends de.ambertation.wunderlib.general.Logger {
     public static Logger create(ModCore mod) {
         return cache.computeIfAbsent(mod.MOD_ID, (id) -> new Logger(id));
     }
+
+    /**
+     * Log a message with level DEBUG on this logger.
+     *
+     * @param message the message string to be logged
+     */
+    public void debug(String message) {
+        if (ModCore.isDevEnvironment()) {
+            info("(DEBUG) " + message);
+        } else {
+            super.debug(message);
+        }
+    }
+
+    /**
+     * Log a message with parameters with level DEBUG on this logger.
+     *
+     * @param message the message string to be logged
+     * @param params  the parameters to the message
+     */
+    public void debug(String message, Object... params) {
+        if (ModCore.isDevEnvironment()) {
+            info("(DEBUG) " + message, params);
+        } else {
+            super.debug(message, params);
+        }
+    }
+
 }
