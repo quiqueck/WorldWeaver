@@ -1,0 +1,255 @@
+buildscript {
+    dependencies {
+        classpath 'org.kohsuke:github-api:1.114'
+    }
+
+    repositories {
+        gradlePluginPortal()
+    }
+}
+
+version = project.mod_version
+group = project.maven_group
+
+repositories {
+    maven { url "https://maven.dblsaiko.net/" }
+    maven { url "https://maven.fabricmc.net/" }
+    maven { url "https://maven.shedaniel.me/" }
+    maven { url 'https://maven.blamejared.com' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.terraformersmc.com/releases' }
+    maven { url 'https://maven.terraformersmc.com' }
+}
+
+allprojects { projIt ->
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven-publish'
+    apply plugin: 'fabric-loom'
+
+    java {
+        // Must be added before the split source sets are setup.
+        withSourcesJar()
+    }
+
+    loom {
+        if (projIt.name != 'bclib-legacy') {
+            splitEnvironmentSourceSets()
+        }
+    }
+
+    sourceSets {
+        if (projIt.name == 'bclib-legacy') {
+            client {}
+        }
+        main {
+            resources {
+                srcDirs += [
+                        'src/main/generated'
+                ]
+            }
+        }
+
+        testmod {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+        }
+
+        testmodClient {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+            compileClasspath += client.compileClasspath
+            runtimeClasspath += client.runtimeClasspath
+
+            compileClasspath += testmod.compileClasspath
+            runtimeClasspath += testmod.runtimeClasspath
+        }
+
+        datagen {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+            compileClasspath += client.compileClasspath
+            runtimeClasspath += client.runtimeClasspath
+            compileClasspath += client.output
+            runtimeClasspath += client.output
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+        }
+    }
+
+    loom {
+        //runtimeOnlyLog4j = true
+        runs {
+            server{
+                runDir "run-server"
+            }
+            testmodClient {
+                client()
+                ideConfigGenerated project.rootProject == project
+                name = "Testmod Client"
+                source sourceSets.testmodClient
+            }
+            testmodServer {
+                server()
+                ideConfigGenerated project.rootProject == project
+                name = "Testmod Server"
+                runDir "run-server"
+                source sourceSets.testmod
+            }
+        }
+    }
+
+    configurations {
+        dev
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        mappings loom.officialMojangMappings()
+        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+        dev sourceSets.main.output
+        dev sourceSets.client.output
+
+        testmodImplementation sourceSets.main.output
+        testmodClientImplementation sourceSets.main.output
+        testmodClientImplementation sourceSets.client.output
+        testmodClientImplementation sourceSets.testmod.output
+    }
+
+    processResources {
+        println "Version: ${project.mod_version}"
+        inputs.property "version", project.mod_version
+
+        filesMatching("fabric.mod.json") {
+            expand "version": project.mod_version
+        }
+    }
+
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        it.options.release = 17
+    }
+
+    tasks.withType(AbstractArchiveTask).configureEach {
+        preserveFileTimestamps = false
+        reproducibleFileOrder = true
+    }
+
+    // Run this task after updating minecraft to regenerate any required resources
+    tasks.register('generateResources') {
+        group = "fabric"
+    }
+
+    tasks.register('testmodJar', Jar) {
+        from sourceSets.testmod.output
+        from sourceSets.testmodClient.output
+        destinationDirectory = new File(project.buildDir, "devlibs")
+        archiveClassifier = "testmod"
+    }
+
+    [jar, sourcesJar].each {
+        it.from(rootProject.file("LICENSE")) {
+            rename { "${it}-${project.base.archivesName.get()}"}
+        }
+    }
+}
+
+allprojects.each { p ->
+    loom.mods.register(p.name) {
+        sourceSet p.sourceSets.main
+        sourceSet p.sourceSets.client
+    }
+
+    loom.mods.register(p.name + "-testmod") {
+        sourceSet p.sourceSets.testmod
+        sourceSet p.sourceSets.testmodClient
+    }
+}
+
+subprojects.each {
+    remapJar.dependsOn("${it.path}:remapJar")
+}
+
+remapJar {
+    afterEvaluate {
+        subprojects.each {
+            // Include the signed or none signed jar from the sub project.
+            nestedJars.from project("${it.path}").tasks.getByName("remapJar")
+        }
+    }
+}
+
+//dependencies for the main Libraray
+dependencies {
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    subprojects.each {
+        println "API: ${it.path}"
+        api project(path: "${it.path}", configuration: "namedElements")
+        clientImplementation project(path: "${it.path}", configuration: "namedElements")
+
+        testmodImplementation project("${it.path}").sourceSets.testmod.output
+        testmodClientImplementation project("${it.path}").sourceSets.testmodClient.output
+        testmodClientImplementation project("${it.path}").sourceSets.client.output
+
+        datagenImplementation project("${it.path}").sourceSets.client.output
+
+        include project("${it.path}")
+    }
+}
+
+loom{
+    runs {
+        datagen {
+            inherit client
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=${project.archives_base_name}"
+
+            runDir "build/datagen"
+            source sourceSets.datagen
+        }
+    }
+}
+
+javadoc {
+    options {
+        source = "17"
+        encoding = "UTF-8"
+        charSet = "UTF-8"
+        memberLevel = JavadocMemberLevel.PACKAGE
+        links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+        // Disable the crazy super-strict doclint tool in Java 8
+        addStringOption("Xdoclint:none", "-quiet")
+    }
+
+    allprojects.each {
+        source(it.sourceSets.main.allJava)
+        source(it.sourceSets.client.allJava)
+    }
+
+    classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
+    include("**/api/**")
+    failOnError true
+}
+
+jar {
+    from "LICENSE"
+}
+
+configurations {
+    dev {
+        canBeConsumed true
+        canBeResolved false
+    }
+    datagen {
+        canBeConsumed false
+        canBeResolved false
+    }
+}
