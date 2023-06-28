@@ -2,6 +2,9 @@ package org.betterx.wover.core.api;
 
 import net.minecraft.resources.ResourceLocation;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.loader.api.FabricLoader;
+
 import java.util.HashMap;
 
 
@@ -61,4 +64,32 @@ public final class ModCore {
     public ResourceLocation id(String name) {
         return new ResourceLocation(MOD_ID, name);
     }
+
+    /**
+     * Returns true if the game is currently running in a data generation environment.
+     *
+     * @return true if the game is currently running in a data generation environment.
+     */
+    public static boolean isDatagen() {
+        return System.getProperty("fabric-api.datagen") != null;
+    }
+
+    /**
+     * Returns true if the game is currently running in a development environment.
+     *
+     * @return true if the game is currently running in a development environment.
+     */
+    public static boolean isDevEnvironment() {
+        return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    /**
+     * Returns true if the game is currently running on the client.
+     *
+     * @return true if the game is currently running on the client.
+     */
+    public static boolean isClient() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+    }
+
 }
