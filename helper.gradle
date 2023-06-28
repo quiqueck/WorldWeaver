@@ -153,11 +153,16 @@ curseforge {
 
 task nextVersion() {
     doLast {
-        def inputFile = new File('modrinth.json')
+        def slurper = new groovy.json.JsonSlurper();
+        def inputFile = rootProject.file('modrinth.json')
         def gameVersions = java.net.URLEncoder.encode(project.modrinth_versions, "UTF-8")
-        new URL("https://api.modrinth.com/v2/project/${project.archives_base_name}/version?&game_versions=${gameVersions}").withInputStream { i -> inputFile.withOutputStream { it << i } }
-
-        def json = new groovy.json.JsonSlurper().parseText(inputFile.text)
+        def json = slurper.parseText('[{ "version_number" : "1.0.-1" }]')
+        try {
+            new URL("https://api.modrinth.com/v2/project/${project.archives_base_name}/version?&game_versions=${gameVersions}").withInputStream { i -> inputFile.withOutputStream { it << i } }
+            json = slurper.parseText(inputFile.text)
+        } catch (FileNotFoundException) {
+        }
+        println(json)
         def version = json[0].version_number
 
         //increment patch version
@@ -178,18 +183,36 @@ task nextVersion() {
         println "Next Version: " + updatedVersion
         println "\n\n"
 
+
         def propertiesFile = new File("gradle.properties")
         def newContents = propertiesFile.text.replaceFirst("mod_version=\\d+.\\d+.\\d+", "mod_version=${updatedVersion}")
         propertiesFile.text = newContents
 
-        def fabricFile = new File("src/main/resources/fabric.mod.json")
-        newContents = fabricFile.text.replaceFirst('"version": ".+"', "\"version\": \"${updatedVersion}\"")
-        fabricFile.text = newContents
+        def rootFabricFile = rootProject.file("src/main/resources/fabric.mod.json")
+        def rootFabricFileJson = slurper.parseText(rootFabricFile.text)
+        allprojects.each { proj ->
+            if (proj.name == 'WunderLib') {
+                return
+            }
+            println "Updating Verion in ${proj}"
+
+            def fabricFile = proj.file("src/main/resources/fabric.mod.json")
+            def fabricJson = slurper.parseText(fabricFile.text)
+            fabricJson.version = updatedVersion
+            fabricJson.depends.minecraft = slurper.parseText(modrinth_versions)
+            fabricJson.depends.fabricloader = rootFabricFileJson.depends.fabricloader
+            fabricJson.depends['fabric-api'] = rootFabricFileJson.depends['fabric-api']
+            fabricJson.depends.java = rootFabricFileJson.depends.java
+
+            fabricFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(fabricJson))
+        }
+
     }
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
+
 task release(dependsOn: [remapJar, sourcesJar, javadocJar]) {
     onlyIf {
         env.GITHUB_TOKEN

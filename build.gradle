@@ -1,10 +1,11 @@
-
 plugins {
     id 'java'
     id 'maven-publish'
     id 'idea'
     id 'eclipse'
     id 'fabric-loom' version "${loom_version}"
+    id "com.modrinth.minotaur" version "2.+"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 archivesBaseName = project.archives_base_name
 sourceCompatibility = JavaVersion.VERSION_17
@@ -59,3 +60,4 @@ def testDependencies(project, List<String> depNames) {
 }
 
 apply from: "common.gradle"
+apply from: "helper.gradle"

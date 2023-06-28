@@ -81,7 +81,7 @@ allprojects { projIt ->
     loom {
         //runtimeOnlyLog4j = true
         runs {
-            server{
+            server {
                 runDir "run-server"
             }
             testmodClient {
@@ -154,7 +154,7 @@ allprojects { projIt ->
 
     [jar, sourcesJar].each {
         it.from(rootProject.file("LICENSE")) {
-            rename { "${it}-${project.base.archivesName.get()}"}
+            rename { "${it}-${project.base.archivesName.get()}" }
         }
     }
 }
@@ -203,7 +203,7 @@ dependencies {
     }
 }
 
-loom{
+loom {
     runs {
         datagen {
             inherit client
@@ -252,4 +252,12 @@ configurations {
         canBeConsumed false
         canBeResolved false
     }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+}
+
+artifacts {
+    dev javadocJar
 }
