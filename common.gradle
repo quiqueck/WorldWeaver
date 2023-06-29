@@ -82,11 +82,9 @@ allprojects { projIt ->
     }
 
     loom {
+
         //runtimeOnlyLog4j = true
         runs {
-            server {
-                runDir "run-server"
-            }
             testmodClient {
                 client()
                 ideConfigGenerated project.rootProject == project
@@ -99,6 +97,31 @@ allprojects { projIt ->
                 name = "Testmod Server"
                 runDir "run-server"
                 source sourceSets.testmod
+            }
+            if (project.rootProject != project) {
+                println "${projIt.name}-testmod"
+
+                if (projIt.file('src/testmod').exists()) {
+                    "${projIt.name}-testmod" {
+                        server()
+                        runDir "run-server"
+                        name = "Testmod - ${projIt.name}"
+                        ideConfigGenerated true
+                        //source sourceSets["${projIt.name}-testmod"]
+                        source sourceSets.testmod
+                    }
+                }
+
+                if (projIt.file('src/testmodClient').exists()) {
+                    "${projIt.name}-testmodClient" {
+                        client()
+                        runDir "run"
+                        name = "Testmod Client - ${projIt.name}"
+                        ideConfigGenerated true
+                        //source sourceSets["${projIt.name}-testmodClient"]
+                        source sourceSets.testmodClient
+                    }
+                }
             }
         }
     }
