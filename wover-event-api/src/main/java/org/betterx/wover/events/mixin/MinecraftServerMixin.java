@@ -1,6 +1,6 @@
 package org.betterx.wover.events.mixin;
 
-import org.betterx.wover.WoverEventMod;
+import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.events.impl.WorldLifecycleImpl;
 
 import com.mojang.datafixers.DataFixer;
@@ -54,10 +54,12 @@ public class MinecraftServerMixin {
             ChunkProgressListenerFactory chunkProgressListenerFactory,
             CallbackInfo ci
     ) {
-        WoverEventMod.C.LOG.debug("wover_initMinecraftServerLate: " + worldStem.registries());
         //in most cases this call is redundant, as we already captured the registries from the
         // world stem, but just in case...
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(worldStem.registries().compositeAccess());
+        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(
+                worldStem.registries().compositeAccess(),
+                OnRegistryReady.Stage.FINAL
+        );
         //the same goes for the level storage access
         WorldLifecycleImpl.WORLD_FOLDER_READY.emit(levelStorageAccess);
 
@@ -75,10 +77,9 @@ public class MinecraftServerMixin {
      */
     @Inject(method = "createLevels", at = @At(value = "HEAD"))
     private void wover_biomesReady(ChunkProgressListener worldGenerationProgressListener, CallbackInfo ci) {
-        WoverEventMod.C.LOG.debug("wover_biomesReady: " + registries);
         //in most cases this call is redundant, as we already captured the registries from the
         // world stem, but just in case...
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(registries.compositeAccess());
+        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(registries.compositeAccess(), OnRegistryReady.Stage.FINAL);
         //the same goes for the level storage access
         WorldLifecycleImpl.WORLD_FOLDER_READY.emit(storageSource);
 

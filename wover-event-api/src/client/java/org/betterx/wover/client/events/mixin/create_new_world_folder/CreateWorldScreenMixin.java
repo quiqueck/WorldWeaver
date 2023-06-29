@@ -1,4 +1,4 @@
-package org.betterx.wover.client.events.mixin;
+package org.betterx.wover.client.events.mixin.create_new_world_folder;
 
 import org.betterx.wover.events.impl.WorldLifecycleImpl;
 
@@ -29,12 +29,6 @@ public abstract class CreateWorldScreenMixin {
     //this is called when a new world is first created
     @Inject(method = "createNewWorldDirectory", at = @At("RETURN"))
     void wover_createNewWorld(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(
-                this.getUiState()
-                    .getSettings()
-                    .worldgenLoadContext()
-        );
-
         WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER.emit(c -> c.init(
                         cir.getReturnValue().orElse(null),
                         this.getUiState().getSettings().worldgenLoadContext(),

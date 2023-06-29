@@ -1,4 +1,4 @@
-package org.betterx.wover.client.events.mixin;
+package org.betterx.wover.client.events.mixin.before_client_load;
 
 import org.betterx.wover.WoverEventMod;
 import org.betterx.wover.client.events.impl.ClientWorldLifecycleImpl;
@@ -29,8 +29,8 @@ public abstract class WorldOpenFlowsMixin {
     protected abstract void doLoadLevel(Screen screen, String levelID, boolean safeMode, boolean canAskForBackup);
 
     @Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
-    private void wover_callFixerOnLoad(Screen screen, String levelId, CallbackInfo ci) {
-        WoverEventMod.C.LOG.debug("wover_callFixerOnLoad: " + levelId);
+    private void wover_beforeLoadLevel(Screen screen, String levelId, CallbackInfo ci) {
+        WoverEventMod.C.LOG.debug("wover_beforeLoadLevel: " + levelId);
         if (ClientWorldLifecycleImpl.BEFORE_CLIENT_LOAD_SCREEN.process(levelSource, levelId, () -> {
             this.doLoadLevel(screen, levelId, false, false);
         })) {

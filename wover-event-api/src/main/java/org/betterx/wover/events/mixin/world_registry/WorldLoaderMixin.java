@@ -1,6 +1,6 @@
-package org.betterx.wover.events.mixin;
+package org.betterx.wover.events.mixin.world_registry;
 
-import org.betterx.wover.WoverEventMod;
+import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.events.impl.WorldLifecycleImpl;
 
 import net.minecraft.core.RegistryAccess;
@@ -16,9 +16,8 @@ public class WorldLoaderMixin {
     //either when a new Datapack was added to a world on the create-screen
     //or because we did start world loading
     @ModifyArg(method = "load", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/ReloadableServerResources;loadResources(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/core/RegistryAccess$Frozen;Lnet/minecraft/world/flag/FeatureFlagSet;Lnet/minecraft/commands/Commands$CommandSelection;ILjava/util/concurrent/Executor;Ljava/util/concurrent/Executor;)Ljava/util/concurrent/CompletableFuture;"))
-    private static RegistryAccess.Frozen wover_newRegistry(RegistryAccess.Frozen frozen) {
-        WoverEventMod.C.LOG.debug("wover_newRegistry: " + frozen.toString());
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(frozen);
+    private static RegistryAccess.Frozen wover_captureRegistry(RegistryAccess.Frozen frozen) {
+        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(frozen, OnRegistryReady.Stage.PREPARATION);
         return frozen;
     }
 }

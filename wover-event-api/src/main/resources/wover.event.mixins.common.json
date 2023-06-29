@@ -4,11 +4,13 @@
   "package": "org.betterx.wover.events.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "LevelStorageAccessMixin",
     "MinecraftServerMixin",
-    "WorldDimensionDataMixin",
-    "WorldLoaderMixin",
-    "WorldStemMixin"
+    "create_new_world_folder.WorldDimensionDataMixin",
+    "dimension_load.WorldStemMixin",
+    "world_folder.MainMixin",
+    "world_registry.WorldDimensionDataMixin",
+    "world_registry.WorldLoaderMixin",
+    "world_registry.WorldStemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

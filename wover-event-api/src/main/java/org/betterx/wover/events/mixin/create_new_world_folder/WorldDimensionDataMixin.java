@@ -1,4 +1,4 @@
-package org.betterx.wover.events.mixin;
+package org.betterx.wover.events.mixin.create_new_world_folder;
 
 
 import org.betterx.wover.events.impl.WorldLifecycleImpl;
@@ -42,8 +42,6 @@ public class WorldDimensionDataMixin {
     void wover_onCreateWorld(RegistryAccess registryAccess, CallbackInfoReturnable<WorldDimensions> cir) {
         Holder<WorldPreset> holder = wover_getWorldPreset(registryAccess);
         WorldDimensions dimensions = cir.getReturnValue();
-
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(registryAccess);
 
         WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER.emit(c -> c.init(
                         WorldState.storageAccess(),

@@ -1,6 +1,7 @@
 package org.betterx.wover.state.impl;
 
 import org.betterx.wover.events.api.WorldLifecycle;
+import org.betterx.wover.events.api.types.OnRegistryReady;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -17,7 +18,9 @@ public final class WorldStateImpl {
         return currentRegistryAccess;
     }
 
-    public void setCurrentRegistryAccess(RegistryAccess newRegistry) {
+    public void setCurrentRegistryAccess(RegistryAccess newRegistry, OnRegistryReady.Stage stage) {
+        if (stage == OnRegistryReady.Stage.PREPARATION) return;
+        
         if (this.currentRegistryAccess != newRegistry) {
             this.currentRegistryAccess = newRegistry;
         }
