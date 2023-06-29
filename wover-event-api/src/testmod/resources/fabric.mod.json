@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-event-testmod",
+  "version": "1.0.0",
+  "name": "WorldWeaver - Event - TestMod",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-event-testmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.events.test.EventTestMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "minecraft": [
+      "1.20",
+      "1.20.1"
+    ],
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
