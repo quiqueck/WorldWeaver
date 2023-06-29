@@ -246,6 +246,7 @@ javadoc {
     classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
     include("**/api/**")
     include("de/ambertation/**")
+    include("org/betterx/wover/util/**")
     failOnError true
 }
 

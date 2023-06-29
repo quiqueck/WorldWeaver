@@ -1,7 +1,7 @@
 package org.betterx.wover.events.impl;
 
-import org.betterx.wover.events.api.types.AfterCreatingNewWorld;
 import org.betterx.wover.events.api.types.BeforeCreatingLevels;
+import org.betterx.wover.events.api.types.CreatedNewWorldFolder;
 import org.betterx.wover.events.api.types.OnDimensionLoad;
 import org.betterx.wover.events.api.types.OnMinecraftServerReady;
 import org.betterx.wover.events.impl.types.ChainedEventImpl;
@@ -12,7 +12,7 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.server.RegistryLayer;
 
 public class WorldLifecycleImpl {
-    public static final EventImpl<AfterCreatingNewWorld> CREATED_NEW_WORLD_FOLDER = new EventImpl<>(
+    public static final EventImpl<CreatedNewWorldFolder> CREATED_NEW_WORLD_FOLDER = new EventImpl<>(
             "CREATED_NEW_WORLD_FOLDER");
 
     public static final FolderReadyEventImpl WORLD_FOLDER_READY =

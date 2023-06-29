@@ -15,13 +15,12 @@ import org.betterx.wover.events.impl.WorldLifecycleImpl;
  *     <li>{@link #ON_DIMENSION_LOAD}</li>
  *     <li>{@link #MINECRAFT_SERVER_READY}</li>
  *     <li>{@link #BEFORE_CREATING_LEVELS}</li>
+ * </ol>
  */
 public class WorldLifecycle {
     /**
-     * Gets fired whenever a new access object for the world folder was created. At this point it
-     * will be possible to read data from the world folder. This event can be fired multiple
-     * times for the same world folder, but generation of a new world folder or loading of folders
-     * usually will start with this event.
+     * Gets fired when access to the world folder was first created. At this point it
+     * will be possible to read data from the world folder.
      * <p>
      * You can subscribe to this Event with methods that adhere to {@link OnFolderReady}.
      */
@@ -45,9 +44,9 @@ public class WorldLifecycle {
      * existing worlds (worlds that are loaded as opposed to created). You can perform any custom
      * initialization task on that folder here.
      * <p>
-     * You can subscribe to this Event with methods that adhere to {@link AfterCreatingNewWorld}.
+     * You can subscribe to this Event with methods that adhere to {@link CreatedNewWorldFolder}.
      */
-    public static final Event<AfterCreatingNewWorld> CREATED_NEW_WORLD_FOLDER = WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER;
+    public static final Event<CreatedNewWorldFolder> CREATED_NEW_WORLD_FOLDER = WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER;
 
     /**
      * This event is fired when a new {@link net.minecraft.server.WorldStem} is created. It is the
@@ -60,6 +59,22 @@ public class WorldLifecycle {
      * Dimensions the game intended to load. The Final result will be used by the WorldStem.
      */
     public static final Event<OnDimensionLoad> ON_DIMENSION_LOAD = WorldLifecycleImpl.ON_DIMENSION_LOAD;
+
+    /**
+     * This event is fired when the Minecraft Server was instantiated and is ready to be used.
+     * <p>
+     * You can subscribe to this Event with methods that adhere to {@link OnMinecraftServerReady}.
+     */
     public static final Event<OnMinecraftServerReady> MINECRAFT_SERVER_READY = WorldLifecycleImpl.MINECRAFT_SERVER_READY;
+
+    /**
+     * This event is fired before the game starts creating the levels for the world. At this point, Fabric is
+     * guaranteed to have loaded all biomes, features, structures, etc. that are required for the world.
+     * <p>
+     * You can subscribe to this Event with methods that adhere to {@link BeforeCreatingLevels}.
+     */
     public static final Event<BeforeCreatingLevels> BEFORE_CREATING_LEVELS = WorldLifecycleImpl.BEFORE_CREATING_LEVELS;
+
+    private WorldLifecycle() {
+    }
 }

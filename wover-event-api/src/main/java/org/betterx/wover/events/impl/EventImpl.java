@@ -1,11 +1,11 @@
 package org.betterx.wover.events.impl;
 
 import org.betterx.wover.WoverEventMod;
-import org.betterx.wover.events.api.types.EventType;
+import org.betterx.wover.events.api.Subscriber;
 
 import java.util.function.Consumer;
 
-public class EventImpl<T extends EventType> extends AbstractEvent<T> {
+public class EventImpl<T extends Subscriber> extends AbstractEvent<T> {
     public EventImpl(String eventName) {
         super(eventName);
     }

@@ -1,13 +1,13 @@
 package org.betterx.wover.events.impl;
 
 import org.betterx.wover.events.api.Event;
-import org.betterx.wover.events.api.types.EventType;
-import org.betterx.wover.util.api.SortedLinkedList;
+import org.betterx.wover.events.api.Subscriber;
+import org.betterx.wover.util.SortedLinkedList;
 
 import java.util.Objects;
 
-public class AbstractEvent<T extends EventType> implements Event<T> {
-    protected static class Subscriber<T extends EventType> {
+public class AbstractEvent<T extends Subscriber> implements Event<T> {
+    protected static class Subscriber<T extends org.betterx.wover.events.api.Subscriber> {
         public final T task;
         private final int priority;
 
@@ -47,7 +47,7 @@ public class AbstractEvent<T extends EventType> implements Event<T> {
     }
 
     public final boolean subscribe(T handler) {
-        return this.subscribe(handler, 1000);
+        return this.subscribe(handler, DEFAULT_PRIORITY);
     }
 
     public final boolean subscribe(T handler, int priority) {
