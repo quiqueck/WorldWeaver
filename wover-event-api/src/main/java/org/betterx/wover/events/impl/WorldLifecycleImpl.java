@@ -1,9 +1,6 @@
 package org.betterx.wover.events.impl;
 
-import org.betterx.wover.events.api.types.AfterCreatingNewWorld;
-import org.betterx.wover.events.api.types.OnDimensionLoad;
-import org.betterx.wover.events.api.types.OnFolderReady;
-import org.betterx.wover.events.api.types.OnRegistryReady;
+import org.betterx.wover.events.api.types.*;
 import org.betterx.wover.events.impl.types.ChainedEventImpl;
 import org.betterx.wover.events.impl.types.PredicatedValueEventImpl;
 import org.betterx.wover.events.impl.types.ValueEventImpl;
@@ -15,6 +12,9 @@ import net.minecraft.server.RegistryLayer;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
 public class WorldLifecycleImpl {
+    public static final EventImpl<AfterCreatingNewWorld> CREATED_NEW_WORLD_FOLDER = new EventImpl<>(
+            "CREATED_NEW_WORLD_FOLDER");
+
     public static final ValueEventImpl<LevelStorageSource.LevelStorageAccess, OnFolderReady> WORLD_FOLDER_READY =
             new PredicatedValueEventImpl<>(
                     "WORLD_FOLDER_READY",
@@ -25,8 +25,12 @@ public class WorldLifecycleImpl {
                     "WORLD_REGISTRY_READY",
                     (newRegistry) -> WorldState.registryAccess() != newRegistry
             );
-    public static final EventImpl<AfterCreatingNewWorld> CREATED_NEW_WORLD = new EventImpl<>("CREATED_NEW_WORLD");
 
     public static final ChainedEventImpl<LayeredRegistryAccess<RegistryLayer>, OnDimensionLoad> ON_DIMENSION_LOAD =
             new ChainedEventImpl<>("ON_DIMENSION_LOAD");
+
+    public static final EventImpl<BeforeCreatingLevels> BEFORE_CREATING_LEVELS =
+            new EventImpl<>("BEFORE_CREATING_LEVELS");
+    public static final EventImpl<OnMinecraftServerReady> MINECRAFT_SERVER_READY =
+            new EventImpl<>("MINECRAFT_SERVER_READY");
 }

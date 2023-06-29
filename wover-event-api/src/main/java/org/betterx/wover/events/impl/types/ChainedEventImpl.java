@@ -11,8 +11,8 @@ public class ChainedEventImpl<R, T extends ChainableEventType<R>> extends Abstra
 
     public final R process(R input) {
         WoverEventMod.C.LOG.debug("Emitting event: " + eventName);
-        for (var handler : handlers) {
-            input = handler.chain(input);
+        for (var subscriber : handlers) {
+            input = subscriber.task.chain(input);
         }
         return input;
     }

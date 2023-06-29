@@ -6,6 +6,7 @@ import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
+@FunctionalInterface
 public interface AfterCreatingNewWorld extends EventType {
     void init(
             LevelStorageSource.LevelStorageAccess storageAccess,

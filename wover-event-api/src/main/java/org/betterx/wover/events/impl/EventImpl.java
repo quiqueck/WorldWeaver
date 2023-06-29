@@ -12,6 +12,6 @@ public class EventImpl<T extends EventType> extends AbstractEvent<T> {
 
     public void emit(Consumer<T> c) {
         WoverEventMod.C.LOG.debug("Emitting event: " + eventName);
-        handlers.forEach(c);
+        handlers.forEach(sub -> c.accept(sub.task));
     }
 }

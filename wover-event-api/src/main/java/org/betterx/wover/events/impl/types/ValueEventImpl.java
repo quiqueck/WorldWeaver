@@ -11,6 +11,6 @@ public class ValueEventImpl<R, T extends ValueEventType<R>> extends AbstractEven
 
     public void emit(R value) {
         WoverEventMod.C.LOG.debug("Emitting event: " + eventName);
-        handlers.forEach(c -> c.send(value));
+        handlers.forEach(c -> c.task.send(value));
     }
 }

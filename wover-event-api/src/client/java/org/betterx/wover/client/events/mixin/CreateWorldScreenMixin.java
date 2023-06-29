@@ -35,7 +35,7 @@ public abstract class CreateWorldScreenMixin {
                     .worldgenLoadContext()
         );
 
-        WorldLifecycleImpl.CREATED_NEW_WORLD.emit(c -> c.init(
+        WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER.emit(c -> c.init(
                         cir.getReturnValue().orElse(null),
                         this.getUiState().getSettings().worldgenLoadContext(),
                         this.getUiState().getWorldType().preset(),

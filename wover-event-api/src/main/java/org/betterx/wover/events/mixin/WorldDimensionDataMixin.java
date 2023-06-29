@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 @Mixin(DedicatedServerProperties.WorldDimensionData.class)
 public class WorldDimensionDataMixin {
@@ -39,6 +40,23 @@ public class WorldDimensionDataMixin {
     //this is called when a new world is first created on the server
     @Inject(method = "create", at = @At("RETURN"))
     void wover_onCreateWorld(RegistryAccess registryAccess, CallbackInfoReturnable<WorldDimensions> cir) {
+        Holder<WorldPreset> holder = wover_getWorldPreset(registryAccess);
+        WorldDimensions dimensions = cir.getReturnValue();
+
+        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(registryAccess);
+
+        WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER.emit(c -> c.init(
+                        WorldState.storageAccess(),
+                        registryAccess,
+                        holder,
+                        dimensions,
+                        false
+                )
+        );
+    }
+
+    @NotNull
+    private Holder<WorldPreset> wover_getWorldPreset(RegistryAccess registryAccess) {
         Registry<WorldPreset> worldPresetRegistry = registryAccess.registryOrThrow(Registries.WORLD_PRESET);
         Holder.Reference<WorldPreset> reference = worldPresetRegistry.getHolder(WorldPresets.NORMAL)
                                                                      .or(() -> worldPresetRegistry.holders().findAny())
@@ -55,19 +73,7 @@ public class WorldDimensionDataMixin {
         Holder<WorldPreset> holder = presetKey
                 .flatMap(worldPresetRegistry::getHolder)
                 .orElse(reference);
-
-        WorldDimensions dimensions = cir.getReturnValue();
-
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(registryAccess);
-
-        WorldLifecycleImpl.CREATED_NEW_WORLD.emit(c -> c.init(
-                        WorldState.storageAccess(),
-                        registryAccess,
-                        holder,
-                        dimensions,
-                        false
-                )
-        );
+        return holder;
     }
 
 
