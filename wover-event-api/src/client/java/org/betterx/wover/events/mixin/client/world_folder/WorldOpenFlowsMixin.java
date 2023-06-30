@@ -1,6 +1,5 @@
 package org.betterx.wover.events.mixin.client.world_folder;
 
-import org.betterx.wover.WoverEventMod;
 import org.betterx.wover.events.impl.WorldLifecycleImpl;
 
 import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
@@ -26,7 +25,6 @@ public abstract class WorldOpenFlowsMixin {
             PackRepository packRepository,
             CallbackInfoReturnable<WorldStem> cir
     ) {
-        WoverEventMod.C.LOG.debug("wover_captureStorageAccess: " + levelStorageAccess);
         WorldLifecycleImpl.WORLD_FOLDER_READY.emit(levelStorageAccess);
     }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "wover-event-testmod",
+  "id": "wover-events-testmod",
   "version": "1.0.0",
   "name": "WorldWeaver - Event - TestMod",
   "description": "This is an example description! Tell everyone what your mod is about!",
@@ -13,11 +13,14 @@
     "issues": "https://github.com/quiqueck/WorldWeaver/issues"
   },
   "license": "MIT",
-  "icon": "assets/wover-event-testmod/icon.png",
+  "icon": "assets/wover-events-testmod/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       "org.betterx.wover.events.test.EventTestMod"
+    ],
+    "client": [
+      "org.betterx.wover.events.test.client.EventTestMod"
     ]
   },
   "depends": {

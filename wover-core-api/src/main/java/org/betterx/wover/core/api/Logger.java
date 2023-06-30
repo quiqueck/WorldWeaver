@@ -55,5 +55,4 @@ public final class Logger extends de.ambertation.wunderlib.general.Logger {
             super.debug(message, params);
         }
     }
-
 }

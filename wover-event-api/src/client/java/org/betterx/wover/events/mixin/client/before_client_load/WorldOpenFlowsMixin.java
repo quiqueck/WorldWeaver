@@ -1,6 +1,5 @@
 package org.betterx.wover.events.mixin.client.before_client_load;
 
-import org.betterx.wover.WoverEventMod;
 import org.betterx.wover.events.impl.client.ClientWorldLifecycleImpl;
 
 import net.minecraft.client.gui.screens.Screen;
@@ -30,9 +29,8 @@ public abstract class WorldOpenFlowsMixin {
 
     @Inject(method = "loadLevel", cancellable = true, at = @At("HEAD"))
     private void wover_beforeLoadLevel(Screen screen, String levelId, CallbackInfo ci) {
-        WoverEventMod.C.LOG.debug("wover_beforeLoadLevel: " + levelId);
-        if (ClientWorldLifecycleImpl.BEFORE_CLIENT_LOAD_SCREEN.process(levelSource, levelId, () -> {
-            this.doLoadLevel(screen, levelId, false, false);
+        if (!ClientWorldLifecycleImpl.BEFORE_CLIENT_LOAD_SCREEN.process(levelSource, levelId, (showWarning) -> {
+            this.doLoadLevel(screen, levelId, false, showWarning);
         })) {
             ci.cancel();
         }
