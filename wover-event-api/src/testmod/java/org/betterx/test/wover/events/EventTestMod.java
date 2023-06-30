@@ -1,4 +1,4 @@
-package org.betterx.wover.events.test;
+package org.betterx.test.wover.events;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.events.api.WorldLifecycle;
@@ -51,7 +51,7 @@ public class EventTestMod implements ModInitializer {
             C.LOG.info("Dimension load: \n - {}", input);
             return input;
         });
-        
+
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe((storageSource, packRepository, worldStem) -> {
             C.LOG.info("Minecraft server ready: \n - {}\n - {}\n - {}", storageSource, packRepository, worldStem);
         });

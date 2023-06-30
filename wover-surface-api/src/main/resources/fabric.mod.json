@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.core.impl.WoverCoreMod"
+      "org.betterx.wover.entrypoint.WoverCore"
     ]
   },
   "depends": {

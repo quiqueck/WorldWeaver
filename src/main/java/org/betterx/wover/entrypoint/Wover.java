@@ -1,4 +1,4 @@
-package org.betterx.wover;
+package org.betterx.wover.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
 

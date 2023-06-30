@@ -1,4 +1,4 @@
-package org.betterx.wover.surface.impl;
+package org.betterx.wover.entrypoint;
 
 
 import org.betterx.wover.core.api.ModCore;
@@ -10,6 +10,6 @@ public class WoverSurface implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        
+
     }
 }

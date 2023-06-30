@@ -1,6 +1,6 @@
 package org.betterx.wover.events.impl.types.client;
 
-import org.betterx.wover.WoverEventMod;
+import org.betterx.wover.entrypoint.WoverEvents;
 import org.betterx.wover.events.api.types.client.BeforeClientLoadScreen;
 import org.betterx.wover.events.impl.AbstractEvent;
 
@@ -14,7 +14,7 @@ public class LoadScreenEventImpl extends AbstractEvent<BeforeClientLoadScreen> {
     }
 
     public final boolean process(LevelStorageSource levelSource, String levelID, Consumer<Boolean> callLoadScreen) {
-        WoverEventMod.C.LOG.debug("Emitting event: " + eventName);
+        WoverEvents.C.LOG.debug("Emitting event: " + eventName);
         for (var subscriber : handlers) {
             if (!subscriber.task.process(levelSource, levelID, callLoadScreen))
                 return false;

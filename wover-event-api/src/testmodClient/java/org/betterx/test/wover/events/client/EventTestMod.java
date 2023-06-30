@@ -1,4 +1,4 @@
-package org.betterx.wover.events.test.client;
+package org.betterx.test.wover.events.client;
 
 import org.betterx.wover.events.api.client.ClientWorldLifecycle;
 

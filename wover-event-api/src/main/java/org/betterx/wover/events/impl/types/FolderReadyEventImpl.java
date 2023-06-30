@@ -1,6 +1,6 @@
 package org.betterx.wover.events.impl.types;
 
-import org.betterx.wover.WoverEventMod;
+import org.betterx.wover.entrypoint.WoverEvents;
 import org.betterx.wover.events.api.types.OnFolderReady;
 import org.betterx.wover.events.impl.AbstractEvent;
 import org.betterx.wover.state.api.WorldState;
@@ -14,7 +14,7 @@ public class FolderReadyEventImpl extends AbstractEvent<OnFolderReady> {
 
     public void emit(LevelStorageSource.LevelStorageAccess value) {
         if (value != WorldState.storageAccess()) {
-            WoverEventMod.C.LOG.debug("Emitting event: "
+            WoverEvents.C.LOG.debug("Emitting event: "
                     + eventName
                     + " ("
                     + Integer.toHexString(value.hashCode())

@@ -17,10 +17,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.WoverEventMod"
+      "org.betterx.wover.entrypoint.WoverEvents"
     ],
     "client": [
-      "org.betterx.wover.client.WoverEventModClient"
+      "org.betterx.wover.entrypoint.client.WoverEventsClient"
     ]
   },
   "mixins": [

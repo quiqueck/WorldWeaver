@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.events.test.EventTestMod"
+      "org.betterx.test.wover.events.EventTestMod"
     ],
     "client": [
       "org.betterx.wover.events.test.client.EventTestMod"
