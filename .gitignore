@@ -31,3 +31,4 @@ output/
 *.log
 CHANGES.md
 modrinth.json
+node_modules/
