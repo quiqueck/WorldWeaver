@@ -1,0 +1,18 @@
+{
+  "name": "wover.tools",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Some commandline tools used for wover develeopment",
+  "main": "wover.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Quiqueck",
+  "license": "MIT",
+  "dependencies": {
+    "command-line-args": "^5.2.1",
+    "command-line-usage": "^7.0.1",
+    "prismarine-nbt": "^2.2.1",
+    "zlib": "^1.0.5"
+  }
+}
