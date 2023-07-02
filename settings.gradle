@@ -11,6 +11,7 @@ pluginManagement {
 rootProject.name = 'WorldWeaver'
 
 //include 'bclib-legacy'
+include 'wover-common-api'
 include 'wover-core-api'
 include 'wover-event-api'
 include 'wover-surface-api'
