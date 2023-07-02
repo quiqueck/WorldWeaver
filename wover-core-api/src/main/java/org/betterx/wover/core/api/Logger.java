@@ -1,5 +1,7 @@
 package org.betterx.wover.core.api;
 
+import org.betterx.wover.config.api.Configs;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,6 +55,53 @@ public final class Logger extends de.ambertation.wunderlib.general.Logger {
             info("(DEBUG) " + message, params);
         } else {
             super.debug(message, params);
+        }
+    }
+
+    /**
+     * Log a message with level INFO if the verbose logging option is enabled in {@link Configs#MAIN}
+     *
+     * @param message the message string to be logged
+     */
+    public void verbose(String message) {
+        if (Configs.MAIN.verboseLogging.get()) {
+            info(message);
+        }
+    }
+
+    /**
+     * Log a message with parameters with level INFO if the verbose logging option is enabled in {@link Configs#MAIN}
+     *
+     * @param message the message string to be logged
+     * @param params  the parameters to the message
+     */
+    public void verbose(String message, Object... params) {
+        if (Configs.MAIN.verboseLogging.get()) {
+            info(message, params);
+        }
+    }
+
+
+    /**
+     * Log a message with level WARN if the verbose logging option is enabled in {@link Configs#MAIN}
+     *
+     * @param message the message string to be logged
+     */
+    public void verboseWarning(String message) {
+        if (Configs.MAIN.verboseLogging.get()) {
+            warn(message);
+        }
+    }
+
+    /**
+     * Log a message with parameters with level WARN if the verbose logging option is enabled in {@link Configs#MAIN}
+     *
+     * @param message the message string to be logged
+     * @param params  the parameters to the message
+     */
+    public void verboseWarning(String message, Object... params) {
+        if (Configs.MAIN.verboseLogging.get()) {
+            warn(message, params);
         }
     }
 }
