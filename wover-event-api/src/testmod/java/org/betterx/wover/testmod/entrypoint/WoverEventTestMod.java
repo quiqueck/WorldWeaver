@@ -1,11 +1,11 @@
-package org.betterx.test.wover.events;
+package org.betterx.wover.testmod.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.events.api.WorldLifecycle;
 
 import net.fabricmc.api.ModInitializer;
 
-public class EventTestMod implements ModInitializer {
+public class WoverEventTestMod implements ModInitializer {
     public static final ModCore C = ModCore.create("event-test-mod");
 
     @Override

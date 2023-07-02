@@ -4,7 +4,7 @@ import org.betterx.wover.events.api.client.ClientWorldLifecycle;
 
 import net.fabricmc.api.ClientModInitializer;
 
-public class EventTestMod implements ClientModInitializer {
+public class WoverEventTestModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientWorldLifecycle.BEFORE_CLIENT_LOAD_SCREEN.subscribe((levelSource, levelID, callLoadScreen) -> {
@@ -12,6 +12,5 @@ public class EventTestMod implements ClientModInitializer {
             callLoadScreen.accept(false);
             return false;
         });
-
     }
 }

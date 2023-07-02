@@ -17,10 +17,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.test.wover.events.EventTestMod"
+      "org.betterx.wover.testmod.entrypoint.WoverEventTestMod"
     ],
     "client": [
-      "org.betterx.wover.events.test.client.EventTestMod"
+      "org.betterx.wover.testmod.entrypoint.client.WoverEventTestModClient"
     ]
   },
   "depends": {
