@@ -4,4 +4,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
-moduleDependencies(project, ['wover-core-api', 'wover-event-api'])
+loom {
+    accessWidenerPath = file('src/main/resources/wover.surface.accesswidener')
+}
+
+moduleDependencies(project, ['wover-common-api', 'wover-core-api', 'wover-event-api'])

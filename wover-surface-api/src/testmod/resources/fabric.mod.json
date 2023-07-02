@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "wover-surface",
+  "id": "wover-surface-testmod",
   "version": "1.0.0",
-  "name": "WorldWeaver - Surface API",
-  "description": "Provides A Registry for SurfaceRules.",
+  "name": "WorldWeaver - Surface - TestMod",
+  "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
     "Quiqueck"
   ],
@@ -13,11 +13,11 @@
     "issues": "https://github.com/quiqueck/WorldWeaver/issues"
   },
   "license": "MIT",
-  "icon": "assets/wover-surface/icon.png",
+  "icon": "assets/wover-surface-testmod/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverSurface"
+      "org.betterx.wover.testmod.entrypoint.WoverSurfaceTestMod"
     ]
   },
   "depends": {
@@ -27,14 +27,6 @@
       "1.20.1"
     ],
     "java": ">=17",
-    "fabric-api": ">=0.83"
-  },
-  "custom": {
-    "modmenu": {
-      "badges": [
-        "library"
-      ],
-      "parent": "wover"
-    }
+    "fabric-api": "*"
   }
 }
