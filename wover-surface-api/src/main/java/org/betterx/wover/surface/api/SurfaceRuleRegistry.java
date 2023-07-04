@@ -4,10 +4,15 @@ import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.surface.impl.AssignedSurfaceRule;
 import org.betterx.wover.surface.impl.SurfaceRuleRegistryImpl;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+
+import org.jetbrains.annotations.NotNull;
 
 public class SurfaceRuleRegistry {
     public static final ResourceKey<Registry<AssignedSurfaceRule>> SURFACE_RULES_REGISTRY =
@@ -17,11 +22,18 @@ public class SurfaceRuleRegistry {
         return ResourceKey.createRegistryKey(location);
     }
 
-    public static ResourceKey<AssignedSurfaceRule> registerRule(
-            ResourceLocation ruleID,
-            SurfaceRules.RuleSource rules,
-            ResourceLocation biomeID
+    public static ResourceKey<AssignedSurfaceRule> createKey(
+            ResourceLocation ruleID
     ) {
-        return SurfaceRuleRegistryImpl.registerRule(ruleID, rules, biomeID);
+        return SurfaceRuleRegistryImpl.createKey(ruleID);
+    }
+
+    public static Holder<AssignedSurfaceRule> register(
+            @NotNull BootstapContext<AssignedSurfaceRule> ctx,
+            @NotNull ResourceKey<AssignedSurfaceRule> key,
+            @NotNull ResourceKey<Biome> biomeKey,
+            @NotNull SurfaceRules.RuleSource rules
+    ) {
+        return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, rules);
     }
 }

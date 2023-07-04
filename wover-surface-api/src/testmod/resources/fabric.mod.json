@@ -21,6 +21,9 @@
     ],
     "client": [
       "org.betterx.wover.testmod.entrypoint.client.WoverSurfaceClientTestMod"
+    ],
+    "fabric-datagen": [
+      "org.betterx.wover.testmod.surface.datagen.WoverSurfaceDatagenTestMod"
     ]
   },
   "depends": {

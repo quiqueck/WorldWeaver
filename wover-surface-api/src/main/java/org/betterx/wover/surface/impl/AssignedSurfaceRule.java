@@ -17,7 +17,7 @@ public class AssignedSurfaceRule {
     public final SurfaceRules.RuleSource ruleSource;
     public final ResourceLocation biomeID;
 
-    AssignedSurfaceRule(SurfaceRules.RuleSource ruleSource, ResourceLocation biomeID) {
+    public AssignedSurfaceRule(SurfaceRules.RuleSource ruleSource, ResourceLocation biomeID) {
         this.ruleSource = ruleSource;
         this.biomeID = biomeID;
     }
