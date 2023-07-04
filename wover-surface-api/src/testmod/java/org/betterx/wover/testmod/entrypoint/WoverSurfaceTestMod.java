@@ -3,6 +3,7 @@ package org.betterx.wover.testmod.entrypoint;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnRegistryReady;
+import org.betterx.wover.surface.api.SurfaceRuleBuilder;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 import org.betterx.wover.surface.api.noise.NoiseRegistry;
 import org.betterx.wover.surface.impl.AssignedSurfaceRule;
@@ -10,6 +11,8 @@ import org.betterx.wover.util.PriorityLinkedList;
 
 import net.minecraft.core.Registry;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 
 import net.fabricmc.api.ModInitializer;
@@ -29,12 +32,25 @@ public class WoverSurfaceTestMod implements ModInitializer {
             System.out.println(test.getValue(1, 2, 3));
             System.out.println(test.getValue(1, 2, 3));
         });
-
         PriorityLinkedList<String> list = new PriorityLinkedList<>();
         list.add("b", 200);
         list.add("a", 100);
         list.add("c", 300);
 
         System.out.println(list);
+
+        if (!ModCore.isDatagen()) {
+            var TEST_SAVANA = SurfaceRuleRegistry.createKey(C.id("test-savana"));
+            SurfaceRuleRegistry.BOOTSTRAP_SURFACE_RULE_REGISTRY.subscribe(ctx -> {
+                SurfaceRuleBuilder
+                        .start()
+                        .biome(Biomes.SAVANNA)
+                        .chancedFloor(
+                                Blocks.RED_TERRACOTTA.defaultBlockState(),
+                                Blocks.RED_CONCRETE.defaultBlockState()
+                        )
+                        .register(ctx, TEST_SAVANA);
+            });
+        }
     }
 }

@@ -33,6 +33,11 @@ public class SurfaceRuleRegistryImpl {
     public static void bootstrap(RegistryAccess access, OnRegistryReady.Stage stage) {
         final WritableRegistry<AssignedSurfaceRule> registry = (WritableRegistry<AssignedSurfaceRule>) access.registryOrThrow(
                 SurfaceRuleRegistry.SURFACE_RULES_REGISTRY);
+        bootstrap(access, registry);
+    }
+
+    @ApiStatus.Internal
+    public static void bootstrap(RegistryAccess access, WritableRegistry<AssignedSurfaceRule> registry) {
         BootstapContext<AssignedSurfaceRule> ctx = new BootstapContext<>() {
             @Override
             public Holder.Reference<AssignedSurfaceRule> register(
@@ -49,6 +54,12 @@ public class SurfaceRuleRegistryImpl {
 
             @Override
             public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
+                if (access == null) {
+                    if (resourceKey.equals(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY)) {
+                        return (HolderGetter<S>) registry.createRegistrationLookup();
+                    }
+                    return null;
+                }
                 return access.lookupOrThrow(resourceKey);
             }
         };
