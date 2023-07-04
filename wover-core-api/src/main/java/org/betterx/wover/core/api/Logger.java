@@ -28,7 +28,7 @@ public final class Logger extends de.ambertation.wunderlib.general.Logger {
      * @return The logger for the given mod.
      */
     public static Logger create(ModCore mod) {
-        return cache.computeIfAbsent(mod.MOD_ID, (id) -> new Logger(id));
+        return cache.computeIfAbsent(mod.modId, (id) -> new Logger(id));
     }
 
     /**

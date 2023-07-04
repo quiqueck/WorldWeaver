@@ -7,12 +7,10 @@ import org.betterx.wover.core.api.ModCore;
 import net.fabricmc.api.ModInitializer;
 
 public class WoverCore implements ModInitializer {
-    public static final ModCore C = ModCore.create("wover-core");
-    public static final String WOVER_ID = "wover";
+    public static final ModCore C = ModCore.create("wover-core", "wover");
 
     @Override
     public void onInitialize() {
-        
         Configs.saveConfigs();
     }
 }

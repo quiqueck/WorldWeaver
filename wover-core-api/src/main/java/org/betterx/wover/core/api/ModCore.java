@@ -10,6 +10,7 @@ import net.fabricmc.loader.api.ModContainer;
 
 import java.util.HashMap;
 import java.util.Optional;
+import org.jetbrains.annotations.ApiStatus;
 
 
 /**
@@ -37,15 +38,17 @@ public final class ModCore implements Version.ModVersionProvider {
     /**
      * The mod id is used to identify your mod.
      */
-    public final String MOD_ID;
+    public final String modId;
+    public final String namespace;
     private final Version modVersion;
 
-    private ModCore(String modID) {
+    private ModCore(String modID, String namespace) {
         LOG = Logger.create(modID);
         log = LOG;
-        MOD_ID = modID;
+        modId = modID;
+        this.namespace = namespace;
 
-        Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(MOD_ID);
+        Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(modId);
         if (optional.isPresent()) {
             ModContainer modContainer = optional.get();
             modVersion = new Version(modContainer.getMetadata().getVersion().toString());
@@ -66,13 +69,13 @@ public final class ModCore implements Version.ModVersionProvider {
     }
 
     /**
-     * Returns the {@link #MOD_ID} of this mod.
+     * Returns the {@link #modId} of this mod.
      *
-     * @return the {@link #MOD_ID} of this mod.
+     * @return the {@link #modId} of this mod.
      */
     @Override
     public String getModID() {
-        return MOD_ID;
+        return modId;
     }
 
 
@@ -85,7 +88,25 @@ public final class ModCore implements Version.ModVersionProvider {
      * @return The {@link ResourceLocation} for the given name.
      */
     public ResourceLocation id(String name) {
-        return new ResourceLocation(MOD_ID, name);
+        return new ResourceLocation(namespace, name);
+    }
+
+    /**
+     * Returns the {@link ResourceLocation} for the given name in the namespace of BCLib.
+     * <p>
+     * Used to have backward compatibility with BCLib Features.
+     *
+     * @param name The name or path of the resource.
+     * @return The {@link ResourceLocation} for the given name.
+     */
+    @ApiStatus.Internal
+    public ResourceLocation legacyBCLibId(String name) {
+        return new ResourceLocation("bclib", name);
+    }
+
+    @ApiStatus.Internal
+    public ResourceLocation legacyBCLibId(ResourceLocation location) {
+        return new ResourceLocation("bclib", location.getPath());
     }
 
     /**
@@ -96,7 +117,7 @@ public final class ModCore implements Version.ModVersionProvider {
      */
     @Override
     public ResourceLocation mk(String key) {
-        return new ResourceLocation(MOD_ID, key);
+        return new ResourceLocation(namespace, key);
     }
 
 
@@ -109,7 +130,21 @@ public final class ModCore implements Version.ModVersionProvider {
      * @return The instance of {@link ModCore} for the given mod id.
      */
     public static ModCore create(String modID) {
-        return cache.computeIfAbsent(modID, id -> new ModCore(id));
+        return cache.computeIfAbsent(modID, id -> new ModCore(id, id));
+    }
+
+    /**
+     * Returns the instance of {@link ModCore} for the given mod id. Every mod id has a unique, single
+     * instance. Calling this method multiple times with the same mod id is guaranteed to return
+     * the same instance.
+     *
+     * @param modID     The mod id of the mod.
+     * @param namespace The namespace of the mod. The namespace is used to create
+     *                  {@link ResourceLocation}s in {@link #id(String)} and {@link #mk(String)}.
+     * @return The instance of {@link ModCore} for the given mod id.
+     */
+    public static ModCore create(String modID, String namespace) {
+        return cache.computeIfAbsent(modID, id -> new ModCore(id, namespace));
     }
 
     /**

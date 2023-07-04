@@ -436,5 +436,26 @@ public class SortedLinkedList<E> implements Iterable<E>, Collection<E> {
             this(data, null);
         }
     }
+
+    /**
+     * Returns a string representation of the list
+     *
+     * @return A string representation of the list
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        Node<E> current = head;
+        while (current != null) {
+            sb.append(current.data.toString());
+            if (current.next != null) {
+                sb.append(", ");
+            }
+            current = current.next;
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }
 

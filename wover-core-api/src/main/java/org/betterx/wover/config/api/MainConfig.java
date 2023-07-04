@@ -4,7 +4,7 @@ import de.ambertation.wunderlib.configs.ConfigFile;
 import org.betterx.wover.entrypoint.WoverCore;
 
 public class MainConfig extends ConfigFile {
-    public final static Group GENERAL_GROUP = new Group(WoverCore.WOVER_ID, "general", 0);
+    public final static Group GENERAL_GROUP = new Group(WoverCore.C.namespace, "general", 0);
     public final static String LOG_CATEGORY = "log";
 
     public final BooleanValue verboseLogging = new BooleanValue(
