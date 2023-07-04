@@ -144,7 +144,7 @@ export function create(options){
               .replaceAll('{clientClass}', clientTestClass)
               .replace('{postfix}', '.testmod')
         }
-        const mainTestJava = loadAndReplaceTest(Path.join(process.cwd(), 'include', 'Main.java'))
+        const mainTestJava = loadAndReplaceTest(Path.join(process.cwd(), 'include', 'TestMod.java'))
         const clientTestJava = loadAndReplaceTest(Path.join(process.cwd(), 'include', 'Client.java'))
 
         const fabric = JSON.parse(loadAndReplaceTest(Path.join(process.cwd(), 'include', 'mod.json')))

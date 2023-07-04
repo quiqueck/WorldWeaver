@@ -2,7 +2,6 @@ import commandLineArgs from 'command-line-args'
 import commandLineUsage from 'command-line-usage'
 import {createDefinitions, createSections, validateCreateOptions, create} from './lib/projectBuilder.js'
 
-
 /* first - parse the main command */
 const mainDefinitions = [
   { name: 'command', multiple:false, defaultOption: true }
@@ -33,11 +32,9 @@ if (mainOptions.command === 'create') {
         ]
         const options = commandLineArgs(definitions, { argv })
         if (options.subcommand === 'create') helpUsage = createUsage
-
     }
 
     if (helpUsage===undefined) {
-        process.exit(-1)
         const mainSections = [
           ...mainHeader,
           {

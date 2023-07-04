@@ -6,7 +6,7 @@ import org.betterx.wover.state.impl.WorldStateImpl;
 import net.fabricmc.api.ModInitializer;
 
 public class WoverEvents implements ModInitializer {
-    public static final ModCore C = ModCore.create("wover-events");
+    public static final ModCore C = ModCore.create("wover-events", "wover");
 
     @Override
     public void onInitialize() {
