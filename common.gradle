@@ -56,6 +56,11 @@ allprojects { projIt ->
         }
 
         testmod {
+            resources {
+                srcDirs += [
+                        'src/testmod/generated'
+                ]
+            }
             compileClasspath += main.compileClasspath
             runtimeClasspath += main.runtimeClasspath
         }
@@ -75,10 +80,25 @@ allprojects { projIt ->
             runtimeClasspath += main.runtimeClasspath
             compileClasspath += client.compileClasspath
             runtimeClasspath += client.runtimeClasspath
+
             compileClasspath += client.output
             runtimeClasspath += client.output
             compileClasspath += main.output
             runtimeClasspath += main.output
+        }
+
+        testmodDatagen {
+            compileClasspath += main.compileClasspath
+            runtimeClasspath += main.runtimeClasspath
+            compileClasspath += client.compileClasspath
+            runtimeClasspath += client.runtimeClasspath
+
+            compileClasspath += testmod.compileClasspath
+            runtimeClasspath += testmod.runtimeClasspath
+            compileClasspath += testmodClient.compileClasspath
+            runtimeClasspath += testmodClient.runtimeClasspath
+            compileClasspath += datagen.compileClasspath
+            runtimeClasspath += datagen.runtimeClasspath
         }
     }
 
@@ -124,6 +144,22 @@ allprojects { projIt ->
                     }
                 }
 
+
+                if (projIt.file('src/testmodDatagen').exists()) {
+                    def modId = projIt.name.replace('-api', '-testmod');
+                    "${projIt.name}-testmodDatagen" {
+                        client()
+                        vmArg "-Dfabric-api.datagen"
+                        vmArg "-Dfabric-api.datagen.output-dir=${file("src/testmod/generated")}"
+                        vmArg "-Dfabric-api.datagen.modid=${modId}"
+
+                        runDir "build/datagenTestmod"
+                        name = "Testmod DataGen - ${projIt.name}"
+                        ideConfigGenerated true
+                        source sourceSets.testmodDatagen
+                    }
+                }
+
                 if (projIt.file('src/datagen').exists()) {
                     def modId = projIt.name.replace('-api', '');
                     println("Mod ID: ${modId}")
@@ -144,13 +180,23 @@ allprojects { projIt ->
     }
 
     configurations {
-        dev
-
-        devClient {
-            extendsFrom api
-            canBeConsumed true
-            canBeResolved false
+        dev {
             transitive true
+            canBeResolved = false
+            canBeConsumed = true
+            extendsFrom api
+        }
+        devClient {
+            transitive true
+            canBeResolved = false
+            canBeConsumed = true
+            extendsFrom api
+        }
+        devMain {
+            transitive true
+            canBeResolved = false
+            canBeConsumed = true
+            extendsFrom api
         }
     }
 
@@ -163,17 +209,23 @@ allprojects { projIt ->
         dev sourceSets.client.output
 
         devClient sourceSets.client.output
+        devMain sourceSets.main.output
 
         testmodImplementation sourceSets.main.output
         testmodClientImplementation sourceSets.main.output
         testmodClientImplementation sourceSets.client.output
         testmodClientImplementation sourceSets.testmod.output
 
+        testmodDatagenImplementation sourceSets.main.output
+        testmodDatagenImplementation sourceSets.client.output
+        testmodDatagenImplementation sourceSets.testmod.output
+        testmodDatagenImplementation sourceSets.testmodClient.output
+
         datagenImplementation sourceSets.main.output
         datagenImplementation sourceSets.client.output
 
         if (projIt.name != "wover-datagen-api") {
-            datagenImplementation project(":wover-datagen-api")
+            datagenImplementation project(path: ":wover-datagen-api", configuration: "namedElements")
         }
     }
 
@@ -207,6 +259,7 @@ allprojects { projIt ->
     tasks.register('testmodJar', Jar) {
         from sourceSets.testmod.output
         from sourceSets.testmodClient.output
+        from sourceSets.testmodDatagen.output
         destinationDirectory = new File(project.buildDir, "devlibs")
         archiveClassifier = "testmod"
     }
@@ -227,6 +280,7 @@ allprojects.each { p ->
     loom.mods.register(p.name + "-testmod") {
         sourceSet p.sourceSets.testmod
         sourceSet p.sourceSets.testmodClient
+        sourceSet p.sourceSets.testmodDatagen
     }
 }
 
@@ -254,6 +308,8 @@ dependencies {
         testmodImplementation project("${it.path}").sourceSets.testmod.output
         testmodClientImplementation project("${it.path}").sourceSets.testmodClient.output
         testmodClientImplementation project("${it.path}").sourceSets.client.output
+
+        testmodDatagenImplementation project("${it.path}").sourceSets.testmodDatagen.output
 
         datagenImplementation project("${it.path}").sourceSets.client.output
 
