@@ -13,48 +13,47 @@ targetCompatibility = JavaVersion.VERSION_17
 
 def moduleDependencies(project, List<String> depNames) {
     def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-    def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+    def depsClient = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'devClient') }
 
     project.dependencies {
         deps.each {
             api it
         }
 
-        clientOutputs.each {
+        depsClient.each {
+            devClient it
+            datagenImplementation it
             clientImplementation it
-        }
-    }
-
-    // As we manually handle the maven artifacts, we need to also manually specify the deps.
-    project.publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                pom.withXml {
-                    def depsNode = asNode().appendNode("dependencies")
-                    deps.each {
-                        def depNode = depsNode.appendNode("dependency")
-                        depNode.appendNode("groupId", it.group)
-                        depNode.appendNode("artifactId", it.name)
-                        depNode.appendNode("version", it.version)
-                        depNode.appendNode("scope", "compile")
-                    }
-                }
-            }
         }
     }
 }
 
 def testDependencies(project, List<String> depNames) {
     def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-    def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
+    def depsClient = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'devClient') }
 
     project.dependencies {
         deps.each {
             testmodImplementation it
         }
 
-        clientOutputs.each {
+        depsClient.each {
             testmodClientImplementation it
+        }
+    }
+}
+
+def datagenDependencies(project, List<String> depNames) {
+    def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
+    def depsClient = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'devClient') }
+
+    project.dependencies {
+        deps.each {
+            datagenImplementation it
+        }
+
+        depsClient.each {
+            datagenImplementation it
         }
     }
 }

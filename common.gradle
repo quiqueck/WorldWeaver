@@ -31,6 +31,7 @@ allprojects { projIt ->
     version = rootProject.mod_version
     group = rootProject.maven_group
 
+
     java {
         // Must be added before the split source sets are setup.
         withSourcesJar()
@@ -122,12 +123,35 @@ allprojects { projIt ->
                         source sourceSets.testmodClient
                     }
                 }
+
+                if (projIt.file('src/datagen').exists()) {
+                    def modId = projIt.name.replace('-api', '');
+                    println("Mod ID: ${modId}")
+                    "${projIt.name}-datagen" {
+                        client()
+                        vmArg "-Dfabric-api.datagen"
+                        vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+                        vmArg "-Dfabric-api.datagen.modid=${modId}"
+
+                        runDir "build/datagen"
+                        name = "DataGen - ${projIt.name}"
+                        ideConfigGenerated true
+                        source sourceSets.datagen
+                    }
+                }
             }
         }
     }
 
     configurations {
         dev
+
+        devClient {
+            extendsFrom api
+            canBeConsumed true
+            canBeResolved false
+            transitive true
+        }
     }
 
     dependencies {
@@ -138,10 +162,19 @@ allprojects { projIt ->
         dev sourceSets.main.output
         dev sourceSets.client.output
 
+        devClient sourceSets.client.output
+
         testmodImplementation sourceSets.main.output
         testmodClientImplementation sourceSets.main.output
         testmodClientImplementation sourceSets.client.output
         testmodClientImplementation sourceSets.testmod.output
+
+        datagenImplementation sourceSets.main.output
+        datagenImplementation sourceSets.client.output
+
+        if (projIt.name != "wover-datagen-api") {
+            datagenImplementation project(":wover-datagen-api")
+        }
     }
 
     processResources {
@@ -215,7 +248,6 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     subprojects.each {
-        println "API: ${it.path}"
         api project(path: "${it.path}", configuration: "namedElements")
         clientImplementation project(path: "${it.path}", configuration: "namedElements")
 
@@ -280,10 +312,6 @@ jar {
 configurations {
     dev {
         canBeConsumed true
-        canBeResolved false
-    }
-    datagen {
-        canBeConsumed false
         canBeResolved false
     }
 }
