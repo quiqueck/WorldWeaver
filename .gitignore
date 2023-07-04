@@ -32,3 +32,5 @@ output/
 CHANGES.md
 modrinth.json
 node_modules/
+generated/.cache/
+generated/
