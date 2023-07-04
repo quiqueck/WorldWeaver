@@ -1,0 +1,11 @@
+archivesBaseName = "wover-datagen-api"
+
+dependencies {
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover.datagen.accesswidener')
+}
+
+moduleDependencies(project, ['wover-core-api'])
