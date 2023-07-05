@@ -1,13 +1,15 @@
 package org.betterx.wover.surface.impl;
 
+import org.betterx.wover.core.api.DatapackRegistryBuilder;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 
-import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.*;
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -38,37 +40,17 @@ public class SurfaceRuleRegistryImpl {
 
     @ApiStatus.Internal
     public static void bootstrap(RegistryAccess access, WritableRegistry<AssignedSurfaceRule> registry) {
-        BootstapContext<AssignedSurfaceRule> ctx = new BootstapContext<>() {
-            @Override
-            public Holder.Reference<AssignedSurfaceRule> register(
-                    ResourceKey<AssignedSurfaceRule> resourceKey,
-                    AssignedSurfaceRule object,
-                    Lifecycle lifecycle
-            ) {
-                if (!registry.containsKey(resourceKey)) {
-                    return registry.register(resourceKey, object, lifecycle);
-                } else {
-                    return registry.getHolderOrThrow(resourceKey);
-                }
-            }
-
-            @Override
-            public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
-                if (access == null) {
-                    if (resourceKey.equals(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY)) {
-                        return (HolderGetter<S>) registry.createRegistrationLookup();
-                    }
-                    return null;
-                }
-                return access.lookupOrThrow(resourceKey);
-            }
-        };
-
+        BootstapContext<AssignedSurfaceRule> ctx = DatapackRegistryBuilder.getContext(access, registry);
         bootstrap(ctx);
     }
 
     @ApiStatus.Internal
     public static void initialize() {
+        DatapackRegistryBuilder.register(
+                SurfaceRuleRegistry.SURFACE_RULES_REGISTRY,
+                AssignedSurfaceRule.CODEC,
+                SurfaceRuleRegistryImpl::bootstrap
+        );
         WorldLifecycle.WORLD_REGISTRY_READY.subscribe(SurfaceRuleRegistryImpl::bootstrap, 10000);
         WorldLifecycle.BEFORE_CREATING_LEVELS.subscribe(SurfaceRuleUtil::injectSurfaceRulesToAllDimensions, 500);
     }

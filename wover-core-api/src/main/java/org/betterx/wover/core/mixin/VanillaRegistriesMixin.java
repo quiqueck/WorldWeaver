@@ -1,10 +1,10 @@
-package org.betterx.wover.surface.mixin;
+package org.betterx.wover.core.mixin;
 
-import org.betterx.wover.surface.api.SurfaceRuleRegistry;
-import org.betterx.wover.surface.impl.SurfaceRuleRegistryImpl;
+import org.betterx.wover.core.impl.DatapackRegistryBuilderImpl;
 
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.resources.ResourceKey;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,9 +21,9 @@ public class VanillaRegistriesMixin {
 
     @Inject(method = "<clinit>", at = @At(value = "TAIL"))
     private static void together_registerSurface(CallbackInfo ci) {
-        BUILDER.add(
-                SurfaceRuleRegistry.SURFACE_RULES_REGISTRY,
-                SurfaceRuleRegistryImpl::bootstrap
-        );
+        DatapackRegistryBuilderImpl.bootstrap((key, bootstrap) -> {
+            BUILDER.add((ResourceKey) key, (RegistrySetBuilder.RegistryBootstrap<? extends Object>) bootstrap);
+        });
+
     }
 }

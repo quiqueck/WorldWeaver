@@ -1,8 +1,6 @@
-package org.betterx.wover.surface.mixin;
+package org.betterx.wover.core.mixin;
 
-import org.betterx.wover.surface.api.SurfaceRuleRegistry;
-import org.betterx.wover.surface.impl.AssignedSurfaceRule;
-import org.betterx.wover.surface.impl.SurfaceRuleRegistryImpl;
+import org.betterx.wover.core.impl.DatapackRegistryBuilderImpl;
 
 import com.mojang.serialization.Decoder;
 import net.minecraft.core.Registry;
@@ -24,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Mixin(RegistryDataLoader.class)
-public abstract class RegistryDataLoaderMixin {
+public class RegistryDataLoaderMixin {
     @Accessor("WORLDGEN_REGISTRIES")
     @Mutable
     static void wt_set_WORLDGEN_REGISTRIES(List<RegistryDataLoader.RegistryData<?>> list) {
@@ -33,12 +31,12 @@ public abstract class RegistryDataLoaderMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void wover_init(CallbackInfo ci) {
-        List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + 1);
+        List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList<>(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + 1);
         enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES);
-        enhanced.add(new RegistryDataLoader.RegistryData<>(
-                SurfaceRuleRegistry.SURFACE_RULES_REGISTRY,
-                AssignedSurfaceRule.CODEC
-        ));
+        DatapackRegistryBuilderImpl.forEach((key, value) -> {
+            enhanced.add(new RegistryDataLoader.RegistryData(key, value));
+        });
+
         wt_set_WORLDGEN_REGISTRIES(enhanced);
     }
 
@@ -52,11 +50,6 @@ public abstract class RegistryDataLoaderMixin {
             Map<ResourceKey<?>, Exception> map,
             CallbackInfo ci
     ) {
-        if (resourceKey.equals(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY)) {
-            SurfaceRuleRegistryImpl.bootstrap(
-                    null,
-                    (WritableRegistry<AssignedSurfaceRule>) writableRegistry
-            );
-        }
+        DatapackRegistryBuilderImpl.bootstrap(resourceKey, writableRegistry);
     }
 }
