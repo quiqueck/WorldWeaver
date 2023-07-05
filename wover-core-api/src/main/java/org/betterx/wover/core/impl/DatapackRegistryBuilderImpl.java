@@ -21,7 +21,7 @@ public class DatapackRegistryBuilderImpl {
             ResourceKey<? extends Registry<T>> key,
             Codec<T> elementCodec,
             Consumer<BootstapContext<T>> bootstrap) {
-
+        
         public BootstapContext<T> getContext(WritableRegistry<T> registry) {
             return DatapackRegistryBuilder.getContext(null, registry);
         }
