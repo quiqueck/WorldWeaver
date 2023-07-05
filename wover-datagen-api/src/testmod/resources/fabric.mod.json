@@ -17,12 +17,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverDatagenTestMod"
+      "org.betterx.wover.testmod.entrypoint.WoverDatagenTestMod"
     ]
   },
-  "mixins": [
-    "wover.datagen-testmod.mixins.common.json"
-  ],
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": [

@@ -14,15 +14,7 @@
   },
   "license": "MIT",
   "icon": "assets/wover-math-testmod/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "org.betterx.wover.entrypoint.WoverMathTestMod"
-    ]
-  },
-  "mixins": [
-    "wover.math-testmod.mixins.common.json"
-  ],
+  "environment": "server",
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": [

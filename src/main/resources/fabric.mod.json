@@ -18,8 +18,12 @@
   "entrypoints": {
     "main": [
       "org.betterx.wover.entrypoint.Wover"
+    ],
+    "modmenu": [
+      "org.betterx.wover.entrypoint.client.ModMenuEntryPoint"
     ]
   },
+  "accessWidener": "wover.accesswidener",
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": [

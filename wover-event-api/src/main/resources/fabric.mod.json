@@ -27,6 +27,7 @@
     "wover.event.mixins.common.json",
     "wover.event.mixins.client.json"
   ],
+  "accessWidener": "wover.event.accesswidener",
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": [

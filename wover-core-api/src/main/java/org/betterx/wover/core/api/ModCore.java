@@ -5,11 +5,16 @@ import de.ambertation.wunderlib.utils.Version;
 import net.minecraft.resources.ResourceLocation;
 
 import net.fabricmc.api.EnvType;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.ApiStatus;
 
 
@@ -23,6 +28,8 @@ import org.jetbrains.annotations.ApiStatus;
  */
 public final class ModCore implements Version.ModVersionProvider {
     private static final HashMap<String, ModCore> cache = new HashMap<>();
+
+    private final List<ResourceLocation> providedDatapacks = new LinkedList<>();
     /**
      * This logger is used to write text to the console and the log file.
      * The mod id is used as the logger's name, making it clear which mod wrote info,
@@ -42,6 +49,8 @@ public final class ModCore implements Version.ModVersionProvider {
     public final String namespace;
     private final Version modVersion;
 
+    public final ModContainer modContainer;
+
     private ModCore(String modID, String namespace) {
         LOG = Logger.create(modID);
         log = LOG;
@@ -50,9 +59,10 @@ public final class ModCore implements Version.ModVersionProvider {
 
         Optional<ModContainer> optional = FabricLoader.getInstance().getModContainer(modId);
         if (optional.isPresent()) {
-            ModContainer modContainer = optional.get();
+            this.modContainer = optional.get();
             modVersion = new Version(modContainer.getMetadata().getVersion().toString());
         } else {
+            this.modContainer = null;
             modVersion = new Version(0, 0, 0);
             ;
         }
@@ -78,6 +88,15 @@ public final class ModCore implements Version.ModVersionProvider {
         return modId;
     }
 
+    /**
+     * Returns the namespace of this mod.
+     *
+     * @return the namespace of this mod.
+     */
+    @Override
+    public String getNamespace() {
+        return namespace;
+    }
 
     /**
      * Returns the {@link ResourceLocation} for the given name in the namespace of this mod.
@@ -118,6 +137,34 @@ public final class ModCore implements Version.ModVersionProvider {
     @Override
     public ResourceLocation mk(String key) {
         return new ResourceLocation(namespace, key);
+    }
+
+    /**
+     * Returns a stream of all Datapacks {@link ResourceLocation}s that are provided by this mod.
+     *
+     * @return a stream of all Datapacks {@link ResourceLocation}s that are provided by this mod.
+     */
+    public Stream<ResourceLocation> providedDatapacks() {
+        return providedDatapacks.stream();
+    }
+
+    /**
+     * Register a Datapack {@link ResourceLocation} that is provided by this mod.
+     *
+     * @param name           The name of the Datapack.
+     * @param activationType The {@link ResourcePackActivationType} of the Datapack.
+     * @return The {@link ResourceLocation} of the Datapack.
+     */
+    public ResourceLocation addDatapack(String name, ResourcePackActivationType activationType) {
+        final ResourceLocation id = id(name);
+        providedDatapacks.add(id);
+
+        ResourceManagerHelper.registerBuiltinResourcePack(
+                id,
+                this.modContainer,
+                activationType
+        );
+        return id;
     }
 
 

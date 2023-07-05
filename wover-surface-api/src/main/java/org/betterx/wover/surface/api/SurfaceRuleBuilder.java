@@ -1,7 +1,6 @@
 package org.betterx.wover.surface.api;
 
 import org.betterx.wover.surface.api.conditions.NoiseCondition;
-import org.betterx.wover.surface.impl.AssignedSurfaceRule;
 import org.betterx.wover.surface.impl.SurfaceRuleRegistryImpl;
 import org.betterx.wover.util.PriorityLinkedList;
 
@@ -17,17 +16,44 @@ import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import org.jetbrains.annotations.NotNull;
 
 public class SurfaceRuleBuilder {
+    /**
+     * {@code = 2900} - Default priority for steep surfaces. This is the highest priority Rule.
+     */
     public static int STEEP_SURFACE_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 900;
+    /**
+     * {@code = 2800} - Default priority for surface blocks. This is the next priority after {@link #STEEP_SURFACE_PRIORITY}
+     */
     public static int TOP_SURFACE_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 800;
+    /**
+     * {@code = 2700} - Default priority for ceiling blocks. This is the next priority after {@link #TOP_SURFACE_PRIORITY}
+     */
     public static int CEILING_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 700;
+    /**
+     * {@code = 2600} - Default priority for sub surfaces blocks. This is the next priority after {@link #CEILING_PRIORITY}
+     */
     public static int SUB_SURFACE_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 600;
+    /**
+     * {@code = 2500} - Default priority for floor blocks. This is the next priority after {@link #SUB_SURFACE_PRIORITY}
+     */
     public static int FLOOR_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 500;
+
+    /**
+     * {@code = 2400} - Default priority for blocks below a floor. This is the next priority after {@link #FLOOR_PRIORITY}
+     */
     public static int BELOW_FLOOR_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 400;
+
+    /**
+     * {@code = 2300} -  Default priority for blocks above a ceiling. This is the next priority after {@link #BELOW_FLOOR_PRIORITY}
+     */
     public static int ABOVE_CEILING_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 300;
+    /**
+     * {@code = 900} -  Default priority for filler blocks. This is lower than the default priority for all other rules.
+     */
     public static int FILLER_PRIORITY = PriorityLinkedList.DEFAULT_PRIORITY - 100;
 
     private final PriorityLinkedList<RuleSource> rules;
     private ResourceKey<Biome> biomeKey;
+
 
     private SurfaceRuleBuilder() {
         this.biomeKey = null;
@@ -245,7 +271,7 @@ public class SurfaceRuleBuilder {
 
     /**
      * Set biome floor with specified {@link BlockState} and the
-     * {@link org.betterx.wover.surface.api.conditions.DoubleBlockSurfaceNoiseCondition}.
+     * {@link Conditions#DOUBLE_BLOCK_SURFACE_NOISE}.
      * The rule is added with priority {@link #FLOOR_PRIORITY}.
      *
      * @param surfaceBlockA {@link BlockState} for the ground cover.
@@ -289,22 +315,54 @@ public class SurfaceRuleBuilder {
      * @return {@link RuleSource}.
      */
     public RuleSource build() {
-        RuleSource[] ruleArray = rules.toArray(new RuleSource[rules.size()]);
-        RuleSource rule = SurfaceRules.sequence(ruleArray);
+        RuleSource rule = getRuleSource();
         if (biomeKey != null) {
             rule = SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), rule);
         }
         return rule;
     }
 
+    @NotNull
+    private RuleSource getRuleSource() {
+        if (rules.size() == 1) {
+            return rules.get(0);
+        }
+        RuleSource[] ruleArray = rules.toArray(new RuleSource[rules.size()]);
+        RuleSource rule = SurfaceRules.sequence(ruleArray);
+        return rule;
+    }
+
+    /**
+     * Register rule in the {@link SurfaceRuleRegistry} with default priority {@link PriorityLinkedList#DEFAULT_PRIORITY}.
+     *
+     * @param ctx The {@link BootstapContext} to register the rule with.
+     * @param key The {@link ResourceKey} to register the rule with.
+     * @return The {@link Holder} for the registry item.
+     */
     public Holder<AssignedSurfaceRule> register(
             @NotNull BootstapContext<AssignedSurfaceRule> ctx,
             @NotNull ResourceKey<AssignedSurfaceRule> key
+    ) {
+        return register(ctx, key, PriorityLinkedList.DEFAULT_PRIORITY);
+    }
+
+    /**
+     * Register rule in the {@link SurfaceRuleRegistry}.
+     *
+     * @param ctx      The {@link BootstapContext} to register the rule with.
+     * @param key      The {@link ResourceKey} to register the rule with.
+     * @param priority The priority to register the rule with. Higher priority rules are applied first in the rule sequence for a biome.
+     * @return The {@link Holder} for the registry item.
+     */
+    public Holder<AssignedSurfaceRule> register(
+            @NotNull BootstapContext<AssignedSurfaceRule> ctx,
+            @NotNull ResourceKey<AssignedSurfaceRule> key,
+            int priority
     ) {
         if (biomeKey == null) {
             throw new IllegalStateException("Biome key is not set for surface rule '" + key.location() + "'");
         }
 
-        return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, build());
+        return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, getRuleSource(), priority);
     }
 }

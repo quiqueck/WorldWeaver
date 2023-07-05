@@ -4,6 +4,7 @@ import org.betterx.wover.core.api.DatapackRegistryBuilder;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 
 import net.minecraft.core.Holder;
@@ -22,7 +23,7 @@ public class SurfaceRuleRegistryImpl {
     public static final EventImpl<OnBootstrapRegistry<AssignedSurfaceRule>> BOOTSTRAP_SURFACE_RULE_REGISTRY
             = new EventImpl<>("BOOTSTRAP_SURFACE_RULE_REGISTRY");
     private static Map<ResourceKey<AssignedSurfaceRule>, AssignedSurfaceRule> KNOWN = new HashMap<>();
-    
+
     private static void onBootstrap(BootstapContext<AssignedSurfaceRule> ctx) {
         BOOTSTRAP_SURFACE_RULE_REGISTRY.emit(c -> c.bootstrap(ctx));
     }
@@ -31,7 +32,7 @@ public class SurfaceRuleRegistryImpl {
     public static void initialize() {
         DatapackRegistryBuilder.register(
                 SurfaceRuleRegistry.SURFACE_RULES_REGISTRY,
-                AssignedSurfaceRule.CODEC,
+                AssignedSurfaceRuleImpl.CODEC,
                 SurfaceRuleRegistryImpl::onBootstrap
         );
 
@@ -52,7 +53,8 @@ public class SurfaceRuleRegistryImpl {
             @NotNull BootstapContext<AssignedSurfaceRule> ctx,
             @NotNull ResourceKey<AssignedSurfaceRule> key,
             @NotNull ResourceKey<Biome> biomeKey,
-            @NotNull SurfaceRules.RuleSource rules
+            @NotNull SurfaceRules.RuleSource rules,
+            int priority
     ) {
         if (biomeKey == null) {
             throw new IllegalStateException("Biome key is not set for surface rule '" + key.location() + "'");
@@ -60,7 +62,7 @@ public class SurfaceRuleRegistryImpl {
 
         return ctx.register(
                 key,
-                new AssignedSurfaceRule(rules, biomeKey.location())
+                new AssignedSurfaceRuleImpl(rules, biomeKey.location(), priority)
         );
     }
 }

@@ -3,22 +3,28 @@ package org.betterx.wover.testmod.entrypoint;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnRegistryReady;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.surface.api.SurfaceRuleBuilder;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 import org.betterx.wover.surface.api.noise.NoiseRegistry;
-import org.betterx.wover.surface.impl.AssignedSurfaceRule;
 import org.betterx.wover.util.PriorityLinkedList;
 
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 
 public class WoverSurfaceTestMod implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-surface-testmod");
+    public static final ResourceLocation ADDON_PACK = C.addDatapack(
+            "testpack",
+            ResourcePackActivationType.DEFAULT_ENABLED
+    );
 
     @Override
     public void onInitialize() {

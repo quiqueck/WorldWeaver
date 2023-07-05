@@ -4,6 +4,7 @@ import org.betterx.wover.common.surface.api.InjectableSurfaceRules;
 import org.betterx.wover.common.surface.api.SurfaceRuleProvider;
 import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.state.api.WorldState;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 
 import net.minecraft.core.Holder;
@@ -11,7 +12,6 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.biome.Biome;
@@ -25,12 +25,12 @@ import net.minecraft.world.level.storage.WorldData;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.ApiStatus;
 
 public class SurfaceRuleUtil {
-    private static List<SurfaceRules.RuleSource> getRulesForBiome(ResourceLocation biomeID) {
+    private static List<SurfaceRules.RuleSource> getRulesForBiome(ResourceKey<Biome> biomeKey) {
         Registry<AssignedSurfaceRule> registry = null;
         if (WorldState.registryAccess() != null)
             registry = WorldState.registryAccess()
@@ -38,20 +38,22 @@ public class SurfaceRuleUtil {
 
         if (registry == null) return List.of();
 
-        return registry.stream()
-                       .filter(a -> a != null && a.biomeID != null && a.biomeID.equals(
-                               biomeID))
-                       .map(a -> a.ruleSource)
-                       .toList();
+        var list = registry.stream()
+                           .filter(a -> a != null && a.biomeID != null && a.biomeID.equals(biomeKey.location()))
+                           .sorted((a, b) -> b.priority - a.priority)
+                           .map(a -> a.ruleSource)
+                           .toList();
 
+        return List.of(SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), new SurfaceRules.SequenceRuleSource(list)));
     }
 
     private static List<SurfaceRules.RuleSource> getRulesForBiomes(List<Biome> biomes) {
         Registry<Biome> biomeRegistry = WorldState.registryAccess().registryOrThrow(Registries.BIOME);
-        List<ResourceLocation> biomeIDs = biomes.stream()
-                                                .map(biomeRegistry::getKey)
-                                                .filter(Objects::nonNull)
-                                                .toList();
+        List<ResourceKey<Biome>> biomeIDs = biomes.stream()
+                                                  .map(biomeRegistry::getResourceKey)
+                                                  .filter(Optional::isPresent)
+                                                  .map(Optional::get)
+                                                  .toList();
 
         return biomeIDs.stream()
                        .map(SurfaceRuleUtil::getRulesForBiome)

@@ -3,8 +3,8 @@ package org.betterx.wover.surface.api;
 import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
-import org.betterx.wover.surface.impl.AssignedSurfaceRule;
 import org.betterx.wover.surface.impl.SurfaceRuleRegistryImpl;
+import org.betterx.wover.util.PriorityLinkedList;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -42,6 +42,16 @@ public class SurfaceRuleRegistry {
             @NotNull ResourceKey<Biome> biomeKey,
             @NotNull SurfaceRules.RuleSource rules
     ) {
-        return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, rules);
+        return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, rules, PriorityLinkedList.DEFAULT_PRIORITY);
+    }
+
+    public static Holder<AssignedSurfaceRule> register(
+            @NotNull BootstapContext<AssignedSurfaceRule> ctx,
+            @NotNull ResourceKey<AssignedSurfaceRule> key,
+            @NotNull ResourceKey<Biome> biomeKey,
+            @NotNull SurfaceRules.RuleSource rules,
+            int priority
+    ) {
+        return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, rules, priority);
     }
 }

@@ -1,6 +1,7 @@
-package org.betterx.wover.surface.api.conditions;
+package org.betterx.wover.surface.impl.conditions;
 
 import org.betterx.wover.math.api.noise.OpenSimplexNoise;
+import org.betterx.wover.surface.api.conditions.SurfaceNoiseCondition;
 import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
@@ -16,9 +17,9 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 
-public class ThresholdCondition extends SurfaceNoiseCondition {
+public class ThresholdConditionImpl extends SurfaceNoiseCondition {
     private static final Map<Long, Context> NOISES = Maps.newHashMap();
-    public static final Codec<ThresholdCondition> CODEC = RecordCodecBuilder.create(instance -> instance
+    public static final Codec<ThresholdConditionImpl> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
                     Codec.LONG.fieldOf("seed").forGetter(p -> p.noiseContext.seed),
                     Codec.DOUBLE.fieldOf("threshold").orElse(0.0).forGetter(p -> p.threshold),
@@ -26,15 +27,15 @@ public class ThresholdCondition extends SurfaceNoiseCondition {
                     Codec.DOUBLE.fieldOf("scale_x").orElse(0.1).forGetter(p -> p.scaleX),
                     Codec.DOUBLE.fieldOf("scale_z").orElse(0.1).forGetter(p -> p.scaleZ)
             )
-            .apply(instance, ThresholdCondition::new));
-    public static final KeyDispatchDataCodec<ThresholdCondition> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
+            .apply(instance, ThresholdConditionImpl::new));
+    public static final KeyDispatchDataCodec<ThresholdConditionImpl> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
     private final Context noiseContext;
     private final double threshold;
     private final FloatProvider range;
     private final double scaleX;
     private final double scaleZ;
 
-    public ThresholdCondition(long noiseSeed, double threshold, FloatProvider range, double scaleX, double scaleZ) {
+    public ThresholdConditionImpl(long noiseSeed, double threshold, FloatProvider range, double scaleX, double scaleZ) {
         this.threshold = threshold;
         this.range = range;
         this.scaleX = scaleX;

@@ -1,0 +1,13 @@
+accessWidener   v1  named
+
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$BiomeConditionSource
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$Condition
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$LazyCondition
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$LazyXZCondition
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$SequenceRuleSource
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$SurfaceRule
+accessible class net/minecraft/world/level/levelgen/SurfaceRules$TestRuleSource
+
+accessible method net/minecraft/world/level/levelgen/SurfaceRules$SequenceRuleSource <init> (Ljava/util/List;)V
+
+accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context context Lnet/minecraft/world/level/levelgen/WorldGenerationContext;

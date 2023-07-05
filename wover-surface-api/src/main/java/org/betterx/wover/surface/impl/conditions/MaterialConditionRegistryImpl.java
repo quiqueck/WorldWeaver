@@ -3,9 +3,6 @@ package org.betterx.wover.surface.impl.conditions;
 import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.surface.api.conditions.ConditionRegistry;
-import org.betterx.wover.surface.api.conditions.RoughNoiseCondition;
-import org.betterx.wover.surface.api.conditions.ThresholdCondition;
-import org.betterx.wover.surface.api.conditions.VolumeThresholdCondition;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -45,8 +42,8 @@ public class MaterialConditionRegistryImpl {
 
     @ApiStatus.Internal
     public static void bootstrap() {
-        register(ConditionRegistry.THRESHOLD_CONDITION, ThresholdCondition.CODEC, true);
-        register(ConditionRegistry.VOLUME_THRESHOLD_CONDITION, VolumeThresholdCondition.CODEC, true);
-        register(ConditionRegistry.ROUGH_NOISE_CONDITION, RoughNoiseCondition.CODEC, true);
+        register(ConditionRegistry.THRESHOLD_CONDITION, ThresholdConditionImpl.CODEC, true);
+        register(ConditionRegistry.VOLUME_THRESHOLD_CONDITION, VolumeThresholdConditionImpl.CODEC, true);
+        register(ConditionRegistry.ROUGH_NOISE_CONDITION, RoughNoiseConditionImpl.CODEC, true);
     }
 }

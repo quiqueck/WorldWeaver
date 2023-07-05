@@ -1,4 +1,4 @@
-package org.betterx.wover.surface.api.conditions;
+package org.betterx.wover.surface.impl.conditions;
 
 
 import org.betterx.wover.surface.api.noise.NoiseRegistry;
@@ -15,8 +15,8 @@ import net.minecraft.util.valueproviders.UniformFloat;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-public class RoughNoiseCondition implements SurfaceRules.ConditionSource {
-    public static final Codec<RoughNoiseCondition> CODEC = RecordCodecBuilder.create(instance -> instance
+public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
+    public static final Codec<RoughNoiseConditionImpl> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
                     ResourceKey.codec(Registries.NOISE).fieldOf("noise").forGetter(o -> o.noise),
                     Codec.DOUBLE.fieldOf("min_threshold").forGetter(o -> o.minThreshold),
@@ -25,7 +25,7 @@ public class RoughNoiseCondition implements SurfaceRules.ConditionSource {
             )
             .apply(
                     instance,
-                    (noise1, minThreshold1, maxThreshold1, roughness1) -> new RoughNoiseCondition(
+                    (noise1, minThreshold1, maxThreshold1, roughness1) -> new RoughNoiseConditionImpl(
                             noise1,
                             roughness1,
                             minThreshold1,
@@ -33,14 +33,14 @@ public class RoughNoiseCondition implements SurfaceRules.ConditionSource {
                     )
             ));
 
-    public static final KeyDispatchDataCodec<RoughNoiseCondition> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
+    public static final KeyDispatchDataCodec<RoughNoiseConditionImpl> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
 
     private final ResourceKey<NormalNoise.NoiseParameters> noise;
     private final double minThreshold;
     private final double maxThreshold;
     private final FloatProvider roughness;
 
-    public RoughNoiseCondition(
+    public RoughNoiseConditionImpl(
             ResourceKey<NormalNoise.NoiseParameters> noise,
             FloatProvider roughness,
             double minThreshold,
@@ -53,7 +53,7 @@ public class RoughNoiseCondition implements SurfaceRules.ConditionSource {
         this.roughness = roughness;
     }
 
-    public RoughNoiseCondition(
+    public RoughNoiseConditionImpl(
             ResourceKey<NormalNoise.NoiseParameters> noise,
             FloatProvider roughness,
             double minThreshold
@@ -61,14 +61,14 @@ public class RoughNoiseCondition implements SurfaceRules.ConditionSource {
         this(noise, roughness, minThreshold, Double.MAX_VALUE);
     }
 
-    public RoughNoiseCondition(
+    public RoughNoiseConditionImpl(
             ResourceKey<NormalNoise.NoiseParameters> noise,
             double minThreshold
     ) {
         this(noise, UniformFloat.of(-0.2f, 0.4f), minThreshold, Double.MAX_VALUE);
     }
 
-    public RoughNoiseCondition(
+    public RoughNoiseConditionImpl(
             ResourceKey<NormalNoise.NoiseParameters> noise,
             double minThreshold,
             double maxThreshold
@@ -104,7 +104,7 @@ public class RoughNoiseCondition implements SurfaceRules.ConditionSource {
                 double d = normalNoise
                         .getValue(
                                 ctx.getBlockX(),
-                                ctx.getBlockZ(),
+                                ctx.getBlockY(),
                                 ctx.getBlockZ()
                         ) + roughness.sample(roughnessSource);
                 return d >= minThreshold && d <= maxThreshold;

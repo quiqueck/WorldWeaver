@@ -217,6 +217,16 @@ public class PriorityLinkedList<T> implements Iterable<T>, Collection<T> {
         return a;
     }
 
+    /**
+     * Gets the element at the specified index
+     *
+     * @param i The index
+     * @return The element
+     */
+    public T get(int i) {
+        return list.get(i).value;
+    }
+
 
     //Iterator class for PriorityLinkedList
     private static class PriorityLinkedListIterator<T> implements Iterator<T> {

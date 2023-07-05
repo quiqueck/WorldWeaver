@@ -1,0 +1,8 @@
+{
+  "description.config.wover.client.loading.disableExperimentalWarning": "Wenn Du eine Welt lädst, die experimentelle oder modifizierte Ressourcen enthält, wird eine Warnung angezeigt. Mit dieser Option wird diese Warnung deaktiviert.",
+  "description.config.wover.main.log.verbose": "Schreibt zusätzliche Informationen in die Protokolldatei. Nützlich für die Fehlersuche.",
+  "title.config.group.wover.general": "Allgemein",
+  "title.config.wover.client.loading.disableExperimentalWarning": "Warnung \"Experimentelle Welt\" abschalten",
+  "title.config.wover.main.log.verbose": "Ausführliches Protokoll",
+  "wover.mainmenu.title": "WorldWeaver Einstellungen"
+}

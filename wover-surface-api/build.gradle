@@ -5,7 +5,7 @@ dependencies {
 }
 
 loom {
-    accessWidenerPath = file('src/main/resources/wover.surface.accesswidener')
+    accessWidenerPath = file('src/main/resources/wover-surface.accesswidener')
 }
 
 moduleDependencies(project, ['wover-common-api', 'wover-core-api', 'wover-math-api', 'wover-event-api'])

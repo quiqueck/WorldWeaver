@@ -1,0 +1,8 @@
+{
+  "description.config.wover.client.loading.disableExperimentalWarning": "When you load a world that contains experimental or modded resources, a warning is shown. This option disables this warning.",
+  "description.config.wover.main.log.verbose": "Writes additional info into the log file. Usefull for debugging issues",
+  "title.config.group.wover.general": "General",
+  "title.config.wover.client.loading.disableExperimentalWarning": "Hide Experimental Warning",
+  "title.config.wover.main.log.verbose": "Verbose Logging",
+  "wover.mainmenu.title": "WorldWeaver Configuration"
+}

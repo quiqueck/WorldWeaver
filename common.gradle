@@ -11,22 +11,22 @@ buildscript {
 version = project.mod_version
 group = project.maven_group
 
-repositories {
-    maven { url "https://maven.dblsaiko.net/" }
-    maven { url "https://maven.fabricmc.net/" }
-    maven { url "https://maven.shedaniel.me/" }
-    maven { url 'https://maven.blamejared.com' }
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://maven.terraformersmc.com/releases' }
-    maven { url 'https://maven.terraformersmc.com' }
-}
-
 allprojects { projIt ->
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'eclipse'
     apply plugin: 'maven-publish'
     apply plugin: 'fabric-loom'
+
+    repositories {
+        maven { url "https://maven.dblsaiko.net/" }
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.shedaniel.me/" }
+        maven { url 'https://maven.blamejared.com' }
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://maven.terraformersmc.com/releases' }
+        maven { url 'https://maven.terraformersmc.com' }
+    }
 
     version = rootProject.mod_version
     group = rootProject.maven_group
@@ -304,17 +304,20 @@ dependencies {
     subprojects.each {
         api project(path: "${it.path}", configuration: "namedElements")
         clientImplementation project(path: "${it.path}", configuration: "namedElements")
+        clientImplementation project(path: "${it.path}", configuration: "dev")
 
-        testmodImplementation project("${it.path}").sourceSets.testmod.output
-        testmodClientImplementation project("${it.path}").sourceSets.testmodClient.output
-        testmodClientImplementation project("${it.path}").sourceSets.client.output
-
-        testmodDatagenImplementation project("${it.path}").sourceSets.testmodDatagen.output
+//        testmodImplementation project("${it.path}").sourceSets.testmod.output
+//        testmodClientImplementation project("${it.path}").sourceSets.testmodClient.output
+//        testmodClientImplementation project("${it.path}").sourceSets.client.output
+//
+//        testmodDatagenImplementation project("${it.path}").sourceSets.testmodDatagen.output
 
         datagenImplementation project("${it.path}").sourceSets.client.output
 
         include project("${it.path}")
     }
+    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
 loom {
@@ -330,6 +333,19 @@ loom {
             source sourceSets.datagen
         }
     }
+
+    subprojects.each { sub ->
+        //println "${sub.loom.accessWidenerPath.text}"
+        try {
+
+        } catch (e) {
+            println "No access widener for ${sub.name}"
+        }
+        
+    }
+    accessWidenerPath = file("src/main/resources/wover.accesswidener")
+
+    enableTransitiveAccessWideners = true
 }
 
 javadoc {
@@ -354,7 +370,7 @@ javadoc {
         source(it.sourceSets.client.allJava)
     }
 
-    classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
+    classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath, sourceSets.main.runtimeClasspath, sourceSets.client.runtimeClasspath)
     include("**/api/**")
     include("de/ambertation/**")
     include("org/betterx/wover/util/**")
