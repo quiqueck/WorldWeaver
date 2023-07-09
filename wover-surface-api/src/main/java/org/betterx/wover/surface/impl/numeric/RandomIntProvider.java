@@ -1,7 +1,7 @@
 package org.betterx.wover.surface.impl.numeric;
 
 import org.betterx.wover.math.api.MathHelper;
-import org.betterx.wover.surface.api.numeric.NumericProvider;
+import org.betterx.wover.surface.api.noise.NumericProvider;
 import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
@@ -19,9 +19,13 @@ public final class RandomIntProvider implements NumericProvider {
     private final RandomSource random;
 
 
-    public RandomIntProvider(int range) {
+    RandomIntProvider(int range) {
         this.range = range;
         random = new XoroshiroRandomSource(MathHelper.getSeed(range));
+    }
+
+    public static RandomIntProvider max(int range) {
+        return new RandomIntProvider(range);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.betterx.wover.surface.api.conditions;
 
-import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.surface.impl.conditions.MaterialConditionRegistryImpl;
 
 import com.mojang.serialization.Codec;
@@ -10,14 +9,18 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 
 import org.jetbrains.annotations.NotNull;
 
-public class ConditionRegistry {
-    public static final ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> THRESHOLD_CONDITION
-            = createKey(WoverSurface.C.id("threshold_condition"));
-    public static final ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> VOLUME_THRESHOLD_CONDITION
-            = createKey(WoverSurface.C.id("volume_threshold_condition"));
-    public static final ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> ROUGH_NOISE_CONDITION
-            = createKey(WoverSurface.C.id("rough_noise_condition"));
-
+/**
+ * Helper class for registering custom conditions in
+ * {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_CONDITION}.
+ */
+public class ConditionManager {
+    /**
+     * Registers a condition.
+     *
+     * @param location the location of the condition
+     * @param codec    the codec of the condition
+     * @return the new key of the condition
+     */
     public static ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> register(
             ResourceLocation location,
             Codec<? extends SurfaceRules.ConditionSource> codec
@@ -25,6 +28,13 @@ public class ConditionRegistry {
         return MaterialConditionRegistryImpl.register(MaterialConditionRegistryImpl.createKey(location), codec, false);
     }
 
+    /**
+     * Registers a condition.
+     *
+     * @param key   the key of the condition
+     * @param codec the codec of the condition
+     * @return the same key that was passed in
+     */
     public static ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> register(
             ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> key,
             Codec<? extends SurfaceRules.ConditionSource> codec
@@ -32,6 +42,12 @@ public class ConditionRegistry {
         return MaterialConditionRegistryImpl.register(key, codec, false);
     }
 
+    /**
+     * Creates a {@link ResourceKey} for a condition.
+     *
+     * @param location the location of the condition
+     * @return the key
+     */
     @NotNull
     public static ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> createKey(ResourceLocation location) {
         return MaterialConditionRegistryImpl.createKey(location);

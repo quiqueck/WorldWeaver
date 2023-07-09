@@ -2,17 +2,20 @@ package org.betterx.wover.surface.impl.numeric;
 
 import org.betterx.wover.math.api.random.RandomHelper;
 import org.betterx.wover.surface.api.Conditions;
-import org.betterx.wover.surface.api.numeric.NumericProvider;
-import org.betterx.wover.surface.impl.conditions.VolumeThresholdConditionImpl;
+import org.betterx.wover.surface.api.noise.NumericProvider;
 import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
 
 public class NetherNoiseCondition implements NumericProvider {
+    /**
+     * A simple scalar random number provider
+     */
+    public static final NumericProvider INSTANCE = new NetherNoiseCondition();
     public static final Codec<NetherNoiseCondition> CODEC = Codec
             .BYTE.fieldOf("nether_noise")
                  .xmap(
-                         (obj) -> (NetherNoiseCondition) Conditions.NETHER_NOISE,
+                         (obj) -> (NetherNoiseCondition) INSTANCE,
                          obj -> (byte) 0
                  )
                  .codec();
@@ -44,7 +47,8 @@ public class NetherNoiseCondition implements NumericProvider {
         float cmp = RandomHelper.inRange(Conditions.NETHER_VOLUME_NOISE.getNoiseContext().getRandom(), 0.4F, 0.5F);
         if (value > cmp || value < -cmp) return 2 + offset;
 
-        if (value > Conditions.NETHER_VOLUME_NOISE.getRange().sample(Conditions.NETHER_VOLUME_NOISE.getNoiseContext().getRandom()))
+        if (value > Conditions.NETHER_VOLUME_NOISE.getRoughness()
+                                                  .sample(Conditions.NETHER_VOLUME_NOISE.getNoiseContext().getRandom()))
             return 0 + offset;
 
         return 1 + offset;

@@ -15,6 +15,14 @@ import net.minecraft.world.level.levelgen.placement.CaveSurface;
 
 import org.jetbrains.annotations.NotNull;
 
+
+/**
+ * Simplifies surface rule building and registration.
+ * <p>
+ * If you do not want to use the surface Builder, you can use
+ * {@link SurfaceRuleRegistry#register(BootstapContext, ResourceKey, ResourceKey, RuleSource, int)}
+ * directly to register arbitrary rule sources.
+ */
 public class SurfaceRuleBuilder {
     /**
      * {@code = 2900} - Default priority for steep surfaces. This is the highest priority Rule.
@@ -60,6 +68,11 @@ public class SurfaceRuleBuilder {
         this.rules = new PriorityLinkedList<>();
     }
 
+    /**
+     * Start the builder
+     *
+     * @return new {@link SurfaceRuleBuilder} instance.
+     */
     public static SurfaceRuleBuilder start() {
         return new SurfaceRuleBuilder();
     }
@@ -338,6 +351,7 @@ public class SurfaceRuleBuilder {
      * @param ctx The {@link BootstapContext} to register the rule with.
      * @param key The {@link ResourceKey} to register the rule with.
      * @return The {@link Holder} for the registry item.
+     * @see SurfaceRuleRegistry#register(BootstapContext, ResourceKey, ResourceKey, RuleSource)
      */
     public Holder<AssignedSurfaceRule> register(
             @NotNull BootstapContext<AssignedSurfaceRule> ctx,
@@ -353,6 +367,7 @@ public class SurfaceRuleBuilder {
      * @param key      The {@link ResourceKey} to register the rule with.
      * @param priority The priority to register the rule with. Higher priority rules are applied first in the rule sequence for a biome.
      * @return The {@link Holder} for the registry item.
+     * @see SurfaceRuleRegistry#register(BootstapContext, ResourceKey, ResourceKey, RuleSource, int)
      */
     public Holder<AssignedSurfaceRule> register(
             @NotNull BootstapContext<AssignedSurfaceRule> ctx,

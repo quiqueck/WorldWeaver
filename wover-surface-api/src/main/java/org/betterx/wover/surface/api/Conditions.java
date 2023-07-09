@@ -1,12 +1,10 @@
 package org.betterx.wover.surface.api;
 
 import org.betterx.wover.surface.api.conditions.NoiseCondition;
-import org.betterx.wover.surface.api.conditions.VolumeThresholdCondition;
-import org.betterx.wover.surface.api.numeric.NumericProvider;
 import org.betterx.wover.surface.impl.conditions.RoughNoiseConditionImpl;
 import org.betterx.wover.surface.impl.conditions.ThresholdConditionImpl;
+import org.betterx.wover.surface.impl.conditions.VolumeThresholdCondition;
 import org.betterx.wover.surface.impl.conditions.VolumeThresholdConditionImpl;
-import org.betterx.wover.surface.impl.numeric.NetherNoiseCondition;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.valueproviders.FloatProvider;
@@ -28,6 +26,24 @@ public class Conditions {
      * <p>
      * The noise is an instance of {@link org.betterx.wover.math.api.noise.OpenSimplexNoise} with
      * the seed {@code noiseSeed}.
+     * <p>
+     * When used in a .json file, the condition would look like this:
+     * <pre>
+     * {
+     *   "type": "wover:threshold_condition",
+     *   "scale_x": 0.5,
+     *   "scale_z": 0.5,
+     *   "seed": 523,
+     *   "threshold": 0.05,
+     *   "roughness": {
+     *     "type": "minecraft:uniform",
+     *     "value": {
+     *       "max_exclusive": -0.3,
+     *       "min_inclusive": -0.4
+     *     }
+     *   }
+     * }
+     * </pre>
      *
      * @param noiseSeed The seed for the noise generator. The condition will internally use the
      *                  {@link org.betterx.wover.math.api.noise.OpenSimplexNoise}
@@ -58,6 +74,26 @@ public class Conditions {
      * <p>
      * The noise is an instance of {@link org.betterx.wover.math.api.noise.OpenSimplexNoise} with
      * the seed {@code noiseSeed}.
+     * <p>
+     * When used in a .json file, the condition would look like this:
+     *
+     * <pre>
+     * {
+     *   "type": "wover:volume_threshold_condition",
+     *   "scale_x": 0.2,
+     *   "scale_y": 0.2,
+     *   "scale_z": 0.2,
+     *   "seed": 523,
+     *   "threshold": 0.03,
+     *   "roughness": {
+     *     "type": "minecraft:uniform",
+     *     "value": {
+     *       "max_exclusive": 0.4,
+     *       "min_inclusive": -0.1
+     *     }
+     *   }
+     * }
+     * </pre>
      *
      * @param noiseSeed The seed for the noise generator. The condition will internally use the
      *                  {@link org.betterx.wover.math.api.noise.OpenSimplexNoise}
@@ -85,12 +121,32 @@ public class Conditions {
      * <p>
      * The value for a location x/y/z is calculated as follows:
      * <pre>minThreshold &lt; noise.eval(x * scaleX, y*scaleY, z * scaleZ) + roughness.sample(random) &lt; maxThreshold</pre>
+     * <p>
+     * You can use this condition in any place where a rule source is expecting a condition.
+     * In a .json file , the condition would look like this:
+     *
+     * <pre>
+     * {
+     *   "type": "wover:rough_noise_condition",
+     *   "min_threshold": 0.19,
+     *   "max_threshold": 0.31,
+     *   "noise": "minecraft:gravel_layer",
+     *   "roughness": {
+     *     "type": "minecraft:uniform",
+     *     "value": {
+     *       "min_inclusive": -0.2,
+     *       "max_exclusive": 0.4
+     *     }
+     *   }
+     * }
+     * </pre>
+     * The {@code max_threshold} is optional. If not specified, it will default to {@link Double#MAX_VALUE}.
      *
      * @param noise        The noise to use for the condition.
      * @param roughness    The roughness of the noise. This is used to create more variation in the surface.
      * @param minThreshold The minimum threshold that the noise value has to be above to be true.
      * @param maxThreshold The maximum threshold that the noise value has to be below to be true.
-     * @return A condition that is true if the noise value at the current position is above the threshold.
+     * @return A condition that is true if the noise value at the current position is between both thresholds.
      */
     public static SurfaceRules.ConditionSource roughNoise(
             ResourceKey<NormalNoise.NoiseParameters> noise,
@@ -101,10 +157,50 @@ public class Conditions {
         return new RoughNoiseConditionImpl(noise, roughness, minThreshold, maxThreshold);
     }
 
+    /**
+     * Generates a 3D condition that is true if the noise value is above the min threshold.
+     * <p>
+     * This will create the same {@link net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource}
+     * as {@link #roughNoise(ResourceKey, FloatProvider, double, double)} with the max threshold
+     * set to {@link Double#MAX_VALUE}.
+     *
+     * @param noise        The noise to use for the condition.
+     * @param roughness    The roughness of the noise. This is used to create more variation in the surface.
+     * @param minThreshold The minimum threshold that the noise value has to be above to be true.
+     * @return A condition that is true if the noise value at the current position is above the threshold.
+     */
+    public static SurfaceRules.ConditionSource roughNoise(
+            ResourceKey<NormalNoise.NoiseParameters> noise,
+            FloatProvider roughness,
+            double minThreshold
+    ) {
+        return new RoughNoiseConditionImpl(noise, roughness, minThreshold, Double.MAX_VALUE);
+    }
+
+    /**
+     * Generates a 3D condition that is true if the noise value is above the min threshold.
+     * <p>
+     * This will create the same {@link net.minecraft.world.level.levelgen.SurfaceRules.ConditionSource}
+     * as {@link #roughNoise(ResourceKey, FloatProvider, double, double)} with the max threshold
+     * set to {@link Double#MAX_VALUE} and the roughness set to {@code UniformFloat.of(-0.2, 0.4)}.
+     *
+     * @param noise        The noise to use for the condition.
+     * @param minThreshold The minimum threshold that the noise value has to be above to be true.
+     * @return A condition that is true if the noise value at the current position is above the threshold.
+     */
+    public static SurfaceRules.ConditionSource roughNoise(
+            ResourceKey<NormalNoise.NoiseParameters> noise,
+            double minThreshold
+    ) {
+        return new RoughNoiseConditionImpl(noise, UniformFloat.of(-0.2f, 0.4f), minThreshold, Double.MAX_VALUE);
+    }
+
 
     /**
      * Used by {@link SurfaceRuleBuilder#chancedFloor(BlockState, BlockState)} to
      * choose one of two different surface blocks.
+     *
+     * @see #threshold(long, double, FloatProvider, double, double)
      */
     public static final NoiseCondition DOUBLE_BLOCK_SURFACE_NOISE = threshold(
             4141,
@@ -116,6 +212,8 @@ public class Conditions {
 
     /**
      * Used to generate the surface of a forrest floor.
+     *
+     * @see #threshold(long, double, FloatProvider, double, double)
      */
     public static final NoiseCondition FORREST_FLOOR_SURFACE_NOISE_A = threshold(
             614,
@@ -127,6 +225,8 @@ public class Conditions {
 
     /**
      * Used to generate the surface of a forrest floor.
+     *
+     * @see #threshold(long, double, FloatProvider, double, double)
      */
     public static final NoiseCondition FORREST_FLOOR_SURFACE_NOISE_B = threshold(
             614,
@@ -138,6 +238,8 @@ public class Conditions {
 
     /**
      * Used to generate the surface of a nether biome.
+     *
+     * @see #threshold(long, double, FloatProvider, double, double)
      */
     public static final NoiseCondition NETHER_SURFACE_NOISE = threshold(
             245,
@@ -149,6 +251,8 @@ public class Conditions {
 
     /**
      * Used to generate the surface of a nether biome with larger scale variations.
+     *
+     * @see #threshold(long, double, FloatProvider, double, double)
      */
     public static final NoiseCondition NETHER_SURFACE_NOISE_LARGE = threshold(
             523,
@@ -159,7 +263,9 @@ public class Conditions {
     );
 
     /**
-     * Used to generate the distribution in the nether.
+     * Used to generate the 3D distribution in the nether.
+     *
+     * @see #volumeThreshold(long, double, FloatProvider, double, double, double)
      */
     public static final VolumeThresholdCondition NETHER_VOLUME_NOISE = volumeThreshold(
             245,
@@ -170,6 +276,11 @@ public class Conditions {
             0.1
     );
 
+    /**
+     * Used to generate a larger 3D distribution in the nether.
+     *
+     * @see #volumeThreshold(long, double, FloatProvider, double, double, double)
+     */
     public static final VolumeThresholdCondition NETHER_VOLUME_NOISE_LARGE = volumeThreshold(
             523,
             0,
@@ -179,10 +290,7 @@ public class Conditions {
             0.2
     );
 
-    /**
-     * A simple scalar random number provider
-     */
-    public static final NumericProvider NETHER_NOISE = new NetherNoiseCondition();
+    private Conditions() {
 
-
+    }
 }

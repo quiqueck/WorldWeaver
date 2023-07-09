@@ -6,7 +6,7 @@ import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.surface.api.SurfaceRuleBuilder;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
-import org.betterx.wover.surface.api.noise.NoiseRegistry;
+import org.betterx.wover.surface.api.noise.NoiseParameterManager;
 import org.betterx.wover.util.PriorityLinkedList;
 
 import net.minecraft.core.Registry;
@@ -34,7 +34,7 @@ public class WoverSurfaceTestMod implements ModInitializer {
             C.log.info("Surface rule registry: " + Integer.toHexString(surfaceRegistr.hashCode()));
 
             if (stage != OnRegistryReady.Stage.FINAL) return;
-            var test = NoiseRegistry.getOrCreateNoise(registry, rSource, NoiseRegistry.ROUGHNESS_NOISE);
+            var test = NoiseParameterManager.getOrCreateNoise(registry, rSource, NoiseParameterManager.ROUGHNESS_NOISE);
             System.out.println(test.getValue(1, 2, 3));
             System.out.println(test.getValue(1, 2, 3));
         });

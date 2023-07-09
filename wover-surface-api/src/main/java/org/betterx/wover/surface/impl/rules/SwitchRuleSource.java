@@ -1,6 +1,6 @@
-package org.betterx.wover.surface.api.rules;
+package org.betterx.wover.surface.impl.rules;
 
-import org.betterx.wover.surface.api.numeric.NumericProvider;
+import org.betterx.wover.surface.api.noise.NumericProvider;
 import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;

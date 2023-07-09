@@ -23,7 +23,7 @@ public class ThresholdConditionImpl extends SurfaceNoiseCondition {
             .group(
                     Codec.LONG.fieldOf("seed").forGetter(p -> p.noiseContext.seed),
                     Codec.DOUBLE.fieldOf("threshold").orElse(0.0).forGetter(p -> p.threshold),
-                    FloatProvider.CODEC.fieldOf("threshold_offset").orElse(ConstantFloat.of(0)).forGetter(p -> p.range),
+                    FloatProvider.CODEC.fieldOf("roughness").orElse(ConstantFloat.of(0)).forGetter(p -> p.roughness),
                     Codec.DOUBLE.fieldOf("scale_x").orElse(0.1).forGetter(p -> p.scaleX),
                     Codec.DOUBLE.fieldOf("scale_z").orElse(0.1).forGetter(p -> p.scaleZ)
             )
@@ -31,13 +31,19 @@ public class ThresholdConditionImpl extends SurfaceNoiseCondition {
     public static final KeyDispatchDataCodec<ThresholdConditionImpl> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
     private final Context noiseContext;
     private final double threshold;
-    private final FloatProvider range;
+    private final FloatProvider roughness;
     private final double scaleX;
     private final double scaleZ;
 
-    public ThresholdConditionImpl(long noiseSeed, double threshold, FloatProvider range, double scaleX, double scaleZ) {
+    public ThresholdConditionImpl(
+            long noiseSeed,
+            double threshold,
+            FloatProvider roughness,
+            double scaleX,
+            double scaleZ
+    ) {
         this.threshold = threshold;
-        this.range = range;
+        this.roughness = roughness;
         this.scaleX = scaleX;
         this.scaleZ = scaleZ;
 
@@ -49,13 +55,13 @@ public class ThresholdConditionImpl extends SurfaceNoiseCondition {
         final double x = context.getBlockX() * scaleX;
         final double z = context.getBlockZ() * scaleZ;
         if (noiseContext.lastX == x && noiseContext.lastZ == z)
-            return noiseContext.lastValue + range.sample(noiseContext.random) > threshold;
+            return noiseContext.lastValue + roughness.sample(noiseContext.random) > threshold;
         double value = noiseContext.noise.eval(x, z);
 
         noiseContext.lastX = x;
         noiseContext.lastZ = z;
         noiseContext.lastValue = value;
-        return value + range.sample(noiseContext.random) > threshold;
+        return value + roughness.sample(noiseContext.random) > threshold;
     }
 
     @Override

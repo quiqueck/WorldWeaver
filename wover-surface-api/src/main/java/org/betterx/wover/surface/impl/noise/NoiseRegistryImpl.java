@@ -1,6 +1,6 @@
 package org.betterx.wover.surface.impl.noise;
 
-import org.betterx.wover.surface.api.noise.NoiseRegistry;
+import org.betterx.wover.surface.api.noise.NoiseParameterManager;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 public class NoiseRegistryImpl {
     public static ResourceKey<NormalNoise.NoiseParameters> createKey(ResourceLocation loc) {
-        return ResourceKey.create(NoiseRegistry.NOISE_REGISTRY, loc);
+        return ResourceKey.create(Registries.NOISE, loc);
     }
 
     private static NormalNoise createNoise(
@@ -44,19 +44,19 @@ public class NoiseRegistryImpl {
         );
     }
 
-    private static void register(
+    public static void register(
             BootstapContext<NormalNoise.NoiseParameters> bootstapContext,
             ResourceKey<NormalNoise.NoiseParameters> resourceKey,
-            int i,
-            double d,
-            double... ds
+            int firstOctave,
+            double firstAmplitude,
+            double... amplitudes
     ) {
-        bootstapContext.register(resourceKey, new NormalNoise.NoiseParameters(i, d, ds));
+        bootstapContext.register(resourceKey, new NormalNoise.NoiseParameters(firstOctave, firstAmplitude, amplitudes));
     }
 
 
     @ApiStatus.Internal
     public static void bootstrap(BootstapContext<NormalNoise.NoiseParameters> bootstapContext) {
-        register(bootstapContext, NoiseRegistry.ROUGHNESS_NOISE, 2, 1.0D, 1.0, 1.0, 1.0, 1.0);
+        register(bootstapContext, NoiseParameterManager.ROUGHNESS_NOISE, 2, 1.0D, 1.0, 1.0, 1.0, 1.0);
     }
 }

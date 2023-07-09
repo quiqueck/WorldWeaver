@@ -1,7 +1,7 @@
 package org.betterx.wover.surface.impl.conditions;
 
 
-import org.betterx.wover.surface.api.noise.NoiseRegistry;
+import org.betterx.wover.surface.api.noise.NoiseParameterManager;
 import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
@@ -20,7 +20,7 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
             .group(
                     ResourceKey.codec(Registries.NOISE).fieldOf("noise").forGetter(o -> o.noise),
                     Codec.DOUBLE.fieldOf("min_threshold").forGetter(o -> o.minThreshold),
-                    Codec.DOUBLE.fieldOf("max_threshold").forGetter(o -> o.maxThreshold),
+                    Codec.DOUBLE.fieldOf("max_threshold").orElse(Double.MAX_VALUE).forGetter(o -> o.maxThreshold),
                     FloatProvider.CODEC.fieldOf("roughness").forGetter(o -> o.roughness)
             )
             .apply(
@@ -55,21 +55,6 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
 
     public RoughNoiseConditionImpl(
             ResourceKey<NormalNoise.NoiseParameters> noise,
-            FloatProvider roughness,
-            double minThreshold
-    ) {
-        this(noise, roughness, minThreshold, Double.MAX_VALUE);
-    }
-
-    public RoughNoiseConditionImpl(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
-            double minThreshold
-    ) {
-        this(noise, UniformFloat.of(-0.2f, 0.4f), minThreshold, Double.MAX_VALUE);
-    }
-
-    public RoughNoiseConditionImpl(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
             double minThreshold,
             double maxThreshold
     ) {
@@ -86,8 +71,8 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
         final SurfaceRulesContextAccessor ctx = SurfaceRulesContextAccessor.class.cast(context2);
         final NormalNoise normalNoise = ctx.getRandomState().getOrCreateNoise(this.noise);
         final RandomSource roughnessSource = ctx.getRandomState()
-                                                .getOrCreateRandomFactory(NoiseRegistry.ROUGHNESS_NOISE.location())
-                                                .fromHashOf(NoiseRegistry.ROUGHNESS_NOISE.location());
+                                                .getOrCreateRandomFactory(NoiseParameterManager.ROUGHNESS_NOISE.location())
+                                                .fromHashOf(NoiseParameterManager.ROUGHNESS_NOISE.location());
 
         class NoiseThresholdCondition extends SurfaceRules.LazyCondition {
             NoiseThresholdCondition() {

@@ -1,8 +1,8 @@
 package org.betterx.wover.surface.impl.rules;
 
+import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.legacy.api.LegacyHelper;
-import org.betterx.wover.surface.api.rules.RuleRegistry;
-import org.betterx.wover.surface.api.rules.SwitchRuleSource;
+import org.betterx.wover.surface.api.rules.MaterialRuleManager;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -15,6 +15,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public class MaterialRuleRegistryImpl {
+    public static ResourceKey<Codec<? extends SurfaceRules.RuleSource>> SWITCH_RULE
+            = MaterialRuleManager.createKey(WoverSurface.C.id("switch_rule"));
+
     public static ResourceKey<Codec<? extends SurfaceRules.RuleSource>> register(
             ResourceKey<Codec<? extends SurfaceRules.RuleSource>> key,
             Codec<? extends SurfaceRules.RuleSource> rule
@@ -33,7 +36,7 @@ public class MaterialRuleRegistryImpl {
 
     @ApiStatus.Internal
     public static void bootstrap() {
-        register(RuleRegistry.SWITCH_RULE, SwitchRuleSource.CODEC);
+        register(SWITCH_RULE, SwitchRuleSource.CODEC);
 
         Registry.register(
                 BuiltInRegistries.MATERIAL_RULE,

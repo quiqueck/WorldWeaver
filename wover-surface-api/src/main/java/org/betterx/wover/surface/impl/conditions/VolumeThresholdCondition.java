@@ -1,6 +1,7 @@
-package org.betterx.wover.surface.api.conditions;
+package org.betterx.wover.surface.impl.conditions;
 
 import org.betterx.wover.math.api.noise.OpenSimplexNoise;
+import org.betterx.wover.surface.api.conditions.NoiseCondition;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.FloatProvider;
@@ -16,5 +17,5 @@ public interface VolumeThresholdCondition extends NoiseCondition {
     double getScaleX();
     double getScaleY();
     double getScaleZ();
-    FloatProvider getRange();
+    FloatProvider getRoughness();
 }

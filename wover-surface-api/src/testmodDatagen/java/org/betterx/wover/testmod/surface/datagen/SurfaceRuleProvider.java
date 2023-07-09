@@ -1,15 +1,18 @@
 package org.betterx.wover.testmod.surface.datagen;
 
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
-import org.betterx.wover.surface.api.AssignedSurfaceRule;
-import org.betterx.wover.surface.api.SurfaceRuleBuilder;
-import org.betterx.wover.surface.api.SurfaceRuleRegistry;
+import org.betterx.wover.surface.api.*;
+import org.betterx.wover.surface.api.noise.NumericProviders;
 import org.betterx.wover.testmod.entrypoint.WoverSurfaceTestMod;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.Noises;
+import net.minecraft.world.level.levelgen.SurfaceRules;
+
+import java.util.List;
 
 public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSurfaceRule> {
     public static final ResourceKey<AssignedSurfaceRule> TEST_PLAINS
@@ -18,6 +21,12 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
             = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-plains-below"));
     public static final ResourceKey<AssignedSurfaceRule> TEST_BEACH
             = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-beach"));
+
+    public static final ResourceKey<AssignedSurfaceRule> TEST_DESERT
+            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-desert"));
+
+    public static final ResourceKey<AssignedSurfaceRule> TEST_FLOWER_FORREST
+            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-flower-forrest"));
 
     public SurfaceRuleProvider() {
         super(
@@ -48,5 +57,36 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
                 .surface(Blocks.CHERRY_PLANKS.defaultBlockState())
                 .subsurface(Blocks.WHITE_CONCRETE.defaultBlockState(), 5)
                 .register(ctx, TEST_BEACH);
+
+        SurfaceRuleBuilder
+                .start()
+                .biome(Biomes.DESERT)
+                .rule(Rules.switchRules(
+                        NumericProviders.randomInt(2),
+                        List.of(
+                                SurfaceRules.state(Blocks.DEEPSLATE.defaultBlockState()),
+                                SurfaceRules.state(Blocks.BLACKSTONE.defaultBlockState())
+                        )
+                ))
+                .register(ctx, TEST_DESERT);
+
+        SurfaceRuleBuilder
+                .start()
+                .biome(Biomes.FLOWER_FOREST)
+                .rule(SurfaceRules.sequence(
+                        SurfaceRules.ifTrue(
+                                SurfaceRules.ON_FLOOR,
+                                SurfaceRules.ifTrue(
+                                        Conditions.roughNoise(Noises.NETHERRACK, 0.19),
+                                        SurfaceRules.state(Blocks.PURPLE_CONCRETE.defaultBlockState())
+                                )
+                        ),
+                        SurfaceRules.ifTrue(
+                                Conditions.NETHER_VOLUME_NOISE_LARGE,
+                                SurfaceRules.state(Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState())
+                        ),
+                        SurfaceRules.state(Blocks.WHITE_CONCRETE.defaultBlockState())
+                ))
+                .register(ctx, TEST_FLOWER_FORREST);
     }
 }
