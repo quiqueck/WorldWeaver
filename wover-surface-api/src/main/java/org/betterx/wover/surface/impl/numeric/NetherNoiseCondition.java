@@ -2,8 +2,8 @@ package org.betterx.wover.surface.impl.numeric;
 
 import org.betterx.wover.math.api.random.RandomHelper;
 import org.betterx.wover.surface.api.Conditions;
+import org.betterx.wover.surface.api.conditions.SurfaceRulesContext;
 import org.betterx.wover.surface.api.noise.NumericProvider;
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
 
@@ -31,7 +31,7 @@ public class NetherNoiseCondition implements NumericProvider {
     }
 
     @Override
-    public int getNumber(SurfaceRulesContextAccessor context) {
+    public int getNumber(SurfaceRulesContext context) {
         final int x = context.getBlockX();
         final int y = context.getBlockY();
         final int z = context.getBlockZ();

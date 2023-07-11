@@ -1,6 +1,6 @@
 package org.betterx.wover.surface.api.noise;
 
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
+import org.betterx.wover.surface.api.conditions.SurfaceRulesContext;
 
 import com.mojang.serialization.Codec;
 
@@ -27,7 +27,7 @@ public interface NumericProvider {
      * @param context The context.
      * @return The resulting value.
      */
-    int getNumber(SurfaceRulesContextAccessor context);
+    int getNumber(SurfaceRulesContext context);
 
     /**
      * Get the codec for this type Numeric Provider.

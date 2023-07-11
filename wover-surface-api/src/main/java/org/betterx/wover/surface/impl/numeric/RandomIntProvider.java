@@ -1,8 +1,8 @@
 package org.betterx.wover.surface.impl.numeric;
 
 import org.betterx.wover.math.api.MathHelper;
+import org.betterx.wover.surface.api.conditions.SurfaceRulesContext;
 import org.betterx.wover.surface.api.noise.NumericProvider;
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.util.RandomSource;
@@ -29,7 +29,7 @@ public final class RandomIntProvider implements NumericProvider {
     }
 
     @Override
-    public int getNumber(SurfaceRulesContextAccessor context) {
+    public int getNumber(SurfaceRulesContext context) {
         return random.nextInt(range);
     }
 

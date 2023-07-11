@@ -14,12 +14,10 @@ public class NumericProviders {
      * The maximum value is provided as the {@code bound} attribute.
      * <p>
      * You can use this numeric provider in a .json file like this:
-     * <pre>
-     *  {
-     *    "type": "wover:rnd_int",
-     *    "range": 2
-     *  }
-     *  </pre>
+     * <pre class="json"> {
+     *  "type": "wover:rnd_int",
+     *  "range": 2
+     * }</pre>
      *
      * @param bound the maximum value of the generated sequence
      *              (exclusive, i.e. the generated values will be in [0..bound))
@@ -37,11 +35,9 @@ public class NumericProviders {
      * {@link org.betterx.wover.surface.api.Conditions#NETHER_VOLUME_NOISE}.
      * <p>
      * You can use this numeric provider in a .json file like this:
-     * <pre>
-     *  {
-     *    "type": "wover:nether_noise"
-     *  }
-     *  </pre>
+     * <pre class="json"> {
+     *   "type": "wover:nether_noise"
+     * }</pre>
      *
      * @return a {@link NumericProvider} that generates a random integer in [0..5]
      */

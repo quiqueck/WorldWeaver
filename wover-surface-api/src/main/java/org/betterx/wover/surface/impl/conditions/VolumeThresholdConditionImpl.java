@@ -1,8 +1,9 @@
 package org.betterx.wover.surface.impl.conditions;
 
 import org.betterx.wover.math.api.noise.OpenSimplexNoise;
+import org.betterx.wover.surface.api.conditions.SurfaceRulesContext;
 import org.betterx.wover.surface.api.conditions.VolumeNoiseCondition;
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
+import org.betterx.wover.surface.api.conditions.VolumeThresholdCondition;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -79,7 +80,7 @@ public class VolumeThresholdConditionImpl extends VolumeNoiseCondition implement
         noiseContext = NOISES.computeIfAbsent(noiseSeed, seed -> new Context(seed));
     }
 
-    public double getValue(SurfaceRulesContextAccessor context) {
+    public double getValue(SurfaceRulesContext context) {
         return getValue(context.getBlockX(), context.getBlockY(), context.getBlockZ());
     }
 
@@ -104,7 +105,7 @@ public class VolumeThresholdConditionImpl extends VolumeNoiseCondition implement
     }
 
     @Override
-    public boolean test(SurfaceRulesContextAccessor context) {
+    public boolean test(SurfaceRulesContext context) {
         return getValue(context) > threshold;
     }
 

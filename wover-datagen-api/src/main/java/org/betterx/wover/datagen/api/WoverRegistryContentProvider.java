@@ -7,16 +7,33 @@ import net.minecraft.core.*;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import org.jetbrains.annotations.ApiStatus;
 
+
+/**
+ * Handles the boostrapping as well as the serialization of a {@link Registry} to
+ * a DataPack. This is a special version of {@link WoverRegistryProvider} that
+ * will only serilaize the elements that were registered in the #bootstrap method.
+ *
+ * @param <T> The element type of the registry.
+ */
 public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvider<T> {
     private final List<ResourceKey<T>> content;
 
+    /**
+     * Creates a new instance of {@link WoverRegistryContentProvider}.
+     *
+     * @param modCore     The ModCore instance of the Mod that is providing this instance.
+     * @param title       The title of the provider. Mainly used for logging.
+     * @param registryKey The Key to the Registry.
+     */
     public WoverRegistryContentProvider(
             ModCore modCore,
             String title,
@@ -26,9 +43,18 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
         this.content = new LinkedList<>();
     }
 
+    /**
+     * Called, when the Elements of the Registry need to be created and registered.
+     * <p>
+     * Only Elements that are registered in this method
+     * (using {@link BootstapContext#register(ResourceKey, Object)} or
+     * {@link BootstapContext#register(ResourceKey, Object, Lifecycle)}) will be serialized.
+     *
+     * @param context The context to add the elements to.
+     */
     protected abstract void bootstrap(BootstapContext<T> context);
 
-    protected void addContent(ResourceKey<T> resourceKey) {
+    private void addContent(ResourceKey<T> resourceKey) {
         content.add(resourceKey);
     }
 
@@ -48,12 +74,32 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
         bootstrap(wrapped);
     }
 
-    public void buildRegistry(RegistrySetBuilder registryBuilder) {
+    /**
+     * Adds the Registry to the given {@link RegistrySetBuilder}. This method is
+     * called internally by {@link WoverDataGenEntryPoint#buildRegistry(RegistrySetBuilder)}
+     *
+     * @param registryBuilder The builder to add the registry to.
+     */
+    @ApiStatus.Internal
+    @Override
+    public final void buildRegistry(RegistrySetBuilder registryBuilder) {
         modCore.log.info("Registering " + title);
         registryBuilder.add(registryKey, this::wrappedBoostrap);
     }
 
-    protected FabricDynamicRegistryProvider getProvider(
+    /**
+     * Gets the {@link FabricDynamicRegistryProvider} that will serialize the
+     * Registry to the DataPack. This method is called internally by
+     * {@link WoverDataGenEntryPoint#onInitializeDataGenerator(FabricDataGenerator)}
+     *
+     * @param output           The output to write the data to.
+     * @param registriesFuture A future sent from the Fabric DataGen API
+     * @return The {@link FabricDynamicRegistryProvider} that will serialize the
+     * Registry to the DataPack.
+     */
+    @ApiStatus.Internal
+    @Override
+    protected final FabricDynamicRegistryProvider getProvider(
             FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {

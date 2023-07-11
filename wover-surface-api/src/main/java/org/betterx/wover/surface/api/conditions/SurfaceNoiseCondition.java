@@ -1,7 +1,5 @@
 package org.betterx.wover.surface.api.conditions;
 
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
-
 import net.minecraft.world.level.levelgen.SurfaceRules.Condition;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.LazyXZCondition;
@@ -12,7 +10,7 @@ import net.minecraft.world.level.levelgen.SurfaceRules.LazyXZCondition;
  */
 public abstract class SurfaceNoiseCondition implements NoiseCondition {
     /**
-     * Calls the {@link #test(SurfaceRulesContextAccessor)} method
+     * Calls the {@link #test(SurfaceRulesContext)} method
      * with the correct context type for a 2D (X/Z) location.
      *
      * @param context2 the evaluation context
@@ -29,7 +27,7 @@ public abstract class SurfaceNoiseCondition implements NoiseCondition {
 
             @Override
             protected boolean compute() {
-                final SurfaceRulesContextAccessor context = SurfaceRulesContextAccessor.class.cast(this.context);
+                final SurfaceRulesContext context = SurfaceRulesContext.class.cast(this.context);
                 if (context == null) return false;
                 return self.test(context);
             }

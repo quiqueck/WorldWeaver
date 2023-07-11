@@ -1,9 +1,9 @@
 package org.betterx.wover.surface.api;
 
 import org.betterx.wover.surface.api.conditions.NoiseCondition;
+import org.betterx.wover.surface.api.conditions.VolumeThresholdCondition;
 import org.betterx.wover.surface.impl.conditions.RoughNoiseConditionImpl;
 import org.betterx.wover.surface.impl.conditions.ThresholdConditionImpl;
-import org.betterx.wover.surface.impl.conditions.VolumeThresholdCondition;
 import org.betterx.wover.surface.impl.conditions.VolumeThresholdConditionImpl;
 
 import net.minecraft.resources.ResourceKey;
@@ -28,8 +28,7 @@ public class Conditions {
      * the seed {@code noiseSeed}.
      * <p>
      * When used in a .json file, the condition would look like this:
-     * <pre>
-     * {
+     * <pre class="json"> {
      *   "type": "wover:threshold_condition",
      *   "scale_x": 0.5,
      *   "scale_z": 0.5,
@@ -42,8 +41,7 @@ public class Conditions {
      *       "min_inclusive": -0.4
      *     }
      *   }
-     * }
-     * </pre>
+     * }</pre>
      *
      * @param noiseSeed The seed for the noise generator. The condition will internally use the
      *                  {@link org.betterx.wover.math.api.noise.OpenSimplexNoise}
@@ -70,15 +68,14 @@ public class Conditions {
      * is above the threshold.
      * <p>
      * The value for a location x/y/z is calculated as follows:
-     * <pre>noise.eval(x * scaleX, y*scaleY, z * scaleZ) + roughness.sample(random) &gt; threshold</pre>
+     * <pre>noise.eval(x * scaleX, y * scaleY, z * scaleZ) + roughness.sample(random) &gt; threshold</pre>
      * <p>
      * The noise is an instance of {@link org.betterx.wover.math.api.noise.OpenSimplexNoise} with
      * the seed {@code noiseSeed}.
      * <p>
      * When used in a .json file, the condition would look like this:
      *
-     * <pre>
-     * {
+     * <pre class="json"> {
      *   "type": "wover:volume_threshold_condition",
      *   "scale_x": 0.2,
      *   "scale_y": 0.2,
@@ -92,8 +89,7 @@ public class Conditions {
      *       "min_inclusive": -0.1
      *     }
      *   }
-     * }
-     * </pre>
+     * }</pre>
      *
      * @param noiseSeed The seed for the noise generator. The condition will internally use the
      *                  {@link org.betterx.wover.math.api.noise.OpenSimplexNoise}
@@ -120,13 +116,12 @@ public class Conditions {
      * Generates a 3D condition that is true if the noise value is between the min and max threshold.
      * <p>
      * The value for a location x/y/z is calculated as follows:
-     * <pre>minThreshold &lt; noise.eval(x * scaleX, y*scaleY, z * scaleZ) + roughness.sample(random) &lt; maxThreshold</pre>
+     * <pre>minThreshold &lt; noise.eval(x * scaleX, y * scaleY, z * scaleZ) + roughness.sample(random) &lt; maxThreshold</pre>
      * <p>
      * You can use this condition in any place where a rule source is expecting a condition.
      * In a .json file , the condition would look like this:
      *
-     * <pre>
-     * {
+     * <pre class="json"> {
      *   "type": "wover:rough_noise_condition",
      *   "min_threshold": 0.19,
      *   "max_threshold": 0.31,
@@ -138,8 +133,7 @@ public class Conditions {
      *       "max_exclusive": 0.4
      *     }
      *   }
-     * }
-     * </pre>
+     * }</pre>
      * The {@code max_threshold} is optional. If not specified, it will default to {@link Double#MAX_VALUE}.
      *
      * @param noise        The noise to use for the condition.

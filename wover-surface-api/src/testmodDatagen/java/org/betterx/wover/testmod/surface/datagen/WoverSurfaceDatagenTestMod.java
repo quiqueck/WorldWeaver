@@ -1,6 +1,7 @@
 package org.betterx.wover.testmod.surface.datagen;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverDataGenEntryPoint;
 import org.betterx.wover.testmod.entrypoint.WoverSurfaceTestMod;
 
@@ -11,11 +12,13 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 public class WoverSurfaceDatagenTestMod extends WoverDataGenEntryPoint {
 
     @Override
-    protected void onInitializeProviders() {
-        addRegistryProvider(new SurfaceRuleProvider());
-        addRegistryProvider(new AddonSurfaceRuleProvider());
+    protected void onInitializeProviders(PackBuilder globalPackBuilder) {
+        globalPackBuilder
+                .addRegistryProvider(SurfaceRuleProvider::new);
 
-        addDatapackProvider(WoverSurfaceTestMod.ADDON_PACK, this::onInitializeAddonDatapack);
+        addDatapack(WoverSurfaceTestMod.ADDON_PACK)
+                .callOnInitializeDatapack(this::onInitializeAddonDatapack)
+                .addRegistryProvider(AddonSurfaceRuleProvider::new);
     }
 
     @Override
@@ -29,15 +32,6 @@ public class WoverSurfaceDatagenTestMod extends WoverDataGenEntryPoint {
             ResourceLocation location
     ) {
         modCore().log.info("Initializing addon datapack: " + location);
-
     }
 
-    @Override
-    protected void onInitializeDataGenerator(
-            FabricDataGenerator fabricDataGenerator,
-            FabricDataGenerator.Pack globalPack
-    ) {
-        super.onInitializeDataGenerator(fabricDataGenerator, globalPack);
-        modCore().log.info("Initializing global datapack");
-    }
 }

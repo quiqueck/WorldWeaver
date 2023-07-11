@@ -1,7 +1,7 @@
 package org.betterx.wover.surface.impl.rules;
 
+import org.betterx.wover.surface.api.conditions.SurfaceRulesContext;
 import org.betterx.wover.surface.api.noise.NumericProvider;
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -36,7 +36,7 @@ public record SwitchRuleSource(NumericProvider selector, List<RuleSource> collec
     @Override
     public SurfaceRule apply(Context context) {
         return (x, y, z) -> {
-            final SurfaceRulesContextAccessor ctx = SurfaceRulesContextAccessor.class.cast(context);
+            final SurfaceRulesContext ctx = SurfaceRulesContext.class.cast(context);
             int nr = Math.max(0, selector.getNumber(ctx)) % collection.size();
 
             return collection.get(nr).apply(context).tryApply(x, y, z);

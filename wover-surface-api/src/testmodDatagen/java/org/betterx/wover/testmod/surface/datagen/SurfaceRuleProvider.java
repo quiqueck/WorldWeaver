@@ -1,5 +1,6 @@
 package org.betterx.wover.testmod.surface.datagen;
 
+import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import org.betterx.wover.surface.api.*;
 import org.betterx.wover.surface.api.noise.NumericProviders;
@@ -28,9 +29,9 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
     public static final ResourceKey<AssignedSurfaceRule> TEST_FLOWER_FORREST
             = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-flower-forrest"));
 
-    public SurfaceRuleProvider() {
+    public SurfaceRuleProvider(ModCore modCore) {
         super(
-                WoverSurfaceTestMod.C,
+                modCore,
                 "Test Surface Rules",
                 SurfaceRuleRegistry.SURFACE_RULES_REGISTRY
         );

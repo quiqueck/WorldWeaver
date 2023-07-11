@@ -20,16 +20,14 @@ public class Rules {
      * {@link org.betterx.wover.surface.api.noise.NumericProvider}.
      * <p>
      * You can use this rule source in a .json file like this:
-     * <pre>
-     * {
-     *   "type": "wover:switch_rule",
-     *   "collection": [],
-     *   "selector": {
-     *     "type": "wover:rnd_int",
-     *      "range": 2
-     *   }
-     * }
-     * </pre>
+     * <pre class="json">{
+     *  "type": "wover:switch_rule",
+     *  "collection": [],
+     *  "selector": {
+     *    "type": "wover:rnd_int",
+     *    "range": 2
+     *  }
+     * }</pre>
      * The {@code selector} is any valid {@link NumericProvider} In this case an instance
      * of {@link org.betterx.wover.surface.api.noise.NumericProviders#randomInt(int)}.
      *

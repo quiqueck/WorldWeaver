@@ -2,7 +2,7 @@ package org.betterx.wover.surface.impl.conditions;
 
 import org.betterx.wover.math.api.noise.OpenSimplexNoise;
 import org.betterx.wover.surface.api.conditions.SurfaceNoiseCondition;
-import org.betterx.wover.surface.mixin.SurfaceRulesContextAccessor;
+import org.betterx.wover.surface.api.conditions.SurfaceRulesContext;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -51,7 +51,7 @@ public class ThresholdConditionImpl extends SurfaceNoiseCondition {
     }
 
     @Override
-    public boolean test(SurfaceRulesContextAccessor context) {
+    public boolean test(SurfaceRulesContext context) {
         final double x = context.getBlockX() * scaleX;
         final double z = context.getBlockZ() * scaleZ;
         if (noiseContext.lastX == x && noiseContext.lastZ == z)
