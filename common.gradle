@@ -341,11 +341,16 @@ loom {
         } catch (e) {
             println "No access widener for ${sub.name}"
         }
-        
+
     }
     accessWidenerPath = file("src/main/resources/wover.accesswidener")
 
     enableTransitiveAccessWideners = true
+}
+
+task copyHighlightJs(type: Copy) {
+    from 'javadoc/contrib' // Path to the local folder containing Highlight.js
+    into "$buildDir/docs/javadoc/contrib" // Specify the destination folder in the generated Javadoc
 }
 
 javadoc {
@@ -353,17 +358,31 @@ javadoc {
         source = "17"
         encoding = "UTF-8"
         charSet = "UTF-8"
-        memberLevel = JavadocMemberLevel.PACKAGE
+        memberLevel = JavadocMemberLevel.PROTECTED
         links("https://docs.oracle.com/en/java/javase/17/docs/api/")
         // Disable the crazy super-strict doclint tool in Java 8
         addStringOption("Xdoclint:none", "-quiet")
-
+        addStringOption("noqualifier", "net.minecraft.*:com.mojang.*:net.fabricmc.*")
+        addBooleanOption("-allow-script-in-comments", true)
         tags(
                 'apiNote:a:API Note:',
                 'implSpec:a:Implementation Requirements:',
                 'implNote:a:Implementation Note:'
         )
+        header = "<script type=\"text/javascript\" src=\"../../../../../contrib/highlight/highlight.min.js\"></script>" +
+                " <link rel=\"stylesheet\" href=\"../../../../../contrib/highlight/styles/default.min.css\"></link>" +
+                " <script>window.onload = function () {\n" +
+                "    var allPre, i, j;\n" +
+                "    allPre = document.getElementsByTagName(\"pre\");\n" +
+                "    console.log(allPre); \n" +
+                "    for (i = 0, j = allPre.length; i < j; i++) {\n" +
+                "        hljs.highlightElement(allPre[i]);\n" +
+                "    }\n" +
+                "};</script>"
+
+        stylesheetFile = file("javadoc/wover.css")
     }
+
 
     allprojects.each {
         source(it.sourceSets.main.allJava)
@@ -375,6 +394,8 @@ javadoc {
     include("de/ambertation/**")
     include("org/betterx/wover/util/**")
     failOnError true
+
+    finalizedBy copyHighlightJs
 }
 
 jar {
