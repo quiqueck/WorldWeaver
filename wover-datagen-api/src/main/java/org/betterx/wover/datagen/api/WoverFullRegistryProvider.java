@@ -74,9 +74,9 @@ public abstract class WoverFullRegistryProvider<T> extends WoverRegistryProvider
      * Creates a new instance of {@link WoverFullRegistryProvider} that will only
      * allow elements with the namespace of the Mod (as determined by {@link ModCore#namespace}).
      *
-     * @param modCore
-     * @param title
-     * @param registryKey
+     * @param modCore     The ModCore instance of the Mod that is providing this instance.
+     * @param title       The title of the provider. Mainly used for logging.
+     * @param registryKey The Key to the Registry.
      */
     public WoverFullRegistryProvider(
             ModCore modCore,
