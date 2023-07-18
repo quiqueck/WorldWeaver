@@ -8,4 +8,4 @@ loom {
     accessWidenerPath = file('src/main/resources/wover.datagen.accesswidener')
 }
 
-moduleDependencies(project, ['wover-core-api'])
+moduleDependencies(project, ['wover-core-api', 'wover-tag-api'])

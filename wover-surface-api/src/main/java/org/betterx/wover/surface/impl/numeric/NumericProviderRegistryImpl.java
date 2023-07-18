@@ -22,7 +22,10 @@ public class NumericProviderRegistryImpl {
             Codec<? extends NumericProvider> codec
     ) {
         NumericProviderRegistry.register(key, codec);
-        NumericProviderRegistry.register(WoverSurface.C.legacyBCLibId(key.location()), LegacyHelper.wrap(codec));
+        NumericProviderRegistry.register(
+                LegacyHelper.BCLIB_CORE.convertNamespace(key.location()),
+                LegacyHelper.wrap(codec)
+        );
     }
 
     @ApiStatus.Internal

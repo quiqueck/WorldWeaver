@@ -19,12 +19,14 @@ public interface Event<T extends Subscriber> {
     /**
      * Subscribe to this event.
      * <p>
-     * Will call #subscribe(EventType, int) with {@link #DEFAULT_PRIORITY}.
+     * Will call {@link #subscribe(Subscriber, int)} with {@link #DEFAULT_PRIORITY}.
      *
      * @param subscriber The subscriber to add.
      * @return {@code true} if the subscriber was added, {@code false} if the subscriber was already subscribed.
      */
-    boolean subscribe(T subscriber);
+    default boolean subscribe(T subscriber) {
+        return subscribe(subscriber, DEFAULT_PRIORITY);
+    }
 
     /**
      * Subscribe to this event.

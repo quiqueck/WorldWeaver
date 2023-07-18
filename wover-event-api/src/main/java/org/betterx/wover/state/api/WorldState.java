@@ -1,9 +1,15 @@
 package org.betterx.wover.state.api;
 
+import org.betterx.wover.entrypoint.WoverEvents;
 import org.betterx.wover.state.impl.WorldStateImpl;
 
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.storage.LevelStorageSource;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A collection of useful methods to access the current world state.
@@ -32,5 +38,18 @@ public class WorldState {
      */
     public static LevelStorageSource.LevelStorageAccess storageAccess() {
         return WorldStateImpl.INSTANCE.getCurrentStorageAccess();
+    }
+
+    public static @Nullable ResourceLocation getBiomeID(@Nullable Biome biome) {
+        final RegistryAccess access = registryAccess();
+        final ResourceLocation id = access == null || biome == null
+                ? null
+                : access.registryOrThrow(Registries.BIOME).getKey(biome);
+
+        if (id == null) {
+            WoverEvents.C.log.error("Unable to get ID for " + biome + ".");
+        }
+
+        return id;
     }
 }

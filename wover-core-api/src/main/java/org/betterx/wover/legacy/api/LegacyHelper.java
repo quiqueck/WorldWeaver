@@ -1,5 +1,7 @@
 package org.betterx.wover.legacy.api;
 
+import org.betterx.wover.core.api.ModCore;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -24,4 +26,7 @@ public class LegacyHelper {
             }
         };
     }
+
+    public static final ModCore WORLDS_TOGETHER_CORE = ModCore.create("worlds_together");
+    public static final ModCore BCLIB_CORE = ModCore.create("bclib");
 }

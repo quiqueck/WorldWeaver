@@ -1,6 +1,8 @@
 package org.betterx.wover.datagen.api;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.impl.AutoBlockTagProvider;
+import org.betterx.wover.datagen.impl.AutoItemTagProvider;
 
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.metadata.PackMetadataGenerator;
@@ -236,11 +238,21 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
                     .stream()
                     .forEach(provider -> builder.pack.addProvider(provider::getProvider));
 
+            if (builder.location == null) {
+                //call the custom providers for the global Datapack
+                addDefaultGlobalProviders(builder.pack);
+            }
+
             //call the custom bootstrap method
             if (builder.datapackBootstrap != null) {
                 builder.datapackBootstrap.bootstrap(fabricDataGenerator, builder.pack, builder.location);
             }
         }
+    }
+
+    private void addDefaultGlobalProviders(FabricDataGenerator.Pack pack) {
+        pack.addProvider((output, future) -> new AutoBlockTagProvider(modCore(), output, future));
+        pack.addProvider((output, future) -> new AutoItemTagProvider(modCore(), output, future));
     }
 
     /**

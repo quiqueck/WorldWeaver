@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.ApiStatus;
 
 
 /**
@@ -110,22 +109,15 @@ public final class ModCore implements Version.ModVersionProvider {
         return new ResourceLocation(namespace, name);
     }
 
-    /**
-     * Returns the {@link ResourceLocation} for the given name in the namespace of BCLib.
-     * <p>
-     * Used to have backward compatibility with BCLib Features.
-     *
-     * @param name The name or path of the resource.
-     * @return The {@link ResourceLocation} for the given name.
-     */
-    @ApiStatus.Internal
-    public ResourceLocation legacyBCLibId(String name) {
-        return new ResourceLocation("bclib", name);
-    }
 
-    @ApiStatus.Internal
-    public ResourceLocation legacyBCLibId(ResourceLocation location) {
-        return new ResourceLocation("bclib", location.getPath());
+    /**
+     * Returns the {@link ResourceLocation} for the given path in the namespace of this mod.
+     *
+     * @param location The {@link ResourceLocation} to convert.
+     * @return The {@link ResourceLocation} for the given path in the namespace of this Mod.
+     */
+    public ResourceLocation convertNamespace(ResourceLocation location) {
+        return id(location.getPath());
     }
 
     /**

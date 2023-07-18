@@ -31,7 +31,7 @@ public class MaterialConditionRegistryImpl {
         if (withBCLibLegacy) {
             Registry.register(
                     BuiltInRegistries.MATERIAL_CONDITION,
-                    WoverSurface.C.legacyBCLibId(key.location()),
+                    LegacyHelper.BCLIB_CORE.convertNamespace(key.location()),
                     LegacyHelper.wrap(codec)
             );
         }
