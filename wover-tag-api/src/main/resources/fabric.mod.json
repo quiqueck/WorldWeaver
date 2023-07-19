@@ -18,9 +18,6 @@
   "entrypoints": {
     "main": [
       "org.betterx.wover.entrypoint.WoverTag"
-    ],
-    "fabric-datagen": [
-      "org.betterx.wover.tag.datagen.WoverTagDatagen"
     ]
   },
   "mixins": [

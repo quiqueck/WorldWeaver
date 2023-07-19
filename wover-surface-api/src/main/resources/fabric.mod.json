@@ -18,9 +18,6 @@
   "entrypoints": {
     "main": [
       "org.betterx.wover.entrypoint.WoverSurface"
-    ],
-    "fabric-datagen": [
-      "org.betterx.wover.surface.datagen.WoverSurfaceDatagen"
     ]
   },
   "mixins": [
