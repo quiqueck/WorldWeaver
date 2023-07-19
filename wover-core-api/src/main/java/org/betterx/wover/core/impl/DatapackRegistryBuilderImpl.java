@@ -7,26 +7,38 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import org.jetbrains.annotations.Nullable;
 
 public class DatapackRegistryBuilderImpl {
     private static final List<Entry<?>> REGISTRIES = new LinkedList<>();
 
     private record Entry<T>(
             ResourceKey<? extends Registry<T>> key,
+            @Nullable
             Codec<T> elementCodec,
             Consumer<BootstapContext<T>> bootstrap) {
-        
-        public BootstapContext<T> getContext(WritableRegistry<T> registry) {
-            return DatapackRegistryBuilder.getContext(null, registry);
+
+        public BootstapContext<T> getContext(
+                RegistryOps.RegistryInfoLookup registryInfoLookup,
+                WritableRegistry<T> registry
+        ) {
+            return DatapackRegistryBuilder.getContext(registryInfoLookup, registry);
         }
     }
 
+    public static <T> void register(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap
+    ) {
+        REGISTRIES.add(new Entry<>(key, null, bootstrap));
+    }
 
     public static <T> void register(
             ResourceKey<? extends Registry<T>> key,
@@ -43,12 +55,13 @@ public class DatapackRegistryBuilderImpl {
     }
 
     public static <E> void bootstrap(
+            RegistryOps.RegistryInfoLookup registryInfoLookup,
             ResourceKey<? extends Registry<E>> resourceKey,
             WritableRegistry<E> writableRegistry
     ) {
         REGISTRIES.forEach(entry -> {
             if (entry.key.equals(resourceKey)) {
-                entry.bootstrap.accept(entry.getContext((WritableRegistry) writableRegistry));
+                entry.bootstrap.accept(entry.getContext(registryInfoLookup, (WritableRegistry) writableRegistry));
             }
         });
     }

@@ -33,8 +33,9 @@ public class RegistryDataLoaderMixin {
     private static void wover_init(CallbackInfo ci) {
         List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList<>(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + 1);
         enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES);
-        DatapackRegistryBuilderImpl.forEach((key, value) -> {
-            enhanced.add(new RegistryDataLoader.RegistryData(key, value));
+        DatapackRegistryBuilderImpl.forEach((key, codec) -> {
+            if (codec != null)
+                enhanced.add(new RegistryDataLoader.RegistryData(key, codec));
         });
 
         wt_set_WORLDGEN_REGISTRIES(enhanced);
@@ -50,6 +51,6 @@ public class RegistryDataLoaderMixin {
             Map<ResourceKey<?>, Exception> map,
             CallbackInfo ci
     ) {
-        DatapackRegistryBuilderImpl.bootstrap(resourceKey, writableRegistry);
+        DatapackRegistryBuilderImpl.bootstrap(registryInfoLookup, resourceKey, writableRegistry);
     }
 }
