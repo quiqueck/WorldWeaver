@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-preset",
+  "version": "1.0.0",
+  "name": "WorldWeaver - World Preset API",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-preset/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.entrypoint.WoverWorldPreset"
+    ],
+    "client": [
+      "org.betterx.wover.entrypoint.client.WoverWorldPresetClient"
+    ]
+  },
+  "mixins": [
+    "wover.preset.mixins.common.json",
+    "wover.preset.mixins.client.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "minecraft": [
+      "1.20",
+      "1.20.1"
+    ],
+    "java": ">=17",
+    "fabric-api": ">=0.83"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  },
+  "accessWidener": "wover-preset.accesswidener"
+}
