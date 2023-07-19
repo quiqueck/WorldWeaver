@@ -1,25 +1,19 @@
 package org.betterx.wover.tag.datagen;
 
+import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverTagProvider;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 import org.betterx.wover.tag.api.predefined.CommonPoiTags;
 import org.betterx.wover.tag.api.predefined.MineableTags;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class BlockTagProvider extends WoverTagProvider.ForBlocks {
-    public BlockTagProvider(
-            FabricDataOutput output,
-            CompletableFuture<HolderLookup.Provider> registriesFuture
-    ) {
+    public BlockTagProvider(ModCore modCore) {
         super(
                 null,
                 Set.of(
@@ -28,9 +22,7 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
                         CommonBlockTags.WOODEN_CHEST,
                         CommonBlockTags.WOODEN_COMPOSTER,
                         CommonBlockTags.WORKBENCHES
-                ),
-                output,
-                registriesFuture
+                )
         );
     }
 

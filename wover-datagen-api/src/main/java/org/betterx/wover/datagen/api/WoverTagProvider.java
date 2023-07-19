@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <T> the taggable type
  * @param <P> the bootstrap context type
  */
-public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> extends FabricTagProvider<T> {
+public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> implements WoverDataProvider<FabricTagProvider<T>> {
     /**
      * All allowed namespaces for this tag provider.
      * <p>
@@ -57,56 +57,43 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> exte
      * Creates a new Instance that will not force the writing of any tag, and will
      * allow all namespaces.
      *
-     * @param tagRegistry      the {@link TagRegistry} that will provide the tags
-     * @param output           the {@link FabricDataOutput} instance
-     * @param registriesFuture the backing registry for the tag type
+     * @param tagRegistry the {@link TagRegistry} that will provide the tags
      */
     public WoverTagProvider(
-            TagRegistry<T, P> tagRegistry,
-            FabricDataOutput output,
-            CompletableFuture<HolderLookup.Provider> registriesFuture
+            TagRegistry<T, P> tagRegistry
     ) {
-        this(tagRegistry, null, Set.of(), output, registriesFuture);
+        this(tagRegistry, null, Set.of());
     }
 
     /**
      * Creates a new Instance that will not force the writing of any tag.
      *
-     * @param tagRegistry      the {@link TagRegistry} that will provide the tags
-     * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-     *                         mod will be written to the tag. If null all elements get written, an empty list will
-     *                         write nothing
-     * @param output           the {@link FabricDataOutput} instance
-     * @param registriesFuture the backing registry for the tag type
+     * @param tagRegistry the {@link TagRegistry} that will provide the tags
+     * @param modIDs      List of ModIDs that are allowed to include data. All Resources in the namespace of the
+     *                    mod will be written to the tag. If null all elements get written, an empty list will
+     *                    write nothing
      */
     public WoverTagProvider(
             TagRegistry<T, P> tagRegistry,
-            @Nullable List<String> modIDs,
-            FabricDataOutput output,
-            CompletableFuture<HolderLookup.Provider> registriesFuture
+            @Nullable List<String> modIDs
     ) {
-        this(tagRegistry, modIDs, Set.of(), output, registriesFuture);
+        this(tagRegistry, modIDs, Set.of());
     }
 
     /**
      * Creates a new Instance .
      *
-     * @param tagRegistry      the {@link TagRegistry} that will provide the tags
-     * @param modIDs           List of ModIDs that are allowed to inlcude data. All Resources in the namespace of the
-     *                         mod will be written to the tag. If null all elements get written, an empty list will
-     *                         write nothing
-     * @param forceWriteKeys   the keys that should always get written
-     * @param output           the {@link FabricDataOutput} instance
-     * @param registriesFuture the backing registry for the tag type
+     * @param tagRegistry    the {@link TagRegistry} that will provide the tags
+     * @param modIDs         List of ModIDs that are allowed to inlcude data. All Resources in the namespace of the
+     *                       mod will be written to the tag. If null all elements get written, an empty list will
+     *                       write nothing
+     * @param forceWriteKeys the keys that should always get written
      */
     public WoverTagProvider(
             TagRegistry<T, P> tagRegistry,
             @Nullable List<String> modIDs,
-            Set<TagKey<T>> forceWriteKeys,
-            FabricDataOutput output,
-            CompletableFuture<HolderLookup.Provider> registriesFuture
+            Set<TagKey<T>> forceWriteKeys
     ) {
-        super(output, tagRegistry.registryKey(), registriesFuture);
         this.tagRegistry = tagRegistry;
         this.modIDs = modIDs;
         this.forceWrite = forceWriteKeys;
@@ -127,7 +114,7 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> exte
     }
 
     /**
-     * Called  before the tags are written to disk.
+     * Called before the tags are written to disk.
      * <p>
      * This method is used to add elements to the tags. The {@link TagBootstrapContext}
      * provides the necessary methods to add elements.
@@ -152,42 +139,57 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> exte
         return false;
     }
 
-    /**
-     * Adds all tags to the {@link HolderLookup.Provider}.
-     *
-     * @param arg the {@link HolderLookup.Provider} to add the tags to
-     */
+
     @Override
-    protected final void addTags(HolderLookup.Provider arg) {
-        P provider = tagRegistry.createBootstrapContext(initAll());
-        prepareTags(provider);
-
-        provider.forEach((tag, allElements) -> {
-            boolean force = forceWrite.contains(tag);
-
-            //if the Tag is from an accepted mod, we will write all elements
-            //otherwise (if another mod manages this tag), then we will only
-            // write the elements that are from an accepted mod
-            final List<TagElementWrapper<T>> elements = shouldAdd(tag.location())
-                    ? allElements
-                    : allElements.stream()
-                                 .filter(element -> shouldAdd(element.id()))
-                                 .toList();
-
-            if (!force && elements.isEmpty()) return;
-            final FabricTagProvider<T>.FabricTagBuilder builder = getOrCreateTagBuilder(tag);
-
-            //write all elements that passed the above filtering...
-            for (var element : elements) {
-                if (element.tag()) {
-                    if (element.required()) builder.forceAddTag(TagKey.create(registryKey, element.id()));
-                    else builder.addOptionalTag(element.id());
-                } else {
-                    if (element.required()) builder.add(element.id());
-                    else builder.addOptional(element.id());
-                }
+    public FabricTagProvider<T> getProvider(
+            FabricDataOutput output,
+            CompletableFuture<HolderLookup.Provider> registriesFuture
+    ) {
+        String baseName = this.getClass().getSimpleName();
+        return new FabricTagProvider<T>(output, tagRegistry.registryKey(), registriesFuture) {
+            @Override
+            public String getName() {
+                return baseName + " (" + super.getName() + ")";
             }
-        });
+
+            @Override
+            /**
+             * Adds all tags to the {@link HolderLookup.Provider}.
+             *
+             * @param arg the {@link HolderLookup.Provider} to add the tags to
+             */
+            protected final void addTags(HolderLookup.Provider arg) {
+                P provider = tagRegistry.createBootstrapContext(initAll());
+                prepareTags(provider);
+
+                provider.forEach((tag, allElements) -> {
+                    boolean force = forceWrite.contains(tag);
+
+                    //if the Tag is from an accepted mod, we will write all elements
+                    //otherwise (if another mod manages this tag), then we will only
+                    // write the elements that are from an accepted mod
+                    final List<TagElementWrapper<T>> elements = shouldAdd(tag.location())
+                            ? allElements
+                            : allElements.stream()
+                                         .filter(element -> shouldAdd(element.id()))
+                                         .toList();
+
+                    if (!force && elements.isEmpty()) return;
+                    final FabricTagProvider<T>.FabricTagBuilder builder = getOrCreateTagBuilder(tag);
+
+                    //write all elements that passed the above filtering...
+                    for (var element : elements) {
+                        if (element.tag()) {
+                            if (element.required()) builder.forceAddTag(TagKey.create(registryKey, element.id()));
+                            else builder.addOptionalTag(element.id());
+                        } else {
+                            if (element.required()) builder.add(element.id());
+                            else builder.addOptional(element.id());
+                        }
+                    }
+                });
+            }
+        };
     }
 
     /**
@@ -198,51 +200,37 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> exte
         /**
          * Creates a new Instance that includes all namespaces but will not
          * force the writing of any empty tag.
-         *
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
          */
-        public ForBlocks(
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
-        ) {
-            super(TagManagerImpl.BLOCKS, output, registriesFuture);
+        public ForBlocks() {
+            super(TagManagerImpl.BLOCKS);
         }
 
         /**
          * Creates a new Instance that will not force the writing of any empty tag.
          *
-         * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-         *                         mod will be written to the tag. If null all elements get written, an empty list will
-         *                         write nothing
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
+         * @param modIDs List of ModIDs that are allowed to include data. All Resources in the namespace of the
+         *               mod will be written to the tag. If null all elements get written, an empty list will
+         *               write nothing
          */
         public ForBlocks(
-                @Nullable List<String> modIDs,
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
+                @Nullable List<String> modIDs
         ) {
-            super(TagManagerImpl.BLOCKS, modIDs, output, registriesFuture);
+            super(TagManagerImpl.BLOCKS, modIDs);
         }
 
         /**
          * Creates a new Instance.
          *
-         * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-         *                         mod will be written to the tag. If null all elements get written, an empty list will
-         *                         write nothing
-         * @param forceWriteKeys   the keys that should always get written
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
+         * @param modIDs         List of ModIDs that are allowed to include data. All Resources in the namespace of the
+         *                       mod will be written to the tag. If null all elements get written, an empty list will
+         *                       write nothing
+         * @param forceWriteKeys the keys that should always get written
          */
         public ForBlocks(
                 @Nullable List<String> modIDs,
-                Set<TagKey<Block>> forceWriteKeys,
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
+                Set<TagKey<Block>> forceWriteKeys
         ) {
-            super(TagManagerImpl.BLOCKS, modIDs, forceWriteKeys, output, registriesFuture);
+            super(TagManagerImpl.BLOCKS, modIDs, forceWriteKeys);
         }
     }
 
@@ -254,51 +242,37 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> exte
         /**
          * Creates a new Instance that includes all namespaces but will not
          * force the writing of any empty tag.
-         *
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
          */
-        public ForItems(
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
-        ) {
-            super(TagManagerImpl.ITEMS, output, registriesFuture);
+        public ForItems() {
+            super(TagManagerImpl.ITEMS);
         }
 
         /**
          * Creates a new Instance that will not force the writing of any empty tag.
          *
-         * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-         *                         mod will be written to the tag. If null all elements get written, an empty list will
-         *                         write nothing
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
+         * @param modIDs List of ModIDs that are allowed to include data. All Resources in the namespace of the
+         *               mod will be written to the tag. If null all elements get written, an empty list will
+         *               write nothing
          */
         public ForItems(
-                @Nullable List<String> modIDs,
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
+                @Nullable List<String> modIDs
         ) {
-            super(TagManagerImpl.ITEMS, modIDs, output, registriesFuture);
+            super(TagManagerImpl.ITEMS, modIDs);
         }
 
         /**
          * Creates a new Instance.
          *
-         * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-         *                         mod will be written to the tag. If null all elements get written, an empty list will
-         *                         write nothing
-         * @param forceWriteKeys   the keys that should always get written
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
+         * @param modIDs         List of ModIDs that are allowed to include data. All Resources in the namespace of the
+         *                       mod will be written to the tag. If null all elements get written, an empty list will
+         *                       write nothing
+         * @param forceWriteKeys the keys that should always get written
          */
         public ForItems(
                 @Nullable List<String> modIDs,
-                Set<TagKey<Item>> forceWriteKeys,
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
+                Set<TagKey<Item>> forceWriteKeys
         ) {
-            super(TagManagerImpl.ITEMS, modIDs, forceWriteKeys, output, registriesFuture);
+            super(TagManagerImpl.ITEMS, modIDs, forceWriteKeys);
         }
     }
 
@@ -310,51 +284,37 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> exte
         /**
          * Creates a new Instance that includes all namespaces but will not
          * force the writing of any empty tag.
-         *
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
          */
-        public ForBiomes(
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
-        ) {
-            super(TagManagerImpl.BIOMES, output, registriesFuture);
+        public ForBiomes() {
+            super(TagManagerImpl.BIOMES);
         }
 
         /**
          * Creates a new Instance that will not force the writing of any empty tag.
          *
-         * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-         *                         mod will be written to the tag. If null all elements get written, an empty list will
-         *                         write nothing
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
+         * @param modIDs List of ModIDs that are allowed to include data. All Resources in the namespace of the
+         *               mod will be written to the tag. If null all elements get written, an empty list will
+         *               write nothing
          */
         public ForBiomes(
-                @Nullable List<String> modIDs,
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
+                @Nullable List<String> modIDs
         ) {
-            super(TagManagerImpl.BIOMES, modIDs, output, registriesFuture);
+            super(TagManagerImpl.BIOMES, modIDs);
         }
 
         /**
          * Creates a new Instance.
          *
-         * @param modIDs           List of ModIDs that are allowed to include data. All Resources in the namespace of the
-         *                         mod will be written to the tag. If null all elements get written, an empty list will
-         *                         write nothing
-         * @param forceWriteKeys   the keys that should always get written
-         * @param output           the {@link FabricDataOutput} instance
-         * @param registriesFuture the backing registry for the tag type
+         * @param modIDs         List of ModIDs that are allowed to include data. All Resources in the namespace of the
+         *                       mod will be written to the tag. If null all elements get written, an empty list will
+         *                       write nothing
+         * @param forceWriteKeys the keys that should always get written
          */
         public ForBiomes(
                 @Nullable List<String> modIDs,
-                Set<TagKey<Biome>> forceWriteKeys,
-                FabricDataOutput output,
-                CompletableFuture<HolderLookup.Provider> registriesFuture
+                Set<TagKey<Biome>> forceWriteKeys
         ) {
-            super(TagManagerImpl.BIOMES, modIDs, forceWriteKeys, output, registriesFuture);
+            super(TagManagerImpl.BIOMES, modIDs, forceWriteKeys);
         }
     }
 }

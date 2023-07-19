@@ -2,6 +2,7 @@ package org.betterx.wover.datagen.api;
 
 import org.betterx.wover.core.api.ModCore;
 
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -30,7 +31,8 @@ public class PackBuilder {
     @NotNull
     public final ModCore modCore;
     FabricDataGenerator.Pack pack;
-    List<WoverRegistryProvider<?>> registryProviders = new LinkedList<>();
+    final List<WoverRegistryProvider<?>> registryProviders = new LinkedList<>();
+    final List<WoverDataProvider<?>> providerFactories = new LinkedList<>();
     DatapackBootstrap datapackBootstrap;
 
     PackBuilder(@Nullable ModCore modCore, @NotNull ResourceLocation location) {
@@ -47,6 +49,11 @@ public class PackBuilder {
      */
     public <T> PackBuilder addRegistryProvider(RegistryFactory<T> provider) {
         registryProviders.add(provider.create(modCore));
+        return this;
+    }
+
+    public <T extends DataProvider> PackBuilder addProvider(ProviderFactory<T> provider) {
+        providerFactories.add(provider.create(modCore));
         return this;
     }
 
@@ -103,5 +110,10 @@ public class PackBuilder {
                 FabricDataGenerator.Pack pack,
                 ResourceLocation location
         );
+    }
+
+    @FunctionalInterface
+    public interface ProviderFactory<T extends DataProvider> {
+        WoverDataProvider<T> create(ModCore modCore);
     }
 }

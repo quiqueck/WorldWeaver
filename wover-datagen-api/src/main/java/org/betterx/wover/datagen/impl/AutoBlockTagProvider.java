@@ -5,14 +5,10 @@ import org.betterx.wover.datagen.api.WoverTagProvider;
 import org.betterx.wover.tag.api.BlockTagDataProvider;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Creates block tags for all blocks that implement {@link BlockTagDataProvider}
@@ -22,11 +18,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class AutoBlockTagProvider extends WoverTagProvider.ForBlocks {
     public AutoBlockTagProvider(
-            ModCore modCore,
-            FabricDataOutput output,
-            CompletableFuture<HolderLookup.Provider> registriesFuture
+            ModCore modCore
     ) {
-        super(List.of(modCore.namespace, modCore.modId), output, registriesFuture);
+        super(List.of(modCore.namespace, modCore.modId));
     }
 
     @Override

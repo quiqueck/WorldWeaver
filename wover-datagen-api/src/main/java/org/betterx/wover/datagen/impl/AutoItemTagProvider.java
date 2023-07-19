@@ -5,13 +5,9 @@ import org.betterx.wover.datagen.api.WoverTagProvider;
 import org.betterx.wover.tag.api.ItemTagDataProvider;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 
 /**
@@ -22,11 +18,9 @@ import java.util.concurrent.CompletableFuture;
  */
 public class AutoItemTagProvider extends WoverTagProvider.ForItems {
     public AutoItemTagProvider(
-            ModCore modCore,
-            FabricDataOutput output,
-            CompletableFuture<HolderLookup.Provider> registriesFuture
+            ModCore modCore
     ) {
-        super(List.of(modCore.namespace, modCore.modId), output, registriesFuture);
+        super(List.of(modCore.namespace, modCore.modId));
     }
 
     @Override

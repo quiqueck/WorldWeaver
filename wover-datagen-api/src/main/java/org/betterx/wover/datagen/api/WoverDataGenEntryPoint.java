@@ -232,16 +232,27 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
                 .filter(p -> p.location != null)
                 .forEach(p -> p.pack = createBuiltinDatapack(fabricDataGenerator, p.location));
 
-        for (var builder : builders) {
+        for (PackBuilder builder : builders) {
+            if (builder.location == null) {
+                //call the custom providers for the global Datapack
+                addDefaultGlobalProviders(builder);
+            }
+
             //call all registry providers
             builder.registryProviders
                     .stream()
-                    .forEach(provider -> builder.pack.addProvider(provider::getProvider));
+                    .forEach(provider -> {
+                        builder.pack.addProvider(provider::getProvider);
+                        addMultiProviders(builder, provider);
+                    });
 
-            if (builder.location == null) {
-                //call the custom providers for the global Datapack
-                addDefaultGlobalProviders(builder.pack);
-            }
+            //run other providers
+            builder.providerFactories
+                    .stream()
+                    .forEach(provider -> {
+                        builder.pack.addProvider(provider::getProvider);
+                        addMultiProviders(builder, provider);
+                    });
 
             //call the custom bootstrap method
             if (builder.datapackBootstrap != null) {
@@ -250,9 +261,18 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
         }
     }
 
-    private void addDefaultGlobalProviders(FabricDataGenerator.Pack pack) {
-        pack.addProvider((output, future) -> new AutoBlockTagProvider(modCore(), output, future));
-        pack.addProvider((output, future) -> new AutoItemTagProvider(modCore(), output, future));
+    private static void addMultiProviders(PackBuilder builder, Object provider) {
+        if (provider instanceof WoverDataProvider.Secondary<?> wpp) {
+            builder.pack.addProvider(wpp::getSecondaryProvider);
+        }
+        if (provider instanceof WoverDataProvider.Tertiary<?> wpp) {
+            builder.pack.addProvider(wpp::getTertiaryProvider);
+        }
+    }
+
+    private void addDefaultGlobalProviders(PackBuilder pack) {
+        pack.addProvider(AutoBlockTagProvider::new);
+        pack.addProvider(AutoItemTagProvider::new);
     }
 
     /**
