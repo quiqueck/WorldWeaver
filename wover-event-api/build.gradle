@@ -1,5 +1,10 @@
 archivesBaseName = "wover-event-api"
 
+ext {
+    baseNamespace = "event"
+    baseClass = "WoverEvents"
+}
+
 dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }

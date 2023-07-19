@@ -1,5 +1,10 @@
 archivesBaseName = "wover-surface-api"
 
+ext {
+    baseNamespace = "surface"
+    baseClass = "WoverSurface"
+}
+
 dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
@@ -9,4 +14,4 @@ loom {
 }
 
 moduleDependencies(project, ['wover-common-api', 'wover-core-api', 'wover-math-api', 'wover-event-api'])
-//datagenDependencies(project, ['wover-datagen-api'])
+//datagenDependencies(project, ['wover-preset-api'])

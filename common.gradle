@@ -85,6 +85,12 @@ allprojects { projIt ->
             runtimeClasspath += client.output
             compileClasspath += main.output
             runtimeClasspath += main.output
+
+            resources {
+                srcDirs += [
+                        'src/main/resources'
+                ]
+            }
         }
 
         testmodDatagen {
@@ -226,6 +232,7 @@ allprojects { projIt ->
 
         if (projIt.name != "wover-datagen-api") {
             datagenImplementation project(path: ":wover-datagen-api", configuration: "namedElements")
+            datagenImplementation project(path: ":wover-datagen-api", configuration: "devClient")
         }
     }
 
@@ -244,6 +251,36 @@ allprojects { projIt ->
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
         it.options.release = 17
+    }
+
+    tasks.named("processDatagenResources", Copy) {
+        doLast {
+            def sourceDir = sourceSets.main.resources.srcDirs.first()
+            def fabricJsonFile = fileTree(dir: sourceDir, include: "fabric.mod.json").files.first()
+
+            if (fabricJsonFile.exists()) {
+                println("DO IT ITIT")
+                // Read the entire content of the file into a string
+                def fileContent = fabricJsonFile.text
+
+                // Modify the JSON content
+                def jsonSlurper = new groovy.json.JsonSlurper()
+                def json = jsonSlurper.parseText(fileContent)
+
+                def entrypoint = "org.betterx.wover.${project.baseNamespace}.datagen.${project.baseClass}Datagen"
+                json.entrypoints = [
+                        "fabric-datagen": [
+                                entrypoint
+                        ]
+                ]
+
+                // Convert the modified JSON back to a JSON string
+                def alteredJsonString = groovy.json.JsonOutput.toJson(json)
+
+                def processedFile = file("$destinationDir/fabric.mod.json")
+                processedFile.text = alteredJsonString
+            }
+        }
     }
 
     tasks.withType(AbstractArchiveTask).configureEach {

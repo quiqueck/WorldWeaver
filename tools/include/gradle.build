@@ -1,5 +1,10 @@
 archivesBaseName = "wover-{namespace}-api"
 
+ext {
+    baseNamespace = "{namespace}"
+    baseClass = "{mainClass}"
+}
+
 dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
