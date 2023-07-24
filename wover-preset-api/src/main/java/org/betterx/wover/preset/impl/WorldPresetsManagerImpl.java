@@ -22,7 +22,7 @@ public class WorldPresetsManagerImpl {
     private static int currentDefaultPriority = Integer.MIN_VALUE;
 
     public static Holder<WorldPreset> get(RegistryAccess access, ResourceKey<WorldPreset> key) {
-        return access
+        return access == null ? null : access
                 .registryOrThrow(Registries.WORLD_PRESET)
                 .getHolderOrThrow(key);
     }

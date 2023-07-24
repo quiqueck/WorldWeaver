@@ -10,8 +10,17 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 
+/**
+ * API to register custom Setup UIs for {@link net.minecraft.world.level.levelgen.presets.WorldPreset}s
+ */
 @Environment(EnvType.CLIENT)
 public class WorldPresetsUI {
+    /**
+     * Registers a custom Setup UI for a {@link WorldPreset}.
+     *
+     * @param key         The key of the preset.
+     * @param setupScreen The setup screen.
+     */
     public static void registerCustomUI(ResourceKey<WorldPreset> key, PresetEditor setupScreen) {
         WorldPresetsClientImpl.registerCustomUI(key, setupScreen);
     }
