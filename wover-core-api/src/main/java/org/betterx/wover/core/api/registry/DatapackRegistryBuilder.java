@@ -14,8 +14,9 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The DatapackRegistryBuilder add custom, Datapack-Backed Registries or get
- * notified when a custom or builtin Registry is loaded from a Datapack.
+ * The DatapackRegistryBuilder adds custom, Datapack-Backed Registries and allows you
+ * to add a bootstrap functions to any Registry. The bootstrap function is
+ * called whenever the Registry is loaded from a Datapack.
  */
 public class DatapackRegistryBuilder {
     /**

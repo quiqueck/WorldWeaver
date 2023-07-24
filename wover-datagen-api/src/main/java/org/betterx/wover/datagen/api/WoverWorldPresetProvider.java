@@ -36,6 +36,8 @@ public abstract class WoverWorldPresetProvider
 
     /**
      * Called, when the Elements of the Registry need to be created and registered.
+     * <p>
+     * This implementation just redirects to {@link #bootstrap(WorldPresetBootstrapContext)}
      *
      * @param context The context to add the elements to.
      */

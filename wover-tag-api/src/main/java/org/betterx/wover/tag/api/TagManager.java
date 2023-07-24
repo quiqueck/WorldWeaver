@@ -1,8 +1,10 @@
 package org.betterx.wover.tag.api;
 
+import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 import org.betterx.wover.tag.impl.TagManagerImpl;
+import org.betterx.wover.tag.impl.TagRegistryImpl;
 
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
@@ -77,5 +79,24 @@ public class TagManager {
             TagRegistry.LocationProvider<T> locationProvider
     ) {
         return TagManagerImpl.registerType(registry, directory, locationProvider);
+    }
+
+    /**
+     * Creates a new {@link TagRegistry} for the given registry.
+     * <p>
+     * This method is just a convenice method for
+     * {@link #registerType(ResourceKey, String, TagRegistry.LocationProvider)}. The
+     * {@code directory} is built using Minecrafts
+     * {@link net.minecraft.tags.TagManager#getTagDir(ResourceKey)}, while {@code locationProvider}
+     * will lookup the Registry using {@link WorldState#registryAccess()} and determin the
+     * {@link net.minecraft.resources.ResourceLocation} using {@link Registry#getKey(Object)}.
+     *
+     * @param registry The registry to create the {@link TagRegistry} for.
+     * @return The created {@link TagRegistry}.
+     */
+    public static <T, P extends TagBootstrapContext<T>> TagRegistryImpl<T, P> registerType(
+            ResourceKey<? extends Registry<T>> registry
+    ) {
+        return TagManagerImpl.registerType(registry);
     }
 }

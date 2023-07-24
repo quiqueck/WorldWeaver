@@ -12,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagLoader;
+import net.minecraft.tags.TagManager;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -58,6 +59,20 @@ public class TagManagerImpl {
                         return new TagBootstrapContextImpl<>(this, initAll);
                     }
                 }
+        );
+    }
+
+    public static <T, P extends TagBootstrapContext<T>> TagRegistryImpl<T, P> registerType(
+            ResourceKey<? extends Registry<T>> registryKey
+    ) {
+        return registerType(
+                registryKey,
+                TagManager.getTagDir(registryKey),
+                (preset) -> WorldState.registryAccess() != null
+                        ? WorldState.registryAccess()
+                                    .registryOrThrow(registryKey)
+                                    .getKey(preset)
+                        : null
         );
     }
 
