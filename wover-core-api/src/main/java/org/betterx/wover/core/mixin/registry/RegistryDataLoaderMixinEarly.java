@@ -17,7 +17,7 @@ public class RegistryDataLoaderMixinEarly {
     // but instead force the vanilla behavior.
     @Inject(method = "registryDirPath", at = @At("RETURN"), cancellable = true)
     private static void prependDirectoryWithNamespace(ResourceLocation id, CallbackInfoReturnable<String> info) {
-        if (DatapackRegistryBuilderImpl.has(id)) {
+        if (DatapackRegistryBuilderImpl.isRegistered(id)) {
             info.setReturnValue(info.getReturnValue());
         }
     }

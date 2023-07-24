@@ -1,6 +1,6 @@
-package org.betterx.wover.core.api;
+package org.betterx.wover.core.api.registry;
 
-import org.betterx.wover.core.impl.DatapackRegistryBuilderImpl;
+import org.betterx.wover.core.impl.registry.DatapackRegistryBuilderImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
@@ -8,15 +8,14 @@ import net.minecraft.core.*;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The DatapackRegistryBuilder can be used to get notified when a builtin Registry
- * is loaded from a Datapack.
- * <p>
- * It also allows you to add custom Registries to the Datapack-Loading procedure.
+ * The DatapackRegistryBuilder add custom, Datapack-Backed Registries or get
+ * notified when a custom or builtin Registry is loaded from a Datapack.
  */
 public class DatapackRegistryBuilder {
     /**
@@ -36,18 +35,31 @@ public class DatapackRegistryBuilder {
     }
 
     /**
-     * Registers a method that will be called whenever the Registry is
-     * loaded from a Datapack.
+     * Add a method that will be called whenever the Registry is
+     * loaded from a Datapack. This includes custom Registries added using
+     * {@link #register(ResourceKey, Codec, Consumer)}, as well as vanilla
+     * Registries.
      *
      * @param key       The ResourceKey of the Registry
      * @param bootstrap The bootstrap function, which is called when the Registry is loaded from a DataPack
      * @param <T>       The type of the Registry-Elements
      */
-    public static <T> void registerNotification(
+    public static <T> void addBootstrap(
             ResourceKey<? extends Registry<T>> key,
             Consumer<BootstapContext<T>> bootstrap
     ) {
         DatapackRegistryBuilderImpl.register(key, bootstrap);
+    }
+
+    /**
+     * Checks if a Registry with the given {@link ResourceLocation} was created with our
+     * {@link DatapackRegistryBuilder}.
+     *
+     * @param registryId The {@link ResourceLocation} of the Registry
+     * @return {@code true} if the Registry is registered, {@code false} otherwise
+     */
+    public static boolean isRegistered(ResourceLocation registryId) {
+        return DatapackRegistryBuilderImpl.isRegistered(registryId);
     }
 
     /**
@@ -58,7 +70,7 @@ public class DatapackRegistryBuilder {
      * @param <T>                The type of the Registry-Elements
      * @return A BootstapContext for the given Registry
      */
-    public static <T> BootstapContext<T> getContext(
+    public static <T> BootstapContext<T> makeContext(
             RegistryOps.RegistryInfoLookup registryInfoLookup,
             WritableRegistry<T> registry
     ) {
@@ -92,7 +104,7 @@ public class DatapackRegistryBuilder {
      * @param <T>      The type of the Registry-Elements
      * @return A BootstapContext for the given Registry
      */
-    public static <T> BootstapContext<T> getContext(
+    public static <T> BootstapContext<T> makeContext(
             @Nullable RegistryAccess access,
             WritableRegistry<T> registry
     ) {

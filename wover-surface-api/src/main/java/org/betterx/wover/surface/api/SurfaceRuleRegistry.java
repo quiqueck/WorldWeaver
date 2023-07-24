@@ -27,6 +27,9 @@ import org.jetbrains.annotations.NotNull;
  * <li> <b>priority</b>: An optional priority. When multiple rules are added for a single biome,
  * the rules are put in a sequence sorted by priority, with the highest priority being first.</li>
  * </ul>
+ * <p>
+ * Surface Rules are injected using the {@link org.betterx.wover.events.api.WorldLifecycle#BEFORE_CREATING_LEVELS}
+ * event with an event priority of 500.
  *
  * @see org.betterx.wover.surface.api
  */

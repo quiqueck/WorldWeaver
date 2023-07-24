@@ -1,6 +1,6 @@
 package org.betterx.wover.surface.impl;
 
-import org.betterx.wover.core.api.DatapackRegistryBuilder;
+import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;

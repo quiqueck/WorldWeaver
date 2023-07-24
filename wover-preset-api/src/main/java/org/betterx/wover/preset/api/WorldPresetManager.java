@@ -24,4 +24,7 @@ public class WorldPresetManager {
     public static void suggestDefault(ResourceKey<WorldPreset> preset, int priority) {
         WorldPresetsManagerImpl.suggestDefault(preset, priority);
     }
+
+    private WorldPresetManager() {
+    }
 }

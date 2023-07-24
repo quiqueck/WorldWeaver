@@ -1,6 +1,6 @@
-package org.betterx.wover.core.impl;
+package org.betterx.wover.core.impl.registry;
 
-import org.betterx.wover.core.api.DatapackRegistryBuilder;
+import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -9,6 +9,7 @@ import net.minecraft.core.WritableRegistry;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,8 +30,18 @@ public class DatapackRegistryBuilderImpl {
                 RegistryOps.RegistryInfoLookup registryInfoLookup,
                 WritableRegistry<T> registry
         ) {
-            return DatapackRegistryBuilder.getContext(registryInfoLookup, registry);
+            return DatapackRegistryBuilder.makeContext(registryInfoLookup, registry);
         }
+
+        public boolean definesRegistry() {
+            return elementCodec != null;
+        }
+    }
+
+    public static boolean isRegistered(ResourceLocation registryId) {
+        return REGISTRIES.stream()
+                         .filter(entry -> entry.definesRegistry())
+                         .anyMatch(entry -> entry.key.location().equals(registryId));
     }
 
     public static <T> void register(
@@ -45,6 +56,10 @@ public class DatapackRegistryBuilderImpl {
             Codec<T> elementCodec,
             Consumer<BootstapContext<T>> bootstrap
     ) {
+        if (isRegistered(key.location())) {
+            throw new IllegalStateException("Registry with id " + key.location() + " was already registered!");
+        }
+
         REGISTRIES.add(new Entry<>(key, elementCodec, bootstrap));
     }
 

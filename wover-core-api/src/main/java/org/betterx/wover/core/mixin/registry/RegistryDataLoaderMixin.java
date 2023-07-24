@@ -1,6 +1,6 @@
-package org.betterx.wover.core.mixin;
+package org.betterx.wover.core.mixin.registry;
 
-import org.betterx.wover.core.impl.DatapackRegistryBuilderImpl;
+import org.betterx.wover.core.impl.registry.DatapackRegistryBuilderImpl;
 
 import com.mojang.serialization.Decoder;
 import net.minecraft.core.Registry;

@@ -1,6 +1,6 @@
 package org.betterx.wover.preset.impl;
 
-import org.betterx.wover.core.api.DatapackRegistryBuilder;
+import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.preset.api.context.WorldPresetBootstrapContext;
 import org.betterx.wover.preset.api.event.OnBootstrapWorldPresets;
@@ -29,7 +29,7 @@ public class WorldPresetsManagerImpl {
 
     @ApiStatus.Internal
     public static void initialize() {
-        DatapackRegistryBuilder.registerNotification(
+        DatapackRegistryBuilder.addBootstrap(
                 Registries.WORLD_PRESET,
                 WorldPresetsManagerImpl::onBootstrap
         );
