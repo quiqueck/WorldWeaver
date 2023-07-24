@@ -18,27 +18,81 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
+/**
+ * Special bootstrap context for world presets.
+ * <p>
+ * The context is created from a regular {@link BootstapContext} and provides
+ * a few helper methods specialized for world presets as well as access to some
+ * data relevant when creating a world preset.
+ */
 public class WorldPresetBootstrapContext implements BootstapContext<WorldPreset> {
+    /**
+     * Read-only access to the {@link NoiseGeneratorSettings} registry
+     */
     public final HolderGetter<NoiseGeneratorSettings> noiseSettings;
+    /**
+     * Read-only access to the {@link Biome} registry
+     */
     public final HolderGetter<Biome> biomes;
+
+    /**
+     * Read-only access to the {@link PlacedFeature} registry
+     */
     public final HolderGetter<PlacedFeature> placedFeatures;
+
+    /**
+     * Read-only access to the {@link StructureSet} registry
+     */
     public final HolderGetter<StructureSet> structureSets;
+
+    /**
+     * Read-only access to the {@link MultiNoiseBiomeSourceParameterList} registry
+     */
     public final HolderGetter<MultiNoiseBiomeSourceParameterList> parameterLists;
 
 
+    /**
+     * The default overworld stem.
+     */
     public final LevelStem overworldStem;
+    /**
+     * The default overworld dimension type.
+     */
     public final Holder<DimensionType> overworldDimensionType;
 
+    /**
+     * The default nether stem.
+     */
     public final LevelStem netherStem;
+    /**
+     * The builtin {@link DimensionType} for the nether.
+     */
     public final Holder<DimensionType> netherDimensionType;
+    /**
+     * Additional Data for the nether stem.
+     */
     public final StemContext netherContext;
 
+    /**
+     * The default end stem.
+     */
     public final LevelStem endStem;
+    /**
+     * The builtin {@link DimensionType} for the end.
+     */
     public final Holder<DimensionType> endDimensionType;
+    /**
+     * Additional Data for the end stem.
+     */
     public final StemContext endContext;
 
     private final BootstapContext<WorldPreset> context;
 
+    /**
+     * Creates a new world preset bootstrap context from the given context.
+     *
+     * @param bootstapContext the original context to wrap
+     */
     public WorldPresetBootstrapContext(BootstapContext<WorldPreset> bootstapContext) {
         this.context = bootstapContext;
 
@@ -110,23 +164,50 @@ public class WorldPresetBootstrapContext implements BootstapContext<WorldPreset>
         return this.makeOverworld(new NoiseBasedChunkGenerator(biomeSource, holder));
     }
 
+    /**
+     * Registers a new world preset.
+     *
+     * @param resourceKey the key of the preset
+     * @param preset      the preset to register
+     * @param lifecycle   the lifecycle of the preset
+     * @return
+     */
     @Override
     public Holder.Reference<WorldPreset> register(
             ResourceKey<WorldPreset> resourceKey,
-            WorldPreset object,
+            WorldPreset preset,
             Lifecycle lifecycle
     ) {
-        return context.register(resourceKey, object, lifecycle);
+        return context.register(resourceKey, preset, lifecycle);
     }
 
+    /**
+     * Looks up a holder for the given registry.
+     *
+     * @param resourceKey the key of the registry
+     * @param <S>         the type of the registry
+     * @return a holder for the registry
+     */
     @Override
     public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
         return context.lookup(resourceKey);
     }
 
+    /**
+     * Additional data for used when creating a {@link LevelStem} for a dimension.
+     */
     public static class StemContext {
+        /**
+         * The suggested dimension type of the stem.
+         */
         public final Holder<DimensionType> dimension;
+        /**
+         * Read-only access to the {@link StructureSet} registry
+         */
         public final HolderGetter<StructureSet> structureSets;
+        /**
+         * The default {@link NoiseGeneratorSettings} for the stem.
+         */
         public final Holder<NoiseGeneratorSettings> generatorSettings;
 
         private StemContext(

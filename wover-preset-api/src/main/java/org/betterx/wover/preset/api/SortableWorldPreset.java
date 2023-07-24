@@ -9,6 +9,10 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import java.util.Map;
 
+/**
+ * A {@link WorldPreset} that can be sorted and provides access to otherwise
+ * private data structures
+ */
 public abstract class SortableWorldPreset extends WorldPreset {
     protected SortableWorldPreset(Map<ResourceKey<LevelStem>, LevelStem> map) {
         super(map);

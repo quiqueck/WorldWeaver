@@ -20,13 +20,41 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Special bootstrap context for flat level presets.
+ * <p>
+ * The context is created from a regular {@link BootstapContext} and provides
+ * a few helper methods specialized for flat level presets.
+ */
 public class FlatLevelPresetBootstrapContext {
     private final BootstapContext<FlatLevelGeneratorPreset> context;
 
+    /**
+     * Creates a new flat level preset bootstrap context from the given context.
+     *
+     * @param context the original context to wrap
+     */
     public FlatLevelPresetBootstrapContext(BootstapContext<FlatLevelGeneratorPreset> context) {
         this.context = context;
     }
 
+
+    /**
+     * Registers a new flat level preset with the given parameters.
+     * <p>
+     * This is a convenience method that calls
+     * {@link #register(ResourceKey, Lifecycle, ItemLike, ResourceKey, Set, boolean, boolean, FlatLayerInfo...)}
+     * and uses {@link Lifecycle#stable()} as lifecycle.
+     *
+     * @param presetKey            the key of the preset
+     * @param icon                 the icon you want to display for the preset in the UI
+     * @param biomeKey             the key for the biome that will be used by the flat world
+     * @param allowedStructureSets StructureSets that are allowed to generate in the world
+     * @param addDecorations       should decorations be generated
+     * @param addLakes             should lakes be generated
+     * @param flatLayerInfos       the layers of the flat world
+     * @return a holder to the created preset
+     */
     public Holder.Reference<FlatLevelGeneratorPreset> register(
             ResourceKey<FlatLevelGeneratorPreset> presetKey,
             ItemLike icon,
@@ -48,6 +76,19 @@ public class FlatLevelPresetBootstrapContext {
         );
     }
 
+    /**
+     * Registers a new flat level preset with the given parameters.
+     *
+     * @param presetKey            the key of the preset
+     * @param lifecycle            the lifecycle of the preset
+     * @param icon                 the icon you want to display for the preset in the UI
+     * @param biomeKey             the key for the biome that will be used by the flat world
+     * @param allowedStructureSets StructureSets that are allowed to generate in the world
+     * @param addDecorations       should decorations be generated
+     * @param addLakes             should lakes be generated
+     * @param flatLayerInfos       the layers of the flat world
+     * @return a holder to the created preset
+     */
     public Holder.Reference<FlatLevelGeneratorPreset> register(
             ResourceKey<FlatLevelGeneratorPreset> presetKey,
             Lifecycle lifecycle,
@@ -92,6 +133,12 @@ public class FlatLevelPresetBootstrapContext {
         );
     }
 
+    /**
+     * Lookup other available registries.
+     *
+     * @param resourceKey the key of the registry
+     * @return a readonly view for the registry
+     */
     public HolderGetter<FlatLevelGeneratorPreset> lookup(ResourceKey<? extends Registry<? extends FlatLevelGeneratorPreset>> resourceKey) {
         return context.lookup(resourceKey);
     }
