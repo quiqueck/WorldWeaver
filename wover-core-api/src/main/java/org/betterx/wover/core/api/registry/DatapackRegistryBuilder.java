@@ -136,4 +136,8 @@ public class DatapackRegistryBuilder {
             }
         };
     }
+
+    public static <T> ResourceKey<Registry<T>> createRegistryKey(ResourceLocation location) {
+        return ResourceKey.createRegistryKey(location);
+    }
 }

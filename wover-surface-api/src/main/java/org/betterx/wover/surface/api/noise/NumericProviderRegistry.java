@@ -1,5 +1,6 @@
 package org.betterx.wover.surface.api.noise;
 
+import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.entrypoint.WoverSurface;
 
 import com.mojang.serialization.Codec;
@@ -21,15 +22,16 @@ public class NumericProviderRegistry {
     /**
      * The Key for the Registry. ({@code wover/numeric_provider})
      */
-    public static final ResourceKey<Registry<Codec<? extends NumericProvider>>> NUMERIC_PROVIDER_REGISTRY = ResourceKey.createRegistryKey(
-            WoverSurface.C.id("wover/numeric_provider"));
+    public static final ResourceKey<Registry<Codec<? extends NumericProvider>>> NUMERIC_PROVIDER_REGISTRY = DatapackRegistryBuilder.createRegistryKey(
+            WoverSurface.C.id("wover/numeric_provider")
+    );
 
     /**
      * The actual Registry for the Numeric Providers.
      */
     public static final Registry<Codec<? extends NumericProvider>> NUMERIC_PROVIDER = new MappedRegistry<>(
             NUMERIC_PROVIDER_REGISTRY,
-            Lifecycle.experimental()
+            Lifecycle.stable()
     );
 
     /**

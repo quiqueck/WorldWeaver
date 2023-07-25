@@ -14,15 +14,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public class SurfaceRuleRegistryImpl {
     public static final EventImpl<OnBootstrapRegistry<AssignedSurfaceRule>> BOOTSTRAP_SURFACE_RULE_REGISTRY
             = new EventImpl<>("BOOTSTRAP_SURFACE_RULE_REGISTRY");
-    private static Map<ResourceKey<AssignedSurfaceRule>, AssignedSurfaceRule> KNOWN = new HashMap<>();
 
     private static void onBootstrap(BootstapContext<AssignedSurfaceRule> ctx) {
         BOOTSTRAP_SURFACE_RULE_REGISTRY.emit(c -> c.bootstrap(ctx));

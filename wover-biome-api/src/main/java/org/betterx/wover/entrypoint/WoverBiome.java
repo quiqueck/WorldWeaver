@@ -1,5 +1,6 @@
 package org.betterx.wover.entrypoint;
 
+import org.betterx.wover.biome.impl.api.modification.predicates.BiomePredicateRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.ModInitializer;
@@ -9,6 +10,6 @@ public class WoverBiome implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        BiomePredicateRegistryImpl.initialize();
     }
 }
