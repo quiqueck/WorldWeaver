@@ -1,5 +1,7 @@
 package org.betterx.wover.feature.api.placed;
 
+import org.betterx.wover.events.api.Event;
+import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.builders.FeatureConfigurator;
 import org.betterx.wover.feature.impl.placed.PlacedFeatureManagerImpl;
@@ -17,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlacedFeatureManager {
+    public static final Event<OnBootstrapRegistry<PlacedFeature>> BOOTSTRAP_PLACED_FEATURES =
+            PlacedFeatureManagerImpl.BOOTSTRAP_PLACED_FEATURES;
+
     public static PlacedFeatureKey createKey(ResourceLocation id) {
         return new PlacedFeatureKey(id);
     }
