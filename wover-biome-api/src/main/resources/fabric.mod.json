@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "wover-block-testmod",
+  "id": "wover-biome",
   "version": "1.0.0",
-  "name": "WorldWeaver - Block and Item (TestMod)",
+  "name": "WorldWeaver - Biome API",
   "description": "",
   "authors": [
     "Quiqueck"
@@ -13,20 +13,16 @@
     "issues": "https://github.com/quiqueck/WorldWeaver/issues"
   },
   "license": "MIT",
-  "icon": "assets/wover-block-testmod/icon.png",
+  "icon": "assets/wover-biome/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.WoverBlockAndItemTestMod"
-    ],
-    "fabric-datagen": [
-      "org.betterx.wover.testmod.block.datagen.WoverBlockAndItemDatagenTestMod"
-    ],
-    "client": [
-      "org.betterx.wover.testmod.entrypoint.client.WoverBlockAndItemClientTestMod"
+      "org.betterx.wover.entrypoint.WoverBiome"
     ]
   },
-  "mixins": [],
+  "mixins": [
+    "wover.biome.mixins.common.json"
+  ],
   "depends": {
     "fabricloader": ">=0.14.21",
     "minecraft": [
@@ -43,5 +39,6 @@
       ],
       "parent": "wover"
     }
-  }
+  },
+  "accessWidener": "wover-biome.accesswidener"
 }
