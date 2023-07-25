@@ -21,7 +21,7 @@ import java.util.HashSet;
 
 public class WoverWorldPresetTestMod implements ModInitializer {
     // ModCore for the TestMod. TestMod's do not share the wover namespace,
-    // but (like otehr Mods that include Wover) have a unique one
+    // but (like other Mods that include Wover) have a unique one
     public static final ModCore C = ModCore.create("wover-preset-testmod");
 
     public static final ResourceKey<WorldPreset> END_START

@@ -7,4 +7,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover.core.accesswidener')
+}
+
 moduleDependencies(project, ['WunderLib'])

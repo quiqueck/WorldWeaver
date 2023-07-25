@@ -8,6 +8,7 @@ export const createDefinitions = [
     { name: 'main', alias: 'm', type: Boolean, description: 'Should a main mod data get created', defaultOption: false },
     { name: 'client', alias: 'c', type: Boolean, description: 'Should a client mod get created', defaultOption: false },
     { name: 'test', alias: 't', type: Boolean, description: 'Should a test mod get created', defaultOption: false },
+    { name: 'clientTest', alias: 'C', type: Boolean, description: 'Should a clientside test mod get created', defaultOption: false },
     { name: 'datagen', alias: 'd', type: Boolean, description: 'Should a datagen entry get created', defaultOption: false },
     { name: 'datagenTest', alias: 'D', type: Boolean, description: 'Should a datagen testmod entry get created', defaultOption: false }
 ]
@@ -178,9 +179,8 @@ export function create(options){
         fs.writeFileSync(Path.join(entryPath, `${datagenClass}.java`), datagenJava)
     }
 
-
-
-    if (options.test){
+    const anyTest = options.test || options.clientTest || options.datagenTest
+    if (anyTest){
         const mainTestJava = loadAndReplaceTest(Path.join(process.cwd(), 'include', 'TestMod.java'))
         const clientTestJava = loadAndReplaceTest(Path.join(process.cwd(), 'include', 'Client.java'))
 
@@ -209,7 +209,7 @@ export function create(options){
             fs.writeFileSync(Path.join(entryPath, `${datagenTestClass}.java`), datagenTestJava)
         }
 
-        if (options.main){
+        if (options.main || options.test){
             const packagePath = mksub(javaPath, Path.join('org','betterx','wover', 'testmod', options.namespace))
             const assetsPath = mksub(resourcesPath, `assets/wover-${options.namespace}-testmod`)
 
@@ -219,7 +219,7 @@ export function create(options){
             fs.writeFileSync(Path.join(entryPath, `${mainTestClass}.java`), mainTestJava)
         }
 
-        if (options.client){
+        if (options.client || options.clientTest){
             console.log(`  - Building client testmod folder structure in '${basePath}'`)
             const clientTestPath = mksub(srcPath, 'testmodClient')
             const javaPath = mksub(clientTestPath, 'java')

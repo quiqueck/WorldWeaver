@@ -1,0 +1,16 @@
+archivesBaseName = "wover-feature-api"
+
+ext {
+    baseNamespace = "feature"
+    baseClass = "WoverFeature"
+}
+
+dependencies {
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover-feature.accesswidener')
+}
+
+moduleDependencies(project, ['wover-core-api', 'wover-event-api', 'wover-surface-api', 'wover-block-api'])

@@ -39,5 +39,6 @@
       ],
       "parent": "wover"
     }
-  }
+  },
+  "accessWidener": "wover.core.accesswidener"
 }

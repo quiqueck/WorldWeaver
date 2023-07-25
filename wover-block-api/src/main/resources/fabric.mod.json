@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-block",
+  "version": "1.0.0",
+  "name": "WorldWeaver - Block and Item API",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-block/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.entrypoint.WoverBlockAndItem"
+    ]
+  },
+  "mixins": [
+    "wover.block.mixins.common.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "minecraft": [
+      "1.20",
+      "1.20.1"
+    ],
+    "java": ">=17",
+    "fabric-api": ">=0.83"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  },
+  "accessWidener": "wover-block.accesswidener"
+}

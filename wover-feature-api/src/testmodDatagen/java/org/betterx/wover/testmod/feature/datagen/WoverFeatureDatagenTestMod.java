@@ -1,0 +1,20 @@
+package org.betterx.wover.testmod.feature.datagen;
+
+import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.api.PackBuilder;
+import org.betterx.wover.datagen.api.WoverDataGenEntryPoint;
+import org.betterx.wover.testmod.entrypoint.WoverFeatureTestMod;
+
+public class WoverFeatureDatagenTestMod extends WoverDataGenEntryPoint {
+    @Override
+    protected void onInitializeProviders(PackBuilder globalPack) {
+        globalPack.addRegistryProvider(ConfiguredFeaturesProvider::new);
+        globalPack.addRegistryProvider(PlacedFeatureProvider::new);
+    }
+
+    @Override
+    protected ModCore modCore() {
+        return WoverFeatureTestMod.C;
+    }
+
+}

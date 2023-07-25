@@ -52,6 +52,13 @@ public class PackBuilder {
         return this;
     }
 
+    /**
+     * Adds a {@link ProviderFactory} to the Datapack.
+     *
+     * @param provider The {@link ProviderFactory} to add
+     * @param <T>      The element type of the registry.
+     * @return This instance
+     */
     public <T extends DataProvider> PackBuilder addProvider(ProviderFactory<T> provider) {
         providerFactories.add(provider.create(modCore));
         return this;
@@ -112,8 +119,19 @@ public class PackBuilder {
         );
     }
 
+    /**
+     * A functional interface that is used to create a {@link WoverDataProvider}.
+     *
+     * @param <T> The element type of the registry.
+     */
     @FunctionalInterface
     public interface ProviderFactory<T extends DataProvider> {
+        /**
+         * Creates a new {@link WoverDataProvider}.
+         *
+         * @param modCore The ModCore instance of the Mod that is providing this instance.
+         * @return The created {@link WoverDataProvider}.
+         */
         WoverDataProvider<T> create(ModCore modCore);
     }
 }

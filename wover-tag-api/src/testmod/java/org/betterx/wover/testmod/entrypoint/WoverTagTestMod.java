@@ -11,7 +11,7 @@ import net.fabricmc.api.ModInitializer;
 
 public class WoverTagTestMod implements ModInitializer {
     // ModCore for the TestMod. TestMod's do not share the wover namespace,
-    // but (like otehr Mods that include Wover) have a unique one
+    // but (like other Mods that include Wover) have a unique one
     public static final ModCore C = ModCore.create("wover-tag-testmod");
 
     @Override
