@@ -5,6 +5,7 @@ import org.betterx.wover.feature.impl.FeatureManagerImpl;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,11 +21,11 @@ public class FeatureManager {
      * @param feature  the feature
      * @return the new key of the feature
      */
-    public static ResourceKey<Feature<?>> register(
+    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(
             ResourceLocation location,
-            Feature<?> feature
+            F feature
     ) {
-        return FeatureManagerImpl.register(FeatureManagerImpl.createKey(location), feature, false);
+        return FeatureManagerImpl.register(FeatureManagerImpl.createKey(location), feature);
     }
 
 
@@ -35,11 +36,11 @@ public class FeatureManager {
      * @param feature the feature
      * @return the same key that was passed in
      */
-    public static ResourceKey<Feature<?>> register(
+    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(
             ResourceKey<Feature<?>> key,
-            Feature<?> feature
+            F feature
     ) {
-        return FeatureManagerImpl.register(key, feature, false);
+        return FeatureManagerImpl.register(key, feature);
     }
 
     /**

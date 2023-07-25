@@ -4,6 +4,7 @@ import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
 import org.betterx.wover.feature.api.configured.builders.FeatureConfigurator;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
+import org.betterx.wover.feature.impl.placed.PlacedFeatureManagerImpl;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
@@ -11,11 +12,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A key for a {@link PlacedFeature} that can be used to reference the feature as well as
@@ -25,8 +28,9 @@ public class PlacedFeatureKey {
     /**
      * The key for the {@link PlacedFeature} you can use to reference it.
      */
-
     public final ResourceKey<PlacedFeature> key;
+
+    private GenerationStep.Decoration decoration = GenerationStep.Decoration.SURFACE_STRUCTURES;
 
     /**
      * Creates a new {@link PlacedFeatureKey} from the given id.
@@ -65,6 +69,27 @@ public class PlacedFeatureKey {
         return new InlineBuilderImpl(this.key);
     }
 
+    public GenerationStep.Decoration getDecoration() {
+        return decoration;
+    }
+
+    public PlacedFeatureKey setDecoration(GenerationStep.Decoration decoration) {
+        this.decoration = decoration;
+        return this;
+    }
+    
+    /**
+     * Gets the {@link Holder} for the {@link PlacedFeature} from the given getter.
+     *
+     * @param getter The getter to get the holder from or {@code null}
+     * @return The holder for the {@link PlacedFeature} or {@code null} if it is not present
+     */
+    @Nullable
+    public Holder<PlacedFeature> getHolder(@Nullable HolderGetter<PlacedFeature> getter) {
+        return PlacedFeatureManagerImpl.getHolder(getter, key);
+    }
+
+
     /**
      * Creates a new {@link PlacedFeatureKey} that will place a {@link ConfiguredFeature}.
      */
@@ -102,7 +127,7 @@ public class PlacedFeatureKey {
         }
 
         /**
-         * Places the  {@link ConfiguredFeature} used for creting this instance
+         * Places the  {@link ConfiguredFeature} used for creating this instance
          * from the given {@link HolderGetter}.
          * <p>
          * When configuration is finished, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
@@ -139,6 +164,12 @@ public class PlacedFeatureKey {
         public ConfiguredFeatureManager.InlineBuilder inlineConfiguration() {
             throw new UnsupportedOperationException(
                     "Cannot use an inline configuration, when Placement is linked to a Configured Feature. (" + key.location() + ")");
+        }
+
+        @Override
+        public PlacedFeatureKey.WithConfigured setDecoration(GenerationStep.Decoration decoration) {
+            super.setDecoration(decoration);
+            return this;
         }
     }
 }

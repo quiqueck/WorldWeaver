@@ -1,6 +1,7 @@
 package org.betterx.wover.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.feature.impl.FeatureManagerImpl;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 import org.betterx.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
@@ -12,6 +13,7 @@ public class WoverFeature implements ModInitializer {
     @Override
     public void onInitialize() {
         PlacementModifiersImpl.ensureStaticInitialization();
+        FeatureManagerImpl.ensureStaticInitialization();
         FeatureConfiguratorImpl.initialize();
     }
 }

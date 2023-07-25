@@ -28,14 +28,14 @@ public class ForSimpleBlockImpl extends FeatureConfiguratorImpl<SimpleBlockConfi
 
 
     @Override
-    public org.betterx.wover.feature.impl.configured.ForSimpleBlockImpl block(BlockStateProvider provider) {
+    public ForSimpleBlockImpl block(BlockStateProvider provider) {
         this.provider = provider;
         return this;
     }
 
 
     @Override
-    public org.betterx.wover.feature.impl.configured.ForSimpleBlockImpl block(Block block) {
+    public ForSimpleBlockImpl block(Block block) {
         return block(BlockStateProvider.simple(block));
     }
 
@@ -76,7 +76,7 @@ public class ForSimpleBlockImpl extends FeatureConfiguratorImpl<SimpleBlockConfi
 
         @Override
         public ForSimpleBlock bootstrap() {
-            return new org.betterx.wover.feature.impl.configured.ForSimpleBlockImpl(key);
+            return new ForSimpleBlockImpl(key);
         }
     }
 }

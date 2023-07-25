@@ -1,5 +1,6 @@
 package org.betterx.wover.entrypoint;
 
+import org.betterx.wover.block.impl.predicate.BlockPredicatesImpl;
 import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.ModInitializer;
@@ -9,6 +10,6 @@ public class WoverBlockAndItem implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        BlockPredicatesImpl.ensureStaticInitialization();
     }
 }

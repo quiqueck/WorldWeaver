@@ -7,9 +7,34 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public class BlockHelper {
+    public static final int FLAG_UPDATE_BLOCK = 1;
+    public static final int FLAG_SEND_CLIENT_CHANGES = 2;
+    public static final int FLAG_NO_RERENDER = 4;
+    public static final int FORSE_RERENDER = 8;
+    public static final int FLAG_IGNORE_OBSERVERS = 16;
+
+    public static final int SET_SILENT = FLAG_IGNORE_OBSERVERS | FLAG_SEND_CLIENT_CHANGES;
+    public static final int SET_OBSERV = FLAG_UPDATE_BLOCK | FLAG_SEND_CLIENT_CHANGES;
+    public static final List<Direction> HORIZONTAL = List.of(
+            Direction.NORTH,
+            Direction.EAST,
+            Direction.WEST,
+            Direction.SOUTH
+    );
+    public static final List<Direction> VERTICAL = List.of(Direction.UP, Direction.DOWN);
+    public static final List<Direction> ALL = List.of(
+            Direction.NORTH,
+            Direction.EAST,
+            Direction.SOUTH,
+            Direction.WEST,
+            Direction.UP,
+            Direction.DOWN
+    );
+
     public static boolean isFluid(BlockState state) {
         return state.liquid();
     }
@@ -20,6 +45,17 @@ public class BlockHelper {
 
     public static boolean isTerrain(BlockState state) {
         return state.is(CommonBlockTags.TERRAIN);
+    }
+
+    /**
+     * @param world
+     * @param pos
+     * @param state
+     * @deprecated use {@link LevelAccessor#setBlock(BlockPos, BlockState, int)} instead
+     */
+    @Deprecated(forRemoval = true)
+    public static void setWithoutUpdate(LevelAccessor world, BlockPos pos, BlockState state) {
+        world.setBlock(pos, state, SET_SILENT);
     }
 
     public static boolean findOnSurroundingSurface(
