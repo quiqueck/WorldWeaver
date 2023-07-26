@@ -1,6 +1,5 @@
 package org.betterx.wover.screens.impl;
 
-import de.ambertation.wunderlib.WunderLibClient;
 import de.ambertation.wunderlib.ui.vanilla.ConfigScreen;
 import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.config.api.client.ClientConfigs;
@@ -16,7 +15,6 @@ public class MainMenu extends ConfigScreen {
             @Nullable Screen parent
     ) {
         super(parent, Component.translatable("wover.mainmenu.title"), List.of(ClientConfigs.CLIENT, Configs.MAIN));
-        WunderLibClient.shoudlRender = true;
     }
 
     @Override
