@@ -255,30 +255,42 @@ allprojects { projIt ->
 
     tasks.named("processDatagenResources", Copy) {
         doLast {
-            def sourceDir = sourceSets.main.resources.srcDirs.first()
-            def fabricJsonFile = fileTree(dir: sourceDir, include: "fabric.mod.json").files.first()
+            if (project.hasProperty("baseNamespace")) {
+                println("DataGen Namespace: ${project.baseNamespace}")
+                def sourceDir = sourceSets.main.resources.srcDirs.first()
+                def datagenFile = "$sourceDir/../../datagen/java/org/betterx/wover/${project.baseNamespace}/datagen/${project.baseClass}Datagen.java"
+                if (file(datagenFile).exists()) {
+                    println("Add DataGen for: ${datagenFile}")
+                    def fabricJsonFile = fileTree(dir: sourceDir, include: "fabric.mod.json").files.first()
 
-            if (fabricJsonFile.exists()) {
-                println("DO IT ITIT")
-                // Read the entire content of the file into a string
-                def fileContent = fabricJsonFile.text
+                    if (fabricJsonFile.exists()) {
+                        // Read the entire content of the file into a string
+                        def fileContent = fabricJsonFile.text
 
-                // Modify the JSON content
-                def jsonSlurper = new groovy.json.JsonSlurper()
-                def json = jsonSlurper.parseText(fileContent)
+                        // Modify the JSON content
+                        def jsonSlurper = new groovy.json.JsonSlurper()
+                        def json = jsonSlurper.parseText(fileContent)
 
-                def entrypoint = "org.betterx.wover.${project.baseNamespace}.datagen.${project.baseClass}Datagen"
-                json.entrypoints = [
-                        "fabric-datagen": [
-                                entrypoint
+                        def entrypoint = "org.betterx.wover.${project.baseNamespace}.datagen.${project.baseClass}Datagen"
+                        json.entrypoints = [
+                                "fabric-datagen": [
+                                        entrypoint
+                                ]
                         ]
-                ]
 
-                // Convert the modified JSON back to a JSON string
-                def alteredJsonString = groovy.json.JsonOutput.toJson(json)
+                        // Convert the modified JSON back to a JSON string
+                        def alteredJsonString = groovy.json.JsonOutput.toJson(json)
 
-                def processedFile = file("$destinationDir/fabric.mod.json")
-                processedFile.text = alteredJsonString
+                        def processedFile = file("$destinationDir/fabric.mod.json")
+                        processedFile.text = alteredJsonString
+                    } else {
+                        println("No Fabric JSON File at ${sourceDir}")
+                    }
+                } else {
+                    println("No DataGen File at ${datagenFile}")
+                }
+            } else {
+                println("No DataGen Namespace in ${project.name}")
             }
         }
     }
