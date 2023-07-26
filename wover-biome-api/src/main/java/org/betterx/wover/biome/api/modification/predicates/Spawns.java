@@ -3,9 +3,8 @@ package org.betterx.wover.biome.api.modification.predicates;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.entity.EntityType;
-
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 
 public record Spawns(EntityType<?> entityType) implements BiomePredicate {
     public static final KeyDispatchDataCodec<Spawns> CODEC = KeyDispatchDataCodec
@@ -28,7 +27,17 @@ public record Spawns(EntityType<?> entityType) implements BiomePredicate {
     }
 
     @Override
-    public boolean test(BiomeSelectionContext ctx) {
-        return BiomeSelectors.spawnsOneOf(entityType).test(ctx);
+    public boolean test(Context ctx) {
+        final MobSpawnSettings spawns = ctx.biome.getMobSettings();
+
+        for (MobCategory spawnGroup : MobCategory.values()) {
+            for (MobSpawnSettings.SpawnerData spawnEntry : spawns.getMobs(spawnGroup).unwrap()) {
+                if (spawnEntry.type.equals(entityType)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

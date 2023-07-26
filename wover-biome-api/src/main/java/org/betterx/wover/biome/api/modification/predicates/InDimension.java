@@ -1,11 +1,10 @@
 package org.betterx.wover.biome.api.modification.predicates;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.dimension.LevelStem;
-
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 
 public record InDimension(ResourceKey<LevelStem> dimensionKey) implements BiomePredicate {
     public static final KeyDispatchDataCodec<InDimension> CODEC = KeyDispatchDataCodec
@@ -21,7 +20,15 @@ public record InDimension(ResourceKey<LevelStem> dimensionKey) implements BiomeP
     }
 
     @Override
-    public boolean test(BiomeSelectionContext ctx) {
-        return ctx.canGenerateIn(dimensionKey);
+    public boolean test(Context ctx) {
+        final LevelStem dimension = ctx.levelStems.get(dimensionKey);
+        if (dimension == null) return false;
+
+        return dimension.generator()
+                        .getBiomeSource()
+                        .possibleBiomes()
+                        .stream()
+                        .map(Holder::value)
+                        .anyMatch(entry -> entry.equals(ctx.biome));
     }
 }

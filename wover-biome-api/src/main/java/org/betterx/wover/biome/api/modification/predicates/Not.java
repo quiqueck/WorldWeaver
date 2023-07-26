@@ -2,8 +2,6 @@ package org.betterx.wover.biome.api.modification.predicates;
 
 import net.minecraft.util.KeyDispatchDataCodec;
 
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
-
 public record Not(BiomePredicate predicate) implements BiomePredicate {
     public static final KeyDispatchDataCodec<Not> CODEC = KeyDispatchDataCodec.of(
             BiomePredicate.CODEC
@@ -16,7 +14,7 @@ public record Not(BiomePredicate predicate) implements BiomePredicate {
     }
 
     @Override
-    public boolean test(BiomeSelectionContext ctx) {
+    public boolean test(Context ctx) {
         return !predicate().test(ctx);
     }
 }

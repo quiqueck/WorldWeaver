@@ -1,11 +1,11 @@
 package org.betterx.wover.biome.api.modification.predicates;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
 
 public record HasPlacedFeature(ResourceKey<PlacedFeature> key) implements BiomePredicate {
     public static final KeyDispatchDataCodec<HasPlacedFeature> CODEC = KeyDispatchDataCodec
@@ -21,7 +21,16 @@ public record HasPlacedFeature(ResourceKey<PlacedFeature> key) implements BiomeP
     }
 
     @Override
-    public boolean test(BiomeSelectionContext ctx) {
-        return ctx.hasPlacedFeature(key);
+    public boolean test(Context ctx) {
+        for (HolderSet<PlacedFeature> featuresForStep : ctx.biome.getGenerationSettings().features()) {
+            for (Holder<PlacedFeature> holders : featuresForStep) {
+                var optionalKey = ctx.placedFeatures.getResourceKey(holders.value());
+                if (optionalKey.map(fkey -> fkey.equals(key)).orElse(false)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

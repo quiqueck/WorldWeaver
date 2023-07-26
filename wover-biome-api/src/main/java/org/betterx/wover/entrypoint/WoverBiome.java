@@ -1,5 +1,6 @@
 package org.betterx.wover.entrypoint;
 
+import org.betterx.wover.biome.impl.api.modification.BiomeModificationRegistryImpl;
 import org.betterx.wover.biome.impl.api.modification.predicates.BiomePredicateRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
 
@@ -11,5 +12,6 @@ public class WoverBiome implements ModInitializer {
     @Override
     public void onInitialize() {
         BiomePredicateRegistryImpl.initialize();
+        BiomeModificationRegistryImpl.initialize();
     }
 }

@@ -5,8 +5,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.biome.Biome;
 
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
-
 public record HasTag(TagKey<Biome> biomeTag) implements BiomePredicate {
     public static final KeyDispatchDataCodec<HasTag> CODEC = KeyDispatchDataCodec
             .of(TagKey.codec(Registries.BIOME)
@@ -21,7 +19,7 @@ public record HasTag(TagKey<Biome> biomeTag) implements BiomePredicate {
     }
 
     @Override
-    public boolean test(BiomeSelectionContext ctx) {
-        return ctx.hasTag(biomeTag);
+    public boolean test(Context ctx) {
+        return ctx.biomeHolder.is(biomeTag);
     }
 }

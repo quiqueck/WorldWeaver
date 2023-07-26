@@ -5,8 +5,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
-import net.fabricmc.fabric.api.biome.v1.BiomeSelectionContext;
-
 public record HasStructure(ResourceKey<Structure> key) implements BiomePredicate {
     public static final KeyDispatchDataCodec<HasStructure> CODEC = KeyDispatchDataCodec
             .of(ResourceKey.codec(Registries.STRUCTURE)
@@ -21,7 +19,10 @@ public record HasStructure(ResourceKey<Structure> key) implements BiomePredicate
     }
 
     @Override
-    public boolean test(BiomeSelectionContext ctx) {
-        return ctx.validForStructure(key);
+    public boolean test(Context ctx) {
+        final Structure instance = ctx.structures.get(key);
+        if (instance == null) return false;
+        
+        return instance.biomes().contains(ctx.biomeHolder);
     }
 }

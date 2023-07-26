@@ -8,7 +8,7 @@ import org.betterx.wover.testmod.entrypoint.WoverBiomeTestMod;
 public class WoverBiomeDatagenTestMod extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
-
+        globalPack.addRegistryProvider(ModificationProvider::new);
     }
 
     @Override
