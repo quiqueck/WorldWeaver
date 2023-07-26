@@ -53,7 +53,7 @@
  * <p>
  * If you prefere, you can also manually create josn files in a datapack that will get
  * picked up when the SurfaceRule Registry is loaded. The json files should be placed in
- * {@code data/<namespace>/wover/surface_rules/<surface_rule_name>.json} and should look like this:
+ * {@code data/<namespace>/wover/worldgen/surface_rules/<surface_rule_name>.json} and should look like this:
  * <pre class="json"> {
  *   "biome": "minecraft:plains",
  *   "priority": 1001,

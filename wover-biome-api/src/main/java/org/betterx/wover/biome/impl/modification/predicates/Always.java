@@ -1,4 +1,6 @@
-package org.betterx.wover.biome.api.modification.predicates;
+package org.betterx.wover.biome.impl.modification.predicates;
+
+import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.util.KeyDispatchDataCodec;

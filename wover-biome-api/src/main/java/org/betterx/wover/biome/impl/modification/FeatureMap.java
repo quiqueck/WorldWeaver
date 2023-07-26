@@ -1,4 +1,4 @@
-package org.betterx.wover.biome.impl.api.modification;
+package org.betterx.wover.biome.impl.modification;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;

@@ -1,7 +1,7 @@
 package org.betterx.wover.entrypoint;
 
-import org.betterx.wover.biome.impl.api.modification.BiomeModificationRegistryImpl;
-import org.betterx.wover.biome.impl.api.modification.predicates.BiomePredicateRegistryImpl;
+import org.betterx.wover.biome.impl.modification.BiomeModificationRegistryImpl;
+import org.betterx.wover.biome.impl.modification.predicates.BiomePredicateRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.ModInitializer;

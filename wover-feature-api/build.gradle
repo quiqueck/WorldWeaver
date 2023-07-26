@@ -14,3 +14,4 @@ loom {
 }
 
 moduleDependencies(project, ['wover-core-api', 'wover-event-api', 'wover-surface-api', 'wover-block-api'])
+testDependencies(project, ['wover-biome-api'])

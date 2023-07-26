@@ -1,5 +1,7 @@
 package org.betterx.wover.testmod.entrypoint;
 
+import org.betterx.wover.biome.api.modification.BiomeModification;
+import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
@@ -8,7 +10,10 @@ import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 
 import net.minecraft.data.worldgen.features.MiscOverworldFeatures;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.GenerationStep;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -20,7 +25,7 @@ public class WoverFeatureTestMod implements ModInitializer {
     public static final ConfiguredFeatureKey<ForSimpleBlock>
             TEST_FEATURE_SIMPLE = ConfiguredFeatureManager.simple(C.id("test_feature"));
     public static final ConfiguredFeatureKey<ForSimpleBlock>
-            TEST_DATAGEN_SIMPLE = ConfiguredFeatureManager.simple(C.id("test_datagen"));
+            CONFIGURED_REDSTONE_BLOCK = ConfiguredFeatureManager.simple(C.id("test_datagen"));
 
     public static final ConfiguredFeatureKey<ForSimpleBlock>
             TEST_RANDOM_SIMPLE = ConfiguredFeatureManager.simple(C.id("random_spread"));
@@ -32,8 +37,12 @@ public class WoverFeatureTestMod implements ModInitializer {
             C.id("vanilla_feature"),
             MiscOverworldFeatures.BLUE_ICE
     );
-    public static final PlacedFeatureKey.WithConfigured REF_FEATURE = PlacedFeatureManager.createKey(
-            TEST_DATAGEN_SIMPLE
+    public static final PlacedFeatureKey.WithConfigured PLACED_REDSTONE_BLOCK = PlacedFeatureManager.createKey(
+            CONFIGURED_REDSTONE_BLOCK
+    );
+
+    public static final PlacedFeatureKey.WithConfigured PLACED_LAPIS_BLOCK = PlacedFeatureManager.createKey(
+            TEST_FEATURE_SIMPLE
     );
 
     @Override
@@ -41,6 +50,23 @@ public class WoverFeatureTestMod implements ModInitializer {
         ConfiguredFeatureManager.BOOTSTRAP_CONFIGURED_FEATURES.subscribe(ctx -> TEST_FEATURE_SIMPLE
                 .bootstrap()
                 .block(Blocks.LAPIS_BLOCK)
+                .register(ctx));
+
+        PlacedFeatureManager.BOOTSTRAP_PLACED_FEATURES.subscribe(ctx -> PLACED_LAPIS_BLOCK
+                .place(ctx)
+                .count(64)
+                .squarePlacement()
+                .modifier(PlacementUtils.HEIGHTMAP)
+                .register(ctx));
+
+        BiomeModificationRegistry.BOOTSTRAP_BIOME_MODIFICATION_REGISTRY.subscribe(ctx -> BiomeModification
+                .build(C.id("lapis_modification"))
+                .isBiome(Biomes.SAVANNA)
+                .addFeature(
+                        GenerationStep.Decoration.VEGETAL_DECORATION,
+                        PLACED_LAPIS_BLOCK.getHolder(
+                                ctx)
+                )
                 .register(ctx));
     }
 

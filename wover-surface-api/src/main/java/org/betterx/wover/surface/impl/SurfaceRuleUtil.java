@@ -22,6 +22,8 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
+import com.google.common.base.Stopwatch;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +46,8 @@ public class SurfaceRuleUtil {
                            .map(a -> a.ruleSource)
                            .toList();
 
+        if (list.size() == 0) return List.of();
+        
         return List.of(SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), new SurfaceRules.SequenceRuleSource(list)));
     }
 
@@ -68,6 +72,7 @@ public class SurfaceRuleUtil {
             List<SurfaceRules.RuleSource> additionalRules
     ) {
         if (additionalRules == null || additionalRules.isEmpty()) return null;
+        Stopwatch sw = Stopwatch.createStarted();
         final int count = additionalRules.size();
         if (org instanceof SurfaceRules.SequenceRuleSource sequenceRule) {
             List<SurfaceRules.RuleSource> existingSequence = sequenceRule.sequence();
@@ -97,7 +102,13 @@ public class SurfaceRuleUtil {
                 additionalRules.add(org);
         }
 
-        WoverSurface.C.LOG.verbose("Merged " + count + " additional Surface Rules for " + source + " => " + additionalRules.size());
+        WoverSurface.C.LOG.verbose(
+                "Merged {} additional Surface Rules for {} => {} ({})",
+                count,
+                source,
+                additionalRules.size(),
+                sw.stop()
+        );
 
         return new SurfaceRules.SequenceRuleSource(additionalRules);
     }

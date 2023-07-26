@@ -5,6 +5,7 @@ import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -53,6 +54,22 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
     @Nullable
     public Holder<ConfiguredFeature<?, ?>> getHolder(@Nullable HolderGetter<ConfiguredFeature<?, ?>> getter) {
         return FeatureConfiguratorImpl.getHolder(getter, key);
+    }
+
+    /**
+     * Gets the {@link Holder} for the {@link ConfiguredFeature} from the given getter.
+     *
+     * <p>
+     * This method internally looks up {@link Registries#CONFIGURED_FEATURE}. If you need to retrieve
+     * a lot of holders, it is recommended to manually lookup the
+     * Registry first and use {@link #getHolder(HolderGetter)} instead.
+     *
+     * @param context The {@link BootstapContext} to get the holder from
+     * @return The holder for the {@link ConfiguredFeature} or {@code null} if it is not present
+     */
+    @Nullable
+    public Holder<ConfiguredFeature<?, ?>> getHolder(@NotNull BootstapContext<?> context) {
+        return getHolder(context.lookup(Registries.CONFIGURED_FEATURE));
     }
 
     /**

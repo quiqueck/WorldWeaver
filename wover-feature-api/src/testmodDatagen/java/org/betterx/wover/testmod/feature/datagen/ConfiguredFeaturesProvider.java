@@ -18,7 +18,7 @@ public class ConfiguredFeaturesProvider extends WoverRegistryContentProvider<Con
 
     @Override
     protected void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
-        WoverFeatureTestMod.TEST_DATAGEN_SIMPLE
+        WoverFeatureTestMod.CONFIGURED_REDSTONE_BLOCK
                 .bootstrap()
                 .block(Blocks.REDSTONE_BLOCK)
                 .register(context);

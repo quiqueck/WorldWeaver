@@ -1,4 +1,4 @@
-package org.betterx.wover.biome.impl.api.modification;
+package org.betterx.wover.biome.impl.modification;
 
 import org.betterx.wover.biome.api.modification.BiomeModification;
 import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
@@ -86,7 +86,7 @@ public class BiomeModificationRegistryImpl {
             GenerationSettingsWorker worker = null;
 
             for (BiomeModification modification : biomeModifications) {
-                if (modification.predicate.test(context)) {
+                if (modification.predicate().test(context)) {
                     if (worker == null) {
                         worker = new GenerationSettingsWorker(registryAccess, context.biome);
                     }

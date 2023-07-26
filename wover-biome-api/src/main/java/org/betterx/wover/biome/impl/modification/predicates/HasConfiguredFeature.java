@@ -1,4 +1,6 @@
-package org.betterx.wover.biome.api.modification.predicates;
+package org.betterx.wover.biome.impl.modification.predicates;
+
+import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;

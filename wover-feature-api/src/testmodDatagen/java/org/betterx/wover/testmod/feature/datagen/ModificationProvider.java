@@ -1,13 +1,13 @@
-package org.betterx.wover.testmod.biome.datagen;
+package org.betterx.wover.testmod.feature.datagen;
 
 import org.betterx.wover.biome.api.modification.BiomeModification;
 import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
+import org.betterx.wover.testmod.entrypoint.WoverFeatureTestMod;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
-import net.minecraft.data.worldgen.placement.NetherPlacements;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
@@ -26,13 +26,12 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
     @Override
     protected void bootstrap(BootstapContext<BiomeModification> context) {
         var features = context.lookup(Registries.PLACED_FEATURE);
-
         BiomeModification
                 .build(modCore.id("test_modification"))
-                .inBiomes(Biomes.BEACH, Biomes.MEADOW)
+                .isBiome(Biomes.DESERT)
                 .addFeature(
                         GenerationStep.Decoration.VEGETAL_DECORATION,
-                        features.getOrThrow(NetherPlacements.SMALL_BASALT_COLUMNS)
+                        WoverFeatureTestMod.PLACED_REDSTONE_BLOCK.getHolder(features)
                 )
                 .register(context);
     }

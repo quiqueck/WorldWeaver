@@ -1,6 +1,7 @@
-package org.betterx.wover.biome.impl.api.modification.predicates;
+package org.betterx.wover.biome.impl.modification.predicates;
 
-import org.betterx.wover.biome.api.modification.predicates.*;
+import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
+import org.betterx.wover.biome.api.modification.predicates.BiomePredicateRegistry;
 import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
 import org.betterx.wover.entrypoint.WoverBiome;
 
@@ -17,7 +18,7 @@ public class BiomePredicateRegistryImpl {
             BiomePredicateRegistryImpl::onBootstrap
     );
 
-    static Codec<? extends BiomePredicate> register(
+    public static Codec<? extends BiomePredicate> register(
             Registry<Codec<? extends BiomePredicate>> registry,
             ResourceLocation location,
             KeyDispatchDataCodec<? extends BiomePredicate> keyDispatchDataCodec
@@ -48,6 +49,7 @@ public class BiomePredicateRegistryImpl {
         register(registry, WoverBiome.C.id("is_biome"), IsBiome.CODEC);
         register(registry, WoverBiome.C.id("has_tag"), HasTag.CODEC);
         register(registry, WoverBiome.C.id("in_dimension"), InDimension.CODEC);
+        register(registry, WoverBiome.C.id("is_namespace"), IsNamespace.CODEC);
         register(registry, WoverBiome.C.id("spawns"), Spawns.CODEC);
         register(registry, WoverBiome.C.id("has_structure"), HasStructure.CODEC);
         register(registry, WoverBiome.C.id("has_placed_feature"), HasPlacedFeature.CODEC);

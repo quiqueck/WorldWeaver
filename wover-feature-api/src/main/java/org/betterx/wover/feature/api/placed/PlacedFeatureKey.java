@@ -77,7 +77,7 @@ public class PlacedFeatureKey {
         this.decoration = decoration;
         return this;
     }
-    
+
     /**
      * Gets the {@link Holder} for the {@link PlacedFeature} from the given getter.
      *
@@ -87,6 +87,22 @@ public class PlacedFeatureKey {
     @Nullable
     public Holder<PlacedFeature> getHolder(@Nullable HolderGetter<PlacedFeature> getter) {
         return PlacedFeatureManagerImpl.getHolder(getter, key);
+    }
+
+    /**
+     * Gets the {@link Holder} for the {@link PlacedFeature} from the given getter.
+     *
+     * <p>
+     * This method internally looks up {@link Registries#PLACED_FEATURE}. If you need to retrieve
+     * a lot of holders, it is recommended to manually lookup the
+     * Registry first and use {@link #getHolder(HolderGetter)} instead.
+     *
+     * @param context The {@link BootstapContext} to get the holder from
+     * @return The holder for the {@link PlacedFeature} or {@code null} if it is not present
+     */
+    @Nullable
+    public Holder<PlacedFeature> getHolder(@NotNull BootstapContext<?> context) {
+        return getHolder(context.lookup(Registries.PLACED_FEATURE));
     }
 
 
@@ -124,6 +140,22 @@ public class PlacedFeatureKey {
         WithConfigured(ResourceLocation featureId, ResourceKey<ConfiguredFeature<?, ?>> linked) {
             super(featureId);
             this.holderProvider = (getter) -> ConfiguredFeatureManager.getHolder(getter, linked);
+        }
+
+
+        /**
+         * Places the  {@link ConfiguredFeature} used for creating this instance
+         * from the given {@link BootstapContext}.
+         * <p>
+         * This method internally looks up {@link Registries#CONFIGURED_FEATURE}. If you need to perform
+         * a lot of placements, it is recommended to manually lookup the
+         * Registry first and use {@link #place(HolderGetter)} instead.
+         *
+         * @param ctx A {@link BootstapContext} to get the {@link ConfiguredFeature} from
+         * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
+         */
+        public FeaturePlacementBuilder place(@NotNull BootstapContext<?> ctx) {
+            return this.place(ctx.lookup(Registries.CONFIGURED_FEATURE));
         }
 
         /**

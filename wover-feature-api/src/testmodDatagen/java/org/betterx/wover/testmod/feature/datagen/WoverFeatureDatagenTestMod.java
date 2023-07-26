@@ -10,6 +10,7 @@ public class WoverFeatureDatagenTestMod extends WoverDataGenEntryPoint {
     protected void onInitializeProviders(PackBuilder globalPack) {
         globalPack.addRegistryProvider(ConfiguredFeaturesProvider::new);
         globalPack.addRegistryProvider(PlacedFeatureProvider::new);
+        globalPack.addRegistryProvider(ModificationProvider::new);
     }
 
     @Override
