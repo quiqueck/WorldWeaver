@@ -34,6 +34,7 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
                         GenerationStep.Decoration.VEGETAL_DECORATION,
                         features.getOrThrow(NetherPlacements.SMALL_BASALT_COLUMNS)
                 )
+                //.addToTag(BiomeTags.HAS_SWAMP_HUT)
                 .register(context);
     }
 }

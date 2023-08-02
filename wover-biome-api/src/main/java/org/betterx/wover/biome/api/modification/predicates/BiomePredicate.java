@@ -357,6 +357,26 @@ public interface BiomePredicate {
         ) {
             if (registryAccess == null) return null;
             var biomes = registryAccess.registryOrThrow(Registries.BIOME);
+            return of(registryAccess, biomes, biomeKey);
+        }
+
+        /**
+         * Creates a new context object for the passed biome key.
+         *
+         * @param registryAccess the registry access object
+         * @param biomeKey       the biome key
+         * @param biomes         the biome registry
+         * @return the context object, or {@code null} if the biome key is not present in the biome registry
+         */
+        @ApiStatus.Internal
+        @Nullable
+        public static Context of(
+                @Nullable RegistryAccess registryAccess,
+                @Nullable Registry<Biome> biomes,
+                @NotNull ResourceKey<Biome> biomeKey
+
+        ) {
+            if (biomes == null || registryAccess == null) return null;
             var biome = biomes.get(biomeKey);
             if (biome == null) return null;
 

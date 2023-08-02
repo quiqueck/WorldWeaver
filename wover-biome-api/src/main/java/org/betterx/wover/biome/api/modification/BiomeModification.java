@@ -10,6 +10,7 @@ import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -22,9 +23,9 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Biome Modifications are used to modify some aspects of a Biome after a world was loaded.
@@ -44,7 +45,11 @@ public interface BiomeModification {
                     BiomePredicate.CODEC.fieldOf("predicate").forGetter(BiomeModification::predicate),
                     FeatureMap.CODEC.fieldOf("features")
                                     .orElse(new ArrayList<>())
-                                    .forGetter(BiomeModification::features)
+                                    .forGetter(BiomeModification::features),
+                    TagKey.codec(Registries.BIOME)
+                          .listOf()
+                          .optionalFieldOf("biome_tags")
+                          .forGetter(BiomeModification::biomeTags)
             ).apply(instance, BiomeModificationImpl::new)
     );
 
@@ -62,6 +67,14 @@ public interface BiomeModification {
      * @return The features.
      */
     List<List<Holder<PlacedFeature>>> features();
+
+
+    /**
+     * The biome tags the biome should be added to
+     *
+     * @return The biome tags
+     */
+    Optional<List<TagKey<Biome>>> biomeTags();
 
     /**
      * For <b>internal</b> use only! Called when the modification should be applied to a biome.
@@ -95,11 +108,12 @@ public interface BiomeModification {
      * A builder for {@link BiomeModification}s.
      * <p>
      * When the modification is finished, it can be registered using {@link #register(BootstapContext)}.
-     * You can also build a {@link Holder.Direct} using {@link #build()}.
+     * You can also build a {@link Holder.Direct} using {@link #directHolder()}.
      */
     final class Builder {
         private BiomePredicate predicate;
         private final FeatureMap features;
+        private final Set<TagKey<Biome>> tags = new HashSet<>();
 
         private final ResourceKey<BiomeModification> key;
 
@@ -383,12 +397,23 @@ public interface BiomeModification {
         }
 
         /**
+         * Adds the Biome into a given Tag.
+         *
+         * @param tag
+         * @return
+         */
+        public Builder addToTag(TagKey<Biome> tag) {
+            tags.add(tag);
+            return this;
+        }
+
+        /**
          * Creates a {@link Holder.Direct} for the {@link BiomeModification}.
          *
          * @return The holder.
          */
-        public Holder<BiomeModification> build() {
-            return Holder.direct(new BiomeModificationImpl(predicate, features.generic()));
+        public Holder<BiomeModification> directHolder() {
+            return Holder.direct(build());
         }
 
         /**
@@ -398,7 +423,16 @@ public interface BiomeModification {
          * @return The holder created in the registry
          */
         public Holder<BiomeModification> register(BootstapContext<BiomeModification> ctx) {
-            return ctx.register(key, new BiomeModificationImpl(predicate, features.generic()));
+            return ctx.register(key, build());
+        }
+
+        @NotNull
+        private BiomeModificationImpl build() {
+            return new BiomeModificationImpl(
+                    predicate,
+                    features.generic(),
+                    (tags == null || tags.isEmpty()) ? Optional.empty() : Optional.of(tags.stream().toList())
+            );
         }
     }
 }
