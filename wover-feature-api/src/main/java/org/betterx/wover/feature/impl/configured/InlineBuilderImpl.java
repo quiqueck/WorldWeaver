@@ -1,10 +1,11 @@
 package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
-import org.betterx.wover.feature.api.configured.builders.ForSimpleBlock;
-import org.betterx.wover.feature.api.configured.builders.RandomPatch;
+import org.betterx.wover.feature.api.configured.builders.*;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -26,14 +27,109 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
         this.key = key;
     }
 
-    public ForSimpleBlock simple() {
-        final var res = new ForSimpleBlockImpl(null);
+    @Override
+    public AsOre ore() {
+        final var res = new AsOreImpl(null, null);
         res.setTransitiveFeatureKey(key);
         return res;
     }
 
+    @Override
+    public AsPillar pillar() {
+        final var res = new AsPillarImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public AsSequence sequence() {
+        final var res = new AsSequenceImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public AsBlockColumn blockColumn() {
+        final var res = new AsBlockColumnImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public WithTemplates templates() {
+        final var res = new WithTemplatesImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public NetherForrestVegetation netherForrestVegetation() {
+        final var res = new NetherForrestVegetationImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public <F extends Feature<FC>, FC extends FeatureConfiguration> WithConfiguration<F, FC> configuration(F feature) {
+        final var res = new WithConfigurationImpl<F, FC>(null, null);
+        res.feature(feature);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public FacingBlock facingBlock() {
+        final var res = new FacingBlockImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public WeightedBlockPatch randomBlockPatch() {
+        final var res = new WeightedBlockPatchImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public WeightedBlockPatch bonemealPatch() {
+        final var res = new WeightedBlockPatchImpl(null, null);
+        res.likeDefaultBonemeal();
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public WeightedBlock randomBlock() {
+        final var res = new WeightedBlockImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public AsRandomSelect randomFeature() {
+        final var res = new AsRandomSelectImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public AsMultiPlaceRandomSelect multiPlaceRandomSelect() {
+        final var res = new AsMultiPlaceRandomSelectImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
+    public ForSimpleBlock simple() {
+        final var res = new ForSimpleBlockImpl(null, null);
+        res.setTransitiveFeatureKey(key);
+        return res;
+    }
+
+    @Override
     public RandomPatch randomPatch() {
-        final var res = new RandomPatchImpl(null);
+        final var res = new RandomPatchImpl(null, null);
         res.setTransitiveFeatureKey(key);
         return res;
     }

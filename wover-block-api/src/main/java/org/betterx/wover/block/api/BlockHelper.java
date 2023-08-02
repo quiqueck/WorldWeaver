@@ -5,9 +5,13 @@ import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.google.common.collect.ImmutableSet;
+
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class BlockHelper {
@@ -83,5 +87,9 @@ public class BlockHelper {
             startPos.move(dir, 1);
         }
         return false;
+    }
+
+    public static Set<BlockState> getPossibleStates(Block block) {
+        return ImmutableSet.copyOf(block.getStateDefinition().getPossibleStates());
     }
 }

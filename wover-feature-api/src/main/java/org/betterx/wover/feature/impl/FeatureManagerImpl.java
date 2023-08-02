@@ -2,10 +2,7 @@ package org.betterx.wover.feature.impl;
 
 import org.betterx.wover.entrypoint.WoverFeature;
 import org.betterx.wover.feature.api.features.*;
-import org.betterx.wover.feature.api.features.config.ConditionFeatureConfig;
-import org.betterx.wover.feature.api.features.config.PillarFeatureConfig;
-import org.betterx.wover.feature.api.features.config.PlaceFacingBlockConfig;
-import org.betterx.wover.feature.api.features.config.SequenceFeatureConfig;
+import org.betterx.wover.feature.api.features.config.*;
 import org.betterx.wover.legacy.api.LegacyHelper;
 
 import com.mojang.serialization.Codec;
@@ -87,6 +84,12 @@ public class FeatureManagerImpl {
             WoverFeature.C.id("pillar"),
             codec -> new PillarFeature(),
             null
+    );
+
+    public static final Feature<TemplateFeatureConfig> TEMPLATE = registerWithLegacy(
+            WoverFeature.C.id("template"),
+            TemplateFeature::new,
+            TemplateFeatureConfig.CODEC
     );
 
     @ApiStatus.Internal

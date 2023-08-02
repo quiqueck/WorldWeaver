@@ -2,8 +2,10 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.builders.RandomPatch;
+import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -22,9 +24,10 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
     private int ySpread = 3;
 
     RandomPatchImpl(
+            @Nullable BootstapContext<ConfiguredFeature<?, ?>> ctx,
             @Nullable ResourceKey<ConfiguredFeature<?, ?>> featureKey
     ) {
-        super(featureKey);
+        super(ctx, featureKey);
     }
 
     @Override
@@ -59,6 +62,11 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
     }
 
     @Override
+    public RandomPatch featureToPlace(PlacedFeatureKey featureToPlace) {
+        return this.featureToPlace(featureToPlace.getHolder(bootstrapContext));
+    }
+
+    @Override
     public RandomPatch featureToPlace(Holder<PlacedFeature> featureToPlace) {
         this.featureToPlace = featureToPlace;
         return this;
@@ -83,8 +91,8 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
         }
 
         @Override
-        public RandomPatch bootstrap() {
-            return new org.betterx.wover.feature.impl.configured.RandomPatchImpl(key);
+        public RandomPatch bootstrap(@NotNull BootstapContext<ConfiguredFeature<?, ?>> ctx) {
+            return new RandomPatchImpl(ctx, key);
         }
     }
 }

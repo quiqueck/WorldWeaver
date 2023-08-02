@@ -70,13 +70,16 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
     // --------------------------------------------------
     @Nullable
     public final ResourceKey<ConfiguredFeature<?, ?>> key;
+    protected final @Nullable BootstapContext<ConfiguredFeature<?, ?>> bootstrapContext;
 
     private ResourceKey<PlacedFeature> transitiveFeatureKey;
 
     FeatureConfiguratorImpl(
+            @Nullable BootstapContext<ConfiguredFeature<?, ?>> ctx,
             @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
     ) {
         this.key = key;
+        this.bootstrapContext = ctx;
     }
 
     void setTransitiveFeatureKey(ResourceKey<PlacedFeature> key) {
@@ -91,13 +94,16 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
     protected abstract @NotNull FC createConfiguration();
     protected abstract @NotNull F getFeature();
 
-    public Holder<ConfiguredFeature<?, ?>> register(@NotNull BootstapContext<ConfiguredFeature<?, ?>> ctx) {
+    public Holder<ConfiguredFeature<?, ?>> register() {
         if (key == null) {
-            throw new IllegalStateException("A ResourceKey can not be null if it should be registered!");
+            throw new IllegalStateException("A ResourceKey can not be null if a feature should be registered!");
+        }
+        if (bootstrapContext == null) {
+            throwStateError("Can not register a feature without a bootstrap context!");
         }
         ConfiguredFeature<FC, F> cFeature = build();
 
-        return ctx.register(
+        return bootstrapContext.register(
                 key,
                 cFeature
         );
@@ -118,7 +124,7 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
 
     public FeaturePlacementBuilder inlinePlace() {
         return FeaturePlacementBuilder.withTransitive(this, (cfg, plc) -> {
-            var res = new RandomPatchImpl(cfg);
+            var res = new RandomPatchImpl(bootstrapContext, cfg);
             res.setTransitiveFeatureKey(plc);
             return res;
         });

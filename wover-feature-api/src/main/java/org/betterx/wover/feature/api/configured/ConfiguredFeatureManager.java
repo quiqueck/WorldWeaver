@@ -2,20 +2,17 @@ package org.betterx.wover.feature.api.configured;
 
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
-import org.betterx.wover.feature.api.configured.builders.FeatureConfigurator;
-import org.betterx.wover.feature.api.configured.builders.ForSimpleBlock;
-import org.betterx.wover.feature.api.configured.builders.RandomPatch;
+import org.betterx.wover.feature.api.configured.builders.*;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
-import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
-import org.betterx.wover.feature.impl.configured.ForSimpleBlockImpl;
-import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
-import org.betterx.wover.feature.impl.configured.RandomPatchImpl;
+import org.betterx.wover.feature.impl.configured.*;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +46,75 @@ public abstract class ConfiguredFeatureManager {
         return new RandomPatchImpl.Key(id);
     }
 
+    public static ConfiguredFeatureKey<AsOre> ore(ResourceLocation id) {
+        return new AsOreImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<AsPillar> pillar(ResourceLocation id) {
+        return new AsPillarImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<AsSequence> sequence(ResourceLocation id) {
+        return new AsSequenceImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<AsBlockColumn> blockColumn(ResourceLocation id) {
+        return new AsBlockColumnImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<WithTemplates> templates(ResourceLocation id) {
+        return new WithTemplatesImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<NetherForrestVegetation> netherForrestVegetation(ResourceLocation id) {
+        return new NetherForrestVegetationImpl.Key(id);
+    }
+
+    public static <F extends Feature<FC>, FC extends FeatureConfiguration> ConfiguredFeatureKey<WithConfiguration<F, FC>> configuration(
+            ResourceLocation id,
+            F feature
+    ) {
+        return new WithConfigurationImpl.Key<>(id, feature);
+    }
+
+    public static ConfiguredFeatureKey<FacingBlock> facingBlock(ResourceLocation id) {
+        return new FacingBlockImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<WeightedBlockPatch> randomBlockPatch(ResourceLocation id) {
+        return new WeightedBlockPatchImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<WeightedBlockPatch> bonemealPatch(ResourceLocation id) {
+        return new WeightedBlockPatchImpl.KeyBonemeal(id);
+    }
+
+    public static ConfiguredFeatureKey<WeightedBlock> randomBlock(ResourceLocation id) {
+        return new WeightedBlockImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<AsRandomSelect> randomFeature(ResourceLocation id) {
+        return new AsRandomSelectImpl.Key(id);
+    }
+
+    public static ConfiguredFeatureKey<AsMultiPlaceRandomSelect> multiPlaceRandomSelect(ResourceLocation id) {
+        return new AsMultiPlaceRandomSelectImpl.Key(id);
+    }
+
     public interface InlineBuilder {
+        AsOre ore();
+        AsPillar pillar();
+        AsSequence sequence();
+        AsBlockColumn blockColumn();
+        WithTemplates templates();
+        NetherForrestVegetation netherForrestVegetation();
+        <F extends Feature<FC>, FC extends FeatureConfiguration> WithConfiguration<F, FC> configuration(F feature);
+        FacingBlock facingBlock();
+        WeightedBlockPatch randomBlockPatch();
+        WeightedBlockPatch bonemealPatch();
+        WeightedBlock randomBlock();
+        AsRandomSelect randomFeature();
+        AsMultiPlaceRandomSelect multiPlaceRandomSelect();
         ForSimpleBlock simple();
         RandomPatch randomPatch();
     }

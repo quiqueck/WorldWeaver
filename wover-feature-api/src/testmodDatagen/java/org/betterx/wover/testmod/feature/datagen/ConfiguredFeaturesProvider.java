@@ -19,17 +19,17 @@ public class ConfiguredFeaturesProvider extends WoverRegistryContentProvider<Con
     @Override
     protected void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
         WoverFeatureTestMod.CONFIGURED_REDSTONE_BLOCK
-                .bootstrap()
+                .bootstrap(context)
                 .block(Blocks.REDSTONE_BLOCK)
-                .register(context);
+                .register();
 
         WoverFeatureTestMod.TEST_RANDOM_SIMPLE
-                .bootstrap()
+                .bootstrap(context)
                 .block(Blocks.AMETHYST_BLOCK)
                 .inlinePlace()
                 .isEmpty()
                 .inRandomPatch()
-                .register(context);
+                .register();
 
 //        var rnd = ConfiguredFeatureManager.simple()
 //                                          .block(Blocks.AMETHYST_BLOCK)

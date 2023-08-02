@@ -1,5 +1,10 @@
 package org.betterx.wover.util;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.RandomSource;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -11,9 +16,23 @@ import java.util.Random;
  * @param <T> the type of the values
  */
 public class RandomizedWeightedList<T> {
+    public static <T> Codec<RandomizedWeightedList<T>> buildCodec(Codec<T> elementCodec) {
+        return RecordCodecBuilder.create((instance) -> instance
+                .group(
+                        ExtraCodecs.nonEmptyList(WeightedEntry.buildElementCodec(elementCodec).listOf())
+                                   .fieldOf("items").forGetter((RandomizedWeightedList<T> cfg) -> cfg.entries)
+                )
+                .apply(instance, RandomizedWeightedList::new));
+    }
+
     private final List<WeightedEntry<T>> entries;
 
     private double totalWeight;
+
+    private RandomizedWeightedList(List<WeightedEntry<T>> entries) {
+        this.entries = entries;
+        totalWeight = entries.stream().map(w -> w.weight).reduce(0.0, Double::sum);
+    }
 
     /**
      * Creates a new instance.
@@ -60,11 +79,30 @@ public class RandomizedWeightedList<T> {
      * @return the randomly chosen value
      */
     public T getRandomValue(Random random) {
+        return getRandomValue(random::nextDouble);
+    }
+
+    /**
+     * Returns a random value from the list.
+     *
+     * @param random the random generator to use
+     * @return the randomly chosen value
+     */
+    public T getRandomValue(RandomSource random) {
+        return getRandomValue(random::nextDouble);
+    }
+
+    @FunctionalInterface
+    private interface RandomValueSupplier {
+        double nextDouble();
+    }
+
+    private T getRandomValue(RandomValueSupplier rnd) {
         if (entries.isEmpty()) {
             throw new IllegalStateException("The list is empty.");
         }
 
-        double randomValue = random.nextDouble() * totalWeight;
+        double randomValue = rnd.nextDouble() * totalWeight;
         double cumulativeWeight = 0.0;
 
         for (WeightedEntry<T> entry : entries) {
@@ -78,7 +116,35 @@ public class RandomizedWeightedList<T> {
         return entries.get(entries.size() - 1).getValue();
     }
 
+    public static <E> RandomizedWeightedList<E> of() {
+        return new RandomizedWeightedList<E>();
+    }
+
+    public static <E> RandomizedWeightedList<E> of(E e1) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e1, 1);
+        return l;
+    }
+
+    public int size() {
+        return entries.size();
+    }
+
+    public boolean isEmpty() {
+        return entries.isEmpty();
+    }
+
     private static class WeightedEntry<T> {
+        public static <T> Codec<WeightedEntry<T>> buildElementCodec(Codec<T> elementCodec) {
+            return RecordCodecBuilder.create((instance) -> instance
+                    .group(
+                            elementCodec.fieldOf("value").forGetter(WeightedEntry::getValue),
+                            Codec.DOUBLE.fieldOf("weight").orElse(1.0).forGetter(WeightedEntry::getWeight)
+                    )
+                    .apply(instance, WeightedEntry::new)
+            );
+        }
+
         private final T value;
         private final double weight;
 

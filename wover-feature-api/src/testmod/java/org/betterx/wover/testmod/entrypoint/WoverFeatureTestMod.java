@@ -48,9 +48,9 @@ public class WoverFeatureTestMod implements ModInitializer {
     @Override
     public void onInitialize() {
         ConfiguredFeatureManager.BOOTSTRAP_CONFIGURED_FEATURES.subscribe(ctx -> TEST_FEATURE_SIMPLE
-                .bootstrap()
+                .bootstrap(ctx)
                 .block(Blocks.LAPIS_BLOCK)
-                .register(ctx));
+                .register());
 
         PlacedFeatureManager.BOOTSTRAP_PLACED_FEATURES.subscribe(ctx -> PLACED_LAPIS_BLOCK
                 .place(ctx)
