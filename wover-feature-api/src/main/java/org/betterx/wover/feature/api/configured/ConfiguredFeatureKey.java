@@ -76,12 +76,12 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
      * Creates a new {@link FeatureConfigurator} for this Feature.
      * <p>
      * The builder is used to alter the settings of this configured feature.
-     * When done, you should call {@link FeatureConfigurator#register(BootstapContext)}
+     * When done, you should call {@link FeatureConfigurator#register()}
      * to register the configured feature.
      *
      * @param ctx The {@link BootstapContext} this bootstrap is performed in
      * @return The builder for this Feature
-     * @see FeatureConfigurator#register(BootstapContext)
+     * @see FeatureConfigurator#register()
      */
     public abstract B bootstrap(@NotNull BootstapContext<ConfiguredFeature<?, ?>> ctx);
 }

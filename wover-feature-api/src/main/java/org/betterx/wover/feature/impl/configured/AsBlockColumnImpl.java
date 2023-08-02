@@ -138,14 +138,14 @@ public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfig
     }
 
     @Override
-    public AsBlockColumn prioritizeTip(boolean v) {
-        prioritizeTip = v;
+    public AsBlockColumn prioritizeTip(boolean prio) {
+        prioritizeTip = prio;
         return this;
     }
 
     @Override
-    public AsBlockColumn allowedPlacement(BlockPredicate v) {
-        allowedPlacement = v;
+    public AsBlockColumn allowedPlacement(BlockPredicate predicate) {
+        allowedPlacement = predicate;
         return this;
     }
 

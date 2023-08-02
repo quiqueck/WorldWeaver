@@ -118,7 +118,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
-    public AsMultiPlaceRandomSelect multiPlaceRandomSelect() {
+    public AsMultiPlaceRandomSelect multiPlaceRandomFeature() {
         final var res = new AsMultiPlaceRandomSelectImpl(null, null);
         res.setTransitive(bootstapContext, key);
         return res;
