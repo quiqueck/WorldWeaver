@@ -1,0 +1,16 @@
+archivesBaseName = "wover-structure-api"
+
+ext {
+    baseNamespace = "structure"
+    baseClass = "WoverStructure"
+}
+
+dependencies {
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover-structure.accesswidener')
+}
+
+moduleDependencies(project, ['wover-core-api', 'wover-event-api', 'wover-block-api'])
