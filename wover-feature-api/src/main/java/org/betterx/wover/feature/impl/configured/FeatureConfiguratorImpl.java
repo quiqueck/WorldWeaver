@@ -73,6 +73,7 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
     protected final @Nullable BootstapContext<ConfiguredFeature<?, ?>> bootstrapContext;
 
     private ResourceKey<PlacedFeature> transitiveFeatureKey;
+    private BootstapContext<PlacedFeature> transitiveBootstrapContext;
 
     FeatureConfiguratorImpl(
             @Nullable BootstapContext<ConfiguredFeature<?, ?>> ctx,
@@ -82,13 +83,19 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
         this.bootstrapContext = ctx;
     }
 
-    void setTransitiveFeatureKey(ResourceKey<PlacedFeature> key) {
+    void setTransitive(BootstapContext<PlacedFeature> ctx, ResourceKey<PlacedFeature> key) {
+        this.transitiveBootstrapContext = ctx;
         this.transitiveFeatureKey = key;
     }
 
     @ApiStatus.Internal
     public ResourceKey<PlacedFeature> getTransitiveFeatureKey() {
         return this.transitiveFeatureKey;
+    }
+
+    @ApiStatus.Internal
+    public BootstapContext<PlacedFeature> getTransitiveBootstrapContext() {
+        return this.transitiveBootstrapContext;
     }
 
     protected abstract @NotNull FC createConfiguration();
@@ -125,7 +132,7 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
     public FeaturePlacementBuilder inlinePlace() {
         return FeaturePlacementBuilder.withTransitive(this, (cfg, plc) -> {
             var res = new RandomPatchImpl(bootstrapContext, cfg);
-            res.setTransitiveFeatureKey(plc);
+            res.setTransitive(transitiveBootstrapContext, plc);
             return res;
         });
     }

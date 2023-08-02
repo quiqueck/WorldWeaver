@@ -24,28 +24,28 @@ public class PlacedFeatureProvider extends WoverRegistryContentProvider<PlacedFe
                                                  .count(64)
                                                  .squarePlacement()
                                                  .modifier(PlacementUtils.HEIGHTMAP)
-                                                 .register(context);
+                                                 .register();
 
         WoverFeatureTestMod.VANILLA_FEATURE.place(context)
                                            .squarePlacement()
-                                           .register(context);
+                                           .register();
 
 
         var cfg = ConfiguredFeatureManager.INLINE_BUILDER.simple().block(Blocks.QUARTZ_BLOCK).directHolder();
 
 
-        WoverFeatureTestMod.INLINE_FEATURE.place(cfg)
+        WoverFeatureTestMod.INLINE_FEATURE.place(context, cfg)
                                           .squarePlacement()
-                                          .register(context);
+                                          .register();
 
-        WoverFeatureTestMod.INLINE_FEATURE_2.inlineConfiguration()
-                                            .simple()
-                                            .block(Blocks.COAL_BLOCK)
-                                            .inlinePlace()
-                                            .isEmpty()
-                                            .inRandomPatch()
-                                            .inlinePlace()
-                                            .squarePlacement()
-                                            .register(context);
+        WoverFeatureTestMod.INLINE_FEATURE_ALL.inlineConfiguration(context)
+                                              .simple()
+                                              .block(Blocks.COAL_BLOCK)
+                                              .inlinePlace()
+                                              .isEmpty()
+                                              .inRandomPatch()
+                                              .inlinePlace()
+                                              .squarePlacement()
+                                              .register();
     }
 }

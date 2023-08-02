@@ -37,6 +37,8 @@ public class FeaturePlacementBuilder {
     private final ResourceKey<PlacedFeature> key;
     @NotNull
     private final Holder<ConfiguredFeature<?, ?>> configuredFeatureHolder;
+    @Nullable
+    private final BootstapContext<PlacedFeature> bootstrapContext;
 
     //Transitive Members
     @Nullable
@@ -46,18 +48,21 @@ public class FeaturePlacementBuilder {
     private final BiFunction<ResourceKey<ConfiguredFeature<?, ?>>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder;
 
     FeaturePlacementBuilder(
+            @Nullable BootstapContext<PlacedFeature> bootstrapContext,
             @Nullable ResourceKey<PlacedFeature> key,
             @NotNull Holder<ConfiguredFeature<?, ?>> configuredFeatureHolder
     ) {
-        this(key, configuredFeatureHolder, null, null);
+        this(bootstrapContext, key, configuredFeatureHolder, null, null);
     }
 
     FeaturePlacementBuilder(
+            @Nullable BootstapContext<PlacedFeature> bootstrapContext,
             @Nullable ResourceKey<PlacedFeature> key,
             @NotNull Holder<ConfiguredFeature<?, ?>> configuredFeatureHolder,
             @Nullable ResourceKey<ConfiguredFeature<?, ?>> transitiveConfiguredFeatureKey,
             @Nullable BiFunction<ResourceKey<ConfiguredFeature<?, ?>>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder
     ) {
+        this.bootstrapContext = bootstrapContext;
         this.key = key;
         this.configuredFeatureHolder = configuredFeatureHolder;
         this.transitiveConfiguredFeatureKey = transitiveConfiguredFeatureKey;
@@ -70,6 +75,7 @@ public class FeaturePlacementBuilder {
             BiFunction<ResourceKey<ConfiguredFeature<?, ?>>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder
     ) {
         return new FeaturePlacementBuilder(
+                configuredFeatureBuilder.getTransitiveBootstrapContext(),
                 configuredFeatureBuilder.getTransitiveFeatureKey(),
                 configuredFeatureBuilder.directHolder(),
                 configuredFeatureBuilder.key,
@@ -492,19 +498,24 @@ public class FeaturePlacementBuilder {
         if (randomPatchBuilder != null) {
             randomPatch = randomPatchBuilder.apply(transitiveConfiguredFeatureKey, key);
         } else {
-            randomPatch = new InlineBuilderImpl(this.key).randomPatch();
+            randomPatch = new InlineBuilderImpl(this.bootstrapContext, this.key).randomPatch();
         }
 
         return randomPatch.featureToPlace(directHolder());
     }
 
 
-    public Holder<PlacedFeature> register(BootstapContext<PlacedFeature> context) {
+    public Holder<PlacedFeature> register() {
         if (key == null) {
-            throw new IllegalStateException("A ResourceKey can not be null if it should be registered!");
+            throw new IllegalStateException("A ResourceKey for a Feature can not be null if it should be registered!");
+        }
+        if (bootstrapContext == null) {
+            throw new IllegalStateException(
+                    "A BootstrapContext for a Feature can not be null if it should be registered! (" + key.location() + ")"
+            );
         }
         PlacedFeature feature = build();
-        return context.register(key, feature);
+        return bootstrapContext.register(key, feature);
     }
 
     public Holder<PlacedFeature> directHolder() {

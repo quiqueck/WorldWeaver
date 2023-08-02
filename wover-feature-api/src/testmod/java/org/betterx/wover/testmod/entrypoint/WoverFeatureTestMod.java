@@ -31,7 +31,7 @@ public class WoverFeatureTestMod implements ModInitializer {
             TEST_RANDOM_SIMPLE = ConfiguredFeatureManager.simple(C.id("random_spread"));
 
     public static final PlacedFeatureKey INLINE_FEATURE = PlacedFeatureManager.createKey(C.id("inline_feature"));
-    public static final PlacedFeatureKey INLINE_FEATURE_2 = PlacedFeatureManager.createKey(C.id("inline_feature_2"));
+    public static final PlacedFeatureKey INLINE_FEATURE_ALL = PlacedFeatureManager.createKey(C.id("inline_feature_all"));
 
     public static final PlacedFeatureKey.WithConfigured VANILLA_FEATURE = PlacedFeatureManager.createKey(
             C.id("vanilla_feature"),
@@ -57,7 +57,7 @@ public class WoverFeatureTestMod implements ModInitializer {
                 .count(64)
                 .squarePlacement()
                 .modifier(PlacementUtils.HEIGHTMAP)
-                .register(ctx));
+                .register());
 
         BiomeModificationRegistry.BOOTSTRAP_BIOME_MODIFICATION_REGISTRY.subscribe(ctx -> BiomeModification
                 .build(C.id("lapis_modification"))

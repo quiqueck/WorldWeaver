@@ -47,11 +47,36 @@ public class PlacedFeatureKey {
      * When configuration is finished, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
      * to add it to the registry.
      *
-     * @param holder The {@link Holder} for the {@link ConfiguredFeature} to place
+     * @param bootstrapContext The {@link BootstapContext} to use
+     * @param key              The {@link ResourceKey} for the {@link ConfiguredFeature} to place
      * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
      */
-    public FeaturePlacementBuilder place(Holder<ConfiguredFeature<?, ?>> holder) {
-        return new FeaturePlacementBuilder(key, holder);
+    public FeaturePlacementBuilder place(
+            BootstapContext<PlacedFeature> bootstrapContext,
+            ResourceKey<ConfiguredFeature<?, ?>> key
+    ) {
+        return new FeaturePlacementBuilder(
+                bootstrapContext,
+                this.key,
+                ConfiguredFeatureManager.getHolder(bootstrapContext.lookup(Registries.CONFIGURED_FEATURE), key)
+        );
+    }
+
+    /**
+     * Creates a new builder for a {@link PlacedFeature}.
+     * <p>
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
+     * to add it to the registry.
+     *
+     * @param bootstrapContext The {@link BootstapContext} to use
+     * @param holder           The {@link Holder} for the {@link ConfiguredFeature} to place
+     * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
+     */
+    public FeaturePlacementBuilder place(
+            BootstapContext<PlacedFeature> bootstrapContext,
+            Holder<ConfiguredFeature<?, ?>> holder
+    ) {
+        return new FeaturePlacementBuilder(bootstrapContext, key, holder);
     }
 
     /**
@@ -62,11 +87,12 @@ public class PlacedFeatureKey {
      * <p>
      * When the Placement is done, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
      *
+     * @param bootstrapContext The {@link BootstapContext} to use
      * @return A {@link ConfiguredFeatureManager.InlineBuilder} start the
      * configuration.
      */
-    public ConfiguredFeatureManager.InlineBuilder inlineConfiguration() {
-        return new InlineBuilderImpl(this.key);
+    public ConfiguredFeatureManager.InlineBuilder inlineConfiguration(BootstapContext<PlacedFeature> bootstrapContext) {
+        return new InlineBuilderImpl(bootstrapContext, this.key);
     }
 
     public GenerationStep.Decoration getDecoration() {
@@ -154,8 +180,8 @@ public class PlacedFeatureKey {
          * @param ctx A {@link BootstapContext} to get the {@link ConfiguredFeature} from
          * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
          */
-        public FeaturePlacementBuilder place(@NotNull BootstapContext<?> ctx) {
-            return this.place(ctx.lookup(Registries.CONFIGURED_FEATURE));
+        public FeaturePlacementBuilder place(@NotNull BootstapContext<PlacedFeature> ctx) {
+            return this.place(ctx, ctx.lookup(Registries.CONFIGURED_FEATURE));
         }
 
         /**
@@ -168,36 +194,50 @@ public class PlacedFeatureKey {
          * @param getter A {@link HolderGetter} for {@link ConfiguredFeature}s
          * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
          */
-        public FeaturePlacementBuilder place(@NotNull HolderGetter<ConfiguredFeature<?, ?>> getter) {
-            return super.place(holderProvider.getHolder(getter));
+        public FeaturePlacementBuilder place(
+                @NotNull BootstapContext<PlacedFeature> ctx,
+                @NotNull HolderGetter<ConfiguredFeature<?, ?>> getter
+        ) {
+            return super.place(ctx, holderProvider.getHolder(getter));
         }
 
         /**
          * This method is not supported for {@link PlacedFeatureKey.WithConfigured}.
-         * Use {@link #place(HolderGetter)} instead.
+         * Use {@link #place(BootstapContext, HolderGetter)} instead.
          *
+         * @param ctx    A {@link BootstapContext} to get the {@link ConfiguredFeature} from
          * @param holder the holder for the {@link ConfiguredFeature}
          * @return Nothing, this method always throws an {@link UnsupportedOperationException}.
          */
         @Override
-        @Contract(value = "_ -> fail", pure = true)
-        public FeaturePlacementBuilder place(Holder<ConfiguredFeature<?, ?>> holder) {
+        @Contract(value = "_,_ -> fail", pure = true)
+        public FeaturePlacementBuilder place(
+                @NotNull BootstapContext<PlacedFeature> ctx,
+                Holder<ConfiguredFeature<?, ?>> holder
+        ) {
             throw new UnsupportedOperationException(
                     "Cannot manually select a holder, when Placement is linked to a Configured Feature. (" + key.location() + ")");
         }
 
         /**
          * This method is not supported for {@link PlacedFeatureKey.WithConfigured}.
-         * Use {@link #place(HolderGetter)} instead.
          *
+         * @param ctx A {@link BootstapContext} to get the {@link ConfiguredFeature} from
          * @return Nothing, this method always throws an {@link UnsupportedOperationException}.
          */
         @Override
-        public ConfiguredFeatureManager.InlineBuilder inlineConfiguration() {
+        @Contract(value = "_ -> fail", pure = true)
+        public ConfiguredFeatureManager.InlineBuilder inlineConfiguration(@NotNull BootstapContext<PlacedFeature> ctx) {
             throw new UnsupportedOperationException(
                     "Cannot use an inline configuration, when Placement is linked to a Configured Feature. (" + key.location() + ")");
         }
 
+        /**
+         * Changes the decoration stage for this feature
+         *
+         * @param decoration The new decoration stage
+         * @return this
+         */
         @Override
         public PlacedFeatureKey.WithConfigured setDecoration(GenerationStep.Decoration decoration) {
             super.setDecoration(decoration);

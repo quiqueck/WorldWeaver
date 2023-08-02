@@ -17,6 +17,14 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Allows you to create a {@link ConfiguredFeatureKey} for {@link ConfiguredFeature}s. A {@link ConfiguredFeatureKey}
+ * is (in general) a wrapper around the {@link ResourceKey} for a {@link ConfiguredFeature}.
+ * <p>
+ * {@link ConfiguredFeatureKey} can also be used to bootstrap a {@link ConfiguredFeature}. Configured Features
+ * should be bootstrapped in the data generator whenever possible. However, if you need to bootstrap a
+ * {@link ConfiguredFeature} in code, you can use the {@link #BOOTSTRAP_CONFIGURED_FEATURES} Event.
+ */
 public abstract class ConfiguredFeatureManager {
     /**
      * The event that is fired when the Registry for a {@link ConfiguredFeature}
@@ -38,6 +46,13 @@ public abstract class ConfiguredFeatureManager {
      */
     public final static InlineBuilder INLINE_BUILDER = new InlineBuilderImpl();
 
+    /**
+     * Creates a Key for a simple block-state providing feature.
+     *
+     * @param id the id of the {@link ConfiguredFeature}
+     * @return the new key
+     * @See ForSimpleBlock
+     */
     public static ConfiguredFeatureKey<ForSimpleBlock> simple(ResourceLocation id) {
         return new ForSimpleBlockImpl.Key(id);
     }
