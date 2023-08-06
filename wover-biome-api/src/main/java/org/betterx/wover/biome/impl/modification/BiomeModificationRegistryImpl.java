@@ -7,7 +7,6 @@ import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
-import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.tag.api.TagManager;
@@ -44,21 +43,14 @@ public class BiomeModificationRegistryImpl {
                 BiomeModificationRegistryImpl::onBootstrap
         );
 
-        WorldLifecycle.WORLD_REGISTRY_READY.subscribe(BiomeModificationRegistryImpl::setCurrentRegistryAccess);
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe(BiomeModificationRegistryImpl::whenReady);
         TagManager.BIOMES.bootstrapEvent().subscribe(BiomeModificationRegistryImpl::addBiomeTags);
-    }
-
-    private static RegistryAccess lastRegistryAccess;
-
-    private static void setCurrentRegistryAccess(RegistryAccess registryAccess, OnRegistryReady.Stage stage) {
-        lastRegistryAccess = registryAccess;
     }
 
     private static void addBiomeTags(TagBootstrapContext<Biome> biomeTagBootstrapContext) {
         final Stopwatch sw = Stopwatch.createStarted();
 
-        final RegistryAccess registryAccess = lastRegistryAccess;
+        final RegistryAccess registryAccess = WorldState.allStageRegistryAccess();
         if (registryAccess == null) {
             WoverBiome.C.log.warn("Failed to apply biome tag modifications. Registry access is null.");
             return;
@@ -69,6 +61,7 @@ public class BiomeModificationRegistryImpl {
 
         int biomesProcessed = 0;
         int modifiersApplied = 0;
+        int tagsAdded = 0;
 
         final List<ResourceKey<Biome>> keys = biomes
                 .entrySet()
@@ -79,7 +72,7 @@ public class BiomeModificationRegistryImpl {
 
         for (ResourceKey<Biome> biomeKey : keys) {
             final BiomePredicate.Context context = BiomePredicate.Context.of(
-                    WorldState.registryAccess(),
+                    registryAccess,
                     biomes,
                     biomeKey
             );
@@ -93,6 +86,7 @@ public class BiomeModificationRegistryImpl {
                 if (!modification.biomeTags().isEmpty() && modification.predicate().test(context)) {
                     modifiersApplied++;
                     for (TagKey<Biome> tag : modification.biomeTags().orElse(List.of())) {
+                        tagsAdded++;
                         biomeTagBootstrapContext.add(tag, context.biome);
                         didUpdate = true;
                     }
@@ -105,7 +99,8 @@ public class BiomeModificationRegistryImpl {
 
         if (biomesProcessed > 0) {
             WoverBiome.C.log.info(
-                    "Applied {} biome tag extensions to {} biomes in {}",
+                    "Applied {} biome tag extensions from {} modifications to {} biomes in {}",
+                    tagsAdded,
                     modifiersApplied,
                     biomesProcessed,
                     sw.stop()

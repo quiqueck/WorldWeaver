@@ -9,6 +9,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 public final class WorldStateImpl {
     public static final WorldStateImpl INSTANCE = new WorldStateImpl();
     private RegistryAccess currentRegistryAccess;
+    public RegistryAccess currentAllStageRegistryAccess;
     private LevelStorageSource.LevelStorageAccess currentStorageAccess;
 
     private WorldStateImpl() {
@@ -19,8 +20,10 @@ public final class WorldStateImpl {
     }
 
     public void setCurrentRegistryAccess(RegistryAccess newRegistry, OnRegistryReady.Stage stage) {
+        currentAllStageRegistryAccess = newRegistry;
+
         if (stage == OnRegistryReady.Stage.PREPARATION) return;
-        
+
         if (this.currentRegistryAccess != newRegistry) {
             this.currentRegistryAccess = newRegistry;
         }
