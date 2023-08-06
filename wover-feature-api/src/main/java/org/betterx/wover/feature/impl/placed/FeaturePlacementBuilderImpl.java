@@ -592,10 +592,8 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     }
 
 
-    @Override
     @NotNull
     public PlacedFeature build() {
         return new PlacedFeature(configuredFeatureHolder, modifications);
     }
-
 }

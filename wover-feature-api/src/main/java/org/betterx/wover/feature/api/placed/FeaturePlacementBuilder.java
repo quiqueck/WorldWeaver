@@ -15,7 +15,6 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Builder for a {@link PlacedFeature}. You can either use the builder register
@@ -138,8 +137,29 @@ public interface FeaturePlacementBuilder {
     FeaturePlacementBuilder betterNetherInWall(int countPerLayer);
     FeaturePlacementBuilder modifier(PlacementModifier... modifiers);
     FeaturePlacementBuilder modifier(List<PlacementModifier> modifiers);
+    /**
+     * Start a new RandomPatch {@link net.minecraft.world.level.levelgen.feature.ConfiguredFeature}
+     * based on this PlacedFeature.
+     *
+     * @return a new RandomPatch builder
+     */
     RandomPatch inRandomPatch();
+    /**
+     * Register this PlacedFeature with the {@link BootstapContext} and {@link ResourceKey} used to create
+     * this Builder. If no {@link BootstapContext} or no {@link ResourceKey} was used, the call will fail.
+     *
+     * @return a holder for the registered PlacedFeature
+     * @throws IllegalStateException if no {@link BootstapContext} was used to create this Builder or the
+     *                               {@link ResourceKey} for this builder is empty
+     */
     Holder<PlacedFeature> register();
+    /**
+     * Create a new, anonymous Holder for this {@link PlacedFeature}. The holder can be used to
+     * inline the PlacedFeature in other configurations (for example in {@link RandomPatch} or
+     * {@link org.betterx.wover.feature.api.configured.configurators.AsSequence}).
+     *
+     * @return a new Holder for this PlacedFeature
+     */
     Holder<PlacedFeature> directHolder();
-    @NotNull PlacedFeature build();
+
 }
