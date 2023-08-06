@@ -52,8 +52,8 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     }
 
     @Override
-    public AsMultiPlaceRandomSelect addAll(int weight, Block... blocks) {
-        return addAll(weight, lastID + 1, blocks);
+    public AsMultiPlaceRandomSelect addAll(int weight, Block... blockSet) {
+        return addAll(weight, lastID + 1, blockSet);
     }
 
     @Override

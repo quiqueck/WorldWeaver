@@ -44,7 +44,7 @@ public class PlacedFeatureKey {
     /**
      * Creates a new builder for a {@link PlacedFeature}.
      * <p>
-     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
      * to add it to the registry.
      *
      * @param bootstrapContext The {@link BootstapContext} to use
@@ -65,7 +65,7 @@ public class PlacedFeatureKey {
     /**
      * Creates a new builder for a {@link PlacedFeature}.
      * <p>
-     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
      * to add it to the registry.
      *
      * @param bootstrapContext The {@link BootstapContext} to use
@@ -85,7 +85,7 @@ public class PlacedFeatureKey {
      * When you finished configuration a feature, you need to call
      * {@link FeatureConfigurator#inlinePlace()} to get to the placement phase.
      * <p>
-     * When the Placement is done, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
+     * When the Placement is done, you should call {@link FeaturePlacementBuilder#register()}
      *
      * @param bootstrapContext The {@link BootstapContext} to use
      * @return A {@link ConfiguredFeatureManager.InlineBuilder} start the
@@ -175,7 +175,7 @@ public class PlacedFeatureKey {
          * <p>
          * This method internally looks up {@link Registries#CONFIGURED_FEATURE}. If you need to perform
          * a lot of placements, it is recommended to manually lookup the
-         * Registry first and use {@link #place(HolderGetter)} instead.
+         * Registry first and use {@link #place(BootstapContext, HolderGetter)} instead.
          *
          * @param ctx A {@link BootstapContext} to get the {@link ConfiguredFeature} from
          * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
@@ -188,7 +188,7 @@ public class PlacedFeatureKey {
          * Places the  {@link ConfiguredFeature} used for creating this instance
          * from the given {@link HolderGetter}.
          * <p>
-         * When configuration is finished, you should call {@link FeaturePlacementBuilder#register(BootstapContext)}
+         * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
          * to add it to the registry.
          *
          * @param getter A {@link HolderGetter} for {@link ConfiguredFeature}s
