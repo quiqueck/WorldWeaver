@@ -4,6 +4,7 @@ import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
+import org.betterx.wover.feature.impl.placed.FeaturePlacementBuilderImpl;
 import org.betterx.wover.feature.impl.placed.PlacedFeatureManagerImpl;
 
 import net.minecraft.core.Holder;
@@ -55,7 +56,7 @@ public class PlacedFeatureKey {
             BootstapContext<PlacedFeature> bootstrapContext,
             ResourceKey<ConfiguredFeature<?, ?>> key
     ) {
-        return new FeaturePlacementBuilder(
+        return new FeaturePlacementBuilderImpl(
                 bootstrapContext,
                 this.key,
                 ConfiguredFeatureManager.getHolder(bootstrapContext.lookup(Registries.CONFIGURED_FEATURE), key)
@@ -76,7 +77,7 @@ public class PlacedFeatureKey {
             BootstapContext<PlacedFeature> bootstrapContext,
             Holder<ConfiguredFeature<?, ?>> holder
     ) {
-        return new FeaturePlacementBuilder(bootstrapContext, key, holder);
+        return new FeaturePlacementBuilderImpl(bootstrapContext, key, holder);
     }
 
     /**

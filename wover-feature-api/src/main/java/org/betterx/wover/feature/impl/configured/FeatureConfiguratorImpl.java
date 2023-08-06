@@ -4,7 +4,7 @@ import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
-import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
+import org.betterx.wover.feature.impl.placed.FeaturePlacementBuilderImpl;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
@@ -129,8 +129,8 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
         return Holder.direct(build());
     }
 
-    public FeaturePlacementBuilder inlinePlace() {
-        return FeaturePlacementBuilder.withTransitive(this, (cfg, plc) -> {
+    public FeaturePlacementBuilderImpl inlinePlace() {
+        return FeaturePlacementBuilderImpl.withTransitive(this, (cfg, plc) -> {
             var res = new RandomPatchImpl(bootstrapContext, cfg);
             res.setTransitive(transitiveBootstrapContext, plc);
             return res;
