@@ -8,6 +8,8 @@ import org.betterx.wover.feature.impl.configured.*;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -362,6 +364,24 @@ public abstract class ConfiguredFeatureManager {
             @NotNull ResourceKey<ConfiguredFeature<?, ?>> key
     ) {
         return FeatureConfiguratorImpl.getHolder(getter, key);
+    }
+
+    /**
+     * Gets the {@link Holder} for a {@link ConfiguredFeature} from a {@link BootstapContext}.
+     *
+     * @param context the context to get registry containing the holder. When you need to
+     *                get multiple holders at a time, you might want to use
+     *                {@link #getHolder(HolderGetter, ResourceKey)} instead, as it will
+     *                be slightly faster.
+     * @param key     the key to get the holder for
+     * @return the holder, or null if the holder is not present
+     */
+    @Nullable
+    public static Holder<ConfiguredFeature<?, ?>> getHolder(
+            @Nullable BootstapContext<?> context,
+            @NotNull ResourceKey<ConfiguredFeature<?, ?>> key
+    ) {
+        return getHolder(context.lookup(Registries.CONFIGURED_FEATURE), key);
     }
 
     private ConfiguredFeatureManager() {

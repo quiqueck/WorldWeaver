@@ -49,4 +49,7 @@ public class Features {
      * @see org.betterx.wover.feature.api.features.TemplateFeature
      */
     public static final Feature<TemplateFeatureConfig> TEMPLATE = FeatureManagerImpl.TEMPLATE;
+
+    private Features() {
+    }
 }

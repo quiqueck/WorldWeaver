@@ -53,4 +53,7 @@ public class FeatureManager {
     public static ResourceKey<Feature<?>> createKey(ResourceLocation location) {
         return FeatureManagerImpl.createKey(location);
     }
+
+    private FeatureManager() {
+    }
 }

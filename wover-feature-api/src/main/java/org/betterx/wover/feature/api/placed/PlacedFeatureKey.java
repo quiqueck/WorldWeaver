@@ -95,10 +95,21 @@ public class PlacedFeatureKey {
         return new InlineBuilderImpl(bootstrapContext, this.key);
     }
 
+    /**
+     * Get the {@link GenerationStep.Decoration} for the {@link PlacedFeature}.
+     *
+     * @return The decoration
+     */
     public GenerationStep.Decoration getDecoration() {
         return decoration;
     }
 
+    /**
+     * Sets the {@link GenerationStep.Decoration} for the {@link PlacedFeature}.
+     *
+     * @param decoration The decoration to set
+     * @return This {@link PlacedFeatureKey} for chaining
+     */
     public PlacedFeatureKey setDecoration(GenerationStep.Decoration decoration) {
         this.decoration = decoration;
         return this;
