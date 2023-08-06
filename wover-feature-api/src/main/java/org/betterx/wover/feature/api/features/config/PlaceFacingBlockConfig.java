@@ -18,7 +18,13 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStatePr
 
 import java.util.List;
 
+/**
+ * Places a Block with a {@link net.minecraft.world.level.block.HorizontalDirectionalBlock#FACING} property.
+ */
 public class PlaceFacingBlockConfig extends PlaceBlockFeatureConfig {
+    /**
+     * Codec for {@link PlaceFacingBlockConfig}.
+     */
     public static final Codec<PlaceFacingBlockConfig> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
                     blockStateCodec(),
@@ -31,27 +37,69 @@ public class PlaceFacingBlockConfig extends PlaceBlockFeatureConfig {
 
     private final List<Direction> directions;
 
+    /**
+     * Creates a new {@link PlaceFacingBlockConfig}.
+     *
+     * @param block The block to place.
+     * @param dir   The allowed directions to place the block in.
+     */
     public PlaceFacingBlockConfig(Block block, List<Direction> dir) {
         this(block.defaultBlockState(), dir);
     }
 
+    /**
+     * Creates a new {@link PlaceFacingBlockConfig}.
+     *
+     * @param state The blockstate to place.
+     * @param dir   The allowed directions to place the block in.
+     */
     public PlaceFacingBlockConfig(BlockState state, List<Direction> dir) {
         this(BlockStateProvider.simple(state), dir);
     }
 
+    /**
+     * Creates a new {@link PlaceFacingBlockConfig}.
+     *
+     * @param states The blockstates to place.
+     * @param dir    The allowed directions to place the block in.
+     */
     public PlaceFacingBlockConfig(List<BlockState> states, List<Direction> dir) {
         this(buildWeightedList(states), dir);
     }
 
+    /**
+     * Creates a new {@link PlaceFacingBlockConfig}.
+     *
+     * @param blocks The blockstates to place.
+     * @param dir    The allowed directions to place the block in.
+     */
     public PlaceFacingBlockConfig(SimpleWeightedRandomList<BlockState> blocks, List<Direction> dir) {
         this(new WeightedStateProvider(blocks), dir);
     }
 
-    public PlaceFacingBlockConfig(BlockStateProvider blocks, List<Direction> dir) {
-        super(blocks);
+    /**
+     * Creates a new {@link PlaceFacingBlockConfig}.
+     *
+     * @param provider The blockstate provider used to determin the states.
+     * @param dir      The allowed directions to place the block in.
+     */
+    public PlaceFacingBlockConfig(BlockStateProvider provider, List<Direction> dir) {
+        super(provider);
         directions = dir;
     }
 
+    /**
+     * Places a block, and selects a fitting direction. The direction is
+     * selected from the list of directions passed to the constructor.
+     * every possible direction is tested using {@link BlockState#canSurvive}.
+     * Blocks are only placed in air. The first fitting direction is used.
+     *
+     * @param ctx         The context
+     * @param level       The world
+     * @param pos         The position where the block should be placed
+     * @param targetState The state of the block that is being placed
+     * @return {@code true} if the block was placed, {@code false} otherwise
+     */
     @Override
     public boolean placeBlock(
             FeaturePlaceContext<? extends PlaceBlockFeatureConfig> ctx,

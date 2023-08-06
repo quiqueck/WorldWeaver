@@ -1059,3 +1059,9 @@ hr {
 .member-signature .element-name {
     font-weight: bold;
 }
+
+p > code {
+    border-radius: 4px;
+    padding: 4px 1px 4px 1px;
+    background-color: #f1f1f1;
+}

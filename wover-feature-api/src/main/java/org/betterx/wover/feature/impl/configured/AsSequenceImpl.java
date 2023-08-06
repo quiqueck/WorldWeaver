@@ -46,7 +46,7 @@ public class AsSequenceImpl extends FeatureConfiguratorImpl<SequenceFeatureConfi
         if (features.isEmpty()) {
             throwStateError("Sequence must have at least one feature");
         }
-        return new SequenceFeatureConfig(features);
+        return SequenceFeatureConfig.createSequence(features);
     }
 
     @Override

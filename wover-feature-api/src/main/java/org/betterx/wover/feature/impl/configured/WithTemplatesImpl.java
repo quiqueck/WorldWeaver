@@ -47,7 +47,7 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
             int offsetY,
             float weight
     ) {
-        templates.add(TemplateFeatureConfig.cfg(location, offsetY), weight);
+        templates.add(TemplateFeatureConfig.createTemplate(location, offsetY), weight);
         return this;
     }
 
@@ -55,7 +55,7 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
     public @NotNull TemplateFeatureConfig createConfiguration() {
         if (templates.isEmpty())
             throwStateError("Template Feature Config must have at least one template!");
-        return new TemplateFeatureConfig(templates);
+        return TemplateFeatureConfig.of(templates);
     }
 
     @Override

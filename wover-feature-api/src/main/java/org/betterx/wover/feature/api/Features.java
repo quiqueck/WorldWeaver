@@ -10,6 +10,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
  * Contains all provided custom features.
  */
 public class Features {
+    /**
+     * {@code wover:place_block} - Places a block with a facing property
+     */
     public static final Feature<PlaceFacingBlockConfig> PLACE_BLOCK = FeatureManagerImpl.PLACE_BLOCK;
 
     /**
@@ -19,6 +22,11 @@ public class Features {
      */
     public static final Feature<NoneFeatureConfiguration> MARK_POSTPROCESSING = FeatureManagerImpl.MARK_POSTPROCESSING;
 
+    /**
+     * {@code wover:sequence} - Places multiple features.
+     *
+     * @see org.betterx.wover.feature.api.features.SequenceFeature
+     */
     public static final Feature<SequenceFeatureConfig> SEQUENCE = FeatureManagerImpl.SEQUENCE;
 
     /**
@@ -35,5 +43,10 @@ public class Features {
      */
     public static final Feature<PillarFeatureConfig> PILLAR = FeatureManagerImpl.PILLAR;
 
+    /**
+     * {@code wover:template} - Places a template.
+     *
+     * @see org.betterx.wover.feature.api.features.TemplateFeature
+     */
     public static final Feature<TemplateFeatureConfig> TEMPLATE = FeatureManagerImpl.TEMPLATE;
 }
