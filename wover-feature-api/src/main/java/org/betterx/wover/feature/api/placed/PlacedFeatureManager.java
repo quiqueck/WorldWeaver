@@ -8,6 +8,8 @@ import org.betterx.wover.feature.impl.placed.PlacedFeatureManagerImpl;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -56,5 +58,13 @@ public class PlacedFeatureManager {
             @NotNull ResourceKey<PlacedFeature> key
     ) {
         return PlacedFeatureManagerImpl.getHolder(getter, key);
+    }
+
+    @Nullable
+    public static Holder<PlacedFeature> getHolder(
+            @Nullable BootstapContext<?> context,
+            @NotNull ResourceKey<PlacedFeature> key
+    ) {
+        return PlacedFeatureManagerImpl.getHolder(context.lookup(Registries.PLACED_FEATURE), key);
     }
 }

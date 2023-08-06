@@ -5,11 +5,25 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
+/**
+ * Places a mark for postprocessing  (<b>{@code wover:mark_postprocessing}</b>).
+ *
+ * @see org.betterx.wover.feature.api.Features#MARK_POSTPROCESSING
+ */
 public class MarkPostProcessingFeature extends Feature<NoneFeatureConfiguration> {
+    /**
+     * Creates a new instance.
+     */
     public MarkPostProcessingFeature() {
         super(NoneFeatureConfiguration.CODEC);
     }
 
+    /**
+     * Places a mark on the chunk for postprocessing.
+     *
+     * @param ctx The context
+     * @return {@code true}
+     */
     @Override
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> ctx) {
         BlockPos pos = ctx.origin();
