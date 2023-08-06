@@ -2,7 +2,7 @@ package org.betterx.wover.feature.api.placed;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
-import org.betterx.wover.feature.api.configured.builders.FeatureConfigurator;
+import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
 import org.betterx.wover.feature.impl.placed.PlacedFeatureManagerImpl;
 

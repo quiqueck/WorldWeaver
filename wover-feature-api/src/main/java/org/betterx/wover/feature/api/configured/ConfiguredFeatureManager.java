@@ -2,7 +2,7 @@ package org.betterx.wover.feature.api.configured;
 
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
-import org.betterx.wover.feature.api.configured.builders.*;
+import org.betterx.wover.feature.api.configured.configurators.*;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.impl.configured.*;
 

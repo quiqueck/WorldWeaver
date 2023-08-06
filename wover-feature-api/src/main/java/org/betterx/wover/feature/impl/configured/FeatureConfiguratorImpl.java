@@ -3,7 +3,7 @@ package org.betterx.wover.feature.impl.configured;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
-import org.betterx.wover.feature.api.configured.builders.FeatureConfigurator;
+import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 
 import net.minecraft.core.Holder;

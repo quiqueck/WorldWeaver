@@ -5,7 +5,7 @@ import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
-import org.betterx.wover.feature.api.configured.builders.ForSimpleBlock;
+import org.betterx.wover.feature.api.configured.configurators.ForSimpleBlock;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 

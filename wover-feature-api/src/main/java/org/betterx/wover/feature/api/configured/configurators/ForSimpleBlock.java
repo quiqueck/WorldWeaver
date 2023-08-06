@@ -1,4 +1,4 @@
-package org.betterx.wover.feature.api.configured.builders;
+package org.betterx.wover.feature.api.configured.configurators;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -7,7 +7,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConf
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 /**
- * Configuration of a simple block-placing Feature.
+ * Configuration of a simple block-placing Feature ({@link SimpleBlockFeature}).
  * <p>
  * This builder configures a {@link SimpleBlockFeature}.
  */

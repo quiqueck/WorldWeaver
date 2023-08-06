@@ -3,7 +3,7 @@ package org.betterx.wover.feature.impl.configured;
 import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
-import org.betterx.wover.feature.api.configured.builders.AsMultiPlaceRandomSelect;
+import org.betterx.wover.feature.api.configured.configurators.AsMultiPlaceRandomSelect;
 import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 import org.betterx.wover.util.Triple;
 

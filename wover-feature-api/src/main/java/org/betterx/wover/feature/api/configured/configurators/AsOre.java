@@ -1,4 +1,4 @@
-package org.betterx.wover.feature.api.configured.builders;
+package org.betterx.wover.feature.api.configured.configurators;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;

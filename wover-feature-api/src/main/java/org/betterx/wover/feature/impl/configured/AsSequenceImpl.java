@@ -2,7 +2,7 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.Features;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.AsSequence;
+import org.betterx.wover.feature.api.configured.configurators.AsSequence;
 import org.betterx.wover.feature.api.features.SequenceFeature;
 import org.betterx.wover.feature.api.features.config.SequenceFeatureConfig;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
@@ -30,14 +30,14 @@ public class AsSequenceImpl extends FeatureConfiguratorImpl<SequenceFeatureConfi
     }
 
     @Override
-    public AsSequence add(PlacedFeatureKey p) {
-        features.add(p.getHolder(bootstrapContext));
+    public AsSequence add(PlacedFeatureKey featureKey) {
+        features.add(featureKey.getHolder(bootstrapContext));
         return this;
     }
 
     @Override
-    public AsSequence add(Holder<PlacedFeature> p) {
-        features.add(p);
+    public AsSequence add(Holder<PlacedFeature> holder) {
+        features.add(holder);
         return this;
     }
 

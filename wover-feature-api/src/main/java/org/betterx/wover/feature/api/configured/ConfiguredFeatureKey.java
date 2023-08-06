@@ -1,6 +1,6 @@
 package org.betterx.wover.feature.api.configured;
 
-import org.betterx.wover.feature.api.configured.builders.FeatureConfigurator;
+import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 
 import net.minecraft.core.Holder;

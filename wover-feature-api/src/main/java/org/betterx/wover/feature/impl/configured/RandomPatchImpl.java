@@ -1,7 +1,7 @@
 package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.RandomPatch;
+import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;
@@ -44,20 +44,20 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
     }
 
     @Override
-    public RandomPatch tries(int v) {
-        tries = v;
+    public RandomPatch tries(int tries) {
+        this.tries = tries;
         return this;
     }
 
     @Override
-    public RandomPatch spreadXZ(int v) {
-        xzSpread = v;
+    public RandomPatch spreadXZ(int spread) {
+        xzSpread = spread;
         return this;
     }
 
     @Override
-    public RandomPatch spreadY(int v) {
-        ySpread = v;
+    public RandomPatch spreadY(int spread) {
+        ySpread = spread;
         return this;
     }
 

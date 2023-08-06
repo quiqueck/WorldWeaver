@@ -2,7 +2,7 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.Features;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.WithTemplates;
+import org.betterx.wover.feature.api.configured.configurators.WithTemplates;
 import org.betterx.wover.feature.api.features.TemplateFeature;
 import org.betterx.wover.feature.api.features.config.TemplateFeatureConfig;
 import org.betterx.wover.feature.impl.features.FeatureTemplate;
@@ -16,7 +16,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureConfig, TemplateFeature<TemplateFeatureConfig>> implements org.betterx.wover.feature.api.configured.builders.WithTemplates {
+public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureConfig, TemplateFeature<TemplateFeatureConfig>> implements org.betterx.wover.feature.api.configured.configurators.WithTemplates {
     private final RandomizedWeightedList<FeatureTemplate> templates = new RandomizedWeightedList<>();
 
     WithTemplatesImpl(
@@ -36,18 +36,18 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
     @Override
     public WithTemplates add(
             ResourceLocation location,
-            float chance
+            float weight
     ) {
-        return add(location, 0, chance);
+        return add(location, 0, weight);
     }
 
     @Override
     public WithTemplates add(
             ResourceLocation location,
             int offsetY,
-            float chance
+            float weight
     ) {
-        templates.add(TemplateFeatureConfig.cfg(location, offsetY), chance);
+        templates.add(TemplateFeatureConfig.cfg(location, offsetY), weight);
         return this;
     }
 

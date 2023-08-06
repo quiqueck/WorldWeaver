@@ -1,7 +1,7 @@
 package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.WithConfiguration;
+import org.betterx.wover.feature.api.configured.configurators.WithConfiguration;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -14,7 +14,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class WithConfigurationImpl<F extends Feature<FC>, FC extends FeatureConfiguration> extends FeatureConfiguratorImpl<FC, F> implements org.betterx.wover.feature.api.configured.builders.WithConfiguration<F, FC> {
+public class WithConfigurationImpl<F extends Feature<FC>, FC extends FeatureConfiguration> extends FeatureConfiguratorImpl<FC, F> implements org.betterx.wover.feature.api.configured.configurators.WithConfiguration<F, FC> {
     private FC configuration;
     private F feature;
 

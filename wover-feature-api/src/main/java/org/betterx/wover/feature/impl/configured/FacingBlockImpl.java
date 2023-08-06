@@ -3,7 +3,7 @@ package org.betterx.wover.feature.impl.configured;
 import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.feature.api.Features;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.FacingBlock;
+import org.betterx.wover.feature.api.configured.configurators.FacingBlock;
 import org.betterx.wover.feature.api.features.PlaceBlockFeature;
 import org.betterx.wover.feature.api.features.config.PlaceFacingBlockConfig;
 
@@ -26,7 +26,7 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockConfig, PlaceBlockFeature<PlaceFacingBlockConfig>> implements org.betterx.wover.feature.api.configured.builders.FacingBlock {
+public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockConfig, PlaceBlockFeature<PlaceFacingBlockConfig>> implements org.betterx.wover.feature.api.configured.configurators.FacingBlock {
     private final SimpleWeightedRandomList.Builder<BlockState> stateBuilder = SimpleWeightedRandomList.builder();
     BlockState firstState;
     private int count = 0;
@@ -84,7 +84,7 @@ public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockCon
     @Override
     public FacingBlock addAllStates(Block block, int weight) {
         Set<BlockState> states = BlockHelper.getPossibleStates(block);
-        states.forEach(s -> add(block.defaultBlockState(), Math.max(1, weight / states.size())));
+        states.forEach(s -> add(s, Math.max(1, weight / states.size())));
         return this;
     }
 

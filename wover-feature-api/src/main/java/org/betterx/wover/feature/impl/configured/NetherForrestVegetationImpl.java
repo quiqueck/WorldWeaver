@@ -2,7 +2,7 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.NetherForrestVegetation;
+import org.betterx.wover.feature.api.configured.configurators.NetherForrestVegetation;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +22,7 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherForestVegetationConfig, NetherForestVegetationFeature> implements org.betterx.wover.feature.api.configured.builders.NetherForrestVegetation {
+public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherForestVegetationConfig, NetherForestVegetationFeature> implements org.betterx.wover.feature.api.configured.configurators.NetherForrestVegetation {
     private SimpleWeightedRandomList.Builder<BlockState> blocks;
     private WeightedStateProvider stateProvider;
     private int spreadWidth = 8;
@@ -37,14 +37,14 @@ public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherF
 
 
     @Override
-    public NetherForrestVegetation spreadWidth(int v) {
-        spreadWidth = v;
+    public NetherForrestVegetation spreadWidth(int width) {
+        spreadWidth = width;
         return this;
     }
 
     @Override
-    public NetherForrestVegetation spreadHeight(int v) {
-        spreadHeight = v;
+    public NetherForrestVegetation spreadHeight(int height) {
+        spreadHeight = height;
         return this;
     }
 

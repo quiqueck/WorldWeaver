@@ -1,7 +1,7 @@
 package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.ForSimpleBlock;
+import org.betterx.wover.feature.api.configured.configurators.ForSimpleBlock;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;

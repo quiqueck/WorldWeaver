@@ -1,4 +1,4 @@
-package org.betterx.wover.feature.api.configured.builders;
+package org.betterx.wover.feature.api.configured.configurators;
 
 import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 
@@ -7,6 +7,12 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
+/**
+ * Base Interface for a Configurator. Configurators are used to build a {@link ConfiguredFeature}.
+ *
+ * @param <FC> The type of the {@link FeatureConfiguration}
+ * @param <F>  The Type of the {@link Feature}
+ */
 public interface FeatureConfigurator<FC extends FeatureConfiguration, F extends Feature<FC>> {
     /**
      * Registers the {@link ConfiguredFeature} with the currently active

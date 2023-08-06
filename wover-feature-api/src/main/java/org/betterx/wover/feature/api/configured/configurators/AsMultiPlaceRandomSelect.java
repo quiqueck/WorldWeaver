@@ -1,4 +1,4 @@
-package org.betterx.wover.feature.api.configured.builders;
+package org.betterx.wover.feature.api.configured.configurators;
 
 import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 

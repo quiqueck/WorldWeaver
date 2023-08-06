@@ -1,7 +1,7 @@
 package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.AsRandomSelect;
+import org.betterx.wover.feature.api.configured.configurators.AsRandomSelect;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;

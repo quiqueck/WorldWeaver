@@ -1,7 +1,7 @@
 package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.block.api.BlockHelper;
-import org.betterx.wover.feature.api.configured.builders.WeightedBaseBlock;
+import org.betterx.wover.feature.api.configured.configurators.BaseWeightedBlock;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class WeightedBaseBlockImpl<FC extends FeatureConfiguration, F extends Feature<FC>, W extends WeightedBaseBlock<FC, F, W>> extends FeatureConfiguratorImpl<FC, F> implements WeightedBaseBlock<FC, F, W> {
+public abstract class WeightedBaseBlockImpl<FC extends FeatureConfiguration, F extends Feature<FC>, W extends BaseWeightedBlock<FC, F, W>> extends FeatureConfiguratorImpl<FC, F> implements BaseWeightedBlock<FC, F, W> {
     SimpleWeightedRandomList.Builder<BlockState> stateBuilder = SimpleWeightedRandomList.builder();
 
     WeightedBaseBlockImpl(

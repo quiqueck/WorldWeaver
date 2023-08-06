@@ -2,7 +2,7 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.block.api.BlockProperties;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.AsBlockColumn;
+import org.betterx.wover.feature.api.configured.configurators.AsBlockColumn;
 
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -26,7 +26,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfiguration, BlockColumnFeature> implements org.betterx.wover.feature.api.configured.builders.AsBlockColumn {
+public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfiguration, BlockColumnFeature> implements org.betterx.wover.feature.api.configured.configurators.AsBlockColumn {
     private final List<BlockColumnConfiguration.Layer> layers = new LinkedList<>();
     private Direction direction = Direction.UP;
     private BlockPredicate allowedPlacement = BlockPredicate.ONLY_IN_AIR_PREDICATE;

@@ -2,7 +2,7 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.Features;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
-import org.betterx.wover.feature.api.configured.builders.AsPillar;
+import org.betterx.wover.feature.api.configured.configurators.AsPillar;
 import org.betterx.wover.feature.api.features.PillarFeature;
 import org.betterx.wover.feature.api.features.config.PillarFeatureConfig;
 
@@ -50,48 +50,48 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
     }
 
     @Override
-    public AsPillar direction(Direction v) {
-        this.direction = v;
+    public AsPillar direction(Direction direction) {
+        this.direction = direction;
         return this;
     }
 
     @Override
-    public AsPillar blockState(Block v) {
-        return blockState(BlockStateProvider.simple(v.defaultBlockState()));
+    public AsPillar blockState(Block block) {
+        return blockState(BlockStateProvider.simple(block.defaultBlockState()));
     }
 
     @Override
-    public AsPillar blockState(BlockState v) {
-        return blockState(BlockStateProvider.simple(v));
+    public AsPillar blockState(BlockState state) {
+        return blockState(BlockStateProvider.simple(state));
     }
 
     @Override
-    public AsPillar blockState(BlockStateProvider v) {
-        this.stateProvider = v;
+    public AsPillar blockState(BlockStateProvider provider) {
+        this.stateProvider = provider;
         return this;
     }
 
     @Override
-    public AsPillar maxHeight(int v) {
-        this.maxHeight = ConstantInt.of(v);
+    public AsPillar maxHeight(int max) {
+        this.maxHeight = ConstantInt.of(max);
         return this;
     }
 
     @Override
-    public AsPillar maxHeight(IntProvider v) {
-        this.maxHeight = v;
+    public AsPillar maxHeight(IntProvider max) {
+        this.maxHeight = max;
         return this;
     }
 
     @Override
-    public AsPillar minHeight(int v) {
-        this.minHeight = ConstantInt.of(v);
+    public AsPillar minHeight(int min) {
+        this.minHeight = ConstantInt.of(min);
         return this;
     }
 
     @Override
-    public AsPillar minHeight(IntProvider v) {
-        this.minHeight = v;
+    public AsPillar minHeight(IntProvider min) {
+        this.minHeight = min;
         return this;
     }
 

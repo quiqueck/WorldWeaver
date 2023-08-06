@@ -2,7 +2,7 @@ package org.betterx.wover.feature.impl.configured;
 
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
-import org.betterx.wover.feature.api.configured.builders.WeightedBlockPatch;
+import org.betterx.wover.feature.api.configured.configurators.WeightedBlockPatch;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -68,12 +68,6 @@ public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchCon
         return this;
     }
 
-    @Override
-    public WeightedBlockPatch likeDefaultBonemeal() {
-        return this.tries(9)
-                   .spreadXZ(3)
-                   .spreadY(1);
-    }
 
     @Override
     public WeightedBlockPatch tries(int v) {

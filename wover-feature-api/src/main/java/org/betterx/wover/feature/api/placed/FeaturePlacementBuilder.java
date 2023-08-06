@@ -3,7 +3,7 @@ package org.betterx.wover.feature.api.placed;
 import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.block.api.predicate.BlockPredicates;
 import org.betterx.wover.block.api.predicate.IsFullShape;
-import org.betterx.wover.feature.api.configured.builders.RandomPatch;
+import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
 import org.betterx.wover.feature.api.placed.modifiers.*;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
@@ -489,7 +489,7 @@ public class FeaturePlacementBuilder {
     }
 
     /**
-     * Creates a new {@link RandomPatch} {@link org.betterx.wover.feature.api.configured.builders.FeatureConfigurator}
+     * Creates a new {@link RandomPatch} {@link org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator}
      *
      * @return {@link RandomPatch} instance.
      */
