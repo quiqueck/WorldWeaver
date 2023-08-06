@@ -8,6 +8,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.dimension.LevelStem;
 
+import java.util.Optional;
+
 public record InDimension(ResourceKey<LevelStem> dimensionKey) implements BiomePredicate {
     public static final InDimension OVERWORLD = new InDimension(LevelStem.OVERWORLD);
     public static final InDimension END = new InDimension(LevelStem.END);
@@ -33,7 +35,9 @@ public record InDimension(ResourceKey<LevelStem> dimensionKey) implements BiomeP
                         .getBiomeSource()
                         .possibleBiomes()
                         .stream()
-                        .map(Holder::value)
-                        .anyMatch(entry -> entry.equals(ctx.biome));
+                        .map(Holder::unwrapKey)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .anyMatch(entry -> entry.equals(ctx.biomeKey));
     }
 }

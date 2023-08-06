@@ -43,9 +43,9 @@ public interface BiomeModification {
     Codec<BiomeModification> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     BiomePredicate.CODEC.fieldOf("predicate").forGetter(BiomeModification::predicate),
-                    FeatureMap.CODEC.fieldOf("features")
-                                    .orElse(new ArrayList<>())
-                                    .forGetter(BiomeModification::features),
+                    FeatureMap.CODEC
+                            .optionalFieldOf("features")
+                            .forGetter(m -> m.features().isEmpty() ? Optional.empty() : Optional.of(m.features())),
                     TagKey.codec(Registries.BIOME)
                           .listOf()
                           .optionalFieldOf("biome_tags")
@@ -55,6 +55,8 @@ public interface BiomeModification {
 
     /**
      * A predicate that determines if this modification should be applied to a biome.
+     * If not set, the modification will be applied to <b>ALL</b> biomes! That is probably
+     * never what you want.
      *
      * @return The predicate.
      */

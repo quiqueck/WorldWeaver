@@ -18,6 +18,18 @@ public class BiomeModificationImpl implements BiomeModification {
 
     public BiomeModificationImpl(
             BiomePredicate predicate,
+            Optional<List<List<Holder<PlacedFeature>>>> features,
+            Optional<List<TagKey<Biome>>> biomeTags
+    ) {
+        this(
+                predicate,
+                features.orElse(List.of()),
+                biomeTags
+        );
+    }
+
+    public BiomeModificationImpl(
+            BiomePredicate predicate,
             List<List<Holder<PlacedFeature>>> features,
             Optional<List<TagKey<Biome>>> biomeTags
     ) {

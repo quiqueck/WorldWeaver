@@ -8,6 +8,7 @@ import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.placement.NetherPlacements;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
@@ -28,13 +29,18 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
         var features = context.lookup(Registries.PLACED_FEATURE);
 
         BiomeModification
-                .build(modCore.id("test_modification"))
+                .build(modCore.id("test_features"))
                 .inBiomes(Biomes.BEACH, Biomes.MEADOW)
                 .addFeature(
                         GenerationStep.Decoration.VEGETAL_DECORATION,
                         features.getOrThrow(NetherPlacements.SMALL_BASALT_COLUMNS)
                 )
-                //.addToTag(BiomeTags.HAS_SWAMP_HUT)
+                .register(context);
+
+        BiomeModification
+                .build(modCore.id("test_tags"))
+                .inNether()
+                .addToTag(BiomeTags.HAS_SWAMP_HUT)
                 .register(context);
     }
 }

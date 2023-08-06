@@ -9,8 +9,6 @@ import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.state.api.WorldState;
-import org.betterx.wover.tag.api.TagManager;
-import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -44,68 +42,6 @@ public class BiomeModificationRegistryImpl {
         );
 
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe(BiomeModificationRegistryImpl::whenReady);
-        TagManager.BIOMES.bootstrapEvent().subscribe(BiomeModificationRegistryImpl::addBiomeTags);
-    }
-
-    private static void addBiomeTags(TagBootstrapContext<Biome> biomeTagBootstrapContext) {
-        final Stopwatch sw = Stopwatch.createStarted();
-
-        final RegistryAccess registryAccess = WorldState.allStageRegistryAccess();
-        if (registryAccess == null) {
-            WoverBiome.C.log.warn("Failed to apply biome tag modifications. Registry access is null.");
-            return;
-        }
-        final Registry<BiomeModification> modifications = registryAccess.registryOrThrow(BiomeModificationRegistry.BIOME_MODIFICATION_REGISTRY);
-        final Registry<Biome> biomes = registryAccess.registryOrThrow(Registries.BIOME);
-        final List<BiomeModification> biomeModifications = modifications.stream().toList();
-
-        int biomesProcessed = 0;
-        int modifiersApplied = 0;
-        int tagsAdded = 0;
-
-        final List<ResourceKey<Biome>> keys = biomes
-                .entrySet()
-                .stream()
-                .map(Map.Entry::getKey)
-                .sorted(Comparator.comparingInt(key -> biomes.getId(biomes.getOrThrow(key))))
-                .toList();
-
-        for (ResourceKey<Biome> biomeKey : keys) {
-            final BiomePredicate.Context context = BiomePredicate.Context.of(
-                    registryAccess,
-                    biomes,
-                    biomeKey
-            );
-            if (context == null) {
-                WoverBiome.C.log.warn("Failed to get biome context for {}", biomeKey.location());
-                continue;
-            }
-            boolean didUpdate = false;
-
-            for (BiomeModification modification : biomeModifications) {
-                if (!modification.biomeTags().isEmpty() && modification.predicate().test(context)) {
-                    modifiersApplied++;
-                    for (TagKey<Biome> tag : modification.biomeTags().orElse(List.of())) {
-                        tagsAdded++;
-                        biomeTagBootstrapContext.add(tag, context.biome);
-                        didUpdate = true;
-                    }
-                }
-            }
-            if (didUpdate) {
-                biomesProcessed++;
-            }
-        }
-
-        if (biomesProcessed > 0) {
-            WoverBiome.C.log.info(
-                    "Applied {} biome tag extensions from {} modifications to {} biomes in {}",
-                    tagsAdded,
-                    modifiersApplied,
-                    biomesProcessed,
-                    sw.stop()
-            );
-        }
     }
 
     private static void onBootstrap(BootstapContext<BiomeModification> ctx) {
@@ -134,11 +70,13 @@ public class BiomeModificationRegistryImpl {
                 .sorted(Comparator.comparingInt(key -> biomes.getId(biomes.getOrThrow(key))))
                 .toList();
 
+        final BiomeTagModificationWorker biomeTagWorker = new BiomeTagModificationWorker();
         final List<BiomeModification> biomeModifications = modifications.stream().toList();
 
         int biomesChanged = 0;
         int biomesProcessed = 0;
         int modifiersApplied = 0;
+        int tagsAdded = 0;
 
         for (ResourceKey<Biome> biomeKey : keys) {
             BiomePredicate.Context context = BiomePredicate.Context.of(registryAccess, biomeKey);
@@ -149,11 +87,20 @@ public class BiomeModificationRegistryImpl {
 
             biomesProcessed++;
             GenerationSettingsWorker worker = null;
-
+            boolean didChangeBiome = false;
             for (BiomeModification modification : biomeModifications) {
                 if (modification.predicate().test(context)) {
                     if (worker == null) {
                         worker = new GenerationSettingsWorker(registryAccess, context.biome);
+                    }
+
+                    if (modification.biomeTags().isPresent()) {
+                        for (TagKey<Biome> tag : modification.biomeTags().get()) {
+                            if (biomeTagWorker.addBiomeToTag(tag, context)) {
+                                tagsAdded++;
+                                didChangeBiome = true;
+                            }
+                        }
                     }
 
                     modification.apply(worker);
@@ -162,16 +109,23 @@ public class BiomeModificationRegistryImpl {
             }
 
             if (worker != null) {
+                //this call has an important side effect of re-freezing the features and carvers
+                // make sure it is not bypassed due to lazy evaluation
                 if (worker.finished()) {
-                    biomesChanged++;
+                    didChangeBiome = true;
                 }
             }
+
+            if (didChangeBiome) biomesChanged++;
         }
+
+        biomeTagWorker.finished();
 
         if (biomesProcessed > 0) {
             WoverBiome.C.log.info(
-                    "Applied {} biome modifications to {} of {} biomes in {}",
+                    "Applied {} biome modifications and added {} tags to {} of {} biomes in {}",
                     modifiersApplied,
+                    tagsAdded,
                     biomesChanged,
                     biomesProcessed,
                     sw.stop()
