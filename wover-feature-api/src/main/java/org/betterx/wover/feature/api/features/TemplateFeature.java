@@ -1,7 +1,6 @@
 package org.betterx.wover.feature.api.features;
 
 import org.betterx.wover.feature.api.features.config.TemplateFeatureConfig;
-import org.betterx.wover.feature.impl.features.FeatureTemplate;
 import org.betterx.wover.structure.api.StructureNBT;
 
 import com.mojang.serialization.Codec;
@@ -36,7 +35,7 @@ public class TemplateFeature<FC extends TemplateFeatureConfig> extends Feature<F
     public boolean place(FeaturePlaceContext<FC> ctx) {
         final TemplateFeatureConfig cfg = ctx.config();
         final RandomSource random = ctx.random();
-        final FeatureTemplate structure = cfg.randomStructure(random);
+        final TemplateFeatureConfig.FeatureTemplate structure = cfg.randomStructure(random);
         return structure.generateIfPlaceable(
                 ctx.level(),
                 ctx.origin(),

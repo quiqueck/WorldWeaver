@@ -46,8 +46,9 @@ public interface WithTemplates extends FeatureConfigurator<TemplateFeatureConfig
      *
      * @param location The location of the template to add
      * @param offsetY  The placement offset in y direction.
-     * @param weight
-     * @return
+     * @param weight   The weight of the template
+     * @return the same instance
+     * @see TemplateFeatureConfig.FeatureTemplate#getOffsetY()
      */
     WithTemplates add(
             ResourceLocation location,

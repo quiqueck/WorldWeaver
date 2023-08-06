@@ -1,5 +1,6 @@
 package org.betterx.wover.feature.impl.features;
 
+import org.betterx.wover.feature.api.features.config.TemplateFeatureConfig;
 import org.betterx.wover.structure.api.StructureNBT;
 
 import com.mojang.serialization.Codec;
@@ -17,42 +18,42 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 
-public class FeatureTemplate extends StructureNBT {
-    public static final Codec<FeatureTemplate> CODEC =
+public class FeatureTemplateImpl extends StructureNBT implements TemplateFeatureConfig.FeatureTemplate {
+    public static final Codec<TemplateFeatureConfig.FeatureTemplate> CODEC =
             RecordCodecBuilder.create((instance) ->
                     instance.group(
                                     ResourceLocation.CODEC
                                             .fieldOf("location")
-                                            .forGetter((cfg) -> cfg.location),
+                                            .forGetter((cfg) -> cfg.getLocation()),
                                     Codec
                                             .INT
                                             .fieldOf("offset_y")
                                             .orElse(0)
-                                            .forGetter((cfg) -> cfg.offsetY)
+                                            .forGetter((cfg) -> cfg.getOffsetY())
                             )
-                            .apply(instance, FeatureTemplate::new)
+                            .apply(instance, FeatureTemplateImpl::new)
             );
     public final int offsetY;
 
-    protected FeatureTemplate(ResourceLocation location, int offsetY) {
+    protected FeatureTemplateImpl(ResourceLocation location, int offsetY) {
         super(location);
         this.offsetY = offsetY;
     }
 
-    private static final Map<String, FeatureTemplate> READER_CACHE = Maps.newHashMap();
+    private static final Map<String, FeatureTemplateImpl> READER_CACHE = Maps.newHashMap();
 
-    public static FeatureTemplate create(
+    public static TemplateFeatureConfig.FeatureTemplate createTemplate(
             ResourceLocation location
     ) {
-        return create(location, 0);
+        return createTemplate(location, 0);
     }
 
-    public static FeatureTemplate create(
+    public static TemplateFeatureConfig.FeatureTemplate createTemplate(
             ResourceLocation location,
             int offsetY
     ) {
         String key = location.toString() + "::" + offsetY;
-        return READER_CACHE.computeIfAbsent(key, r -> new FeatureTemplate(location, offsetY));
+        return READER_CACHE.computeIfAbsent(key, r -> new FeatureTemplateImpl(location, offsetY));
     }
 
     public boolean generateIfPlaceable(
@@ -68,6 +69,7 @@ public class FeatureTemplate extends StructureNBT {
         );
     }
 
+    @Override
     public boolean generateIfPlaceable(
             ServerLevelAccessor level,
             BlockPos pos,
@@ -84,7 +86,7 @@ public class FeatureTemplate extends StructureNBT {
         return generateCentered(level, pos.above(offsetY), r, m);
     }
 
-    protected boolean canGenerate(LevelAccessor level, BlockPos pos, Rotation rotation) {
+    public boolean canGenerate(LevelAccessor level, BlockPos pos, Rotation rotation) {
         if (containsBedrock(level, pos)) return false;
         return true;
     }
@@ -98,7 +100,18 @@ public class FeatureTemplate extends StructureNBT {
         return false;
     }
 
+    @Override
     public boolean loaded() {
         return structure != null;
+    }
+
+    @Override
+    public int getOffsetY() {
+        return offsetY;
+    }
+
+    @Override
+    public ResourceLocation getLocation() {
+        return location;
     }
 }

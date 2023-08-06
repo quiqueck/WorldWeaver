@@ -5,7 +5,7 @@ import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.configurators.WithTemplates;
 import org.betterx.wover.feature.api.features.TemplateFeature;
 import org.betterx.wover.feature.api.features.config.TemplateFeatureConfig;
-import org.betterx.wover.feature.impl.features.FeatureTemplate;
+import org.betterx.wover.feature.impl.features.FeatureTemplateImpl;
 import org.betterx.wover.util.RandomizedWeightedList;
 
 import net.minecraft.data.worldgen.BootstapContext;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureConfig, TemplateFeature<TemplateFeatureConfig>> implements org.betterx.wover.feature.api.configured.configurators.WithTemplates {
-    private final RandomizedWeightedList<FeatureTemplate> templates = new RandomizedWeightedList<>();
+    private final RandomizedWeightedList<TemplateFeatureConfig.FeatureTemplate> templates = new RandomizedWeightedList<>();
 
     WithTemplatesImpl(
             @Nullable BootstapContext<ConfiguredFeature<?, ?>> ctx,
@@ -47,7 +47,7 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
             int offsetY,
             float weight
     ) {
-        templates.add(TemplateFeatureConfig.createTemplate(location, offsetY), weight);
+        templates.add(FeatureTemplateImpl.createTemplate(location, offsetY), weight);
         return this;
     }
 

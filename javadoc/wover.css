@@ -1065,3 +1065,10 @@ p > code {
     padding: 4px 1px 4px 1px;
     background-color: #f1f1f1;
 }
+
+.type-signature {
+    border: 1px solid #f1f1f1;
+    background-color: #fdfdfd;
+    padding: 4px;
+    border-radius: 4px;
+}
