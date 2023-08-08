@@ -23,9 +23,9 @@ public class OffsetProvider extends PlacementModifier {
      */
     public static final Codec<OffsetProvider> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
-                    Vec3iProvider.CODEC
-                            .fieldOf("offset")
-                            .forGetter(cfg -> cfg.offset)
+                    Vec3iProvider.codec(-16, 16)
+                                 .fieldOf("offset")
+                                 .forGetter(cfg -> cfg.offset)
             )
             .apply(instance, OffsetProvider::new));
 
