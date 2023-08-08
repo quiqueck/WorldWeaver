@@ -2,6 +2,7 @@ package org.betterx.wover.block.impl.predicate;
 
 import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.entrypoint.WoverBlockAndItem;
+import org.betterx.wover.legacy.api.LegacyHelper;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -13,6 +14,11 @@ import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicateType;
 public class BlockPredicatesImpl {
     public static final BlockPredicateType<IsFullShape> FULL_SHAPE = register(
             WoverBlockAndItem.C.id("full_shape"),
+            IsFullShape.CODEC
+    );
+
+    private static final BlockPredicateType<IsFullShape> FULL_SHAPE_LEGACY = register(
+            LegacyHelper.BCLIB_CORE.id("full_shape"),
             IsFullShape.CODEC
     );
 

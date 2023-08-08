@@ -105,7 +105,7 @@ public class ExtendXZ extends PlacementModifier {
      * Calculates the positions that this placement modifier will emit.
      *
      * @param placementContext The placement context.
-     * @param random           The random source.
+     * @param randomSource     The random source.
      * @param blockPos         The input position.
      * @return The stream of new positions.
      */

@@ -3,6 +3,7 @@ package org.betterx.wover.feature.api.placed;
 import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
+import org.betterx.wover.feature.api.placed.modifiers.EveryLayer;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -85,7 +86,7 @@ public interface FeaturePlacementBuilder {
      */
     FeaturePlacementBuilder stencil();
     /**
-     * Similar to {@link #stencil()}, but only the stencil position with a random chance of 1 in 4.
+     * Similar to {@link #stencil()}, but every position in the stencil is emoted with a random chance of 1 in 4.
      *
      * @return this builder
      */
@@ -121,7 +122,7 @@ public interface FeaturePlacementBuilder {
      * but different y-coordinates.
      *
      * @return this builder
-     * @see org.betterx.wover.feature.api.placed.modifiers.OnEveryLayer
+     * @see EveryLayer
      */
     FeaturePlacementBuilder onEveryLayer();
 

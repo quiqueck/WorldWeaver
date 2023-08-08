@@ -31,14 +31,14 @@ public class PlacementModifiersImpl {
             Debug.CODEC
     );
 
-    public static final PlacementModifierType<ForAll> FOR_ALL = registerLegacy(
+    public static final PlacementModifierType<Merge> FOR_ALL = registerLegacy(
             "for_all",
-            ForAll.CODEC
+            Merge.CODEC
     );
 
-    public static final PlacementModifierType<FindSolidInDirection> SOLID_IN_DIR = registerLegacy(
+    public static final PlacementModifierType<FindInDirection> SOLID_IN_DIR = registerLegacy(
             "solid_in_dir",
-            FindSolidInDirection.CODEC
+            FindInDirection.CODEC
     );
 
     public static final PlacementModifierType<All> ALL = registerLegacy(
@@ -71,15 +71,22 @@ public class PlacementModifiersImpl {
             ExtendXZ.CODEC
     );
 
-    public static final PlacementModifierType<OnEveryLayer> ON_EVERY_LAYER = registerLegacy(
-            "on_every_layer",
-            OnEveryLayer.CODEC
+    public static final PlacementModifierType<EveryLayer> EVERY_LAYER = register(
+            "every_layer",
+            EveryLayer.CODEC
     );
 
-    public static final PlacementModifierType<UnderEveryLayer> UNDER_EVERY_LAYER = registerLegacy(
-            "under_every_layer",
-            UnderEveryLayer.CODEC
+    private static final PlacementModifierType<EveryLayer> ON_EVERY_LAYER_LEGACY = register(
+            LegacyHelper.BCLIB_CORE.id("on_every_layer"),
+            EveryLayer.CODEC,
+            false
     );
+    private static final PlacementModifierType<EveryLayer> UNDER_EVERY_LAYER_LEGACY = register(
+            LegacyHelper.BCLIB_CORE.id("under_every_layer"),
+            EveryLayer.CODEC_LEGACY_UNDER,
+            false
+    );
+
 
     private static <P extends PlacementModifier> PlacementModifierType<P> registerLegacy(String path, Codec<P> codec) {
         var id = WoverFeature.C.id(path);

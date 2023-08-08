@@ -15,21 +15,41 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class ForAll extends PlacementModifier {
-    public static final Codec<ForAll> CODEC = RecordCodecBuilder.create(instance -> instance
+/**
+ * A placement modifier that applies all of its sub-modifiers to the same
+ * position, merges their result and emits all merged positions.
+ */
+public class Merge extends PlacementModifier {
+    /**
+     * Codec for this placement modifier.
+     */
+    public static final Codec<Merge> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
                     ExtraCodecs.nonEmptyList(PlacementModifier.CODEC.listOf())
                                .fieldOf("modifiers")
                                .forGetter(a -> a.modifiers)
             )
-            .apply(instance, ForAll::new));
+            .apply(instance, Merge::new));
 
     private final List<PlacementModifier> modifiers;
 
-    public ForAll(List<PlacementModifier> modifiers) {
-        this.modifiers = modifiers;
+    /**
+     * Constructs a new instance.
+     *
+     * @param subModifiers The sub-modifiers to apply.
+     */
+    public Merge(List<PlacementModifier> subModifiers) {
+        this.modifiers = subModifiers;
     }
 
+    /**
+     * Calculates the positions that this placement modifier will emit.
+     *
+     * @param placementContext The placement context.
+     * @param randomSource     The random source.
+     * @param blockPos         The input position.
+     * @return The stream of new positions.
+     */
     @Override
     public @NotNull Stream<BlockPos> getPositions(
             PlacementContext placementContext,
@@ -43,6 +63,11 @@ public class ForAll extends PlacementModifier {
         return stream.build();
     }
 
+    /**
+     * Gets the type of this placement modifier.
+     *
+     * @return The type
+     */
     @Override
     public @NotNull PlacementModifierType<?> type() {
         return PlacementModifiersImpl.FOR_ALL;

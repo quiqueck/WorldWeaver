@@ -38,11 +38,11 @@ import org.jetbrains.annotations.NotNull;
  * Finally, if you want to select only a single, random direction, you can set {@code randomSelect} to true.
  * If set, only one random direction will be searched.
  */
-public class FindSolidInDirection extends PlacementModifier {
+public class FindInDirection extends PlacementModifier {
     /**
      * The codec for this placement modifier.
      */
-    public static final Codec<FindSolidInDirection> CODEC = RecordCodecBuilder
+    public static final Codec<FindInDirection> CODEC = RecordCodecBuilder
             .create((instance) -> instance.group(
                                                   ExtraCodecs.nonEmptyList(Direction.CODEC.listOf())
                                                              .optionalFieldOf("dir", List.of(Direction.DOWN))
@@ -55,16 +55,16 @@ public class FindSolidInDirection extends PlacementModifier {
                                           )
                                           .apply(
                                                   instance,
-                                                  FindSolidInDirection::new
+                                                  FindInDirection::new
                                           ));
 
-    private static final FindSolidInDirection DOWN = new FindSolidInDirection(
+    private static final FindInDirection DOWN = new FindInDirection(
             Direction.DOWN,
             6,
             0,
             BlockPredicates.ONLY_GROUND
     );
-    private static final FindSolidInDirection UP = new FindSolidInDirection(
+    private static final FindInDirection UP = new FindInDirection(
             Direction.UP,
             6,
             0,
@@ -80,14 +80,14 @@ public class FindSolidInDirection extends PlacementModifier {
 
 
     /**
-     * Create a new {@link FindSolidInDirection} Modifier with a single direction
+     * Create a new {@link FindInDirection} Modifier with a single direction
      *
      * @param direction         The direction to search in.
      * @param maxSearchDistance The maximum distance to search for a solid block.
      * @param offsetInDir       The offset you want to apply to the result position in the search direction.
      * @param surfacePredicate  The predicate to use to find the surface.
      */
-    public FindSolidInDirection(
+    public FindInDirection(
             Direction direction,
             int maxSearchDistance,
             int offsetInDir,
@@ -97,14 +97,14 @@ public class FindSolidInDirection extends PlacementModifier {
     }
 
     /**
-     * Create a new {@link FindSolidInDirection} Modifier multiple directions. All directions will bea searched.
+     * Create a new {@link FindInDirection} Modifier multiple directions. All directions will bea searched.
      *
      * @param directions        The directions to search in.
      * @param maxSearchDistance The maximum distance to search for a solid block.
      * @param offsetInDir       The offset you want to apply to the result position in the search direction.
      * @param surfacePredicate  The predicate to use to find the surface.
      */
-    public FindSolidInDirection(
+    public FindInDirection(
             List<Direction> directions,
             int maxSearchDistance,
             int offsetInDir,
@@ -114,7 +114,7 @@ public class FindSolidInDirection extends PlacementModifier {
     }
 
     /**
-     * Create a new {@link FindSolidInDirection} Modifier multiple directions.
+     * Create a new {@link FindInDirection} Modifier multiple directions.
      *
      * @param directions        The directions to search in.
      * @param maxSearchDistance The maximum distance to search for a solid block.
@@ -122,7 +122,7 @@ public class FindSolidInDirection extends PlacementModifier {
      * @param offsetInDir       The offset you want to apply to the result position in the search direction.
      * @param surfacePredicate  The predicate to use to find the surface.
      */
-    public FindSolidInDirection(
+    public FindInDirection(
             List<Direction> directions,
             int maxSearchDistance,
             boolean randomSelect,
@@ -138,24 +138,24 @@ public class FindSolidInDirection extends PlacementModifier {
     }
 
     /**
-     * Create a new {@link FindSolidInDirection} that will search below the input
+     * Create a new {@link FindInDirection} that will search below the input
      * position with a maximum distance of 6 Blocks. The resulting position will not be offset.
      * <p>
      * The modifier will use the {@link BlockPredicates#ONLY_GROUND} Predicate.
      *
-     * @return A new {@link FindSolidInDirection} Modifier.
+     * @return A new {@link FindInDirection} Modifier.
      */
     public static PlacementModifier down() {
         return DOWN;
     }
 
     /**
-     * Create a new {@link FindSolidInDirection} that will search above the input
+     * Create a new {@link FindInDirection} that will search above the input
      * position with a maximum distance of 6 Blocks. The resulting position will not be offset.
      * <p>
      * The modifier will use the {@link BlockPredicates#ONLY_GROUND} Predicate.
      *
-     * @return A new {@link FindSolidInDirection} Modifier.
+     * @return A new {@link FindInDirection} Modifier.
      */
     public static PlacementModifier up() {
         return UP;
@@ -166,11 +166,11 @@ public class FindSolidInDirection extends PlacementModifier {
      * The modifier will use the {@link BlockPredicates#ONLY_GROUND} Predicate.
      *
      * @param dist The maximum distance to search for a solid block.
-     * @return A new {@link FindSolidInDirection} Modifier.
+     * @return A new {@link FindInDirection} Modifier.
      */
     public static PlacementModifier down(int dist) {
         if (dist == DOWN.maxSearchDistance && 0 == DOWN.offsetInDir) return DOWN;
-        return new FindSolidInDirection(Direction.DOWN, dist, 0, BlockPredicates.ONLY_GROUND);
+        return new FindInDirection(Direction.DOWN, dist, 0, BlockPredicates.ONLY_GROUND);
     }
 
     /**
@@ -178,11 +178,11 @@ public class FindSolidInDirection extends PlacementModifier {
      * The modifier will use the {@link BlockPredicates#ONLY_GROUND} Predicate.
      *
      * @param dist The maximum distance to search for a solid block.
-     * @return A new {@link FindSolidInDirection} Modifier.
+     * @return A new {@link FindInDirection} Modifier.
      */
     public static PlacementModifier up(int dist) {
         if (dist == UP.maxSearchDistance && 0 == UP.offsetInDir) return UP;
-        return new FindSolidInDirection(Direction.UP, dist, 0, BlockPredicates.ONLY_GROUND);
+        return new FindInDirection(Direction.UP, dist, 0, BlockPredicates.ONLY_GROUND);
     }
 
 
@@ -192,11 +192,11 @@ public class FindSolidInDirection extends PlacementModifier {
      * The modifier will use the {@link BlockPredicates#ONLY_GROUND} Predicate.
      *
      * @param dist The maximum distance to search for a solid block.
-     * @return A new {@link FindSolidInDirection} Modifier.
+     * @return A new {@link FindInDirection} Modifier.
      */
     public static PlacementModifier down(int dist, int offset) {
         if (dist == DOWN.maxSearchDistance && 0 == DOWN.offsetInDir) return DOWN;
-        return new FindSolidInDirection(Direction.DOWN, dist, offset, BlockPredicates.ONLY_GROUND);
+        return new FindInDirection(Direction.DOWN, dist, offset, BlockPredicates.ONLY_GROUND);
     }
 
     /**
@@ -205,11 +205,11 @@ public class FindSolidInDirection extends PlacementModifier {
      * The modifier will use the {@link BlockPredicates#ONLY_GROUND} Predicate.
      *
      * @param dist The maximum distance to search for a solid block.
-     * @return A new {@link FindSolidInDirection} Modifier.
+     * @return A new {@link FindInDirection} Modifier.
      */
     public static PlacementModifier up(int dist, int offset) {
         if (dist == UP.maxSearchDistance && offset == UP.offsetInDir) return UP;
-        return new FindSolidInDirection(Direction.UP, dist, offset, BlockPredicates.ONLY_GROUND);
+        return new FindInDirection(Direction.UP, dist, offset, BlockPredicates.ONLY_GROUND);
     }
 
     /**
@@ -227,7 +227,7 @@ public class FindSolidInDirection extends PlacementModifier {
      * Calculates the positions that this placement modifier will emit.
      *
      * @param placementContext The placement context.
-     * @param random           The random source.
+     * @param randomSource     The random source.
      * @param blockPos         The input position.
      * @return The stream of new positions.
      */

@@ -18,8 +18,14 @@ import java.util.Map;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Moves the input position by a given offset.
+ */
 public class Offset extends PlacementModifier {
     private static final Map<Direction, Offset> DIRECTIONS = Maps.newHashMap();
+    /**
+     * Codec for this placement modifier.
+     */
     public static final Codec<Offset> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
                     Vec3i.CODEC
@@ -30,14 +36,33 @@ public class Offset extends PlacementModifier {
 
     private final Vec3i offset;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param offset The offset to apply
+     */
     public Offset(Vec3i offset) {
         this.offset = offset;
     }
 
+    /**
+     * Creates a new instance that will move the input position one Block in the given direction
+     *
+     * @param dir The direction to move in
+     * @return A new instance
+     */
     public static Offset inDirection(Direction dir) {
         return DIRECTIONS.get(dir);
     }
 
+    /**
+     * Calculates the positions that this placement modifier will emit.
+     *
+     * @param placementContext The placement context.
+     * @param randomSource     The random source.
+     * @param blockPos         The input position.
+     * @return The stream of new positions.
+     */
     @Override
     public @NotNull Stream<BlockPos> getPositions(
             PlacementContext placementContext,
@@ -47,6 +72,11 @@ public class Offset extends PlacementModifier {
         return Stream.of(blockPos.offset(offset));
     }
 
+    /**
+     * Gets the type of this placement modifier.
+     *
+     * @return
+     */
     @Override
     public @NotNull PlacementModifierType<?> type() {
         return PlacementModifiersImpl.OFFSET;

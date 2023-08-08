@@ -48,14 +48,23 @@ public class BlockHelper {
         return state.isAir() || isFluid(state);
     }
 
+    /**
+     * Test if the block is a terrain block. Whenever possible, you should use
+     * {@link org.betterx.wover.block.api.predicate.BlockPredicates#ONLY_GROUND } instead. However,
+     * this method call will be faster if you already have or need to use the block state multiple times.
+     *
+     * @param state the block state to test
+     * @return true if the block is a terrain block. This is the case if the block has
+     * the {@link CommonBlockTags#TERRAIN} tag.
+     */
     public static boolean isTerrain(BlockState state) {
         return state.is(CommonBlockTags.TERRAIN);
     }
 
     /**
-     * @param world
-     * @param pos
-     * @param state
+     * @param world the world
+     * @param pos   the position
+     * @param state the state to set
      * @deprecated use {@link LevelAccessor#setBlock(BlockPos, BlockState, int)} instead
      */
     @Deprecated(forRemoval = true)
@@ -90,6 +99,12 @@ public class BlockHelper {
         return false;
     }
 
+    /**
+     * Returns a set of all possible states for the given block.
+     *
+     * @param block the block
+     * @return a set of all possible states for the given block
+     */
     public static Set<BlockState> getPossibleStates(Block block) {
         return ImmutableSet.copyOf(block.getStateDefinition().getPossibleStates());
     }

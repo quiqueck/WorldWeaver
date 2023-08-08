@@ -16,14 +16,23 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Rejects the input based on the noise value at the xz-coordinate of the input position
+ * <p>
+ * The modifier will look up the noise-vale {@code v} at {@code (x*scaleXZ, y*scaleY, z*scaleXZ)}. If {@code min < v < max}
+ * the position will be accepted. Otherwise, it is rejected.
+ */
 public class NoiseFilter extends PlacementFilter {
+    /**
+     * Codec for this placement modifier.
+     */
     public static final Codec<NoiseFilter> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
                     ResourceKey.codec(Registries.NOISE).fieldOf("noise").forGetter(o -> o.noise),
-                    Codec.DOUBLE.fieldOf("min_noise_level").forGetter(o -> o.minNoiseLevel),
-                    Codec.DOUBLE.fieldOf("max_noise_level").orElse(Double.MAX_VALUE).forGetter(o -> o.maxNoiseLevel),
-                    Codec.FLOAT.fieldOf("scale_xz").orElse(1f).forGetter(o -> o.scaleXZ),
-                    Codec.FLOAT.fieldOf("scale_y").orElse(1f).forGetter(o -> o.scaleY)
+                    Codec.DOUBLE.optionalFieldOf("min_noise_level", -Double.MAX_VALUE).forGetter(o -> o.minNoiseLevel),
+                    Codec.DOUBLE.optionalFieldOf("max_noise_level", Double.MAX_VALUE).forGetter(o -> o.maxNoiseLevel),
+                    Codec.FLOAT.optionalFieldOf("scale_xz", 1f).forGetter(o -> o.scaleXZ),
+                    Codec.FLOAT.optionalFieldOf("scale_y", 1f).forGetter(o -> o.scaleY)
             )
             .apply(instance, NoiseFilter::new));
 
@@ -35,6 +44,15 @@ public class NoiseFilter extends PlacementFilter {
     private final float scaleY;
 
 
+    /**
+     * Creates a new instance
+     *
+     * @param noise         The noise to use
+     * @param minNoiseLevel The minimum noise level
+     * @param maxNoiseLevel The maximum noise level
+     * @param scaleXZ       The xz-scale for the input position
+     * @param scaleY        The y-scale for the input position
+     */
     public NoiseFilter(
             ResourceKey<NormalNoise.NoiseParameters> noise,
             double minNoiseLevel,
@@ -49,6 +67,14 @@ public class NoiseFilter extends PlacementFilter {
         this.scaleY = scaleY;
     }
 
+    /**
+     * Tests the input position against the noise value at the xz-coordinate of the input position
+     *
+     * @param ctx    The placement context
+     * @param random The random source
+     * @param pos    The input position
+     * @return {@code true} if the noise value at {@code (x*scaleXZ, y*scaleY, z*scaleXZ)} is in the range {@code (minNoiseLevel, maxNoiseLevel)}
+     */
     @Override
     protected boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
         final NormalNoise normalNoise = NoiseParameterManager.getOrCreateNoise(
@@ -60,6 +86,11 @@ public class NoiseFilter extends PlacementFilter {
         return v > minNoiseLevel && v < maxNoiseLevel;
     }
 
+    /**
+     * Gets the type of this placement modifier
+     *
+     * @return The type of this placement modifier
+     */
     @Override
     public @NotNull PlacementModifierType<?> type() {
         return PlacementModifiersImpl.NOISE_FILTER;

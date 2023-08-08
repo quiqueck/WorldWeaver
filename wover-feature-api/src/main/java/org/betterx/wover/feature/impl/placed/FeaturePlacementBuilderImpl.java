@@ -2,7 +2,6 @@ package org.betterx.wover.feature.impl.placed;
 
 import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.block.api.predicate.BlockPredicates;
-import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
 import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 import org.betterx.wover.feature.api.placed.modifiers.*;
@@ -159,22 +158,22 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl onEveryLayer() {
-        return modifier(OnEveryLayer.simple());
+        return modifier(EveryLayer.on());
     }
 
     @Override
     public FeaturePlacementBuilderImpl onEveryLayerMin4() {
-        return modifier(OnEveryLayer.min4());
+        return modifier(EveryLayer.onTopMin4());
     }
 
     @Override
     public FeaturePlacementBuilderImpl underEveryLayer() {
-        return modifier(UnderEveryLayer.simple());
+        return modifier(EveryLayer.underneath());
     }
 
     @Override
     public FeaturePlacementBuilderImpl underEveryLayerMin4() {
-        return modifier(UnderEveryLayer.min4());
+        return modifier(EveryLayer.underneathMin4());
     }
 
     /**
@@ -275,7 +274,7 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl inBasinOf(BlockPredicate... predicates) {
-        return modifier(new IsBasin(BlockPredicate.anyOf(predicates)));
+        return modifier(IsBasin.simple(BlockPredicate.anyOf(predicates)));
     }
 
     @Override
@@ -300,27 +299,27 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl findSolidFloor(int distance) {
-        return modifier(FindSolidInDirection.down(distance));
+        return modifier(FindInDirection.down(distance));
     }
 
     @Override
     public FeaturePlacementBuilderImpl findSolidCeil(int distance) {
-        return modifier(FindSolidInDirection.up(distance));
+        return modifier(FindInDirection.up(distance));
     }
 
     @Override
     public FeaturePlacementBuilderImpl findSolidSurface(Direction dir, int distance) {
-        return modifier(new FindSolidInDirection(dir, distance, 0, BlockPredicates.ONLY_GROUND));
+        return modifier(new FindInDirection(dir, distance, 0, BlockPredicates.ONLY_GROUND));
     }
 
     @Override
     public FeaturePlacementBuilderImpl findSolidSurface(List<Direction> dir, int distance, boolean randomSelect) {
-        return modifier(new FindSolidInDirection(dir, distance, randomSelect, 0, BlockPredicates.ONLY_GROUND));
+        return modifier(new FindInDirection(dir, distance, randomSelect, 0, BlockPredicates.ONLY_GROUND));
     }
 
     @Override
     public FeaturePlacementBuilderImpl onWalls(int distance, int depth) {
-        return modifier(new FindSolidInDirection(
+        return modifier(new FindInDirection(
                 BlockHelper.HORIZONTAL,
                 distance,
                 false,
@@ -389,13 +388,13 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     public FeaturePlacementBuilderImpl extendZigZagXZ(int xzSpread) {
         IntProvider xz = UniformInt.of(0, xzSpread);
         return modifier(
-                new ForAll(List.of(
+                new Merge(List.of(
                         new Extend(Direction.NORTH, xz),
                         new Extend(Direction.SOUTH, xz),
                         new Extend(Direction.EAST, xz),
                         new Extend(Direction.WEST, xz)
                 )),
-                new ForAll(List.of(
+                new Merge(List.of(
                         new Extend(Direction.EAST, xz),
                         new Extend(Direction.WEST, xz),
                         new Extend(Direction.NORTH, xz),
@@ -423,17 +422,17 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl isNextTo(BlockPredicate predicate) {
-        return modifier(new IsNextTo(predicate));
+        return modifier(IsNextTo.simple(predicate));
     }
 
     @Override
     public FeaturePlacementBuilderImpl belowIsNextTo(BlockPredicate predicate) {
-        return modifier(new IsNextTo(predicate, Direction.DOWN.getNormal()));
+        return modifier(IsNextTo.offset(predicate, Direction.DOWN.getNormal()));
     }
 
     @Override
     public FeaturePlacementBuilderImpl isNextTo(BlockPredicate predicate, Vec3i offset) {
-        return modifier(new IsNextTo(predicate, offset));
+        return modifier(IsNextTo.offset(predicate, offset));
     }
 
     @Override
@@ -478,7 +477,7 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl isFullShape() {
-        return isEmptyAndUnder(IsFullShape.HERE);
+        return isEmptyAndUnder(BlockPredicates.IS_FULL_BLOCK);
     }
 
     @Override
