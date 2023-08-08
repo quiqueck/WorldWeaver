@@ -18,17 +18,18 @@ public class WoverBiomeTestMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
+
         BiomeModificationRegistry.BOOTSTRAP_BIOME_MODIFICATION_REGISTRY.subscribe(context -> {
             var features = context.lookup(Registries.PLACED_FEATURE);
 
             BiomeModification
-                    .build(C.id("runtime_modification"))
+                    .build(context, C.id("runtime_modification"))
                     .isBiome(Biomes.MEADOW)
                     .addFeature(
                             GenerationStep.Decoration.VEGETAL_DECORATION,
                             features.getOrThrow(NetherPlacements.SMALL_BASALT_COLUMNS)
                     )
-                    .register(context);
+                    .register();
         });
     }
 }

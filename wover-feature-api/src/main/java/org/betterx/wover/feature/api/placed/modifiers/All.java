@@ -14,9 +14,16 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Generates a position for each block in a 16x16 area around the input position.
+ * Offsets the input position between 0 and 15 in the xz-Plane and generates a new
+ * Position for each generated position.
+ * <p>
+ * The minimum position that is emitted is the input position, the largest position is
+ * the input offset by {@code (15, 0, 15)}.
  */
 public class All extends PlacementModifier {
+    /**
+     * The instance of this placement modifier.
+     */
     private static final All INSTANCE = new All();
     /**
      * The codec for this placement modifier.
@@ -24,7 +31,7 @@ public class All extends PlacementModifier {
     public static final Codec<All> CODEC = Codec.unit(All::new);
 
     /**
-     * Returns a stream of all positions in a 16x16 area around the input position.
+     * Returns a stream of all positions that are offset by 0 to 15 in the xz-Plane.
      *
      * @param placementContext The placement context.
      * @param randomSource     The random source.

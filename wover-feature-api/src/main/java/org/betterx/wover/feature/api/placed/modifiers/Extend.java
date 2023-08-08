@@ -16,7 +16,17 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
+
+/**
+ * Extends the input position in the given direction by the given length. All extended positions
+ * will be emitted. The input position will be emitted as well.
+ * <p>
+ * This will basically generate a colum of positions in the given direction.
+ */
 public class Extend extends PlacementModifier {
+    /**
+     * The codec for this placement modifier.
+     */
     public static final Codec<Extend> CODEC = RecordCodecBuilder.create((instance) -> instance
             .group(
                     Direction.CODEC
@@ -33,11 +43,25 @@ public class Extend extends PlacementModifier {
     private final Direction direction;
     private final IntProvider length;
 
+    /**
+     * Constructs a new extend placement modifier.
+     *
+     * @param direction The direction to extend in.
+     * @param length    The length to extend by.
+     */
     public Extend(Direction direction, IntProvider length) {
         this.direction = direction;
         this.length = length;
     }
 
+    /**
+     * Calculates the positions that this placement modifier will emit.
+     *
+     * @param placementContext The placement context.
+     * @param random           The random source.
+     * @param blockPos         The input position.
+     * @return The stream of new positions.
+     */
     @Override
     public @NotNull Stream<BlockPos> getPositions(
             PlacementContext placementContext,
@@ -53,6 +77,11 @@ public class Extend extends PlacementModifier {
         return builder.build();
     }
 
+    /**
+     * Gets the type of this placement modifier.
+     *
+     * @return The type of this placement modifier.
+     */
     @Override
     public @NotNull PlacementModifierType<?> type() {
         return PlacementModifiersImpl.EXTEND;

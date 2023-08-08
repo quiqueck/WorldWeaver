@@ -29,18 +29,18 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
         var features = context.lookup(Registries.PLACED_FEATURE);
 
         BiomeModification
-                .build(modCore.id("test_features"))
+                .build(context, modCore.id("test_features"))
                 .inBiomes(Biomes.BEACH, Biomes.MEADOW)
                 .addFeature(
                         GenerationStep.Decoration.VEGETAL_DECORATION,
                         features.getOrThrow(NetherPlacements.SMALL_BASALT_COLUMNS)
                 )
-                .register(context);
+                .register();
 
         BiomeModification
-                .build(modCore.id("test_tags"))
+                .build(context, modCore.id("test_tags"))
                 .inNether()
                 .addToTag(BiomeTags.HAS_SWAMP_HUT)
-                .register(context);
+                .register();
     }
 }

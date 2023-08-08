@@ -4,6 +4,7 @@ import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.block.api.predicate.BlockPredicates;
 import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
+import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 import org.betterx.wover.feature.api.placed.modifiers.*;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
@@ -15,8 +16,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.valueproviders.IntProvider;
-import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.util.valueproviders.*;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -135,13 +135,13 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
      * Generate feature in certain iterations (per chunk).
      * Feature will be generated on all layers (example - Nether plants).
      *
-     * @param count how many times feature will be generated in chunk layers.
+     * @param repetitions how many times feature will be generated in chunk layers.
      * @return same instance.
      */
     @Override
     @SuppressWarnings("deprecation")
-    public FeaturePlacementBuilderImpl onEveryLayer(int count) {
-        return modifier(CountOnEveryLayerPlacement.of(count));
+    public FeaturePlacementBuilderImpl onEveryLayer(int repetitions) {
+        return modifier(CountOnEveryLayerPlacement.of(repetitions));
     }
 
     /**
@@ -213,57 +213,26 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
         return modifier(new NoiseFilter(Noises.GRAVEL, -Double.MAX_VALUE, value, scaleXZ, scaleY));
     }
 
-    /**
-     * Randomize the xz-Coordinates
-     *
-     * @return same instance.
-     */
     @Override
     public FeaturePlacementBuilderImpl squarePlacement() {
         return modifier(InSquarePlacement.spread());
     }
 
     @Override
-    public FeaturePlacementBuilderImpl onHeightmap(Heightmap.Types types) {
-        return modifier(HeightmapPlacement.onHeightmap(types));
-    }
-
-
-    /**
-     * Select random height that is 10 above min Build height and 10 below max generation height
-     *
-     * @return The instance it was called on
-     */
-    @Override
     public FeaturePlacementBuilderImpl randomHeight10FromFloorCeil() {
         return modifier(PlacementUtils.RANGE_10_10);
     }
 
-    /**
-     * Select random height that is 4 above min Build height and 10 below max generation height
-     *
-     * @return The instance it was called on
-     */
     @Override
     public FeaturePlacementBuilderImpl randomHeight4FromFloorCeil() {
         return modifier(PlacementUtils.RANGE_4_4);
     }
 
-    /**
-     * Select random height that is 8 above min Build height and 10 below max generation height
-     *
-     * @return The instance it was called on
-     */
     @Override
     public FeaturePlacementBuilderImpl randomHeight8FromFloorCeil() {
         return modifier(PlacementUtils.RANGE_8_8);
     }
 
-    /**
-     * Select random height that is above min Build height and 10 below max generation height
-     *
-     * @return The instance it was called on
-     */
     @Override
     public FeaturePlacementBuilderImpl randomHeight() {
         return modifier(PlacementUtils.FULL_RANGE);
@@ -292,18 +261,6 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     @Override
     public FeaturePlacementBuilderImpl offset(Vec3i dir) {
         return modifier(new Offset(dir));
-    }
-
-    /**
-     * Cast a downward ray with max {@code distance} length to find the next solid Block.
-     *
-     * @param distance The maximum search Distance
-     * @return The instance it was called on
-     * @see #findSolidSurface(Direction, int) for Details
-     */
-    @Override
-    public FeaturePlacementBuilderImpl findSolidFloor(int distance) {
-        return modifier(FindSolidInDirection.down(distance));
     }
 
     @Override
@@ -342,33 +299,39 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     }
 
     @Override
+    public FeaturePlacementBuilderImpl findSolidFloor(int distance) {
+        return modifier(FindSolidInDirection.down(distance));
+    }
+
+    @Override
     public FeaturePlacementBuilderImpl findSolidCeil(int distance) {
         return modifier(FindSolidInDirection.up(distance));
     }
 
-    /**
-     * Cast a ray with max {@code distance} length to find the next solid Block. The ray will travel through replaceable
-     * Blocks and will be accepted if it hits a block with the
-     * {@link org.betterx.wover.tag.api.predefined.CommonBlockTags#TERRAIN}-tag
-     *
-     * @param dir      The direction the ray is cast
-     * @param distance The maximum search Distance
-     * @return The instance it was called on
-     * @see #findSolidSurface(Direction, int) for Details
-     */
     @Override
     public FeaturePlacementBuilderImpl findSolidSurface(Direction dir, int distance) {
-        return modifier(new FindSolidInDirection(dir, distance, 0));
+        return modifier(new FindSolidInDirection(dir, distance, 0, BlockPredicates.ONLY_GROUND));
     }
 
     @Override
     public FeaturePlacementBuilderImpl findSolidSurface(List<Direction> dir, int distance, boolean randomSelect) {
-        return modifier(new FindSolidInDirection(dir, distance, randomSelect, 0));
+        return modifier(new FindSolidInDirection(dir, distance, randomSelect, 0, BlockPredicates.ONLY_GROUND));
     }
 
     @Override
     public FeaturePlacementBuilderImpl onWalls(int distance, int depth) {
-        return modifier(new FindSolidInDirection(BlockHelper.HORIZONTAL, distance, false, depth));
+        return modifier(new FindSolidInDirection(
+                BlockHelper.HORIZONTAL,
+                distance,
+                false,
+                depth,
+                BlockPredicates.ONLY_GROUND
+        ));
+    }
+
+    @Override
+    public FeaturePlacementBuilderImpl onHeightmap(Heightmap.Types types) {
+        return modifier(HeightmapPlacement.onHeightmap(types));
     }
 
     @Override
@@ -386,8 +349,44 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
         return modifier(PlacementUtils.HEIGHTMAP_WORLD_SURFACE);
     }
 
+
     @Override
-    public FeaturePlacementBuilderImpl extendXZ(int xzSpread) {
+    public FeaturePlacementBuilder heightmapOceanFloor() {
+        return modifier(PlacementUtils.HEIGHTMAP_OCEAN_FLOOR);
+    }
+
+    @Override
+    public FeaturePlacementBuilderImpl extendXZ(
+            int xzSpread,
+            float centerDensity,
+            float borderDensity,
+            boolean square
+    ) {
+        return this.modifier(new ExtendXZ(
+                ConstantInt.of(xzSpread),
+                ConstantFloat.of(centerDensity),
+                ConstantFloat.of(borderDensity),
+                square
+        ));
+    }
+
+    @Override
+    public FeaturePlacementBuilder extendXZ(
+            IntProvider xzSpread,
+            FloatProvider centerDensity,
+            FloatProvider borderDensity,
+            boolean square
+    ) {
+        return this.modifier(new ExtendXZ(
+                xzSpread,
+                centerDensity,
+                borderDensity,
+                square
+        ));
+    }
+
+    @Override
+    public FeaturePlacementBuilderImpl extendZigZagXZ(int xzSpread) {
         IntProvider xz = UniformInt.of(0, xzSpread);
         return modifier(
                 new ForAll(List.of(
@@ -406,9 +405,9 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     }
 
     @Override
-    public FeaturePlacementBuilderImpl extendXYZ(int xzSpread, int ySpread) {
+    public FeaturePlacementBuilderImpl extendZigZagXYZ(int xzSpread, int ySpread) {
         IntProvider xz = UniformInt.of(0, xzSpread);
-        return extendXZ(xzSpread).extendDown(1, ySpread);
+        return extendZigZagXZ(xzSpread).extendDown(1, ySpread);
     }
 
     @Override
@@ -552,6 +551,11 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     public FeaturePlacementBuilderImpl modifier(List<PlacementModifier> modifiers) {
         modifications.addAll(modifiers);
         return this;
+    }
+
+    @Override
+    public FeaturePlacementBuilderImpl debug(String caption) {
+        return modifier(new Debug(caption));
     }
 
     /**

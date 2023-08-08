@@ -26,6 +26,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import java.util.*;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Biome Modifications are used to modify some aspects of a Biome after a world was loaded.
@@ -89,37 +90,51 @@ public interface BiomeModification {
     /**
      * Creates a new {@link Builder} for a {@link BiomeModification}.
      *
+     * @param context  The bootstrap context of the registry
      * @param location The location of the modification.
      * @return The builder.
      */
-    static Builder build(ResourceLocation location) {
-        return new Builder(ResourceKey.create(BiomeModificationRegistry.BIOME_MODIFICATION_REGISTRY, location));
+    static Builder build(@NotNull BootstapContext<BiomeModification> context, @NotNull ResourceLocation location) {
+        return new Builder(
+                context,
+                ResourceKey.create(BiomeModificationRegistry.BIOME_MODIFICATION_REGISTRY, location)
+        );
     }
 
     /**
      * Creates a new {@link Builder} for a {@link BiomeModification}.
      *
-     * @param key The key of the modification.
+     * @param context The bootstrap context of the registry
+     * @param key     The key of the modification.
      * @return The builder.
      */
-    static Builder build(ResourceKey<BiomeModification> key) {
-        return new Builder(key);
+    static Builder build(
+            @NotNull BootstapContext<BiomeModification> context,
+            @NotNull ResourceKey<BiomeModification> key
+    ) {
+        return new Builder(context, key);
     }
 
     /**
      * A builder for {@link BiomeModification}s.
      * <p>
-     * When the modification is finished, it can be registered using {@link #register(BootstapContext)}.
+     * When the modification is finished, it can be registered using {@link #register()}.
      * You can also build a {@link Holder.Direct} using {@link #directHolder()}.
      */
     final class Builder {
+        @Nullable
+        private final BootstapContext<BiomeModification> bootstrapContext;
         private BiomePredicate predicate;
         private final FeatureMap features;
         private final Set<TagKey<Biome>> tags = new HashSet<>();
 
         private final ResourceKey<BiomeModification> key;
 
-        private Builder(ResourceKey<BiomeModification> key) {
+        private Builder(
+                @Nullable BootstapContext<BiomeModification> bootstrapContext,
+                ResourceKey<BiomeModification> key
+        ) {
+            this.bootstrapContext = bootstrapContext;
             this.key = key;
             this.predicate = BiomePredicate.always();
             this.features = FeatureMap.of(new ArrayList<>(GenerationStep.Decoration.values().length));
@@ -369,6 +384,26 @@ public interface BiomeModification {
          * of all Biomes that match the {@link #predicate}.
          *
          * @param decoration The decoration step.
+         * @param featureKey The {@link ResourceKey} for the feature.
+         * @return This builder.
+         */
+        public Builder addFeature(
+                GenerationStep.Decoration decoration,
+                ResourceKey<PlacedFeature> featureKey
+        ) {
+            if (bootstrapContext == null) {
+                throw new IllegalStateException(
+                        "You can not add a ResourceKey for a PlacedFeature to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");
+            }
+            var holder = bootstrapContext.lookup(Registries.PLACED_FEATURE).getOrThrow(featureKey);
+            return this.addFeature(decoration, holder);
+        }
+
+        /**
+         * Adds a feature to the modification. This feature will be added to the {@link GenerationStep.Decoration}
+         * of all Biomes that match the {@link #predicate}.
+         *
+         * @param decoration The decoration step.
          * @param holder     The holder of the feature.
          * @return This builder.
          */
@@ -390,13 +425,17 @@ public interface BiomeModification {
          * {@link #addFeature(GenerationStep.Decoration, Holder)}
          * instead, as it will be faster.
          *
-         * @param ctx     The bootstrap context.
          * @param feature The feature.
          * @return This builder.
          */
-        public Builder addFeature(BootstapContext<?> ctx, PlacedFeatureKey feature) {
-            return this.addFeature(feature.getDecoration(), feature.getHolder(ctx));
+        public Builder addFeature(PlacedFeatureKey feature) {
+            if (bootstrapContext == null) {
+                throw new IllegalStateException(
+                        "You can not add a PlacedFeatureKey to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");
+            }
+            return this.addFeature(feature.getDecoration(), feature.getHolder(bootstrapContext));
         }
+
 
         /**
          * Adds the Biome into a given Tag.
@@ -421,11 +460,17 @@ public interface BiomeModification {
         /**
          * Registers the {@link BiomeModification} to the {@link BiomeModificationRegistry}.
          *
-         * @param ctx The bootstrap context of the registry
          * @return The holder created in the registry
          */
-        public Holder<BiomeModification> register(BootstapContext<BiomeModification> ctx) {
-            return ctx.register(key, build());
+        public Holder<BiomeModification> register() {
+            if (key == null) {
+                throw new IllegalStateException("You need to specify a key when you register a Biome Modification.");
+            }
+
+            if (bootstrapContext == null) {
+                throw new IllegalStateException("You need to supply a key when you register a Biome Modification (" + key + ").");
+            }
+            return bootstrapContext.register(key, build());
         }
 
         @NotNull

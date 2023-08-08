@@ -27,12 +27,12 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
     protected void bootstrap(BootstapContext<BiomeModification> context) {
         var features = context.lookup(Registries.PLACED_FEATURE);
         BiomeModification
-                .build(modCore.id("test_modification"))
+                .build(context, modCore.id("test_modification"))
                 .isBiome(Biomes.DESERT)
                 .addFeature(
                         GenerationStep.Decoration.VEGETAL_DECORATION,
                         WoverFeatureTestMod.PLACED_REDSTONE_BLOCK.getHolder(features)
                 )
-                .register(context);
+                .register();
     }
 }

@@ -5,14 +5,15 @@ import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 
 import com.google.common.collect.ImmutableSet;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public class BlockHelper {
     public static final int FLAG_UPDATE_BLOCK = 1;
@@ -63,18 +64,18 @@ public class BlockHelper {
     }
 
     public static boolean findOnSurroundingSurface(
-            LevelAccessor level,
+            WorldGenLevel level,
             BlockPos.MutableBlockPos startPos,
             Direction dir,
             int length,
-            Predicate<BlockState> surface
+            BlockPredicate surface
     ) {
         for (int len = 0; len < length; len++) {
-            if (surface.test(level.getBlockState(startPos))) {
+            if (surface.test(level, startPos)) {
                 if (len == 0) { //we started inside of the surface
                     for (int lenUp = 0; lenUp < length; lenUp++) {
                         startPos.move(dir, -1);
-                        if (!surface.test(level.getBlockState(startPos))) {
+                        if (!surface.test(level, startPos)) {
                             return true;
                         }
                     }
