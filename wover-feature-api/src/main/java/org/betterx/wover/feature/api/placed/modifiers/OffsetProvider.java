@@ -61,7 +61,7 @@ public class OffsetProvider extends PlacementModifier {
     /**
      * Gets the type of this placement modifier.
      *
-     * @return
+     * @return The type.
      */
     @Override
     public @NotNull PlacementModifierType<?> type() {

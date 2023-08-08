@@ -289,6 +289,16 @@ public interface FeaturePlacementBuilder {
      * @param z the provider for the offset in z direction
      * @return this builder
      */
+    FeaturePlacementBuilder offset(int x, int y, int z);
+
+    /**
+     * Moves the input position by the specified vector.
+     *
+     * @param x the provider for the offset in x direction
+     * @param y the provider for the offset in y direction
+     * @param z the provider for the offset in z direction
+     * @return this builder
+     */
     FeaturePlacementBuilder offset(IntProvider x, IntProvider y, IntProvider z);
 
     /**
@@ -429,6 +439,15 @@ public interface FeaturePlacementBuilder {
      * @return this builder
      */
     FeaturePlacementBuilder onHeightmap(Heightmap.Types types);
+
+    /**
+     * Projects the point to the surface at the current xz-coordinate.
+     * <p>
+     * This is basically a shortcut for {@code this.heightmap().offset(0, -1, 0)}
+     *
+     * @return this builder
+     */
+    FeaturePlacementBuilder projectToSurface();
 
     /**
      * Convenience method for {@link #onHeightmap(Heightmap.Types)} using

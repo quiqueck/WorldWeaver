@@ -24,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A key for a {@link PlacedFeature} that can be used to reference the feature as well as
  * use it to place a {@link ConfiguredFeature}.
+ * <p>
+ * If you do not call {@link #setDecoration(GenerationStep.Decoration)}, the feature is assigned
+ * to the {@link GenerationStep.Decoration#VEGETAL_DECORATION} step.
  */
 public class PlacedFeatureKey {
     /**
@@ -31,7 +34,7 @@ public class PlacedFeatureKey {
      */
     public final ResourceKey<PlacedFeature> key;
 
-    private GenerationStep.Decoration decoration = GenerationStep.Decoration.SURFACE_STRUCTURES;
+    private GenerationStep.Decoration decoration = GenerationStep.Decoration.VEGETAL_DECORATION;
 
     /**
      * Creates a new {@link PlacedFeatureKey} from the given id.

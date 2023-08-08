@@ -9,11 +9,14 @@ import org.betterx.wover.feature.api.configured.configurators.ForSimpleBlock;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 
-import net.minecraft.core.Vec3i;
 import net.minecraft.data.worldgen.features.MiscOverworldFeatures;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.util.valueproviders.ConstantFloat;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.UniformFloat;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.GenerationStep;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -48,6 +51,8 @@ public class WoverFeatureTestMod implements ModInitializer {
     @Override
     public void onInitialize() {
         final var PLATEAU = PlacedFeatureManager.createKey(C.id("plateau"));
+        final var PATCH = PlacedFeatureManager.createKey(C.id("patch"))
+                                              .setDecoration(GenerationStep.Decoration.TOP_LAYER_MODIFICATION);
 
         ConfiguredFeatureManager.BOOTSTRAP_CONFIGURED_FEATURES.subscribe(ctx -> TEST_FEATURE_SIMPLE
                 .bootstrap(ctx)
@@ -55,21 +60,33 @@ public class WoverFeatureTestMod implements ModInitializer {
                 .register());
 
         PlacedFeatureManager.BOOTSTRAP_PLACED_FEATURES.subscribe(ctx -> {
+            PATCH.inlineConfiguration(ctx)
+                 .simple()
+                 .block(Blocks.SCULK)
+                 .inlinePlace()
+                 .squarePlacement()
+                 .onlyInBiome()
+                 .extendXZ(UniformInt.of(4, 8), ConstantFloat.of(1.0f), UniformFloat.of(0.1f, 0.3f), false)
+                 .projectToSurface()
+                 .register();
+
             PLATEAU.inlineConfiguration(ctx)
                    .simple()
-                   .block(Blocks.GLASS)
+                   .block(Blocks.OAK_PLANKS)
                    .inlinePlace()
                    .squarePlacement()
-                   .modifier(PlacementUtils.HEIGHTMAP)
-                   .offset(new Vec3i(0, 8, 0))
-                   .extendXZ(6, 1, 0.2f, false)
+                   .heightmap()
+                   .onlyInBiome()
+                   .offset(ConstantInt.of(0), UniformInt.of(3, 12), ConstantInt.of(0))
+                   .extendXZ(UniformInt.of(4, 8), ConstantFloat.of(1.0f), UniformFloat.of(0.1f, 0.3f), false)
                    .register();
 
             PLACED_LAPIS_BLOCK
                     .place(ctx)
                     .count(16)
                     .squarePlacement()
-                    .modifier(PlacementUtils.HEIGHTMAP)
+                    .onlyInBiome()
+                    .heightmap()
                     .register();
         });
 
@@ -84,6 +101,7 @@ public class WoverFeatureTestMod implements ModInitializer {
                     .build(ctx, C.id("plateau_modification"))
                     .isBiome(Biomes.BADLANDS)
                     .addFeature(PLATEAU)
+                    .addFeature(PATCH)
                     .register();
         });
     }

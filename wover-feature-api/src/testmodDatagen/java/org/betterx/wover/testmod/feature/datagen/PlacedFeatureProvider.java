@@ -7,7 +7,6 @@ import org.betterx.wover.testmod.entrypoint.WoverFeatureTestMod;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
-import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
@@ -23,11 +22,13 @@ public class PlacedFeatureProvider extends WoverRegistryContentProvider<PlacedFe
         WoverFeatureTestMod.PLACED_REDSTONE_BLOCK.place(context)
                                                  .count(64)
                                                  .squarePlacement()
-                                                 .modifier(PlacementUtils.HEIGHTMAP)
+                                                 .onlyInBiome()
+                                                 .heightmap()
                                                  .register();
 
         WoverFeatureTestMod.VANILLA_FEATURE.place(context)
                                            .squarePlacement()
+                                           .onlyInBiome()
                                            .register();
 
 
@@ -36,6 +37,7 @@ public class PlacedFeatureProvider extends WoverRegistryContentProvider<PlacedFe
 
         WoverFeatureTestMod.INLINE_FEATURE.place(context, cfg)
                                           .squarePlacement()
+                                          .onlyInBiome()
                                           .register();
 
         WoverFeatureTestMod.INLINE_FEATURE_ALL.inlineConfiguration(context)
@@ -46,6 +48,7 @@ public class PlacedFeatureProvider extends WoverRegistryContentProvider<PlacedFe
                                               .inRandomPatch()
                                               .inlinePlace()
                                               .squarePlacement()
+                                              .onlyInBiome()
                                               .register();
     }
 }

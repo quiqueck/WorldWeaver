@@ -264,6 +264,11 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     }
 
     @Override
+    public FeaturePlacementBuilderImpl offset(int x, int y, int z) {
+        return offset(new Vec3i(x, y, z));
+    }
+
+    @Override
     public FeaturePlacementBuilderImpl offset(IntProvider x, IntProvider y, IntProvider z) {
         return modifier(new OffsetProvider(new Vec3iProvider(x, y, z)));
     }
@@ -337,6 +342,11 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     @Override
     public FeaturePlacementBuilderImpl onHeightmap(Heightmap.Types types) {
         return modifier(HeightmapPlacement.onHeightmap(types));
+    }
+
+    @Override
+    public FeaturePlacementBuilder projectToSurface() {
+        return this.heightmap().offset(0, -1, 0);
     }
 
     @Override
