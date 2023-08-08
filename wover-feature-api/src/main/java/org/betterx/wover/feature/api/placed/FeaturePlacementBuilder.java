@@ -282,6 +282,16 @@ public interface FeaturePlacementBuilder {
     FeaturePlacementBuilder offset(Vec3i dir);
 
     /**
+     * Moves the input position by the specified vector.
+     *
+     * @param x the provider for the offset in x direction
+     * @param y the provider for the offset in y direction
+     * @param z the provider for the offset in z direction
+     * @return this builder
+     */
+    FeaturePlacementBuilder offset(IntProvider x, IntProvider y, IntProvider z);
+
+    /**
      * A randomized version of {@link #count(int)}. A noise value is calculated for the given xz-coordinate
      * if that value is smaller than {@code noiseLevel} {@code belowNoiseCount} copies of the input
      * position are emitted. Otherwise{@code aboveNoiseCount} positions are emitted.

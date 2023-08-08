@@ -8,6 +8,7 @@ import org.betterx.wover.feature.api.placed.modifiers.*;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
 import org.betterx.wover.feature.impl.configured.RandomPatchImpl;
+import org.betterx.wover.math.api.valueproviders.Vec3iProvider;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -260,6 +261,11 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     @Override
     public FeaturePlacementBuilderImpl offset(Vec3i dir) {
         return modifier(new Offset(dir));
+    }
+
+    @Override
+    public FeaturePlacementBuilderImpl offset(IntProvider x, IntProvider y, IntProvider z) {
+        return modifier(new OffsetProvider(new Vec3iProvider(x, y, z)));
     }
 
     @Override

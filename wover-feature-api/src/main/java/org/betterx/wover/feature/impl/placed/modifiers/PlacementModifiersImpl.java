@@ -61,6 +61,11 @@ public class PlacementModifiersImpl {
             Offset.CODEC
     );
 
+    public static final PlacementModifierType<OffsetProvider> OFFSET_PROVIDER = register(
+            "offset_provider",
+            OffsetProvider.CODEC
+    );
+
     public static final PlacementModifierType<Extend> EXTEND = registerLegacy(
             "extend",
             Extend.CODEC
