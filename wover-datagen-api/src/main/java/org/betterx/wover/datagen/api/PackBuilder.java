@@ -35,7 +35,7 @@ public class PackBuilder {
     final List<WoverDataProvider<?>> providerFactories = new LinkedList<>();
     DatapackBootstrap datapackBootstrap;
 
-    PackBuilder(@Nullable ModCore modCore, @NotNull ResourceLocation location) {
+    PackBuilder(@Nullable ModCore modCore, @Nullable ResourceLocation location) {
         this.location = location;
         this.modCore = modCore;
     }

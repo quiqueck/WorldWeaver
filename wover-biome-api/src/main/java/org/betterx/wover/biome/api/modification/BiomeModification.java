@@ -23,7 +23,10 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,7 +38,8 @@ import org.jetbrains.annotations.Nullable;
  * event to inject the modifications into the world.
  * <p>
  * Modifications are currently injected by directly altering some constant fields in
- * {@link net.minecraft.world.level.biome.BiomeGenerationSettings}
+ * {@link net.minecraft.world.level.biome.BiomeGenerationSettings} as well as the Tags stored
+ * in the Biome registry
  */
 public interface BiomeModification {
     /**
@@ -45,11 +49,11 @@ public interface BiomeModification {
             instance.group(
                     BiomePredicate.CODEC.fieldOf("predicate").forGetter(BiomeModification::predicate),
                     FeatureMap.CODEC
-                            .optionalFieldOf("features")
-                            .forGetter(m -> m.features().isEmpty() ? Optional.empty() : Optional.of(m.features())),
+                            .optionalFieldOf("features", List.of())
+                            .forGetter(BiomeModification::features),
                     TagKey.codec(Registries.BIOME)
                           .listOf()
-                          .optionalFieldOf("biome_tags")
+                          .optionalFieldOf("biome_tags", List.of())
                           .forGetter(BiomeModification::biomeTags)
             ).apply(instance, BiomeModificationImpl::new)
     );
@@ -77,7 +81,7 @@ public interface BiomeModification {
      *
      * @return The biome tags
      */
-    Optional<List<TagKey<Biome>>> biomeTags();
+    List<TagKey<Biome>> biomeTags();
 
     /**
      * For <b>internal</b> use only! Called when the modification should be applied to a biome.
@@ -478,7 +482,7 @@ public interface BiomeModification {
             return new BiomeModificationImpl(
                     predicate,
                     features.generic(),
-                    (tags == null || tags.isEmpty()) ? Optional.empty() : Optional.of(tags.stream().toList())
+                    tags != null ? tags.stream().toList() : null
             );
         }
     }

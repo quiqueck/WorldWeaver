@@ -94,8 +94,8 @@ public class BiomeModificationRegistryImpl {
                         worker = new GenerationSettingsWorker(registryAccess, context.biome);
                     }
 
-                    if (modification.biomeTags().isPresent()) {
-                        for (TagKey<Biome> tag : modification.biomeTags().get()) {
+                    if (modification.biomeTags() != null) {
+                        for (TagKey<Biome> tag : modification.biomeTags()) {
                             if (biomeTagWorker.addBiomeToTag(tag, context)) {
                                 tagsAdded++;
                                 didChangeBiome = true;

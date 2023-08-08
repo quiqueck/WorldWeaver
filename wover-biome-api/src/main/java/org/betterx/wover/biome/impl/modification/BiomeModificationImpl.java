@@ -9,29 +9,21 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.List;
-import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BiomeModificationImpl implements BiomeModification {
+    @NotNull
     private final BiomePredicate predicate;
+    @NotNull
     private final FeatureMap features;
-    private final Optional<List<TagKey<Biome>>> biomeTags;
+    @Nullable
+    private final List<TagKey<Biome>> biomeTags;
 
     public BiomeModificationImpl(
-            BiomePredicate predicate,
-            Optional<List<List<Holder<PlacedFeature>>>> features,
-            Optional<List<TagKey<Biome>>> biomeTags
-    ) {
-        this(
-                predicate,
-                features.orElse(List.of()),
-                biomeTags
-        );
-    }
-
-    public BiomeModificationImpl(
-            BiomePredicate predicate,
-            List<List<Holder<PlacedFeature>>> features,
-            Optional<List<TagKey<Biome>>> biomeTags
+            @NotNull BiomePredicate predicate,
+            @NotNull List<List<Holder<PlacedFeature>>> features,
+            @Nullable List<TagKey<Biome>> biomeTags
     ) {
         this.predicate = predicate;
         this.features = FeatureMap.of(features);
@@ -44,7 +36,7 @@ public class BiomeModificationImpl implements BiomeModification {
     }
 
     @Override
-    public Optional<List<TagKey<Biome>>> biomeTags() {
+    public List<TagKey<Biome>> biomeTags() {
         return biomeTags;
     }
 
