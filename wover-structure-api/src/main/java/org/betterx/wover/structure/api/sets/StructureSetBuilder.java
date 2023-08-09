@@ -1,7 +1,7 @@
 package org.betterx.wover.structure.api.sets;
 
 import org.betterx.wover.structure.api.StructureKey;
-import org.betterx.wover.structure.api.builders.StructureBuilder;
+import org.betterx.wover.structure.api.builders.BaseStructureBuilder;
 import org.betterx.wover.util.Pair;
 
 import net.minecraft.core.Holder;
@@ -50,15 +50,15 @@ public class StructureSetBuilder {
         return addStructure(structure, 1);
     }
 
-    public <T extends StructureBuilder, K extends StructureKey<T, K>> StructureSetBuilder addStructure(
-            StructureKey<T, K> structure,
+    public <S extends Structure, T extends BaseStructureBuilder<S, T>> StructureSetBuilder addStructure(
+            StructureKey<S, T> structure,
             int weight
     ) {
         return addStructure(structure.key, weight);
     }
 
-    public <T extends StructureBuilder, K extends StructureKey<T, K>> StructureSetBuilder addStructure(
-            StructureKey<T, K> structure
+    public <S extends Structure, T extends BaseStructureBuilder<S, T>> StructureSetBuilder addStructure(
+            StructureKey<S, T> structure
     ) {
         return addStructure(structure, 1);
     }
