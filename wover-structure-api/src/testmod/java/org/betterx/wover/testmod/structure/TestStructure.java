@@ -6,6 +6,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 public class TestStructure extends Structure {
 
@@ -14,12 +15,12 @@ public class TestStructure extends Structure {
     }
 
     @Override
-    protected Optional<GenerationStub> findGenerationPoint(GenerationContext generationContext) {
+    protected @NotNull Optional<GenerationStub> findGenerationPoint(GenerationContext generationContext) {
         return Optional.empty();
     }
 
     @Override
-    public StructureType<?> type() {
+    public @NotNull StructureType<?> type() {
         return WoverStructureTestMod.TEST_STRUCTURE.type();
     }
 }

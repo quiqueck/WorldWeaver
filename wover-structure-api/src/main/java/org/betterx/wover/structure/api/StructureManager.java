@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
 import org.jetbrains.annotations.NotNull;
@@ -129,11 +130,18 @@ public class StructureManager {
         return StructureManagerImpl.getHolder(context.lookup(Registries.STRUCTURE), key);
     }
 
-    public static <S extends Structure> StructureTypeKey<S> registerType(
+    public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
             @NotNull ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
             @NotNull Codec<S> codec
     ) {
         return StructureManagerImpl.registerType(location, structureFactory, codec);
+    }
+
+    public static @NotNull StructurePieceType registerPiece(
+            @NotNull ResourceLocation location,
+            @NotNull StructurePieceType pieceType
+    ) {
+        return StructureManagerImpl.registerPiece(location, pieceType);
     }
 }

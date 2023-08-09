@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 
 import java.util.Optional;
 import org.jetbrains.annotations.ApiStatus;
@@ -49,7 +50,7 @@ public class StructureManagerImpl {
         BOOTSTRAP_STRUCTURES.emit(c -> c.bootstrap(context));
     }
 
-    public static <S extends Structure> StructureTypeKey<S> registerType(
+    public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
             @NotNull ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
             @NotNull Codec<S> codec
@@ -62,5 +63,12 @@ public class StructureManagerImpl {
         );
 
         return new StructureTypeKeyImpl<>(key, type, structureFactory);
+    }
+
+    public static @NotNull StructurePieceType registerPiece(
+            @NotNull ResourceLocation location,
+            @NotNull StructurePieceType pieceType
+    ) {
+        return Registry.register(BuiltInRegistries.STRUCTURE_PIECE, location, pieceType);
     }
 }
