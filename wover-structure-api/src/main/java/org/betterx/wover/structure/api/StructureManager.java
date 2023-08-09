@@ -49,7 +49,7 @@ public class StructureManager {
     }
 
     /**
-     * Creates a {@link StructureKey} for the given {@link ResourceLocation}.
+     * Creates a {@link StructureKey} and {@link StructureTypeKey} for the given {@link ResourceLocation}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
@@ -63,7 +63,9 @@ public class StructureManager {
     }
 
     /**
-     * Creates a {@link StructureKey} for the given {@link ResourceLocation}.
+     * Creates a {@link StructureKey} and {@link StructureTypeKey} for the given {@link ResourceLocation}.
+     * This method will create a {@link Codec} for the {@link Structure} using the given {@link Structure#simpleCodec}.
+     * This codec assumes, that the <b>{@link Structure} has no additional data</b>.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}

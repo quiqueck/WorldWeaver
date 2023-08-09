@@ -1,5 +1,6 @@
 package org.betterx.wover.structure.impl.builders;
 
+import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.structure.api.StructureTypeKey;
 import org.betterx.wover.structure.api.builders.StructureBuilder;
 import org.betterx.wover.structure.impl.StructureKeyImpl;
@@ -20,6 +21,18 @@ public class StructureBuilderImpl<S extends Structure> extends BaseStructureBuil
 
     @Override
     protected Structure build() {
-        return type.structureFactory.create(buildSettings());
+        var res = type.structureFactory.create(buildSettings());
+        if (ModCore.isDevEnvironment()) {
+            if (res.type() == null) {
+                throw new IllegalStateException("Structure type is null for " + key.key.location());
+            }
+
+            if (!res.type().equals(key.type())) {
+                throw new IllegalStateException("Structure type is not the expected one for " + key.key.location());
+            }
+        }
+        return res;
     }
+
+
 }
