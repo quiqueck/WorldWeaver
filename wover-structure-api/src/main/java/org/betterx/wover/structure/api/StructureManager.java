@@ -66,7 +66,9 @@ public class StructureManager {
     /**
      * Creates a {@link StructureKey} and {@link StructureTypeKey} for the given {@link ResourceLocation}.
      * This method will create a {@link Codec} for the {@link Structure} using the given {@link Structure#simpleCodec}.
-     * This codec assumes, that the <b>{@link Structure} has no additional data</b>.
+     * This codec assumes, that the <b>{@link Structure} has no additional data</b>. If this assumption is not
+     * valid you should use {@link #structure(ResourceLocation, StructureTypeKey.StructureFactory, Codec)}
+     * instead.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
@@ -128,6 +130,28 @@ public class StructureManager {
             @NotNull ResourceKey<Structure> key
     ) {
         return StructureManagerImpl.getHolder(context.lookup(Registries.STRUCTURE), key);
+    }
+
+    /**
+     * Registers a new  {@link net.minecraft.world.level.levelgen.structure.StructureType}
+     * for the given {@link ResourceLocation}. This method will create a {@link Codec}
+     * for the {@link Structure} using the given {@link Structure#simpleCodec}. The codec
+     * assumes, that the <b>{@link Structure} has no additional data</b>. If this assumption is not
+     * valid you should use {@link #registerType(ResourceLocation, StructureTypeKey.StructureFactory, Codec)}
+     * instead.
+     *
+     * @param location The location of the {@link Structure}
+     * @return The {@link StructureKey}
+     */
+    public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
+            @NotNull ResourceLocation location,
+            @NotNull StructureTypeKey.StructureFactory<S> structureFactory
+    ) {
+        return StructureManagerImpl.registerType(
+                location,
+                structureFactory,
+                Structure.simpleCodec(structureFactory::create)
+        );
     }
 
     public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(

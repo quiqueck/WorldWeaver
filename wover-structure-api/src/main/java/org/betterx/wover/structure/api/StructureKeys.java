@@ -13,6 +13,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
@@ -104,5 +105,52 @@ public class StructureKeys {
      */
     public static <S extends Structure> StructureKey<JigsawStructure, JigsawBuilder> jigsaw(ResourceLocation location) {
         return StructureManager.jigsaw(location);
+    }
+
+    /**
+     * Alias for {@link StructureManager#registerType(ResourceLocation, StructureTypeKey.StructureFactory)}.
+     *
+     * @param location         The location of the {@link StructureTypeKey}
+     * @param structureFactory The {@link StructureTypeKey.StructureFactory}
+     * @param codec            The {@link Codec} for Structure class
+     * @param <S>              The {@link Structure} type
+     * @return The {@link StructureTypeKey}
+     */
+    public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
+            @NotNull ResourceLocation location,
+            @NotNull StructureTypeKey.StructureFactory<S> structureFactory
+    ) {
+        return StructureManager.registerType(location, structureFactory);
+    }
+
+    /**
+     * Alias for {@link StructureManager#registerType(ResourceLocation, StructureTypeKey.StructureFactory, Codec)}.
+     *
+     * @param location         The location of the {@link StructureTypeKey}
+     * @param structureFactory The {@link StructureTypeKey.StructureFactory}
+     * @param codec            The {@link Codec} for Structure class
+     * @param <S>              The {@link Structure} type
+     * @return The {@link StructureTypeKey}
+     */
+    public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
+            @NotNull ResourceLocation location,
+            @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
+            @NotNull Codec<S> codec
+    ) {
+        return StructureManager.registerType(location, structureFactory, codec);
+    }
+
+    /**
+     * Alias for {@link StructureManager#registerPiece(ResourceLocation, StructurePieceType)}.
+     *
+     * @param location  The location of the {@link net.minecraft.world.level.levelgen.structure.StructurePiece}
+     * @param pieceType The {@link StructurePieceType} to register
+     * @return The {@link StructurePieceType}
+     */
+    public static @NotNull StructurePieceType registerPiece(
+            @NotNull ResourceLocation location,
+            @NotNull StructurePieceType pieceType
+    ) {
+        return StructureManager.registerPiece(location, pieceType);
     }
 }
