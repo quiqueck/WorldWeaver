@@ -20,7 +20,7 @@
       "org.betterx.wover.testmod.entrypoint.WoverStructureTestMod"
     ],
     "fabric-datagen": [
-      "org.betterx.wover.testmod.structure.datagen.WoverStructureDatagen"
+      "org.betterx.wover.testmod.structure.datagen.WoverStructureDatagenTestMod"
     ],
     "client": [
       "org.betterx.wover.testmod.entrypoint.client.WoverStructureClientTestMod"

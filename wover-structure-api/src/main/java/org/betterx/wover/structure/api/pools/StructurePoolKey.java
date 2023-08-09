@@ -1,5 +1,7 @@
 package org.betterx.wover.structure.api.pools;
 
+import org.betterx.wover.structure.impl.pools.StructurePoolBuilderImpl;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -16,7 +18,7 @@ public class StructurePoolKey {
     public final ResourceKey<StructureTemplatePool> key;
 
     public StructurePoolBuilder bootstrap(@NotNull BootstapContext<StructureTemplatePool> context) {
-        return new StructurePoolBuilder(key, context);
+        return new StructurePoolBuilderImpl(key, context);
     }
 
     StructurePoolKey(@NotNull ResourceLocation location) {

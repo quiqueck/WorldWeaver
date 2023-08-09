@@ -68,6 +68,26 @@ public class StructureManager {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
+    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+            ResourceLocation location,
+            @NotNull StructureTypeKey.StructureFactory<S> structureFactory
+    ) {
+        return new StructureKeyImpl<>(
+                location,
+                registerType(
+                        location,
+                        structureFactory,
+                        Structure.simpleCodec(structureFactory::create)
+                )
+        );
+    }
+
+    /**
+     * Creates a {@link StructureKey} for the given {@link ResourceLocation}.
+     *
+     * @param location The location of the {@link Structure}
+     * @return The {@link StructureKey}
+     */
     public static <S extends Structure> StructureKey<JigsawStructure, JigsawBuilder> jigsaw(ResourceLocation location) {
         return new JigsawKeyImpl(location);
     }

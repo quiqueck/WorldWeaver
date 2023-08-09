@@ -40,7 +40,7 @@ public class StructurePoolBuilderImpl implements StructurePoolBuilder {
 
     private List<Pair<Function<StructureTemplatePool.Projection, ? extends StructurePoolElement>, Integer>> elements = new LinkedList<>();
 
-    StructurePoolBuilderImpl(
+    public StructurePoolBuilderImpl(
             @NotNull ResourceKey<StructureTemplatePool> key,
             @NotNull BootstapContext<StructureTemplatePool> context
     ) {
