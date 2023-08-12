@@ -8,8 +8,7 @@ import org.betterx.wover.testmod.entrypoint.WoverStructureTestMod;
 public class WoverStructureDatagenTestMod extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
-        globalPack.addRegistryProvider(StructureProvider::new);
-        globalPack.addRegistryProvider(StructureSetProvider::new);
+        globalPack.addProvider(new StructureProvider());
     }
 
     @Override

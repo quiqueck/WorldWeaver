@@ -24,8 +24,9 @@ public abstract class WoverStructureProcessorProvider extends WoverRegistryConte
 
     /**
      * Called, when the Elements of the Registry need to be created and registered.
+     *
      * @param context The context to add the elements to.
      */
     @Override
-    protected abstract void bootstrap(BootstapContext<StructureProcessorList> context) :
+    protected abstract void bootstrap(BootstapContext<StructureProcessorList> context);
 }

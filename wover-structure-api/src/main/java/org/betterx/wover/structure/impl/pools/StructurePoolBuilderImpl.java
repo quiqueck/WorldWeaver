@@ -89,7 +89,15 @@ public class StructurePoolBuilderImpl implements StructurePoolBuilder {
 
     @Override
     @NotNull
-    public StructurePoolBuilder add(@NotNull Pair<Function<StructureTemplatePool.Projection, ? extends StructurePoolElement>, Integer> element) {
+    public StructurePoolBuilder add(
+            @NotNull Function<StructureTemplatePool.Projection, ? extends StructurePoolElement> element,
+            int weight
+    ) {
+        return add(Pair.of(element, weight));
+    }
+
+    @NotNull
+    private StructurePoolBuilder add(@NotNull Pair<Function<StructureTemplatePool.Projection, ? extends StructurePoolElement>, Integer> element) {
         elements.add(element);
         return this;
     }

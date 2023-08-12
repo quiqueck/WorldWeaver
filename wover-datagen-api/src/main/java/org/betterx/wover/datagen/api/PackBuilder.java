@@ -90,11 +90,12 @@ public class PackBuilder {
      *
      * @return The {@link Stream} of {@link WoverRegistryProvider}s
      */
-    public Stream<WoverRegistryContentProvider<?>> registryProviders() {
+    public List<? extends WoverRegistryContentProvider<?>> registryProviders() {
         return this.providerFactories
                 .stream()
                 .filter(provider -> provider instanceof WoverRegistryContentProvider<?>)
-                .map(provider -> (WoverRegistryContentProvider<?>) provider);
+                .map(provider -> (WoverRegistryContentProvider<?>) provider)
+                .toList();
     }
 
 

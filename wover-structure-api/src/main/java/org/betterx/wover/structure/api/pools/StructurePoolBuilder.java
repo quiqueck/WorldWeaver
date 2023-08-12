@@ -2,7 +2,6 @@ package org.betterx.wover.structure.api.pools;
 
 import org.betterx.wover.structure.api.processors.StructureProcessorKey;
 
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +34,10 @@ public interface StructurePoolBuilder {
      */
     @NotNull Holder<StructureTemplatePool> directHolder();
 
-    @NotNull StructurePoolBuilder add(@NotNull Pair<Function<StructureTemplatePool.Projection, ? extends StructurePoolElement>, Integer> element);
+    @NotNull StructurePoolBuilder add(
+            @NotNull Function<StructureTemplatePool.Projection, ? extends StructurePoolElement> element,
+            int weight
+    );
 
     @NotNull StructurePoolBuilder projection(@NotNull StructureTemplatePool.Projection projection);
 
