@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @param <T> The element type of the registry.
  */
-public abstract class WoverRegistryProvider<T> {
+public abstract class WoverRegistryProvider<T> implements WoverDataProvider<FabricDynamicRegistryProvider> {
     /**
      * The title of the provider. Mainly used for logging.
      */
@@ -67,7 +67,7 @@ public abstract class WoverRegistryProvider<T> {
      * @param registriesFuture A future sent from the Fabric DataGen API
      * @return A new {@link FabricDynamicRegistryProvider} that lists all elements
      */
-    protected abstract FabricDynamicRegistryProvider getProvider(
+    public abstract FabricDynamicRegistryProvider getProvider(
             FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     );

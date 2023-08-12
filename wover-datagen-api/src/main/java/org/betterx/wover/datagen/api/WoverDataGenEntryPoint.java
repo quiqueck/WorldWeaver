@@ -238,14 +238,6 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
                 addDefaultGlobalProviders(builder);
             }
 
-            //call all registry providers
-            builder.registryProviders
-                    .stream()
-                    .forEach(provider -> {
-                        builder.pack.addProvider(provider::getProvider);
-                        addMultiProviders(builder, provider);
-                    });
-
             //run other providers
             builder.providerFactories
                     .stream()
@@ -297,10 +289,9 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
         DataGeneratorEntrypoint.super.buildRegistry(registryBuilder);
         initialize();
 
-        for (var builder : builders) {
-            builder.registryProviders
-                    .stream()
-                    .forEach(provider -> provider.buildRegistry(registryBuilder));
+        for (PackBuilder builder : builders) {
+            builder.registryProviders()
+                   .forEach(provider -> provider.buildRegistry(registryBuilder));
         }
 
         onBuildRegistry(registryBuilder);

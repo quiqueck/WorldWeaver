@@ -1,7 +1,7 @@
 package org.betterx.wover.testmod.preset.datagen;
 
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.datagen.api.WoverWorldPresetProvider;
+import org.betterx.wover.datagen.api.provider.WoverWorldPresetProvider;
 import org.betterx.wover.preset.api.SortableWorldPreset;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.preset.api.context.WorldPresetBootstrapContext;

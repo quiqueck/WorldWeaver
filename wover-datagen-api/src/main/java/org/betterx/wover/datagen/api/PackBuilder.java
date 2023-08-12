@@ -6,9 +6,11 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +33,6 @@ public class PackBuilder {
     @NotNull
     public final ModCore modCore;
     FabricDataGenerator.Pack pack;
-    final List<WoverRegistryProvider<?>> registryProviders = new LinkedList<>();
     final List<WoverDataProvider<?>> providerFactories = new LinkedList<>();
     DatapackBootstrap datapackBootstrap;
 
@@ -48,7 +49,7 @@ public class PackBuilder {
      * @return This instance
      */
     public <T> PackBuilder addRegistryProvider(RegistryFactory<T> provider) {
-        registryProviders.add(provider.create(modCore));
+        providerFactories.add(provider.create(modCore));
         return this;
     }
 
@@ -61,6 +62,11 @@ public class PackBuilder {
      */
     public <T extends DataProvider> PackBuilder addProvider(ProviderFactory<T> provider) {
         providerFactories.add(provider.create(modCore));
+        return this;
+    }
+
+    public PackBuilder addProvider(WoverMultiProvider provider) {
+        provider.registerAllProviders(this);
         return this;
     }
 
@@ -78,6 +84,19 @@ public class PackBuilder {
         return this;
     }
 
+    /**
+     * Returns a {@link Stream} of all {@link WoverRegistryProvider}s that are
+     * registered for this Datapack.
+     *
+     * @return The {@link Stream} of {@link WoverRegistryProvider}s
+     */
+    public Stream<WoverRegistryContentProvider<?>> registryProviders() {
+        return this.providerFactories
+                .stream()
+                .filter(provider -> provider instanceof WoverRegistryContentProvider<?>)
+                .map(provider -> (WoverRegistryContentProvider<?>) provider);
+    }
+
 
     PackBuilder pack(FabricDataGenerator.Pack pack) {
         this.pack = pack;
@@ -90,7 +109,7 @@ public class PackBuilder {
      * @param <T> The element type of the registry.
      */
     @FunctionalInterface
-    public interface RegistryFactory<T> {
+    public interface RegistryFactory<T> extends ProviderFactory<FabricDynamicRegistryProvider> {
         /**
          * Creates a new {@link WoverRegistryProvider}.
          *

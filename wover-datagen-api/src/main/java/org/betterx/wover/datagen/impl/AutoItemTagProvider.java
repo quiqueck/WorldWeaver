@@ -6,6 +6,9 @@ import org.betterx.wover.tag.api.ItemTagDataProvider;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 
@@ -33,9 +36,7 @@ public class AutoItemTagProvider extends WoverTagProvider.ForItems {
                     return modIDs.contains(entry.getKey().location().getNamespace());
                 })
                 .forEach(entry -> {
-                    if (entry.getValue() instanceof ItemTagDataProvider tagProvider) {
-                        tagProvider.addItemTags(provider);
-                    }
+                    addBlockItemTags(provider, entry.getKey(), entry.getValue());
                 });
 
         BuiltInRegistries.ITEM
@@ -46,9 +47,19 @@ public class AutoItemTagProvider extends WoverTagProvider.ForItems {
                     return modIDs.contains(entry.getKey().location().getNamespace());
                 })
                 .forEach(entry -> {
-                    if (entry.getValue() instanceof ItemTagDataProvider tagProvider) {
-                        tagProvider.addItemTags(provider);
-                    }
+                    addItemTags(provider, entry.getKey(), entry.getValue());
                 });
+    }
+
+    private void addBlockItemTags(ItemTagBootstrapContext provider, ResourceKey<Block> blockKey, Block block) {
+        if (block instanceof ItemTagDataProvider tagProvider) {
+            tagProvider.addItemTags(provider);
+        }
+    }
+
+    private void addItemTags(ItemTagBootstrapContext provider, ResourceKey<Item> itemKey, Item item) {
+        if (item instanceof ItemTagDataProvider tagProvider) {
+            tagProvider.addItemTags(provider);
+        }
     }
 }

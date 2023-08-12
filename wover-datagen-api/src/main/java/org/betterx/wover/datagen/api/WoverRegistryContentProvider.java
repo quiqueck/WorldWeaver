@@ -99,7 +99,7 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
      */
     @ApiStatus.Internal
     @Override
-    protected final FabricDynamicRegistryProvider getProvider(
+    public final FabricDynamicRegistryProvider getProvider(
             FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {

@@ -121,7 +121,7 @@ public abstract class WoverFullRegistryProvider<T> extends WoverRegistryProvider
      */
     @ApiStatus.Internal
     @Override
-    protected FabricDynamicRegistryProvider getProvider(
+    public FabricDynamicRegistryProvider getProvider(
             FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {

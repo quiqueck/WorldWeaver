@@ -1,6 +1,9 @@
-package org.betterx.wover.datagen.api;
+package org.betterx.wover.datagen.api.provider;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.api.WoverDataProvider;
+import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
+import org.betterx.wover.datagen.api.WoverTagProvider;
 import org.betterx.wover.preset.api.context.FlatLevelPresetBootstrapContext;
 import org.betterx.wover.preset.api.flat.FlatLevelPresetTags;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
