@@ -277,7 +277,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         bootstrapContext.register(this);
     }
 
-    public abstract void registerBiome(BootstapContext<Biome> biomeContext);
+    public void registerBiome(BootstapContext<Biome> biomeContext) {
+        biomeContext.register(key.key, buildBiome());
+    }
+
     public abstract void registerBiomeData(BootstapContext<BiomeData> dataContext);
 
     public void registerBiomeTags(TagBootstrapContext<Biome> context) {

@@ -6,16 +6,10 @@ import org.betterx.wover.biome.api.builder.BiomeBuilder;
 import org.betterx.wover.biome.api.data.BiomeData;
 
 import net.minecraft.data.worldgen.BootstapContext;
-import net.minecraft.world.level.biome.Biome;
 
-public class VanillaBiomeBuilder extends BiomeBuilder.Vanilla {
-    public VanillaBiomeBuilder(BiomeBootstrapContext context, BiomeKey<Vanilla> key) {
+public class VanillaBiomeBuilderImpl extends BiomeBuilder.Vanilla {
+    public VanillaBiomeBuilderImpl(BiomeBootstrapContext context, BiomeKey<Vanilla> key) {
         super(context, key);
-    }
-
-    @Override
-    public void registerBiome(BootstapContext<Biome> biomeContext) {
-        biomeContext.register(key.key, buildBiome());
     }
 
     @Override
