@@ -10,8 +10,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
-import java.util.List;
-
 
 /**
  * Creates item tags for all blocks or items that implement {@link ItemTagDataProvider}
@@ -23,7 +21,7 @@ public class AutoItemTagProvider extends WoverTagProvider.ForItems {
     public AutoItemTagProvider(
             ModCore modCore
     ) {
-        super(List.of(modCore.namespace, modCore.modId));
+        super(modCore);
     }
 
     @Override

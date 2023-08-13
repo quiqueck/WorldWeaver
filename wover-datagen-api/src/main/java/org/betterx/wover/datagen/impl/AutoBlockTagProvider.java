@@ -9,8 +9,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 
-import java.util.List;
-
 /**
  * Creates block tags for all blocks that implement {@link BlockTagDataProvider}
  * and are registered in the namespace of this mod.
@@ -21,7 +19,7 @@ public class AutoBlockTagProvider extends WoverTagProvider.ForBlocks {
     public AutoBlockTagProvider(
             ModCore modCore
     ) {
-        super(List.of(modCore.namespace, modCore.modId));
+        super(modCore);
     }
 
     @Override

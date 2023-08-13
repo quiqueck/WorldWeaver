@@ -71,19 +71,19 @@ public class StructurePoolBuilderImpl implements StructurePoolBuilder {
 
     @Override
     @NotNull
-    public ElementBuilder addSingle(@NotNull ResourceLocation nbtLocation) {
+    public ElementBuilder startSingle(@NotNull ResourceLocation nbtLocation) {
         return new SinglePoolElementImpl(nbtLocation);
     }
 
     @Override
     @NotNull
-    public ElementBuilder addSingleEnd(@NotNull ResourceLocation nbtLocation) {
+    public ElementBuilder startSingleEnd(@NotNull ResourceLocation nbtLocation) {
         return new SingleEndPoolElementImpl(nbtLocation);
     }
 
     @Override
     @NotNull
-    public ElementBuilder addLegacySingle(@NotNull ResourceLocation nbtLocation) {
+    public ElementBuilder startLegacySingle(@NotNull ResourceLocation nbtLocation) {
         return new LegacyPoolElementImpl(nbtLocation);
     }
 
@@ -177,7 +177,7 @@ public class StructurePoolBuilderImpl implements StructurePoolBuilder {
         }
 
         @Override
-        public @NotNull StructurePoolBuilder push() {
+        public @NotNull StructurePoolBuilder endElement() {
             if (nbtLocation == null) {
                 throw new IllegalStateException("Location for a pool entry must be set before pushing it to the pool.");
             }

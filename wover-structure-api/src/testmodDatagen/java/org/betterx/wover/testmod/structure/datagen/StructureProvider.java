@@ -29,6 +29,7 @@ public class StructureProvider extends WoverStructureProvider {
                 .startPool(WoverStructureTestMod.TEST_STRUCTURE_POOL_START)
                 .maxDepth(5)
                 .projectStartToHeightmap(Heightmap.Types.MOTION_BLOCKING)
+                .adjustment(TerrainAdjustment.BEARD_BOX)
                 .register();
     }
 
@@ -49,21 +50,22 @@ public class StructureProvider extends WoverStructureProvider {
         WoverStructureTestMod.TEST_STRUCTURE_POOL_START
                 .bootstrap(context)
                 .terminator(WoverStructureTestMod.TEST_STRUCTURE_POOL_TERMINAL)
-                .addSingle(C.id("street"))
-                .push()
+                .startSingle(C.id("street"))
+                .endElement()
                 .projection(StructureTemplatePool.Projection.TERRAIN_MATCHING)
                 .register();
 
         WoverStructureTestMod.TEST_STRUCTURE_POOL_HOUSE
                 .bootstrap(context)
-                .addSingle(C.id("house"))
-                .push()
+                .startSingle(C.id("house"))
+                .endElement()
                 .register();
 
         WoverStructureTestMod.TEST_STRUCTURE_POOL_TERMINAL
                 .bootstrap(context)
-                .addSingle(C.id("terminator"))
-                .push()
+                .startSingle(C.id("terminator"))
+                .processor(WoverStructureTestMod.TEST_STRUCTURE_PROCESSOR)
+                .endElement()
                 .register();
     }
 

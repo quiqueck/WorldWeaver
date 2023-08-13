@@ -81,7 +81,7 @@ public abstract class WoverWorldPresetProvider
 
     private class WorldPresetTagProvider extends WoverTagProvider<WorldPreset, TagBootstrapContext<WorldPreset>> {
         public WorldPresetTagProvider(ModCore modCore) {
-            super(WorldPresetTags.TAGS);
+            super(modCore, WorldPresetTags.TAGS);
         }
 
         @Override

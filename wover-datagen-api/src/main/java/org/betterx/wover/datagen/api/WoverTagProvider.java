@@ -1,5 +1,6 @@
 package org.betterx.wover.datagen.api;
 
+import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.tag.api.TagRegistry;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
@@ -42,6 +43,10 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
      */
     @Nullable
     protected final List<String> modIDs;
+    /**
+     * The {@link ModCore} instance to use
+     */
+    protected final ModCore modCore;
 
     /**
      * The {@link TagRegistry} that will provide the tags.
@@ -60,9 +65,10 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
      * @param tagRegistry the {@link TagRegistry} that will provide the tags
      */
     public WoverTagProvider(
+            ModCore modCore,
             TagRegistry<T, P> tagRegistry
     ) {
-        this(tagRegistry, null, Set.of());
+        this(modCore, tagRegistry, List.of(modCore.namespace, modCore.modId), Set.of());
     }
 
     /**
@@ -74,10 +80,11 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
      *                    write nothing
      */
     public WoverTagProvider(
+            ModCore modCore,
             TagRegistry<T, P> tagRegistry,
             @Nullable List<String> modIDs
     ) {
-        this(tagRegistry, modIDs, Set.of());
+        this(modCore, tagRegistry, modIDs, Set.of());
     }
 
     /**
@@ -90,10 +97,12 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
      * @param forceWriteKeys the keys that should always get written
      */
     public WoverTagProvider(
+            ModCore modCore,
             TagRegistry<T, P> tagRegistry,
             @Nullable List<String> modIDs,
             Set<TagKey<T>> forceWriteKeys
     ) {
+        this.modCore = modCore;
         this.tagRegistry = tagRegistry;
         this.modIDs = modIDs;
         this.forceWrite = forceWriteKeys;
@@ -201,8 +210,8 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          * Creates a new Instance that includes all namespaces but will not
          * force the writing of any empty tag.
          */
-        public ForBlocks() {
-            super(TagManagerImpl.BLOCKS);
+        public ForBlocks(ModCore modCore) {
+            super(modCore, TagManagerImpl.BLOCKS);
         }
 
         /**
@@ -213,9 +222,10 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          *               write nothing
          */
         public ForBlocks(
+                ModCore modCore,
                 @Nullable List<String> modIDs
         ) {
-            super(TagManagerImpl.BLOCKS, modIDs);
+            super(modCore, TagManagerImpl.BLOCKS, modIDs);
         }
 
         /**
@@ -227,10 +237,11 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          * @param forceWriteKeys the keys that should always get written
          */
         public ForBlocks(
+                ModCore modCore,
                 @Nullable List<String> modIDs,
                 Set<TagKey<Block>> forceWriteKeys
         ) {
-            super(TagManagerImpl.BLOCKS, modIDs, forceWriteKeys);
+            super(modCore, TagManagerImpl.BLOCKS, modIDs, forceWriteKeys);
         }
     }
 
@@ -243,8 +254,8 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          * Creates a new Instance that includes all namespaces but will not
          * force the writing of any empty tag.
          */
-        public ForItems() {
-            super(TagManagerImpl.ITEMS);
+        public ForItems(ModCore modCore) {
+            super(modCore, TagManagerImpl.ITEMS);
         }
 
         /**
@@ -255,9 +266,10 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          *               write nothing
          */
         public ForItems(
+                ModCore modCore,
                 @Nullable List<String> modIDs
         ) {
-            super(TagManagerImpl.ITEMS, modIDs);
+            super(modCore, TagManagerImpl.ITEMS, modIDs);
         }
 
         /**
@@ -269,10 +281,11 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          * @param forceWriteKeys the keys that should always get written
          */
         public ForItems(
+                ModCore modCore,
                 @Nullable List<String> modIDs,
                 Set<TagKey<Item>> forceWriteKeys
         ) {
-            super(TagManagerImpl.ITEMS, modIDs, forceWriteKeys);
+            super(modCore, TagManagerImpl.ITEMS, modIDs, forceWriteKeys);
         }
     }
 
@@ -285,8 +298,8 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          * Creates a new Instance that includes all namespaces but will not
          * force the writing of any empty tag.
          */
-        public ForBiomes() {
-            super(TagManagerImpl.BIOMES);
+        public ForBiomes(ModCore modCore) {
+            super(modCore, TagManagerImpl.BIOMES);
         }
 
         /**
@@ -297,9 +310,10 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          *               write nothing
          */
         public ForBiomes(
+                ModCore modCore,
                 @Nullable List<String> modIDs
         ) {
-            super(TagManagerImpl.BIOMES, modIDs);
+            super(modCore, TagManagerImpl.BIOMES, modIDs);
         }
 
         /**
@@ -311,10 +325,11 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
          * @param forceWriteKeys the keys that should always get written
          */
         public ForBiomes(
+                ModCore modCore,
                 @Nullable List<String> modIDs,
                 Set<TagKey<Biome>> forceWriteKeys
         ) {
-            super(TagManagerImpl.BIOMES, modIDs, forceWriteKeys);
+            super(modCore, TagManagerImpl.BIOMES, modIDs, forceWriteKeys);
         }
     }
 }

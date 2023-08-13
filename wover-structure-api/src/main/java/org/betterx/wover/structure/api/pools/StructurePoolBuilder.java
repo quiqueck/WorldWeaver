@@ -49,9 +49,9 @@ public interface StructurePoolBuilder {
 
     @NotNull StructurePoolBuilder emptyTerminator();
 
-    @NotNull ElementBuilder addSingle(@NotNull ResourceLocation nbtLocation);
-    @NotNull ElementBuilder addSingleEnd(@NotNull ResourceLocation nbtLocation);
-    @NotNull ElementBuilder addLegacySingle(@NotNull ResourceLocation nbtLocation);
+    @NotNull ElementBuilder startSingle(@NotNull ResourceLocation nbtLocation);
+    @NotNull ElementBuilder startSingleEnd(@NotNull ResourceLocation nbtLocation);
+    @NotNull ElementBuilder startLegacySingle(@NotNull ResourceLocation nbtLocation);
 
     interface ElementBuilder {
         @NotNull ElementBuilder processor(@NotNull Holder<StructureProcessorList> processor);
@@ -61,6 +61,6 @@ public interface StructurePoolBuilder {
 
         @NotNull ElementBuilder weight(int weight);
 
-        @NotNull StructurePoolBuilder push();
+        @NotNull StructurePoolBuilder endElement();
     }
 }

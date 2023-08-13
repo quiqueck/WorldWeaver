@@ -15,6 +15,7 @@ import java.util.Set;
 public class BlockTagProvider extends WoverTagProvider.ForBlocks {
     public BlockTagProvider(ModCore modCore) {
         super(
+                modCore,
                 null,
                 Set.of(
                         CommonBlockTags.NETHER_MYCELIUM,

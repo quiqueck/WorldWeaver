@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 
 public class ItemTagProvider extends WoverTagProvider.ForItems {
     public ItemTagProvider(ModCore modCore) {
-        super();
+        super(modCore);
     }
 
     protected void prepareTags(ItemTagBootstrapContext ctx) {

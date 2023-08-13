@@ -10,7 +10,7 @@ import net.minecraft.world.level.biome.Biomes;
 
 public class BiomeTagProvider extends WoverTagProvider.ForBiomes {
     public BiomeTagProvider(ModCore modCore) {
-        super();
+        super(modCore);
     }
 
     protected void prepareTags(TagBootstrapContext<Biome> ctx) {

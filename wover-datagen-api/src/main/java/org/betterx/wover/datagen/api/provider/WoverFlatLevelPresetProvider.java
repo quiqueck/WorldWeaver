@@ -89,7 +89,7 @@ public abstract class WoverFlatLevelPresetProvider
 
     private class FlatLevelTagProvider extends WoverTagProvider<FlatLevelGeneratorPreset, TagBootstrapContext<FlatLevelGeneratorPreset>> {
         public FlatLevelTagProvider(ModCore modCore) {
-            super(FlatLevelPresetTags.TAGS);
+            super(modCore, FlatLevelPresetTags.TAGS);
         }
 
         @Override
