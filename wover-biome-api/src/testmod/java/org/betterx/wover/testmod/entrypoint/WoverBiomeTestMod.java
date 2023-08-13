@@ -1,5 +1,8 @@
 package org.betterx.wover.testmod.entrypoint;
 
+import org.betterx.wover.biome.api.BiomeKey;
+import org.betterx.wover.biome.api.BiomeManager;
+import org.betterx.wover.biome.api.builder.BiomeBuilder;
 import org.betterx.wover.biome.api.modification.BiomeModification;
 import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.core.api.ModCore;
@@ -15,6 +18,8 @@ public class WoverBiomeTestMod implements ModInitializer {
     // ModCore for the TestMod. TestMod's do not share the wover namespace,
     // but (like other Mods that include Wover) have a unique one
     public static final ModCore C = ModCore.create("wover-biome-testmod");
+
+    public static final BiomeKey<BiomeBuilder.Vanilla> TEST_BIOME = BiomeManager.vanilla(C.id("test_biome"));
 
     @Override
     public void onInitialize() {

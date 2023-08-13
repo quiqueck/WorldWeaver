@@ -1,5 +1,6 @@
 package org.betterx.wover.datagen.api.provider.multi;
 
+import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverMultiProvider;
 import org.betterx.wover.datagen.api.provider.WoverConfiguredFeatureProvider;
@@ -14,9 +15,17 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
  */
 public abstract class WoverFeatureProvider implements WoverMultiProvider {
     /**
-     * Creates a new instance of {@link WoverFeatureProvider}.
+     * The {@link ModCore} of the Mod.
      */
-    public WoverFeatureProvider() {
+    protected final ModCore modCore;
+
+    /**
+     * Creates a new instance of {@link WoverFeatureProvider}.
+     *
+     * @param modCore The {@link ModCore} of the Mod.
+     */
+    public WoverFeatureProvider(ModCore modCore) {
+        this.modCore = modCore;
     }
 
     /**

@@ -32,7 +32,7 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
                 .build(context, modCore.id("test_features"))
                 .inBiomes(Biomes.BEACH, Biomes.MEADOW)
                 .addFeature(
-                        GenerationStep.Decoration.VEGETAL_DECORATION,
+                        GenerationStep.Decoration.SURFACE_STRUCTURES,
                         features.getOrThrow(NetherPlacements.SMALL_BASALT_COLUMNS)
                 )
                 .register();

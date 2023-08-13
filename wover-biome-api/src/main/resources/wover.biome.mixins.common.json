@@ -6,5 +6,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": ["HolderSetNamedAccessor"]
+  "mixins": ["BiomeGenerationSettingsAccessor", "HolderSetNamedAccessor"]
 }

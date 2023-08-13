@@ -1,6 +1,7 @@
 package org.betterx.wover.datagen.api;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.impl.AutoBiomeTagProvider;
 import org.betterx.wover.datagen.impl.AutoBlockTagProvider;
 import org.betterx.wover.datagen.impl.AutoItemTagProvider;
 
@@ -265,6 +266,7 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
     private void addDefaultGlobalProviders(PackBuilder pack) {
         pack.addProvider(AutoBlockTagProvider::new);
         pack.addProvider(AutoItemTagProvider::new);
+        pack.addProvider(AutoBiomeTagProvider::new);
     }
 
     /**

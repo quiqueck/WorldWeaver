@@ -128,9 +128,9 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
      * This method is used to add elements to the tags. The {@link TagBootstrapContext}
      * provides the necessary methods to add elements.
      *
-     * @param provider the {@link TagBootstrapContext} you can use to add elements to the tags
+     * @param context the {@link TagBootstrapContext} you can use to add elements to the tags
      */
-    protected abstract void prepareTags(P provider);
+    protected abstract void prepareTags(P context);
 
     /**
      * When {@code true} all tags will be initialized with an empty element list

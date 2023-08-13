@@ -65,8 +65,8 @@ public class PackBuilder {
         return this;
     }
 
-    public PackBuilder addProvider(WoverMultiProvider provider) {
-        provider.registerAllProviders(this);
+    public <T extends WoverMultiProvider> PackBuilder addMultiProvider(MultiProviderFactory<T> provider) {
+        provider.create(modCore).registerAllProviders(this);
         return this;
     }
 
@@ -142,7 +142,7 @@ public class PackBuilder {
     /**
      * A functional interface that is used to create a {@link WoverDataProvider}.
      *
-     * @param <T> The element type of the registry.
+     * @param <T> The Provider Type.
      */
     @FunctionalInterface
     public interface ProviderFactory<T extends DataProvider> {
@@ -153,5 +153,21 @@ public class PackBuilder {
          * @return The created {@link WoverDataProvider}.
          */
         WoverDataProvider<T> create(ModCore modCore);
+    }
+
+    /**
+     * A functional interface that is used to create a {@link WoverMultiProvider}.
+     *
+     * @param <T> The Provider Type.
+     */
+    @FunctionalInterface
+    public interface MultiProviderFactory<T extends WoverMultiProvider> {
+        /**
+         * Creates a new {@link WoverMultiProvider}.
+         *
+         * @param modCore The ModCore instance of the Mod that is providing this instance.
+         * @return The created {@link WoverMultiProvider}.
+         */
+        T create(ModCore modCore);
     }
 }

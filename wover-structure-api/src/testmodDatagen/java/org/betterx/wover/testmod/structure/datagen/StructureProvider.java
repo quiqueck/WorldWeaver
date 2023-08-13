@@ -2,9 +2,12 @@ package org.betterx.wover.testmod.structure.datagen;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.multi.WoverStructureProvider;
+import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 import org.betterx.wover.testmod.entrypoint.WoverStructureTestMod;
 
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -16,6 +19,15 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 
 public class StructureProvider extends WoverStructureProvider {
     private final ModCore C = WoverStructureTestMod.C;
+
+    /**
+     * Creates a new instance of {@link WoverStructureProvider}.
+     *
+     * @param modCore The {@link ModCore} of the Mod.
+     */
+    public StructureProvider(ModCore modCore) {
+        super(modCore);
+    }
 
     @Override
     protected void bootstrapSturctures(BootstapContext<Structure> context) {
@@ -82,5 +94,12 @@ public class StructureProvider extends WoverStructureProvider {
                 .endRule()
 
                 .register();
+    }
+
+    @Override
+    protected void prepareBiomeTags(TagBootstrapContext<Biome> context) {
+        context.add(WoverStructureTestMod.TEST_STRUCTURE.getBiomeTag(),
+                Biomes.SAVANNA, Biomes.END_HIGHLANDS, Biomes.END_MIDLANDS, Biomes.NETHER_WASTES
+        );
     }
 }

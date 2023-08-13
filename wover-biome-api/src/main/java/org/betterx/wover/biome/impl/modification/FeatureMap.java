@@ -10,9 +10,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class FeatureMap extends ArrayList<LinkedList<Holder<PlacedFeature>>> {
     public static final Codec<List<List<Holder<PlacedFeature>>>> CODEC = PlacedFeature.CODEC.listOf().listOf();
+
+    public void addFeature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
+        this.getFeatures(decoration).add(feature);
+    }
 
     public List<Holder<PlacedFeature>> getFeatures(GenerationStep.Decoration decoration) {
         final int index = decoration.ordinal();
@@ -35,6 +40,15 @@ public class FeatureMap extends ArrayList<LinkedList<Holder<PlacedFeature>>> {
         }
 
         return features.get(index);
+    }
+
+    public void forEach(BiConsumer<GenerationStep.Decoration, Holder<PlacedFeature>> consumer) {
+        for (int i = 0; i < this.size(); i++) {
+            final GenerationStep.Decoration decoration = GenerationStep.Decoration.values()[i];
+            for (final Holder<PlacedFeature> feature : getFeatures(decoration)) {
+                consumer.accept(decoration, feature);
+            }
+        }
     }
 
     public List<List<Holder<PlacedFeature>>> generic() {

@@ -9,6 +9,8 @@ public class WoverBiomeDatagenTestMod extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
         globalPack.addRegistryProvider(ModificationProvider::new);
+        globalPack.addRegistryProvider(BiomeDataProvider::new);
+        globalPack.addMultiProvider(BiomeProvider::new);
     }
 
     @Override

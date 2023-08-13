@@ -50,12 +50,20 @@ public class AbstractEvent<T extends Subscriber> implements Event<T> {
         return this.subscribe(handler, DEFAULT_PRIORITY);
     }
 
-    public final boolean subscribe(T handler, int priority) {
+    public final boolean _subscribe(T handler, int priority) {
         if (!handlers.contains(handler)) {
             handlers.add(new Subscriber<>(handler, priority));
             return true;
         }
 
         return false;
+    }
+
+    public final boolean subscribe(T handler, int priority) {
+        return _subscribe(handler, Math.abs(priority));
+    }
+
+    public final boolean subscribeReadOnly(T handler, int priority) {
+        return _subscribe(handler, DEFAULT_READONLY_PRIORITY + priority);
     }
 }
