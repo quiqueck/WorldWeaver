@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-generator-testmod",
+  "version": "1.0.0",
+  "name": "WorldWeaver - World Generator (TestMod)",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-generator-testmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.testmod.entrypoint.WoverWorldGeneratorTestMod"
+    ],
+    "fabric-datagen": [
+      "org.betterx.wover.testmod.generator.datagen.WoverWorldGeneratorDatagenTestMod"
+    ],
+    "client": [
+      "org.betterx.wover.testmod.entrypoint.client.WoverWorldGeneratorClientTestMod"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.14.21",
+    "minecraft": [
+      "1.20",
+      "1.20.1"
+    ],
+    "java": ">=17",
+    "fabric-api": ">=0.83"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  }
+}

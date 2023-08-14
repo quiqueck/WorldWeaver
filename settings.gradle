@@ -24,6 +24,7 @@ include 'wover-block-api'
 include 'wover-feature-api'
 include 'wover-structure-api'
 include 'wover-biome-api'
+include 'wover-generator-api'
 
 include 'WunderLib'
 project(':WunderLib').buildFileName = './wunderlib-include.gradle'

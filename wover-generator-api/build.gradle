@@ -1,0 +1,16 @@
+archivesBaseName = "wover-generator-api"
+
+ext {
+    baseNamespace = "generator"
+    baseClass = "WoverWorldGenerator"
+}
+
+dependencies {
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover-generator.accesswidener')
+}
+
+moduleDependencies(project, ['wover-core-api', 'wover-event-api', 'wover-biome-api'])
