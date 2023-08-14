@@ -203,7 +203,7 @@ export function create(options){
             const javaPath = mksub(datagenPath, 'java')
             const entryPath = mksub(javaPath, `org/betterx/wover/testmod/${options.namespace}/datagen`)
 
-            fabric.entrypoints['fabric-datagen'] = [`org.betterx.wover.testmod.${options.namespace}.datagen.${datagenClass}`]
+            fabric.entrypoints['fabric-datagen'] = [`org.betterx.wover.testmod.${options.namespace}.datagen.${datagenTestClass}`]
 
             console.log(`    - Adding datagen Entrypoint`)
             fs.writeFileSync(Path.join(entryPath, `${datagenTestClass}.java`), datagenTestJava)

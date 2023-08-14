@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Handles the boostrapping as well as the serialization of a {@link Registry} to
+ * Handles the bootstrapping as well as the serialization of a {@link Registry} to
  * a DataPack. This version of the Registry Provider will serialize all elements
  * of the Registry, that have a valid namespace.
  *

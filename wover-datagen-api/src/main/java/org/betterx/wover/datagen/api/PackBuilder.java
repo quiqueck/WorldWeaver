@@ -65,6 +65,13 @@ public class PackBuilder {
         return this;
     }
 
+    /**
+     * Adds a {@link WoverMultiProvider} to the Datapack.
+     *
+     * @param provider The {@link WoverMultiProvider} to add
+     * @param <T>      The element type of the registry.
+     * @return This instance
+     */
     public <T extends WoverMultiProvider> PackBuilder addMultiProvider(MultiProviderFactory<T> provider) {
         provider.create(modCore).registerAllProviders(this);
         return this;

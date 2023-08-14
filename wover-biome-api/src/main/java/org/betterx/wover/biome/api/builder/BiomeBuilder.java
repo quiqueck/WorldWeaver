@@ -266,12 +266,15 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         return tag(structure.getBiomeTag());
     }
 
-    public B tag(TagKey<Biome> biomeTag) {
-        if (biomeTag != null && !biomeTags.contains(biomeTag))
-            biomeTags.add(biomeTag);
+    @SafeVarargs
+    public final B tag(TagKey<Biome>... tags) {
+        for (TagKey<Biome> biomeTag : tags) {
+            if (biomeTag != null && !biomeTags.contains(biomeTag))
+                biomeTags.add(biomeTag);
+        }
+
         return (B) this;
     }
-
 
     public void register() {
         bootstrapContext.register(this);

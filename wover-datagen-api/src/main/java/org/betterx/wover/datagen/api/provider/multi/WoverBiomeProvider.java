@@ -15,6 +15,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.world.level.biome.Biome;
 
+/**
+ * A {@link WoverMultiProvider} for {@link Biome}s and {@link BiomeData}.
+ */
 public abstract class WoverBiomeProvider implements WoverMultiProvider {
     /**
      * The {@link ModCore} of the Mod.
@@ -31,6 +34,11 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
         this.modCore = modCore;
     }
 
+    /**
+     * Called, when the Elements of the Registry need to be created and registered.
+     *
+     * @param context The context to add the elements to.
+     */
     protected abstract void bootstrap(BiomeBootstrapContext context);
 
     private <T> BiomeBootstrapContextImpl initContext(BootstapContext<T> ctx) {
@@ -93,7 +101,6 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
 
         pack.addProvider(modCore ->
                 new WoverTagProvider.ForBiomes(modCore) {
-
                     @Override
                     protected void prepareTags(TagBootstrapContext<Biome> provider) {
                         prepareBiomeTags(provider);

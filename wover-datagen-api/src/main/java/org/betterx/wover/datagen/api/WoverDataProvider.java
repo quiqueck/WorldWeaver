@@ -7,6 +7,11 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * A factory for a {@link DataProvider}.
+ *
+ * @param <T> The type of the {@link DataProvider}
+ */
 public interface WoverDataProvider<T extends DataProvider> {
     /**
      * Called, when The Data needs to be serialized.
