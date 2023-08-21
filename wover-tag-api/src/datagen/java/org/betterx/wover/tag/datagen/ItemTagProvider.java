@@ -8,9 +8,11 @@ import org.betterx.wover.tag.api.predefined.CommonItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
+import java.util.List;
+
 public class ItemTagProvider extends WoverTagProvider.ForItems {
     public ItemTagProvider(ModCore modCore) {
-        super(modCore);
+        super(modCore, List.of(modCore.namespace, modCore.modId, "c", "minecraft"));
     }
 
     protected void prepareTags(ItemTagBootstrapContext ctx) {

@@ -8,15 +8,12 @@ import org.betterx.wover.biome.impl.data.BiomeDataRegistryImpl;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.events.api.Event;
-import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
-import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.tag.api.TagManager;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -56,8 +53,6 @@ public class BiomeManagerImpl {
                 BiomeManagerImpl::onBootstrapTags,
                 Event.DEFAULT_PRIORITY / 2
         );
-
-        WorldLifecycle.WORLD_REGISTRY_READY.subscribe(BiomeManagerImpl::onRegistryReady);
     }
 
 
@@ -65,6 +60,8 @@ public class BiomeManagerImpl {
     private static BiomeBootstrapContextImpl bootstrapContext = null;
 
     private static <T> BiomeBootstrapContextImpl initContext(BootstapContext<T> lookupContext) {
+        if (lookupContext == null) return bootstrapContext;
+
         final HolderGetter<Biome> biomeGetter = lookupContext.lookup(Registries.BIOME);
         if (biomeGetter != lastBiomeGetter) {
             lastBiomeGetter = biomeGetter;
@@ -93,14 +90,10 @@ public class BiomeManagerImpl {
     private static void onBootstrapTags(TagBootstrapContext<Biome> biomeTagBootstrapContext) {
         final BiomeBootstrapContextImpl context = initContext(null);
         context.prepareTags(biomeTagBootstrapContext);
-    }
 
-    private static void onRegistryReady(RegistryAccess registryAccess, OnRegistryReady.Stage stage) {
-        // The Preparation registryAccess is set as soon as  all registries are bootstrapped.
-        // We use this event to invalidate the Biome Bootsrap Context
-        if (stage == OnRegistryReady.Stage.PREPARATION) {
-            bootstrapContext = null;
-        }
+        //preparing tags is the last step of the bootstrap process, when we are done
+        // we can invalidate the context
+        bootstrapContext = null;
     }
 
     public static ResourceKey<Biome> createKey(

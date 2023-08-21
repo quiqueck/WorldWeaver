@@ -1,1 +1,6 @@
 accessWidener   v1  named
+
+extendable  class   net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator
+
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData noNewCaves (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/core/HolderGetter;Lnet/minecraft/world/level/levelgen/DensityFunction;)Lnet/minecraft/world/level/levelgen/NoiseRouter;
+accessible method net/minecraft/world/level/levelgen/NoiseRouterData slideNetherLike (Lnet/minecraft/core/HolderGetter;II)Lnet/minecraft/world/level/levelgen/DensityFunction;

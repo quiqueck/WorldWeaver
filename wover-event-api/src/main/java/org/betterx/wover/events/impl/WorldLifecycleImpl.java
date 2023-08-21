@@ -17,6 +17,7 @@ public class WorldLifecycleImpl {
 
     public static final FolderReadyEventImpl WORLD_FOLDER_READY =
             new FolderReadyEventImpl("WORLD_FOLDER_READY");
+
     public static final RegistryReadyEventImpl WORLD_REGISTRY_READY =
             new RegistryReadyEventImpl("WORLD_REGISTRY_READY");
 

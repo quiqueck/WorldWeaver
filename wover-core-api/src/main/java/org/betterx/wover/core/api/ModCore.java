@@ -10,10 +10,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -159,6 +156,17 @@ public final class ModCore implements Version.ModVersionProvider {
         return id;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ModCore modCore)) return false;
+        return Objects.equals(modId, modCore.modId) && Objects.equals(namespace, modCore.namespace);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modId, namespace);
+    }
 
     /**
      * Returns the instance of {@link ModCore} for the given mod id. Every mod id has a unique, single

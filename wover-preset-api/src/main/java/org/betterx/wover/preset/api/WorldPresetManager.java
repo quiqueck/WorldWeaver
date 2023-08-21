@@ -47,6 +47,15 @@ public class WorldPresetManager {
     }
 
     /**
+     * Gets the default {@link WorldPreset}.
+     *
+     * @return The default preset.
+     */
+    public static ResourceKey<WorldPreset> getDefault() {
+        return WorldPresetsManagerImpl.getDefault();
+    }
+
+    /**
      * Suggests a {@link WorldPreset} as the default preset. Default presets are
      * selected when a new World is created in the UI and are set as the world Type whenever
      * a new settings file is generated on the server.

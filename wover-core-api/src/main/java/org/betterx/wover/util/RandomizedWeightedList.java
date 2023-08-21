@@ -4,11 +4,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 /**
  * A list that allows to get a random value based on the weight of the entries.
@@ -134,6 +132,21 @@ public class RandomizedWeightedList<T> {
         return entries.isEmpty();
     }
 
+    /**
+     * Returns a sublist of this list.
+     *
+     * @param fromIndex – low endpoint (inclusive) of the subList
+     * @param toIndex   – high endpoint (exclusive) of the subList
+     * @return a view of the specified range within this list
+     */
+    public RandomizedWeightedList<T> subList(int fromIndex, int toIndex) {
+        return new RandomizedWeightedList<>(entries.subList(fromIndex, toIndex));
+    }
+
+    public SearchTree searchTree() {
+        return new SearchTree(this);
+    }
+
     private static class WeightedEntry<T> {
         public static <T> Codec<WeightedEntry<T>> buildElementCodec(Codec<T> elementCodec) {
             return RecordCodecBuilder.create((instance) -> instance
@@ -171,6 +184,103 @@ public class RandomizedWeightedList<T> {
         @Override
         public int hashCode() {
             return Objects.hash(value, weight);
+        }
+    }
+
+    public class SearchTree {
+        private final Node root;
+
+        private SearchTree(RandomizedWeightedList<T> list) {
+            root = getNode(list);
+        }
+
+        /**
+         * Get random value from tree.
+         *
+         * @param random - {@link Random}.
+         * @return {@link T} value.
+         */
+        public T get(WorldgenRandom random) {
+            return root.get(random.nextFloat() * (float) totalWeight);
+        }
+
+        private Node getNode(RandomizedWeightedList<T> list) {
+            List<Float> cumulativeWeights = new ArrayList<>(list.size());
+            float sum = 0;
+            for (int i = 0; i < list.size(); i++) {
+                sum += (float) list.entries.get(i).weight;
+                cumulativeWeights.add(sum);
+            }
+
+            return getNode(list, cumulativeWeights);
+        }
+
+        private Node getNode(RandomizedWeightedList<T> list, List<Float> cumulativeWeights) {
+            int size = list.size();
+            if (size == 1) {
+                return new Leaf(list.entries.get(0).value);
+            } else if (size == 2) {
+                return new Branch(
+                        cumulativeWeights.get(0),
+                        new SearchTree.Leaf(list.entries.get(0).value),
+                        new SearchTree.Leaf(list.entries.get(1).value)
+                );
+            } else {
+                final int midIndex = size >> 1;
+                float separator = cumulativeWeights.get(midIndex);
+                Node lower = getNode(list.subList(0, midIndex), cumulativeWeights.subList(0, midIndex));
+                Node upper = getNode(list.subList(midIndex, size), cumulativeWeights.subList(midIndex, size));
+                return new Branch(separator, lower, upper);
+            }
+        }
+
+        private abstract class Node {
+            abstract T get(float value);
+        }
+
+        private class Branch extends Node {
+            final float separator;
+            final Node min;
+            final Node max;
+
+            public Branch(float separator, Node min, Node max) {
+                this.separator = separator;
+                this.min = min;
+                this.max = max;
+            }
+
+            @Override
+            T get(float value) {
+                return value < separator ? min.get(value) : max.get(value);
+            }
+
+            @Override
+            public String toString() {
+                return String.format(Locale.ROOT, "[%f, %s, %s]", separator, min.toString(), max.toString());
+            }
+        }
+
+        private class Leaf extends Node {
+            final T biome;
+
+            Leaf(T value) {
+                this.biome = value;
+            }
+
+            @Override
+            T get(float value) {
+                return biome;
+            }
+
+            @Override
+            public String toString() {
+                return String.format(Locale.ROOT, "[%s]", biome.toString());
+            }
+        }
+
+        @Override
+        public String toString() {
+            return root.toString();
         }
     }
 }

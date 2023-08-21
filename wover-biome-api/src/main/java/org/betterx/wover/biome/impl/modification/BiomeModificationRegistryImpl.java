@@ -3,6 +3,7 @@ package org.betterx.wover.biome.impl.modification;
 import org.betterx.wover.biome.api.modification.BiomeModification;
 import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
+import org.betterx.wover.common.generator.api.biomesource.ReloadableBiomeSource;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.events.api.WorldLifecycle;
@@ -20,6 +21,7 @@ import net.minecraft.server.WorldStem;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.google.common.base.Stopwatch;
@@ -120,6 +122,16 @@ public class BiomeModificationRegistryImpl {
         }
 
         biomeTagWorker.finished();
+
+        if (tagsAdded > 0) {
+            //We need to reload all BiomeSources, as some tags have changed
+            final Registry<LevelStem> dimensions = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
+            dimensions.forEach(stem -> {
+                if (stem.generator().getBiomeSource() instanceof ReloadableBiomeSource reloadable) {
+                    reloadable.reloadBiomes();
+                }
+            });
+        }
 
         if (biomesProcessed > 0) {
             WoverBiome.C.log.info(

@@ -6,5 +6,8 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": []
+  "mixins": [
+    "biomesource.BiomeSourcePrintMixin", "DSL.V2551Mixin", "DSL.V2832Mixin", "generator.ChunkGeneratorAccessor",
+    "generator.ChunkGeneratorsMixin", "generator.NoiseBasedChunkGeneratorMixin"
+  ]
 }

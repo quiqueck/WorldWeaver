@@ -7,16 +7,18 @@ import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 import org.betterx.wover.tag.api.predefined.CommonPoiTags;
 import org.betterx.wover.tag.api.predefined.MineableTags;
 
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
+import java.util.List;
 import java.util.Set;
 
 public class BlockTagProvider extends WoverTagProvider.ForBlocks {
     public BlockTagProvider(ModCore modCore) {
         super(
                 modCore,
-                null,
+                List.of(modCore.namespace, modCore.modId, "c", "minecraft"),
                 Set.of(
                         CommonBlockTags.NETHER_MYCELIUM,
                         CommonBlockTags.BARREL,
@@ -207,5 +209,7 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
                 Blocks.BIG_DRIPLEAF_STEM,
                 Blocks.SMALL_DRIPLEAF
         );
+
+        ctx.add(CommonBlockTags.GROWS_GRASS, BlockTags.DIRT, CommonBlockTags.TERRAIN, BlockTags.LOGS, BlockTags.PLANKS);
     }
 }

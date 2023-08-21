@@ -8,7 +8,7 @@ import org.betterx.wover.entrypoint.WoverWorldGenerator;
 public class WoverWorldGeneratorDatagen extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
-
+        globalPack.addRegistryProvider(NoiseGeneratorSettingsProvider::new);
     }
 
     @Override

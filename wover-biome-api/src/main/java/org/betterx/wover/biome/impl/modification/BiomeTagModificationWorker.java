@@ -6,6 +6,8 @@ import org.betterx.wover.entrypoint.WoverBiome;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
@@ -15,7 +17,16 @@ public class BiomeTagModificationWorker {
     final Map<HolderSetNamedAccessor<Biome>, List<Holder<Biome>>> unfrozen = new HashMap<>();
 
     boolean addBiomeToTag(TagKey<Biome> tag, BiomePredicate.Context context) {
-        HolderSet.Named<Biome> tagHolder = context.biomes.getOrCreateTag(tag);
+        return addBiomeToTag(tag, context.biomes, context.biomeKey, context.biomeHolder);
+    }
+
+    public boolean addBiomeToTag(
+            TagKey<Biome> tag,
+            Registry<Biome> biomes,
+            ResourceKey<Biome> biomeKey,
+            Holder<Biome> biomeHolder
+    ) {
+        HolderSet.Named<Biome> tagHolder = biomes.getOrCreateTag(tag);
         if (tagHolder instanceof HolderSetNamedAccessor<?>) {
             HolderSetNamedAccessor<Biome> biomeTagHolder = (HolderSetNamedAccessor<Biome>) tagHolder;
 
@@ -23,7 +34,7 @@ public class BiomeTagModificationWorker {
                               .map(Holder::unwrapKey)
                               .filter(Optional::isPresent)
                               .map(Optional::get)
-                              .anyMatch(key -> key.equals(context.biomeKey))) {
+                              .anyMatch(key -> key.equals(biomeKey))) {
                 return false;
             }
 
@@ -31,7 +42,7 @@ public class BiomeTagModificationWorker {
                     biomeTagHolder,
                     holder -> new LinkedList<>(biomeTagHolder.wover_getContents())
             );
-            contents.add(context.biomeHolder);
+            contents.add(biomeHolder);
 
             return true;
         } else {
@@ -40,7 +51,7 @@ public class BiomeTagModificationWorker {
         return false;
     }
 
-    boolean finished() {
+    public boolean finished() {
         if (!unfrozen.isEmpty()) {
             unfrozen.forEach((tag, contents) -> {
                 tag.wover_setContents(List.copyOf(contents));
