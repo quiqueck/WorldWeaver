@@ -21,6 +21,9 @@
     ],
     "client": [
       "org.betterx.wover.entrypoint.client.WoverWorldGeneratorClient"
+    ],
+    "fabric-datagen": [
+      "org.betterx.wover.generator.datagen.WoverWorldGeneratorDatagen"
     ]
   },
   "mixins": [

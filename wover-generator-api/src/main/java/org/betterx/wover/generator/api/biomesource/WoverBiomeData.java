@@ -58,7 +58,7 @@ public class WoverBiomeData extends BiomeData {
         this.parent = parent;
 
         this.edgeData = edge == null ? null : BiomeDataRegistry.createKey(edge.location());
-        this.parentData = edge == null ? null : BiomeDataRegistry.createKey(parent.location());
+        this.parentData = parent == null ? null : BiomeDataRegistry.createKey(parent.location());
     }
 
     public static WoverBiomeData of(ResourceKey<Biome> biome) {
@@ -232,4 +232,6 @@ public class WoverBiomeData extends BiomeData {
     public KeyDispatchDataCodec<? extends WoverBiomeData> codec() {
         return KEY_CODEC;
     }
+
+
 }

@@ -58,33 +58,12 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
     protected final List<Climate.ParameterPoint> parameters = new ArrayList<>(1);
     protected float fogDensity;
     protected final List<TagKey<Biome>> biomeTags = new ArrayList<>(2);
-    private Biome.TemperatureModifier temperatureModifier;
-    private float downfall;
-    private float temperature;
-    private boolean hasPrecipitation;
-    private final BiomeSpecialEffects.Builder fx = new BiomeSpecialEffects.Builder();
-    private final BiomeGenerationSettings.Builder generationSettings;
-    private final MobSpawnSettings.Builder mobSpawnSettings = new MobSpawnSettings.Builder();
 
 
     protected BiomeBuilder(BiomeBootstrapContext context, BiomeKey<B> key) {
         this.key = key;
         this.bootstrapContext = context;
-        this.temperatureModifier = Biome.TemperatureModifier.NONE;
-        this.downfall = 0.f;
-        this.temperature = 0.5f;
-        this.hasPrecipitation = false;
         this.fogDensity = 1.0f;
-
-        generationSettings = new BiomeGenerationSettings.Builder(
-                bootstrapContext.lookup(Registries.PLACED_FEATURE),
-                bootstrapContext.lookup(Registries.CONFIGURED_CARVER)
-        );
-
-        fx.fogColor(DEFAULT_FOG_COLOR);
-        fx.waterFogColor(DEFAULT_WATER_FOG_COLOR);
-        fx.waterColor(DEFAULT_WATER_COLOR);
-        fx.skyColor(calculateSkyColor(temperature));
     }
 
     public B addClimate(Climate.ParameterPoint point) {
@@ -100,165 +79,8 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         return addClimate(Climate.parameters(temperature, humidity, 0, 0, 0, 0, 0));
     }
 
-    public B hasPrecipitation(boolean bl) {
-        this.hasPrecipitation = bl;
-        return (B) this;
-    }
-
-    public B temperature(float f) {
-        this.temperature = f;
-        return (B) this;
-    }
-
-    public B downfall(float f) {
-        this.downfall = f;
-        return (B) this;
-    }
-
-    protected B temperatureAdjustment(Biome.TemperatureModifier temperatureModifier) {
-        this.temperatureModifier = temperatureModifier;
-        return (B) this;
-    }
-
-    public B temperatureFrozen() {
-        return this.temperatureAdjustment(Biome.TemperatureModifier.FROZEN);
-    }
-
-    public B temperatureRegular() {
-        return this.temperatureAdjustment(Biome.TemperatureModifier.NONE);
-    }
-
-    public B feature(PlacedFeatureKey feature) {
-        generationSettings.addFeature(
-                feature.getDecoration(),
-                feature.getHolder(bootstrapContext.lookup(Registries.PLACED_FEATURE))
-        );
-        return (B) this;
-    }
-
-    public B feature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
-        generationSettings.addFeature(
-                decoration,
-                PlacedFeatureManager.getHolder(bootstrapContext.lookup(Registries.PLACED_FEATURE), feature)
-        );
-        return (B) this;
-    }
-
-    public B feature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
-        generationSettings.addFeature(decoration, feature);
-        return (B) this;
-    }
-
-    public B carver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carver) {
-        generationSettings.addCarver(step, bootstrapContext.lookup(Registries.CONFIGURED_CARVER).getOrThrow(carver));
-        return (B) this;
-    }
-
-    public B carver(GenerationStep.Carving step, Holder<ConfiguredWorldCarver<?>> carver) {
-        generationSettings.addCarver(step, carver);
-        return (B) this;
-    }
-
-    public B fogColor(int color) {
-        fx.fogColor(color);
-        return (B) this;
-    }
-
     public B fogDensity(float density) {
         this.fogDensity = density;
-        return (B) this;
-    }
-
-    public B waterColor(int color) {
-        fx.waterColor(color);
-        return (B) this;
-    }
-
-    public B waterFogColor(int color) {
-        fx.waterFogColor(color);
-        return (B) this;
-    }
-
-    public B skyColor(int color) {
-        fx.skyColor(color);
-        return (B) this;
-    }
-
-    public B foliageColorOverride(int color) {
-        fx.foliageColorOverride(color);
-        return (B) this;
-    }
-
-    public B grassColorOverride(int color) {
-        fx.grassColorOverride(color);
-        return (B) this;
-    }
-
-    public B grassColorModifier(BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
-        fx.grassColorModifier(grassColorModifier);
-        return (B) this;
-    }
-
-    public B particles(AmbientParticleSettings ambientParticleSettings) {
-        fx.ambientParticle(ambientParticleSettings);
-        return (B) this;
-    }
-
-    public B loop(Holder<SoundEvent> holder) {
-        fx.ambientLoopSound(holder);
-        return (B) this;
-    }
-
-    public B mood(AmbientMoodSettings ambientMoodSettings) {
-        fx.ambientMoodSound(ambientMoodSettings);
-        return (B) this;
-    }
-
-    public B mood(Holder<SoundEvent> mood) {
-        return mood(mood, 6000, 8, 2.0F);
-    }
-
-    public B mood(Holder<SoundEvent> mood, int tickDelay, int blockSearchExtent, float soundPositionOffset) {
-        return mood(new AmbientMoodSettings(mood, tickDelay, blockSearchExtent, soundPositionOffset));
-    }
-
-    public B additions(AmbientAdditionsSettings ambientAdditionsSettings) {
-        fx.ambientAdditionsSound(ambientAdditionsSettings);
-        return (B) this;
-    }
-
-    public B additions(Holder<SoundEvent> additions, float intensity) {
-        return additions(new AmbientAdditionsSettings(additions, intensity));
-    }
-
-    public B music(@Nullable Music music) {
-        fx.backgroundMusic(music);
-        return (B) this;
-    }
-
-    public B music(Holder<SoundEvent> music) {
-        return music(music, 600, 2400, true);
-    }
-
-    public B music(Holder<SoundEvent> music, int minDelay, int maxDelay, boolean replaceCurrentMusic) {
-        return music(new Music(music, minDelay, maxDelay, replaceCurrentMusic));
-    }
-
-    public <M extends Mob> B spawn(EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
-        mobSpawnSettings.addSpawn(
-                entityType.getCategory(),
-                new MobSpawnSettings.SpawnerData(entityType, weight, minGroupCount, maxGroupCount)
-        );
-        return (B) this;
-    }
-
-    public <M extends Mob> B addMobCharge(EntityType<M> entityType, double energyBudget, double charge) {
-        mobSpawnSettings.addMobCharge(entityType, energyBudget, charge);
-        return (B) this;
-    }
-
-    public B creatureGenerationProbability(float p) {
-        mobSpawnSettings.creatureGenerationProbability(p);
         return (B) this;
     }
 
@@ -280,9 +102,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         bootstrapContext.register(this);
     }
 
-    public void registerBiome(BootstapContext<Biome> biomeContext) {
-        biomeContext.register(key.key, buildBiome());
-    }
+    public abstract void registerBiome(BootstapContext<Biome> biomeContext);
 
     public abstract void registerBiomeData(BootstapContext<BiomeData> dataContext);
 
@@ -292,38 +112,246 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         }
     }
 
-    private static BiomeGenerationSettings fixGenerationSettings(BiomeGenerationSettings settings) {
-        //Fabric Biome Modification API can not handle an empty carver map, thus we will create one with
-        //an empty HolderSet for every possible step:
-        //https://github.com/FabricMC/fabric/issues/2079
-        //TODO: Remove, once fabric gets fixed
-        if (settings instanceof BiomeGenerationSettingsAccessor acc) {
-            Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> carvers = new HashMap<>(acc.wover_getCarvers());
-            for (GenerationStep.Carving step : GenerationStep.Carving.values()) {
-                carvers.computeIfAbsent(step, __ -> HolderSet.direct(Lists.newArrayList()));
-            }
-            acc.wover_setCarvers(Map.copyOf(carvers));
+
+    public abstract static class VanillaBuilder<B extends VanillaBuilder<B>> extends BiomeBuilder<B> {
+        private Biome.TemperatureModifier temperatureModifier;
+        private float downfall;
+        private float temperature;
+        private boolean hasPrecipitation;
+        private final BiomeSpecialEffects.Builder fx = new BiomeSpecialEffects.Builder();
+        private final BiomeGenerationSettings.Builder generationSettings;
+        private final MobSpawnSettings.Builder mobSpawnSettings = new MobSpawnSettings.Builder();
+
+        protected VanillaBuilder(BiomeBootstrapContext context, BiomeKey<B> key) {
+            super(context, key);
+
+            this.temperatureModifier = Biome.TemperatureModifier.NONE;
+            this.downfall = 0.f;
+            this.temperature = 0.5f;
+            this.hasPrecipitation = false;
+
+            generationSettings = new BiomeGenerationSettings.Builder(
+                    bootstrapContext.lookup(Registries.PLACED_FEATURE),
+                    bootstrapContext.lookup(Registries.CONFIGURED_CARVER)
+            );
+
+            fx.fogColor(DEFAULT_FOG_COLOR);
+            fx.waterFogColor(DEFAULT_WATER_FOG_COLOR);
+            fx.waterColor(DEFAULT_WATER_COLOR);
+            fx.skyColor(calculateSkyColor(temperature));
         }
-        return settings;
+
+
+        public B hasPrecipitation(boolean bl) {
+            this.hasPrecipitation = bl;
+            return (B) this;
+        }
+
+        public B temperature(float f) {
+            this.temperature = f;
+            return (B) this;
+        }
+
+        public B downfall(float f) {
+            this.downfall = f;
+            return (B) this;
+        }
+
+        protected B temperatureAdjustment(Biome.TemperatureModifier temperatureModifier) {
+            this.temperatureModifier = temperatureModifier;
+            return (B) this;
+        }
+
+        public B temperatureFrozen() {
+            return this.temperatureAdjustment(Biome.TemperatureModifier.FROZEN);
+        }
+
+        public B temperatureRegular() {
+            return this.temperatureAdjustment(Biome.TemperatureModifier.NONE);
+        }
+
+        public B feature(PlacedFeatureKey feature) {
+            generationSettings.addFeature(
+                    feature.getDecoration(),
+                    feature.getHolder(bootstrapContext.lookup(Registries.PLACED_FEATURE))
+            );
+            return (B) this;
+        }
+
+        public B feature(GenerationStep.Decoration decoration, ResourceKey<PlacedFeature> feature) {
+            generationSettings.addFeature(
+                    decoration,
+                    PlacedFeatureManager.getHolder(bootstrapContext.lookup(Registries.PLACED_FEATURE), feature)
+            );
+            return (B) this;
+        }
+
+        public B feature(GenerationStep.Decoration decoration, Holder<PlacedFeature> feature) {
+            generationSettings.addFeature(decoration, feature);
+            return (B) this;
+        }
+
+        public B carver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+            generationSettings.addCarver(
+                    step,
+                    bootstrapContext.lookup(Registries.CONFIGURED_CARVER).getOrThrow(carver)
+            );
+            return (B) this;
+        }
+
+        public B carver(GenerationStep.Carving step, Holder<ConfiguredWorldCarver<?>> carver) {
+            generationSettings.addCarver(step, carver);
+            return (B) this;
+        }
+
+        public B fogColor(int color) {
+            fx.fogColor(color);
+            return (B) this;
+        }
+
+        public B waterColor(int color) {
+            fx.waterColor(color);
+            return (B) this;
+        }
+
+        public B waterFogColor(int color) {
+            fx.waterFogColor(color);
+            return (B) this;
+        }
+
+        public B skyColor(int color) {
+            fx.skyColor(color);
+            return (B) this;
+        }
+
+        public B foliageColorOverride(int color) {
+            fx.foliageColorOverride(color);
+            return (B) this;
+        }
+
+        public B grassColorOverride(int color) {
+            fx.grassColorOverride(color);
+            return (B) this;
+        }
+
+        public B grassColorModifier(BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
+            fx.grassColorModifier(grassColorModifier);
+            return (B) this;
+        }
+
+        public B particles(AmbientParticleSettings ambientParticleSettings) {
+            fx.ambientParticle(ambientParticleSettings);
+            return (B) this;
+        }
+
+        public B loop(Holder<SoundEvent> holder) {
+            fx.ambientLoopSound(holder);
+            return (B) this;
+        }
+
+        public B mood(AmbientMoodSettings ambientMoodSettings) {
+            fx.ambientMoodSound(ambientMoodSettings);
+            return (B) this;
+        }
+
+        public B mood(Holder<SoundEvent> mood) {
+            return mood(mood, 6000, 8, 2.0F);
+        }
+
+        public B mood(Holder<SoundEvent> mood, int tickDelay, int blockSearchExtent, float soundPositionOffset) {
+            return mood(new AmbientMoodSettings(mood, tickDelay, blockSearchExtent, soundPositionOffset));
+        }
+
+        public B additions(AmbientAdditionsSettings ambientAdditionsSettings) {
+            fx.ambientAdditionsSound(ambientAdditionsSettings);
+            return (B) this;
+        }
+
+        public B additions(Holder<SoundEvent> additions, float intensity) {
+            return additions(new AmbientAdditionsSettings(additions, intensity));
+        }
+
+        public B music(@Nullable Music music) {
+            fx.backgroundMusic(music);
+            return (B) this;
+        }
+
+        public B music(Holder<SoundEvent> music) {
+            return music(music, 600, 2400, true);
+        }
+
+        public B music(Holder<SoundEvent> music, int minDelay, int maxDelay, boolean replaceCurrentMusic) {
+            return music(new Music(music, minDelay, maxDelay, replaceCurrentMusic));
+        }
+
+        public <M extends Mob> B spawn(EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {
+            mobSpawnSettings.addSpawn(
+                    entityType.getCategory(),
+                    new MobSpawnSettings.SpawnerData(entityType, weight, minGroupCount, maxGroupCount)
+            );
+            return (B) this;
+        }
+
+        public <M extends Mob> B addMobCharge(EntityType<M> entityType, double energyBudget, double charge) {
+            mobSpawnSettings.addMobCharge(entityType, energyBudget, charge);
+            return (B) this;
+        }
+
+        public B creatureGenerationProbability(float p) {
+            mobSpawnSettings.creatureGenerationProbability(p);
+            return (B) this;
+        }
+
+        public void register() {
+            bootstrapContext.register(this);
+        }
+
+        public void registerBiome(BootstapContext<Biome> biomeContext) {
+            biomeContext.register(key.key, buildBiome());
+        }
+
+        public abstract void registerBiomeData(BootstapContext<BiomeData> dataContext);
+
+
+        private static BiomeGenerationSettings fixGenerationSettings(BiomeGenerationSettings settings) {
+            //Fabric Biome Modification API can not handle an empty carver map, thus we will create one with
+            //an empty HolderSet for every possible step:
+            //https://github.com/FabricMC/fabric/issues/2079
+            //TODO: Remove, once fabric gets fixed
+            if (settings instanceof BiomeGenerationSettingsAccessor acc) {
+                Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> carvers = new HashMap<>(acc.wover_getCarvers());
+                for (GenerationStep.Carving step : GenerationStep.Carving.values()) {
+                    carvers.computeIfAbsent(step, __ -> HolderSet.direct(Lists.newArrayList()));
+                }
+                acc.wover_setCarvers(Map.copyOf(carvers));
+            }
+            return settings;
+        }
+
+        protected Biome buildBiome() {
+            Biome.BiomeBuilder vanillaBuilder = new Biome.BiomeBuilder();
+
+            vanillaBuilder.hasPrecipitation(hasPrecipitation);
+            vanillaBuilder.downfall(downfall);
+            vanillaBuilder.temperature(temperature);
+            vanillaBuilder.temperatureAdjustment(temperatureModifier);
+
+            vanillaBuilder.generationSettings(fixGenerationSettings(generationSettings.build()));
+            vanillaBuilder.specialEffects(fx.build());
+            vanillaBuilder.mobSpawnSettings(mobSpawnSettings.build());
+
+            return vanillaBuilder.build();
+        }
     }
 
-    protected Biome buildBiome() {
-        Biome.BiomeBuilder vanillaBuilder = new Biome.BiomeBuilder();
-
-        vanillaBuilder.hasPrecipitation(hasPrecipitation);
-        vanillaBuilder.downfall(downfall);
-        vanillaBuilder.temperature(temperature);
-        vanillaBuilder.temperatureAdjustment(temperatureModifier);
-
-        vanillaBuilder.generationSettings(fixGenerationSettings(generationSettings.build()));
-        vanillaBuilder.specialEffects(fx.build());
-        vanillaBuilder.mobSpawnSettings(mobSpawnSettings.build());
-
-        return vanillaBuilder.build();
-    }
-
-    public abstract static class Vanilla extends BiomeBuilder<Vanilla> {
+    public abstract static class Vanilla extends VanillaBuilder<Vanilla> {
         protected Vanilla(BiomeBootstrapContext context, BiomeKey<Vanilla> key) {
+            super(context, key);
+        }
+    }
+
+    public abstract static class Wrapped extends BiomeBuilder<Wrapped> {
+        protected Wrapped(BiomeBootstrapContext context, BiomeKey<Wrapped> key) {
             super(context, key);
         }
     }

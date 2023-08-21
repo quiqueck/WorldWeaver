@@ -21,6 +21,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 public class BiomeManagerImpl {
     public static final EventImpl<OnBootstrapRegistry<Biome>> BOOTSTRAP_BIOME_REGISTRY
@@ -107,5 +108,10 @@ public class BiomeManagerImpl {
 
     public static BiomeKey<BiomeBuilder.Vanilla> vanilla(ResourceLocation location) {
         return new VanillaKeyImpl(location);
+    }
+
+
+    public static BiomeKey<BiomeBuilder.Wrapped> wrapped(@NotNull ResourceKey<Biome> key) {
+        return new WrappedKeyImpl(key.location());
     }
 }

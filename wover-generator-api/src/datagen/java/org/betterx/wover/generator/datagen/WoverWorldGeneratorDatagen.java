@@ -9,6 +9,7 @@ public class WoverWorldGeneratorDatagen extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
         globalPack.addRegistryProvider(NoiseGeneratorSettingsProvider::new);
+        globalPack.addMultiProvider(WorldDataProvider::new);
     }
 
     @Override

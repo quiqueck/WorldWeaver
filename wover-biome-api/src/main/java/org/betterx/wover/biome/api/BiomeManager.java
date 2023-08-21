@@ -6,8 +6,11 @@ import org.betterx.wover.biome.impl.BiomeManagerImpl;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+
+import org.jetbrains.annotations.NotNull;
 
 public class BiomeManager {
     public static final Event<OnBootstrapRegistry<Biome>> BOOTSTRAP_BIOME_REGISTRY
@@ -17,5 +20,9 @@ public class BiomeManager {
 
     public static BiomeKey<BiomeBuilder.Vanilla> vanilla(ResourceLocation location) {
         return BiomeManagerImpl.vanilla(location);
+    }
+
+    public static BiomeKey<BiomeBuilder.Wrapped> wrapped(@NotNull ResourceKey<Biome> key) {
+        return BiomeManagerImpl.wrapped(key);
     }
 }
