@@ -5,6 +5,7 @@ import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
 import org.betterx.wover.common.generator.api.biomesource.ReloadableBiomeSource;
 import org.betterx.wover.common.generator.api.chunkgenerator.EnforceableChunkGenerator;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.generator.impl.biomesource.end.TheEndBiomesHelper;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
@@ -23,6 +24,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
+
+import net.fabricmc.fabric.api.biome.v1.NetherBiomes;
 
 import com.google.common.base.Stopwatch;
 
@@ -74,6 +77,9 @@ class BiomeRepairHelper {
     ) {
         Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions = loadWorldDimensions(registryAccess);
         final Registry<Biome> biomes = registryAccess.registryOrThrow(Registries.BIOME);
+
+        // we ensure that all biomes registered using fabric have the proper biome tags
+        registerAllBiomesFromFabric(biomes);
         for (var entry : dimensionRegistry.entrySet()) {
             boolean didRepair = false;
             ResourceKey<LevelStem> key = entry.getKey();
@@ -122,6 +128,46 @@ class BiomeRepairHelper {
 
 
         return dimensionRegistry;
+    }
+
+    private void registerAllBiomesFromFabric(
+            Registry<Biome> biomes
+    ) {
+        final Stopwatch sw = Stopwatch.createStarted();
+        int biomesAdded = 0;
+
+        final BiomeTagModificationWorker biomeTagWorker = new BiomeTagModificationWorker();
+        for (Map.Entry<ResourceKey<Biome>, Biome> e : biomes.entrySet()) {
+            TagKey<Biome> tag = null;
+            if (NetherBiomes.canGenerateInNether(e.getKey())) {
+                tag = BiomeTags.IS_NETHER;
+            } else if (TheEndBiomesHelper.canGenerateAsMainIslandBiome(e.getKey())) {
+                tag = CommonBiomeTags.IS_END_CENTER;
+            } else if (TheEndBiomesHelper.canGenerateAsHighlandsBiome(e.getKey())) {
+                tag = CommonBiomeTags.IS_END_HIGHLAND;
+            } else if (TheEndBiomesHelper.canGenerateAsEndBarrens(e.getKey())) {
+                tag = CommonBiomeTags.IS_END_BARRENS;
+            } else if (TheEndBiomesHelper.canGenerateAsSmallIslandsBiome(e.getKey())) {
+                tag = CommonBiomeTags.IS_SMALL_END_ISLAND;
+            } else if (TheEndBiomesHelper.canGenerateAsEndMidlands(e.getKey())) {
+                tag = CommonBiomeTags.IS_END_MIDLAND;
+            }
+
+            if (tag != null) {
+                final Holder.Reference<Biome> holder = biomes.getHolderOrThrow(e.getKey());
+                if (!holder.is(tag)) {
+                    biomeTagWorker.addBiomeToTag(tag, biomes, e.getKey(), holder);
+                    biomesAdded++;
+                }
+            }
+        }
+
+        biomeTagWorker.finished();
+
+        if (biomesAdded > 0) {
+            WoverWorldGenerator.C.log.info("Added Tags for {} fabric biomes in {}", biomesAdded, sw);
+        }
+
     }
 
     private void registerAllBiomesFromVanillaDimension(

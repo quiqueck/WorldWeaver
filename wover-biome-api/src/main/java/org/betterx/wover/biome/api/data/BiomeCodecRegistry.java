@@ -20,6 +20,6 @@ public class BiomeCodecRegistry {
             ResourceLocation location,
             KeyDispatchDataCodec<? extends BiomeData> keyDispatchDataCodec
     ) {
-        return BiomeCodecRegistryImpl.register(BIOME_CODECS, location, keyDispatchDataCodec);
+        return BiomeCodecRegistryImpl.register(BiomeCodecRegistryImpl.BIOME_CODECS, location, keyDispatchDataCodec);
     }
 }

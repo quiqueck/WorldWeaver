@@ -20,6 +20,7 @@ import net.minecraft.world.level.biome.Climate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,9 @@ public class WoverBiomeData extends BiomeData {
     public final int edgeSize;
     public final boolean vertical;
     public final @Nullable ResourceKey<Biome> edge;
+    public final @Nullable ResourceKey<BiomeData> edgeData;
     public final @Nullable ResourceKey<Biome> parent;
+    public final @Nullable ResourceKey<BiomeData> parentData;
 
     public WoverBiomeData(
             float fogDensity,
@@ -53,6 +56,17 @@ public class WoverBiomeData extends BiomeData {
         this.vertical = vertical;
         this.edge = edge;
         this.parent = parent;
+
+        this.edgeData = edge == null ? null : BiomeDataRegistry.createKey(edge.location());
+        this.parentData = edge == null ? null : BiomeDataRegistry.createKey(parent.location());
+    }
+
+    public static WoverBiomeData of(ResourceKey<Biome> biome) {
+        return new WoverBiomeData(1.0f, biome, List.of(), 0.1f, 1.0f, 0, false, null, null);
+    }
+
+    public static WoverBiomeData withEdge(ResourceKey<Biome> biome, ResourceKey<Biome> edge) {
+        return new WoverBiomeData(1.0f, biome, List.of(), 0.1f, 1.0f, 4, false, edge, null);
     }
 
     public static <T extends WoverBiomeData> Codec<T> codec(
@@ -139,15 +153,8 @@ public class WoverBiomeData extends BiomeData {
         return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14, p15, p16, factory);
     }
 
-    public boolean isSame(ResourceKey<Biome> biome) {
-        if (biome != null && this.biomeKey != null) {
-            return biome.location().equals(this.biomeKey.location());
-        }
-        return false;
-    }
 
-
-    public Registry<BiomeData> getDataRegistry(String forWhat) throws IllegalStateException {
+    public @NotNull Registry<BiomeData> getDataRegistry(String forWhat) throws IllegalStateException {
         RegistryAccess acc = WorldState.registryAccess();
 
         if (acc == null) {
@@ -186,13 +193,13 @@ public class WoverBiomeData extends BiomeData {
         return null;
     }
 
-    public RandomizedWeightedList<BiomeData> createBiomeAlternatives() {
+    public RandomizedWeightedList<BiomeData> createBiomeAlternatives(Predicate<WoverBiomeData> isAllowed) {
         final Registry<BiomeData> reg = getDataRegistry("biome alternatives");
         final RandomizedWeightedList<BiomeData> alternatives = new RandomizedWeightedList<>();
 
         alternatives.add(this, genChance);
         for (Map.Entry<ResourceKey<BiomeData>, BiomeData> entry : reg.entrySet()) {
-            if (entry.getValue() instanceof WoverBiomeData b && this.isSame(b.parent)) {
+            if (entry.getValue() instanceof WoverBiomeData b && this.isSame(b.parent) && isAllowed.test(b)) {
                 alternatives.add(b, b.genChance);
             }
         }
@@ -208,6 +215,18 @@ public class WoverBiomeData extends BiomeData {
     @Override
     public boolean isPickable() {
         return parent == null && findEdgeParent() == null;
+    }
+
+    public BiomeData getEdgeData() {
+        if (edgeData == null) return null;
+        final Registry<BiomeData> reg = getDataRegistry("edge biome");
+        return reg.get(edgeData);
+    }
+
+    public BiomeData getParentData() {
+        if (edgeData == null) return null;
+        final Registry<BiomeData> reg = getDataRegistry("parent biome");
+        return reg.get(parentData);
     }
 
     public KeyDispatchDataCodec<? extends WoverBiomeData> codec() {

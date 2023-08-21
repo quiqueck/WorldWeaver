@@ -7,7 +7,8 @@
     "defaultRequire": 1
   },
   "mixins": [
-    "biomesource.BiomeSourcePrintMixin", "DSL.V2551Mixin", "DSL.V2832Mixin", "generator.ChunkGeneratorAccessor",
-    "generator.ChunkGeneratorsMixin", "generator.NoiseBasedChunkGeneratorMixin"
+    "biomesource.BiomeSourcePrintMixin", "biomesource.ServerLevelMixin", "biomesource.TheEndBiomesMixin",
+    "DSL.V2551Mixin", "DSL.V2832Mixin", "generator.ChunkGeneratorAccessor", "generator.ChunkGeneratorsMixin",
+    "generator.NoiseBasedChunkGeneratorMixin"
   ]
 }

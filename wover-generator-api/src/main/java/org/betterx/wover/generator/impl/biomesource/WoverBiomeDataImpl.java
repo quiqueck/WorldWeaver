@@ -1,7 +1,7 @@
 package org.betterx.wover.generator.impl.biomesource;
 
 import org.betterx.wover.biome.api.data.BiomeCodecRegistry;
-import org.betterx.wover.entrypoint.WoverBiome;
+import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeData;
 
 import com.mojang.serialization.Codec;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.ApiStatus;
 public class WoverBiomeDataImpl {
     @ApiStatus.Internal
     public static void initialize() {
-        BiomeCodecRegistry.register(WoverBiome.C.id("wover_data"), WoverBiomeData.KEY_CODEC);
+        BiomeCodecRegistry.register(WoverWorldGenerator.C.id("wover_data"), WoverBiomeData.KEY_CODEC);
     }
 
     public static class CodecAttributes<T extends WoverBiomeData> {

@@ -4,9 +4,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * A list that allows to get a random value based on the weight of the entries.
@@ -38,6 +38,15 @@ public class RandomizedWeightedList<T> {
     public RandomizedWeightedList() {
         entries = new LinkedList<>();
         totalWeight = 0.0;
+    }
+
+    /**
+     * Returns the total weight of all entries.
+     *
+     * @return the total weight
+     */
+    public double getTotalWeight() {
+        return totalWeight;
     }
 
     /**
@@ -90,6 +99,22 @@ public class RandomizedWeightedList<T> {
         return getRandomValue(random::nextDouble);
     }
 
+    /**
+     * Maps the each vaue for this list to a new type and creates a new list with the mapped values and the
+     * original weights.
+     *
+     * @param mapper the mapping function
+     * @param <R>    the new type
+     * @return the new list
+     */
+    public <R> RandomizedWeightedList<R> map(Function<T, R> mapper) {
+        RandomizedWeightedList<R> res = new RandomizedWeightedList<>();
+        for (WeightedEntry<T> e : entries) {
+            res.add(mapper.apply(e.getValue()), e.getWeight());
+        }
+        return res;
+    }
+
     @FunctionalInterface
     private interface RandomValueSupplier {
         double nextDouble();
@@ -114,20 +139,43 @@ public class RandomizedWeightedList<T> {
         return entries.get(entries.size() - 1).getValue();
     }
 
+    /**
+     * Creates a new, empty instance.
+     *
+     * @param <E> the type of the values
+     * @return a new, empty instance
+     */
     public static <E> RandomizedWeightedList<E> of() {
         return new RandomizedWeightedList<E>();
     }
 
+    /**
+     * Creates a new instance with a single element.
+     *
+     * @param e1  the element
+     * @param <E> the type of the values
+     * @return the new instance
+     */
     public static <E> RandomizedWeightedList<E> of(E e1) {
         var l = new RandomizedWeightedList<E>();
         l.add(e1, 1);
         return l;
     }
 
+    /**
+     * Returns the number of elements stored in the list
+     *
+     * @return the number of elements
+     */
     public int size() {
         return entries.size();
     }
 
+    /**
+     * Returns whether the list is empty.
+     *
+     * @return @{code true} if the list is empty, {@code false} otherwise
+     */
     public boolean isEmpty() {
         return entries.isEmpty();
     }
@@ -143,7 +191,13 @@ public class RandomizedWeightedList<T> {
         return new RandomizedWeightedList<>(entries.subList(fromIndex, toIndex));
     }
 
-    public SearchTree searchTree() {
+    /**
+     * Creates a search tree for this list. This is a useful speedup if you want to get multiple
+     * random values from the same list (at least if the list is large).
+     *
+     * @return a new search tree
+     */
+    public SearchTree buildSearchTree() {
         return new SearchTree(this);
     }
 
@@ -187,21 +241,52 @@ public class RandomizedWeightedList<T> {
         }
     }
 
+    /**
+     * A search tree for a {@link RandomizedWeightedList}.
+     */
     public class SearchTree {
+        @FunctionalInterface
+        private interface RandomFloatValueSupplier {
+            float nextFloat();
+        }
+
         private final Node root;
 
         private SearchTree(RandomizedWeightedList<T> list) {
             root = getNode(list);
         }
 
-        /**
-         * Get random value from tree.
-         *
-         * @param random - {@link Random}.
-         * @return {@link T} value.
-         */
-        public T get(WorldgenRandom random) {
+        private T getRandomValue(RandomFloatValueSupplier random) {
             return root.get(random.nextFloat() * (float) totalWeight);
+        }
+
+        /**
+         * Returns a random value from the tree.
+         *
+         * @param random the random generator to use
+         * @return the randomly chosen value
+         */
+        public T getRandomValue(Random random) {
+            return getRandomValue(random::nextFloat);
+        }
+
+        /**
+         * Returns a random value from the tree.
+         *
+         * @param random the random generator to use
+         * @return the randomly chosen value
+         */
+        public T getRandomValue(RandomSource random) {
+            return getRandomValue(random::nextFloat);
+        }
+
+        /**
+         * Returns whether the tree is empty.
+         *
+         * @return @{code true} if the tree is empty, {@code false} otherwise
+         */
+        public boolean isEmpty() {
+            return root == null || (root instanceof Leaf l && l.biome == null);
         }
 
         private Node getNode(RandomizedWeightedList<T> list) {
@@ -217,7 +302,9 @@ public class RandomizedWeightedList<T> {
 
         private Node getNode(RandomizedWeightedList<T> list, List<Float> cumulativeWeights) {
             int size = list.size();
-            if (size == 1) {
+            if (size == 0) {
+                return new Leaf(null);
+            } else if (size == 1) {
                 return new Leaf(list.entries.get(0).value);
             } else if (size == 2) {
                 return new Branch(
@@ -227,7 +314,7 @@ public class RandomizedWeightedList<T> {
                 );
             } else {
                 final int midIndex = size >> 1;
-                float separator = cumulativeWeights.get(midIndex);
+                float separator = cumulativeWeights.get(midIndex - 1);
                 Node lower = getNode(list.subList(0, midIndex), cumulativeWeights.subList(0, midIndex));
                 Node upper = getNode(list.subList(midIndex, size), cumulativeWeights.subList(midIndex, size));
                 return new Branch(separator, lower, upper);

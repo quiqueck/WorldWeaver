@@ -43,6 +43,10 @@ public class BiomeData {
         this.parameterPoints = parameterPoints;
     }
 
+    public static BiomeData of(ResourceKey<Biome> biome) {
+        return new BiomeData(1.0f, biome, List.of());
+    }
+
     public static <T extends BiomeData> Codec<T> codec(
             final Function3<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, T> factory
     ) {
@@ -305,12 +309,45 @@ public class BiomeData {
     }
 
     /**
-     * Used to determin wether or not a Biome is pickable. By default this method will return @{code true}.
+     * Used to determine wether or not a Biome is pickable. By default this method will return @{code true}.
      *
      * @return true if the Biome is pickable, false otherwise.
      */
     public boolean isPickable() {
         return true;
+    }
+
+    /**
+     * Used to determine the chance of a Biome being picked. By default this method will return @{code 1.0f}.
+     *
+     * @return the chance of the Biome being picked.
+     */
+    public float genChance() {
+        return 1.0f;
+    }
+
+    /**
+     * Tests if the given biome is the same as this one.
+     *
+     * @param biome the biome to test
+     * @return true if the given biome is the same as this one, false otherwise.
+     */
+    public boolean isSame(ResourceKey<Biome> biome) {
+        if (biome != null && this.biomeKey != null) {
+            return biome.location().equals(this.biomeKey.location());
+        }
+        return false;
+    }
+
+    /**
+     * Tests if the given biome is the same as this one.
+     *
+     * @param biome the biome to test
+     * @return true if the given biome is the same as this one, false otherwise.
+     */
+    public boolean isSame(BiomeData biome) {
+        if (biome == null) return false;
+        return isSame(biome.biomeKey);
     }
 
     @Override
