@@ -191,11 +191,13 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
     protected abstract ModCore modCore();
 
     private void initialize() {
-        if (builders == null) {
-            this.builders = new LinkedList<>();
-            this.globalBuilder = addDatapack(null);
+        synchronized (this) {
+            if (builders == null) {
+                this.builders = new LinkedList<>();
+                this.globalBuilder = addDatapack(null);
 
-            onInitializeProviders(this.globalBuilder);
+                onInitializeProviders(this.globalBuilder);
+            }
         }
     }
 

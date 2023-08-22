@@ -52,4 +52,15 @@ public abstract class SortableWorldPreset extends WorldPreset {
     ) {
         return SortableWorldPresetImpl.fromStems(overworldStem, netherStem, endStem);
     }
+
+    /**
+     * Creates a new {@link SortableWorldPreset} from a map of {@link LevelStem}s.
+     *
+     * @param dimensions The stems.
+     * @param sortOrder  The sorting order.
+     * @return The {@link SortableWorldPreset}.
+     */
+    public static SortableWorldPreset of(Map<ResourceKey<LevelStem>, LevelStem> dimensions, int sortOrder) {
+        return new SortableWorldPresetImpl(dimensions, sortOrder);
+    }
 }

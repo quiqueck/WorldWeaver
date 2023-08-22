@@ -14,7 +14,7 @@ import java.util.function.Function;
 import org.jetbrains.annotations.ApiStatus;
 
 public class BiomeCodecRegistryImpl {
-    public static final Registry<Codec<? extends BiomeData>> BIOME_CODECS = BuiltInRegistryManager.register(
+    public static final Registry<Codec<? extends BiomeData>> BIOME_CODECS = BuiltInRegistryManager.createRegistry(
             BiomeCodecRegistry.BIOME_CODEC_REGISTRY,
             BiomeCodecRegistryImpl::onBootstrap
     );
@@ -28,7 +28,7 @@ public class BiomeCodecRegistryImpl {
             ResourceLocation location,
             KeyDispatchDataCodec<? extends BiomeData> keyDispatchDataCodec
     ) {
-        return Registry.register(registry, location, keyDispatchDataCodec.codec());
+        return BuiltInRegistryManager.register(registry, location, keyDispatchDataCodec.codec());
     }
 
     @ApiStatus.Internal

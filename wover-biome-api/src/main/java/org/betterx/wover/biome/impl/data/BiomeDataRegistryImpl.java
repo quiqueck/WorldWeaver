@@ -40,6 +40,7 @@ public class BiomeDataRegistryImpl {
             ResourceKey<Biome> key,
             Function<ResourceKey<Biome>, BiomeData> factory
     ) {
+        if (WorldState.allStageRegistryAccess() == null) return null;
         final Registry<BiomeData> registry = WorldState.allStageRegistryAccess()
                                                        .registryOrThrow(BiomeDataRegistry.BIOME_DATA_REGISTRY);
         return getFromRegistryOrTemp(registry, key, factory);

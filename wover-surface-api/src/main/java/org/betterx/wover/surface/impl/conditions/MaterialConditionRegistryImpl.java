@@ -1,11 +1,11 @@
 package org.betterx.wover.surface.impl.conditions;
 
+import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
 import org.betterx.wover.entrypoint.WoverSurface;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.surface.api.conditions.ConditionManager;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -27,9 +27,9 @@ public class MaterialConditionRegistryImpl {
             Codec<? extends SurfaceRules.ConditionSource> codec,
             boolean withBCLibLegacy
     ) {
-        Registry.register(BuiltInRegistries.MATERIAL_CONDITION, key, codec);
+        BuiltInRegistryManager.register(BuiltInRegistries.MATERIAL_CONDITION, key, codec);
         if (withBCLibLegacy) {
-            Registry.register(
+            BuiltInRegistryManager.register(
                     BuiltInRegistries.MATERIAL_CONDITION,
                     LegacyHelper.BCLIB_CORE.convertNamespace(key.location()),
                     LegacyHelper.wrap(codec)

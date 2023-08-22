@@ -5,11 +5,14 @@ import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeData;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.OptionalFieldCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 
+import java.util.Optional;
 import org.jetbrains.annotations.ApiStatus;
 
 public class WoverBiomeDataImpl {
@@ -29,12 +32,22 @@ public class WoverBiomeDataImpl {
         public RecordCodecBuilder<T, Boolean> t3 = Codec.BOOL.optionalFieldOf("vertical", false)
                                                              .forGetter(o -> o.vertical);
 
-        public RecordCodecBuilder<T, ResourceKey<Biome>> t4 =
-                ResourceKey.codec(Registries.BIOME).optionalFieldOf("edge", null)
-                           .forGetter(o -> o.edge);
+        public RecordCodecBuilder<T, Optional<ResourceKey<Biome>>> t4 =
+                ResourceKey.codec(Registries.BIOME).optionalFieldOf("edge")
+                           .forGetter(o -> Optional.ofNullable(o.edge));
 
-        public RecordCodecBuilder<T, ResourceKey<Biome>> t5 =
-                ResourceKey.codec(Registries.BIOME).optionalFieldOf("parent", null)
-                           .forGetter(o -> o.parent);
+
+        public RecordCodecBuilder<T, Optional<ResourceKey<Biome>>> t5 =
+                ResourceKey.codec(Registries.BIOME).optionalFieldOf("parent")
+                           .forGetter(o -> Optional.ofNullable(o.parent));
+
+        private static MapCodec<ResourceKey<Biome>> biomeCodec(String name) {
+            return new OptionalFieldCodec<>(name, ResourceKey.codec(Registries.BIOME))
+                    .xmap(
+                            (Optional<ResourceKey<Biome>> r) -> r.orElse(null),
+                            (ResourceKey<Biome> r) -> Optional.ofNullable(r)
+                    );
+        }
     }
+
 }

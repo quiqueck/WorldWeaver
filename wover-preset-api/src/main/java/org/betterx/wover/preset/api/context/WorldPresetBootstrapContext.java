@@ -18,6 +18,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Special bootstrap context for world presets.
  * <p>
@@ -160,7 +162,14 @@ public class WorldPresetBootstrapContext implements BootstapContext<WorldPreset>
         return new LevelStem(this.overworldDimensionType, chunkGenerator);
     }
 
-    private LevelStem makeNoiseBasedOverworld(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> holder) {
+    /**
+     * Create a default overworld
+     *
+     * @param biomeSource the biome source to use
+     * @param holder      the default generator settings
+     * @return a new overworld stem
+     */
+    public LevelStem makeNoiseBasedOverworld(BiomeSource biomeSource, Holder<NoiseGeneratorSettings> holder) {
         return this.makeOverworld(new NoiseBasedChunkGenerator(biomeSource, holder));
     }
 
@@ -170,10 +179,10 @@ public class WorldPresetBootstrapContext implements BootstapContext<WorldPreset>
      * @param resourceKey the key of the preset
      * @param preset      the preset to register
      * @param lifecycle   the lifecycle of the preset
-     * @return
+     * @return a reference to the registered preset
      */
     @Override
-    public Holder.Reference<WorldPreset> register(
+    public Holder.@NotNull Reference<WorldPreset> register(
             ResourceKey<WorldPreset> resourceKey,
             WorldPreset preset,
             Lifecycle lifecycle
@@ -218,6 +227,22 @@ public class WorldPresetBootstrapContext implements BootstapContext<WorldPreset>
             this.dimension = dimension;
             this.structureSets = structureSets;
             this.generatorSettings = generatorSettings;
+        }
+
+        /**
+         * Creates a new stem context.
+         *
+         * @param dimension         the dimension type
+         * @param structureSets     the structure sets that are allowed in the dimension
+         * @param generatorSettings the default generator settings for the dimension
+         * @return a new stem context
+         */
+        public static StemContext of(
+                Holder<DimensionType> dimension,
+                HolderGetter<StructureSet> structureSets,
+                Holder<NoiseGeneratorSettings> generatorSettings
+        ) {
+            return new StemContext(dimension, structureSets, generatorSettings);
         }
     }
 }

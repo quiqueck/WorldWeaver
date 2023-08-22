@@ -73,7 +73,17 @@ public class WoverBiomeData extends BiomeData {
             final Function9<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, factory);
+        return codec(
+                a.t0,
+                a.t1,
+                a.t2,
+                a.t3,
+                a.t4,
+                a.t5,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null)
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10> Codec<T> codec(
@@ -81,7 +91,11 @@ public class WoverBiomeData extends BiomeData {
             final Function10<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null), w9
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10, P11> Codec<T> codec(
@@ -90,7 +104,11 @@ public class WoverBiomeData extends BiomeData {
             final Function11<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, P11, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null), w9, w10
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10, P11, P12> Codec<T> codec(
@@ -100,7 +118,11 @@ public class WoverBiomeData extends BiomeData {
             final Function12<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, P11, P12, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null), w9, w10, w11
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10, P11, P12, P13> Codec<T> codec(
@@ -111,7 +133,11 @@ public class WoverBiomeData extends BiomeData {
             final Function13<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, P11, P12, P13, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null), w9, w10, w11, w12
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10, P11, P12, P13, P14> Codec<T> codec(
@@ -123,7 +149,12 @@ public class WoverBiomeData extends BiomeData {
             final Function14<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, P11, P12, P13, P14, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null),
+                        w9, w10, w11, w12, w13
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10, P11, P12, P13, P14, P15> Codec<T> codec(
@@ -136,7 +167,12 @@ public class WoverBiomeData extends BiomeData {
             final Function15<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, P11, P12, P13, P14, P15, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14, p15, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14, p15,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null),
+                        w9, w10, w11, w12, w13, w14
+                )
+        );
     }
 
     public static <T extends WoverBiomeData, P10, P11, P12, P13, P14, P15, P16> Codec<T> codec(
@@ -150,7 +186,12 @@ public class WoverBiomeData extends BiomeData {
             final Function16<Float, ResourceKey<Biome>, List<Climate.ParameterPoint>, Float, Float, Integer, Boolean, ResourceKey<Biome>, ResourceKey<Biome>, P10, P11, P12, P13, P14, P15, P16, T> factory
     ) {
         WoverBiomeDataImpl.CodecAttributes<T> a = new WoverBiomeDataImpl.CodecAttributes<>();
-        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14, p15, p16, factory);
+        return codec(a.t0, a.t1, a.t2, a.t3, a.t4, a.t5, p10, p11, p12, p13, p14, p15, p16,
+                (w0, w1, w2, w3, w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15) -> factory.apply(
+                        w0, w1, w2, w3, w4, w5, w6, w7.orElse(null), w8.orElse(null),
+                        w9, w10, w11, w12, w13, w14, w15
+                )
+        );
     }
 
 
@@ -232,6 +273,5 @@ public class WoverBiomeData extends BiomeData {
     public KeyDispatchDataCodec<? extends WoverBiomeData> codec() {
         return KEY_CODEC;
     }
-
 
 }

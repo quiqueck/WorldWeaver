@@ -1,4 +1,4 @@
-package org.betterx.wover.generator.api.biomesource.end;
+package org.betterx.wover.generator.impl.biomesource.end;
 
 import org.betterx.wover.biome.impl.data.BiomeDataRegistryImpl;
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
@@ -6,6 +6,8 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
+import org.betterx.wover.generator.api.biomesource.end.BiomeDecider;
+import org.betterx.wover.generator.api.biomesource.end.WoverEndConfig;
 import org.betterx.wover.generator.api.map.BiomeMap;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
@@ -104,10 +106,10 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
 
     @Override
     protected List<TagToPicker> createFreshPickerMap() {
-        this.deciders = BiomeDecider.DECIDERS.stream()
-                                             .filter(d -> d.canProvideFor(this))
-                                             .map(d -> d.createInstance(this))
-                                             .toList();
+        this.deciders = BiomeDeciderImpl.DECIDERS.stream()
+                                                 .filter(d -> d.canProvideFor(this))
+                                                 .map(d -> d.createInstance(this))
+                                                 .toList();
 
         this.endLandBiomePicker = new WoverBiomePicker(fallbackBiome());
         this.endVoidBiomePicker = new WoverBiomePicker(fallbackBiome());

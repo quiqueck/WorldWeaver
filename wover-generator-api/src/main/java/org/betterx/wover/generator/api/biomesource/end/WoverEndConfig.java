@@ -3,6 +3,7 @@ package org.betterx.wover.generator.api.biomesource.end;
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceConfig;
 import org.betterx.wover.core.api.IntegrationCore;
 import org.betterx.wover.generator.api.map.MapBuilderFunction;
+import org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
 import org.betterx.wover.generator.impl.map.hex.HexBiomeMap;
 import org.betterx.wover.generator.impl.map.square.SquareBiomeMap;
 

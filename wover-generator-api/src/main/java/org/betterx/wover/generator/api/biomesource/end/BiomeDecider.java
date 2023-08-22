@@ -4,6 +4,8 @@ import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
 import org.betterx.wover.generator.api.map.BiomeMap;
+import org.betterx.wover.generator.impl.biomesource.end.BiomeDeciderImpl;
+import org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
 
 import net.minecraft.core.HolderGetter;
 import net.minecraft.resources.ResourceKey;
@@ -11,9 +13,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Used to extend the BiomePlacement in the {@link WoverEndBiomeSource}
@@ -47,8 +46,6 @@ public abstract class BiomeDecider {
     protected BiomeMap map;
     private final BiomePredicate predicate;
 
-    static List<BiomeDecider> DECIDERS = new LinkedList<>();
-
     /**
      * Register a high priority Decider for the {@link WoverEndBiomeSource}.
      * Normally you should not need to register a high priority decider and instead use
@@ -61,8 +58,7 @@ public abstract class BiomeDecider {
      *                 new instance of this decider
      */
     public static void registerHighPriorityDecider(ResourceLocation location, BiomeDecider decider) {
-        if (DECIDERS.size() == 0) DECIDERS.add(decider);
-        else DECIDERS.add(0, decider);
+        BiomeDeciderImpl.registerHighPriorityDecider(location, decider);
     }
 
     /**
@@ -74,7 +70,7 @@ public abstract class BiomeDecider {
      *                 new instance of this decider
      */
     public static void registerDecider(ResourceLocation location, BiomeDecider decider) {
-        DECIDERS.add(decider);
+        BiomeDeciderImpl.registerDecider(location, decider);
     }
 
     protected BiomeDecider(BiomePredicate predicate) {

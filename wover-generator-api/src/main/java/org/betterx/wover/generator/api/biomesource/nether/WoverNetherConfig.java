@@ -2,6 +2,7 @@ package org.betterx.wover.generator.api.biomesource.nether;
 
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceConfig;
 import org.betterx.wover.generator.api.map.MapBuilderFunction;
+import org.betterx.wover.generator.impl.biomesource.nether.WoverNetherBiomeSource;
 import org.betterx.wover.generator.impl.map.hex.HexBiomeMap;
 import org.betterx.wover.generator.impl.map.square.SquareBiomeMap;
 

@@ -13,7 +13,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import org.jetbrains.annotations.ApiStatus;
 
 public class BiomePredicateRegistryImpl {
-    public static final Registry<Codec<? extends BiomePredicate>> BIOME_PREDICATES = BuiltInRegistryManager.register(
+    public static final Registry<Codec<? extends BiomePredicate>> BIOME_PREDICATES = BuiltInRegistryManager.createRegistry(
             BiomePredicateRegistry.BIOME_PREDICATE_REGISTRY,
             BiomePredicateRegistryImpl::onBootstrap
     );

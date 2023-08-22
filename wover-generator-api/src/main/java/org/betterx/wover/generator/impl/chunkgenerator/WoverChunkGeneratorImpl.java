@@ -19,6 +19,7 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.WorldData;
 
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,20 @@ public class WoverChunkGeneratorImpl {
     public static void initialize() {
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe(WoverChunkGeneratorImpl::restoreInitialBiomeSourceInAllDimensions);
         WorldLifecycle.ON_DIMENSION_LOAD.subscribe(WoverChunkGeneratorImpl::repairBiomeSourceInAllDimensions);
+        WorldLifecycle.BEFORE_CREATING_LEVELS.subscribe(WoverChunkGeneratorImpl::printInfo, -1000);
+    }
+
+    private static void printInfo(
+            LevelStorageSource.LevelStorageAccess levelStorageAccess,
+            PackRepository packRepository,
+            LayeredRegistryAccess<RegistryLayer> registryLayerLayeredRegistryAccess,
+            WorldData worldData
+    ) {
+        if (WorldState.registryAccess() != null) {
+            final Registry<LevelStem> dimensionsRegistry = WorldState.registryAccess()
+                                                                     .registryOrThrow(Registries.LEVEL_STEM);
+            ChunkGeneratorManagerImpl.printDimensionInfo(dimensionsRegistry);
+        }
     }
 
 

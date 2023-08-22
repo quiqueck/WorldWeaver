@@ -65,7 +65,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
     @Override
     final public void setSeed(long seed) {
         if (seed != currentSeed) {
-            WoverWorldGenerator.C.log.debug(this + "\n    --> new seed = " + seed);
+            WoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> new seed = " + seed);
             this.currentSeed = seed;
             initMap(seed);
         }
@@ -78,7 +78,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
      */
     final public void setMaxHeight(int maxHeight) {
         if (this.maxHeight != maxHeight) {
-            WoverWorldGenerator.C.log.debug(this + "\n    --> new height = " + maxHeight);
+            WoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> new height = " + maxHeight);
             this.maxHeight = maxHeight;
             onHeightChange(maxHeight);
         }
@@ -171,7 +171,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
     }
 
     protected final void initMap(long seed) {
-        WoverWorldGenerator.C.log.debug(this + "\n    --> Map Update");
+        WoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> Map Update");
         onInitMap(seed);
     }
 

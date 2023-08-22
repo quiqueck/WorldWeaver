@@ -2,6 +2,7 @@ package org.betterx.wover.core.api;
 
 import de.ambertation.wunderlib.utils.Version;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import net.fabricmc.api.EnvType;
@@ -115,6 +116,16 @@ public final class ModCore implements Version.ModVersionProvider {
      */
     public ResourceLocation convertNamespace(ResourceLocation location) {
         return id(location.getPath());
+    }
+
+    /**
+     * Returns the {@link ResourceLocation} for the given path in the namespace of this mod.
+     *
+     * @param key The {@link ResourceKey} to convert.
+     * @return The {@link ResourceLocation} for the given path in the namespace of this Mod.
+     */
+    public <T> ResourceLocation convertNamespace(ResourceKey<T> key) {
+        return convertNamespace(key.location());
     }
 
     /**

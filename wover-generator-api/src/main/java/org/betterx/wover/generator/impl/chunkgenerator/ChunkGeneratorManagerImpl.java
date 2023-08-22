@@ -1,6 +1,9 @@
 package org.betterx.wover.generator.impl.chunkgenerator;
 
+import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
+import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.legacy.api.LegacyHelper;
 
@@ -11,6 +14,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.dimension.LevelStem;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -58,6 +62,25 @@ public class ChunkGeneratorManagerImpl {
             throw new IllegalStateException("Duplicate generator id: " + idString);
         }
         GENERATOR_IDS.add(idString);
-        Registry.register(BuiltInRegistries.CHUNK_GENERATOR, location, codec);
+        BuiltInRegistryManager.register(BuiltInRegistries.CHUNK_GENERATOR, location, codec);
+    }
+
+    public static void printDimensionInfo(Registry<LevelStem> dimensionRegistry) {
+        if (!Configs.MAIN.verboseLogging.get()) return;
+
+        StringBuilder output = new StringBuilder("World Dimensions: ");
+        for (var entry : dimensionRegistry.entrySet()) {
+            output.append("\n - ").append(entry.getKey().location()).append(": ")
+                  .append("\n     ").append(entry.getValue().generator()).append(" ")
+                  .append(
+                          entry.getValue()
+                               .generator()
+                               .getBiomeSource()
+                               .toString()
+                               .replace("\n", "\n     ")
+                  );
+        }
+
+        WoverWorldGenerator.C.log.info(output.toString());
     }
 }

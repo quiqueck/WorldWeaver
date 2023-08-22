@@ -1,8 +1,9 @@
-package org.betterx.wover.generator.api.biomesource.nether;
+package org.betterx.wover.generator.impl.biomesource.nether;
 
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
 import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
+import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
 import org.betterx.wover.generator.api.map.BiomeMap;
 import org.betterx.wover.generator.api.map.MapBuilderFunction;
 import org.betterx.wover.generator.impl.map.MapStack;
