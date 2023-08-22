@@ -1,9 +1,6 @@
 package org.betterx.wover.events.impl;
 
-import org.betterx.wover.events.api.types.BeforeCreatingLevels;
-import org.betterx.wover.events.api.types.CreatedNewWorldFolder;
-import org.betterx.wover.events.api.types.OnDimensionLoad;
-import org.betterx.wover.events.api.types.OnMinecraftServerReady;
+import org.betterx.wover.events.api.types.*;
 import org.betterx.wover.events.impl.types.ChainedEventImpl;
 import org.betterx.wover.events.impl.types.FolderReadyEventImpl;
 import org.betterx.wover.events.impl.types.RegistryReadyEventImpl;
@@ -28,4 +25,7 @@ public class WorldLifecycleImpl {
             new EventImpl<>("BEFORE_CREATING_LEVELS");
     public static final EventImpl<OnMinecraftServerReady> MINECRAFT_SERVER_READY =
             new EventImpl<>("MINECRAFT_SERVER_READY");
+
+    public static final EventImpl<OnResourceLoad> RESOURCES_LOADED =
+            new EventImpl<>("RESOURCES_LOADED");
 }

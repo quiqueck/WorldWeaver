@@ -1,0 +1,5 @@
+{
+  "exclude": {
+    "minecraft:is_nether": ["minecraft:crimson_forest"]
+  }
+}

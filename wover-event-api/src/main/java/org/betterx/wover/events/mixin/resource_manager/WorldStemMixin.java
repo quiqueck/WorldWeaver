@@ -1,6 +1,5 @@
-package org.betterx.wover.events.mixin.world_registry;
+package org.betterx.wover.events.mixin.resource_manager;
 
-import org.betterx.wover.events.api.types.OnRegistryReady;
 import org.betterx.wover.events.impl.WorldLifecycleImpl;
 
 import net.minecraft.core.LayeredRegistryAccess;
@@ -14,21 +13,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-
-@Mixin(value = WorldStem.class, priority = 1502)
+@Mixin(value = WorldStem.class, priority = 1501)
 public class WorldStemMixin {
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/lang/Record;<init>()V", shift = At.Shift.AFTER))
-    void wover_captureRegistry(
+    void wover_captureResourceManager(
             CloseableResourceManager closeableResourceManager,
             ReloadableServerResources reloadableServerResources,
             LayeredRegistryAccess layeredRegistryAccess,
             WorldData worldData,
             CallbackInfo ci
     ) {
-        WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(
-                layeredRegistryAccess.compositeAccess(),
-                OnRegistryReady.Stage.FINAL
-        );
+        WorldLifecycleImpl.RESOURCES_LOADED.emit(c -> c.bootstrap(closeableResourceManager));
     }
-
 }

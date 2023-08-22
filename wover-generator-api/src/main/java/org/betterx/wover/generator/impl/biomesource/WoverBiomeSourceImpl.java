@@ -15,6 +15,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.*;
@@ -71,31 +72,33 @@ public class WoverBiomeSourceImpl {
         for (WoverBiomeSource.TagToPicker mapper : pickers) {
             final Optional<HolderSet.Named<Biome>> optionalTag = biomes.getTag(mapper.tag());
             if (optionalTag.isPresent()) {
-                optionalTag.get()
-                           .stream()
-                           .filter(holder -> holder.unwrapKey().isPresent())
-                           .map(holder -> new Pair<>(holder, holder.unwrapKey().get()))
-                           .filter(pair -> !addedBiomes.contains(pair.first))
-                           //TODO: Filter by Datapack (exclude)
-                           .sorted(Comparator.comparing(pair -> pair.second.location().toString()))
-                           .forEach(pair -> {
-                               final boolean isPossible;
-                               final BiomeData data = BiomeDataRegistryImpl.getFromRegistryOrTemp(
-                                       biomeData,
-                                       pair.second
-                               );
+                final HolderSet.Named<Biome> tag = optionalTag.get();
+                final Set<ResourceLocation> excluded = BiomeSourceManagerImpl.getExcludedBiomes(tag.key());
 
-                               if (data.isPickable()) {
-                                   isPossible = pickerAdder.add(data, mapper.tag(), mapper.picker());
-                               } else {
-                                   isPossible = true;
-                               }
+                tag.stream()
+                   .filter(holder -> holder.unwrapKey().isPresent())
+                   .map(holder -> new Pair<>(holder, holder.unwrapKey().get()))
+                   .filter(pair -> !addedBiomes.contains(pair.first))
+                   .filter(pair -> !excluded.contains(pair.second.location()))
+                   .sorted(Comparator.comparing(pair -> pair.second.location().toString()))
+                   .forEach(pair -> {
+                       final boolean isPossible;
+                       final BiomeData data = BiomeDataRegistryImpl.getFromRegistryOrTemp(
+                               biomeData,
+                               pair.second
+                       );
 
-                               if (isPossible) {
-                                   addedBiomes.add(pair.second);
-                                   allBiomes.add(pair.first);
-                               }
-                           });
+                       if (data.isPickable()) {
+                           isPossible = pickerAdder.add(data, mapper.tag(), mapper.picker());
+                       } else {
+                           isPossible = true;
+                       }
+
+                       if (isPossible) {
+                           addedBiomes.add(pair.second);
+                           allBiomes.add(pair.first);
+                       }
+                   });
             }
         }
 

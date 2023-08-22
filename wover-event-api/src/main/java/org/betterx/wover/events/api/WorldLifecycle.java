@@ -75,6 +75,8 @@ public class WorldLifecycle {
      */
     public static final Event<BeforeCreatingLevels> BEFORE_CREATING_LEVELS = WorldLifecycleImpl.BEFORE_CREATING_LEVELS;
 
+    public static final Event<OnResourceLoad> RESOURCES_LOADED = WorldLifecycleImpl.RESOURCES_LOADED;
+
 
     private WorldLifecycle() {
     }
