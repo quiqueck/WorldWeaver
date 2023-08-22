@@ -19,17 +19,17 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.ApiStatus;
 
 public class BiomeSourceManagerImpl {
     public static final ResourceLocation BIOME_CONFIGS = WoverWorldGenerator.C.id("biome_config.json");
     public static final String BIOME_EXCLUSION_TAG = "exclude";
+    public static final String END_CATCH_ALL = "*:is_end";
 
     public static void register(ResourceLocation location, Codec<? extends BiomeSource> codec) {
         BuiltInRegistryManager.register(BuiltInRegistries.BIOME_SOURCE, location, codec);
@@ -73,18 +73,37 @@ public class BiomeSourceManagerImpl {
         return EXCLUSIONS.getOrDefault(tag, Set.of());
     }
 
+    private static void addAllExclusions(List<TagKey<Biome>> tags, ResourceLocation biome) {
+        tags.forEach(tag -> EXCLUSIONS.computeIfAbsent(tag, k -> new HashSet<>()).add(biome));
+    }
+
+    private static void addBiomesToExclusion(
+            JsonElement value,
+            Consumer<ResourceLocation> adder
+    ) {
+        if (value.isJsonPrimitive()) {
+            adder.accept(new ResourceLocation(value.getAsString()));
+        } else if (value.isJsonArray()) {
+            value.getAsJsonArray()
+                 .forEach(v -> adder.accept(new ResourceLocation(v.getAsString())));
+        }
+    }
+
     private static void processBiomeConfigs(ResourceLocation location, JsonObject root) {
         if (root.has(BIOME_EXCLUSION_TAG)) {
             final JsonObject excludes = root.getAsJsonObject(BIOME_EXCLUSION_TAG);
             excludes.asMap().forEach((key, value) -> {
-                final TagKey<Biome> tag = TagKey.create(Registries.BIOME, new ResourceLocation(key));
-                final Set<ResourceLocation> elements = EXCLUSIONS.computeIfAbsent(tag, k -> new HashSet<>());
-                if (value.isJsonPrimitive()) {
-                    elements.add(new ResourceLocation(value.getAsString()));
-                } else if (value.isJsonArray()) {
-                    value.getAsJsonArray().forEach(v -> elements.add(new ResourceLocation(v.getAsString())));
+                if (key.equals(END_CATCH_ALL)) {
+                    final List<TagKey<Biome>> endTags = WoverEndBiomeSource.TAGS;
+                    addBiomesToExclusion(value, id -> addAllExclusions(endTags, id));
+                } else {
+                    final TagKey<Biome> tag = TagKey.create(Registries.BIOME, new ResourceLocation(key));
+                    final Set<ResourceLocation> elements = EXCLUSIONS.computeIfAbsent(tag, k -> new HashSet<>());
+                    addBiomesToExclusion(value, elements::add);
                 }
             });
         }
     }
+
+
 }

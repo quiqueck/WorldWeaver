@@ -52,7 +52,7 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
             )
     );
 
-    private static final List<TagKey<Biome>> TAGS = List.of(
+    public static final List<TagKey<Biome>> TAGS = List.of(
             CommonBiomeTags.IS_END_CENTER,
             CommonBiomeTags.IS_END_BARRENS,
             CommonBiomeTags.IS_SMALL_END_ISLAND,
