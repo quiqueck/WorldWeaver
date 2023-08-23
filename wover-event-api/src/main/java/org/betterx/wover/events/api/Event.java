@@ -19,7 +19,7 @@ public interface Event<T extends Subscriber> {
      * The default priority for read-only subscribers, when added with {@link #subscribe(Subscriber)}.
      * A read-only subscriber should not modify any event releated data.
      */
-    int DEFAULT_READONLY_PRIORITY = -10000;
+    int MAX_READONLY_PRIORITY = -10000;
 
     /**
      * Subscribe to this event.
@@ -41,4 +41,9 @@ public interface Event<T extends Subscriber> {
      * @return {@code true} if the subscriber was added, {@code false} if the subscriber was already subscribed.
      */
     boolean subscribe(T subscriber, int priority);
+
+    default boolean subscribeReadOnly(T subscriber) {
+        return subscribeReadOnly(subscriber, DEFAULT_PRIORITY);
+    }
+    boolean subscribeReadOnly(T subscriber, int priority);
 }

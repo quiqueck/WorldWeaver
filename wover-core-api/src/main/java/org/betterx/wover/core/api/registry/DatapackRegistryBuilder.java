@@ -36,6 +36,24 @@ public class DatapackRegistryBuilder {
     }
 
     /**
+     * Register a new, custom Registry.
+     *
+     * @param key          The ResourceKey of the Registry
+     * @param elementCodec The Codec used to serialize the Registry
+     * @param priority     The priority of the bootstrap function. The higher the priority, the earlier the bootstrap
+     * @param bootstrap    The bootstrap function, which is called when the Registry is loaded from a DataPack
+     * @param <T>          The type of the Registry-Elements
+     */
+    public static <T> void register(
+            ResourceKey<? extends Registry<T>> key,
+            Codec<T> elementCodec,
+            Consumer<BootstapContext<T>> bootstrap,
+            int priority
+    ) {
+        DatapackRegistryBuilderImpl.register(key, elementCodec, priority, bootstrap);
+    }
+
+    /**
      * Add a method that will be called whenever the Registry is
      * loaded from a Datapack. This includes custom Registries added using
      * {@link #register(ResourceKey, Codec, Consumer)}, as well as vanilla
@@ -50,6 +68,61 @@ public class DatapackRegistryBuilder {
             Consumer<BootstapContext<T>> bootstrap
     ) {
         DatapackRegistryBuilderImpl.register(key, bootstrap);
+    }
+
+    /**
+     * Add a method that will be called whenever the Registry is
+     * loaded from a Datapack. This includes custom Registries added using
+     * {@link #register(ResourceKey, Codec, Consumer)}, as well as vanilla
+     * Registries.
+     *
+     * @param key       The ResourceKey of the Registry
+     * @param bootstrap The bootstrap function, which is called when the Registry is loaded from a DataPack
+     * @param priority  The priority of the bootstrap function. The higher the priority, the earlier the bootstrap
+     * @param <T>       The type of the Registry-Elements
+     */
+    public static <T> void addBootstrap(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap,
+            int priority
+    ) {
+        DatapackRegistryBuilderImpl.register(key, bootstrap, priority);
+    }
+
+    /**
+     * Add a method that will be called whenever the Registry is
+     * loaded from a Datapack. This includes custom Registries added using
+     * {@link #register(ResourceKey, Codec, Consumer)}, as well as vanilla
+     * Registries.
+     *
+     * @param key       The ResourceKey of the Registry
+     * @param bootstrap The bootstrap function, which is called when the Registry is loaded from a DataPack
+     * @param <T>       The type of the Registry-Elements
+     */
+    public static <T> void addReadOnlyBootstrap(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap
+    ) {
+        DatapackRegistryBuilderImpl.registerReadOnly(key, bootstrap);
+    }
+
+    /**
+     * Add a method that will be called whenever the Registry is
+     * loaded from a Datapack. This includes custom Registries added using
+     * {@link #register(ResourceKey, Codec, Consumer)}, as well as vanilla
+     * Registries.
+     *
+     * @param key       The ResourceKey of the Registry
+     * @param bootstrap The bootstrap function, which is called when the Registry is loaded from a DataPack
+     * @param priority  The priority of the bootstrap function. The higher the priority, the earlier the bootstrap
+     * @param <T>       The type of the Registry-Elements
+     */
+    public static <T> void addReadOnlyBootstrap(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap,
+            int priority
+    ) {
+        DatapackRegistryBuilderImpl.registerReadOnly(key, bootstrap, priority);
     }
 
     /**

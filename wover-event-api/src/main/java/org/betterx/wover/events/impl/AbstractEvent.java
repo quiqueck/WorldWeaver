@@ -64,6 +64,6 @@ public class AbstractEvent<T extends Subscriber> implements Event<T> {
     }
 
     public final boolean subscribeReadOnly(T handler, int priority) {
-        return _subscribe(handler, DEFAULT_READONLY_PRIORITY + priority);
+        return _subscribe(handler, MAX_READONLY_PRIORITY + priority);
     }
 }

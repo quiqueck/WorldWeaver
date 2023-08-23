@@ -1,6 +1,7 @@
 package org.betterx.wover.core.impl.registry;
 
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
+import org.betterx.wover.util.PriorityLinkedList;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -11,14 +12,14 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 public class DatapackRegistryBuilderImpl {
-    private static final List<Entry<?>> REGISTRIES = new LinkedList<>();
+    public static final int DEFAULT_PRIORITY = 1000;
+    public static final int MAX_READONLY_PRIORITY = -1000;
+    private static final PriorityLinkedList<Entry<?>> REGISTRIES = new PriorityLinkedList<>();
 
     private record Entry<T>(
             ResourceKey<? extends Registry<T>> key,
@@ -48,7 +49,30 @@ public class DatapackRegistryBuilderImpl {
             ResourceKey<? extends Registry<T>> key,
             Consumer<BootstapContext<T>> bootstrap
     ) {
-        REGISTRIES.add(new Entry<>(key, null, bootstrap));
+        register(key, bootstrap, DEFAULT_PRIORITY);
+    }
+
+    public static <T> void register(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap,
+            int priority
+    ) {
+        REGISTRIES.add(new Entry<>(key, null, bootstrap), priority);
+    }
+
+    public static <T> void registerReadOnly(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap
+    ) {
+        register(key, bootstrap, DEFAULT_PRIORITY);
+    }
+
+    public static <T> void registerReadOnly(
+            ResourceKey<? extends Registry<T>> key,
+            Consumer<BootstapContext<T>> bootstrap,
+            int priority
+    ) {
+        register(key, bootstrap, MAX_READONLY_PRIORITY + priority);
     }
 
     public static <T> void register(
@@ -56,11 +80,20 @@ public class DatapackRegistryBuilderImpl {
             Codec<T> elementCodec,
             Consumer<BootstapContext<T>> bootstrap
     ) {
+        register(key, elementCodec, DEFAULT_PRIORITY, bootstrap);
+    }
+
+    public static <T> void register(
+            ResourceKey<? extends Registry<T>> key,
+            Codec<T> elementCodec,
+            int priority,
+            Consumer<BootstapContext<T>> bootstrap
+    ) {
         if (isRegistered(key.location())) {
             throw new IllegalStateException("Registry with id " + key.location() + " was already registered!");
         }
 
-        REGISTRIES.add(new Entry<>(key, elementCodec, bootstrap));
+        REGISTRIES.add(new Entry<>(key, elementCodec, bootstrap), priority);
     }
 
     public static void forEach(BiConsumer<ResourceKey<? extends Registry<?>>, Codec<?>> consumer) {

@@ -27,6 +27,18 @@ public class WorldDataProvider extends WoverBiomeProvider {
                          .edge(Biomes.END_MIDLANDS)
                          .edgeSize(4)
                          .register();
+
+        WoverBiomeBuilder.wrappedKey(Biomes.END_MIDLANDS)
+                         .bootstrap(context)
+                         .parent(Biomes.END_HIGHLANDS)
+                         .genChance(0.5f)
+                         .register();
+
+        WoverBiomeBuilder.wrappedKey(Biomes.END_BARRENS)
+                         .bootstrap(context)
+                         .parent(Biomes.END_HIGHLANDS)
+                         .genChance(0.3f)
+                         .register();
     }
 
 

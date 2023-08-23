@@ -11,4 +11,6 @@ public class IntegrationCore {
 
     public static final boolean RUNS_TERRABLENDER = hasMod("terrablender");
     public static final boolean RUNS_NULLSCAPE = hasMod("nullscape");
+
+    public static final ModCore MINECRAFT = ModCore.create("minecraft");
 }

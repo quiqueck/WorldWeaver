@@ -35,8 +35,9 @@ public class BiomeSourceManager {
      * {@link org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource} includes all biomes
      * that have the {@code c:is_end_center}, {@code c:is_end_highland}, {@code c:is_end_midland}, {@code c:is_end_barrens},
      * {@code c:is_small_end_island} or {@code minecraft:is_end} tag. Excluding a biome from one of the end tags
-     * might still include it in the end if it has additional End-Tags. You can use the special key
-     * {@code *:is_end} in the json file to exclude biomes from all end tags:
+     * might still include it in the end if it has additional End-Tags (all End Biomes are at least in the
+     * {@code minecraft:is_end} Tag). In order to ensure, that a biome is not spawned in the end, you can
+     * use the special key {@code *:is_end} in the json file to exclude biomes from all end tags:
      * <pre class="json"> {
      *   "exclude": {
      *     "*:is_end": ["minecraft:void"]

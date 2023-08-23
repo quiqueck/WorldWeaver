@@ -9,6 +9,7 @@ import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 
 public class BiomeDataRegistry {
     private BiomeDataRegistry() {
@@ -38,5 +39,17 @@ public class BiomeDataRegistry {
             ResourceLocation dataID
     ) {
         return BiomeDataRegistryImpl.createKey(dataID);
+    }
+
+    /**
+     * Creates a ResourceKey for  {@link BiomeData}.
+     *
+     * @param biomeKey A Biome Key
+     * @return The ResourceKey
+     */
+    public static ResourceKey<BiomeData> createKey(
+            ResourceKey<Biome> biomeKey
+    ) {
+        return BiomeDataRegistryImpl.createKey(biomeKey.location());
     }
 }

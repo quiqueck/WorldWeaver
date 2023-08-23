@@ -1,5 +1,7 @@
 {
   "exclude": {
-    "minecraft:is_nether": ["minecraft:crimson_forest"]
-  }
+    "minecraft:is_nether": ["minecraft:crimson_forest"],
+    "*:is_end": ["minecraft:unknown_biome"]
+  },
+  "no_fabric_register": ["minecraft:*", "c:*"]
 }
