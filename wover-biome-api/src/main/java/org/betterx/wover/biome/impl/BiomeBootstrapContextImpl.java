@@ -3,6 +3,7 @@ package org.betterx.wover.biome.impl;
 import org.betterx.wover.biome.api.builder.BiomeBootstrapContext;
 import org.betterx.wover.biome.api.builder.BiomeBuilder;
 import org.betterx.wover.biome.api.data.BiomeData;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
 import com.mojang.serialization.Lifecycle;
@@ -53,6 +54,13 @@ public class BiomeBootstrapContextImpl implements BiomeBootstrapContext {
     public final void bootstrapBiomeData(BootstapContext<BiomeData> context) {
         for (BiomeBuilder<?> builder : registeredBuilders) {
             builder.registerBiomeData(context);
+        }
+    }
+
+    @ApiStatus.Internal
+    public final void bootstrapSurfaceRules(BootstapContext<AssignedSurfaceRule> context) {
+        for (BiomeBuilder<?> builder : registeredBuilders) {
+            builder.registerSurfaceRule(context);
         }
     }
 

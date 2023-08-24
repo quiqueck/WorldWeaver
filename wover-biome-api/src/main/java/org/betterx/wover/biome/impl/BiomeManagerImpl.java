@@ -10,6 +10,8 @@ import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
+import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 import org.betterx.wover.tag.api.TagManager;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
@@ -50,6 +52,11 @@ public class BiomeManagerImpl {
                 Event.DEFAULT_PRIORITY / 2
         );
 
+        SurfaceRuleRegistry.BOOTSTRAP_SURFACE_RULE_REGISTRY.subscribe(
+                BiomeManagerImpl::onBootstrapSurfaceRuleRegistry,
+                Event.DEFAULT_PRIORITY / 2
+        );
+
         TagManager.BIOMES.bootstrapEvent().subscribe(
                 BiomeManagerImpl::onBootstrapTags,
                 Event.DEFAULT_PRIORITY / 2
@@ -86,6 +93,11 @@ public class BiomeManagerImpl {
     private static void onBootstrapBiomeRegistry(BootstapContext<Biome> biomeBootstapContext) {
         final BiomeBootstrapContextImpl context = initContext(biomeBootstapContext);
         context.bootstrapBiome(biomeBootstapContext);
+    }
+
+    private static void onBootstrapSurfaceRuleRegistry(BootstapContext<AssignedSurfaceRule> assignedSurfaceRuleBootstapContext) {
+        final BiomeBootstrapContextImpl context = initContext(assignedSurfaceRuleBootstapContext);
+        context.bootstrapSurfaceRules(assignedSurfaceRuleBootstapContext);
     }
 
     private static void onBootstrapTags(TagBootstrapContext<Biome> biomeTagBootstrapContext) {

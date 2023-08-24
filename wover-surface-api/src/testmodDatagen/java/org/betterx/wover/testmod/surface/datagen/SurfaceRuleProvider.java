@@ -44,13 +44,15 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
                 .start()
                 .biome(Biomes.PLAINS)
                 .surface(Blocks.ACACIA_PLANKS.defaultBlockState())
-                .register(ctx, TEST_PLAINS, 1001);
+                .sortPriority(1001)
+                .register(ctx, TEST_PLAINS);
 
         SurfaceRuleBuilder
                 .start()
                 .biome(Biomes.PLAINS)
                 .belowFloor(Blocks.OAK_PLANKS.defaultBlockState(), 2)
-                .register(ctx, TEST_PLAINS_BELOW, 500);
+                .sortPriority(500)
+                .register(ctx, TEST_PLAINS_BELOW);
 
         SurfaceRuleBuilder
                 .start()

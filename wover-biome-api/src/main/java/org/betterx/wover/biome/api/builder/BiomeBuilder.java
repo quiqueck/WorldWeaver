@@ -2,10 +2,12 @@ package org.betterx.wover.biome.api.builder;
 
 import org.betterx.wover.biome.api.BiomeKey;
 import org.betterx.wover.biome.api.data.BiomeData;
+import org.betterx.wover.biome.impl.builder.BiomeSurfaceRuleBuilderImpl;
 import org.betterx.wover.biome.mixin.BiomeGenerationSettingsAccessor;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 import org.betterx.wover.structure.api.StructureKey;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.core.Holder;
@@ -20,6 +22,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -30,12 +34,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
     public final BiomeKey<B> key;
     public final BiomeBootstrapContext bootstrapContext;
-
 
     public static int calculateSkyColor(float temperature) {
         return OverworldBiomes.calculateSkyColor(temperature);
@@ -58,6 +62,8 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
     protected final List<Climate.ParameterPoint> parameters = new ArrayList<>(1);
     protected float fogDensity;
     protected final List<TagKey<Biome>> biomeTags = new ArrayList<>(2);
+
+    private @Nullable BiomeSurfaceRuleBuilderImpl<B> surfaceBuilder;
 
 
     protected BiomeBuilder(BiomeBootstrapContext context, BiomeKey<B> key) {
@@ -98,6 +104,27 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         return (B) this;
     }
 
+    public BiomeSurfaceRuleBuilder<B> startSurface() {
+        surfaceBuilder = new BiomeSurfaceRuleBuilderImpl<>(key, (B) this);
+        return surfaceBuilder;
+    }
+
+    public B surface(BlockState state) {
+        return startSurface().surface(state).finishSurface();
+    }
+
+    public B surface(Block block) {
+        return startSurface().surface(block).finishSurface();
+    }
+
+    public B surface(BlockState top, BlockState under) {
+        return startSurface().surface(top).subsurface(under, 3).finishSurface();
+    }
+
+    public B surface(Block top, Block under) {
+        return startSurface().surface(top).subsurface(under, 3).finishSurface();
+    }
+
     public void register() {
         bootstrapContext.register(this);
     }
@@ -112,6 +139,11 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         }
     }
 
+    public void registerSurfaceRule(@NotNull BootstapContext<AssignedSurfaceRule> context) {
+        if (surfaceBuilder != null) {
+            surfaceBuilder.register(context);
+        }
+    }
 
     public abstract static class VanillaBuilder<B extends VanillaBuilder<B>> extends BiomeBuilder<B> {
         private Biome.TemperatureModifier temperatureModifier;

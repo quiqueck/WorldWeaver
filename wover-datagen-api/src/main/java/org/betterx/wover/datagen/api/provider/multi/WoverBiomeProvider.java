@@ -9,6 +9,8 @@ import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverMultiProvider;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import org.betterx.wover.datagen.api.WoverTagProvider;
+import org.betterx.wover.surface.api.AssignedSurfaceRule;
+import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.core.registries.Registries;
@@ -63,13 +65,18 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
         context.bootstrapBiomeData(ctx);
     }
 
+    private void bootstrapSurface(BootstapContext<AssignedSurfaceRule> ctx) {
+        final BiomeBootstrapContextImpl context = initContext(ctx);
+        context.bootstrapSurfaceRules(ctx);
+    }
+
     private void prepareBiomeTags(TagBootstrapContext<Biome> ctx) {
         final BiomeBootstrapContextImpl context = initContext(null);
         context.prepareTags(ctx);
     }
 
     /**
-     * Registers all  providers
+     * Registers all providers
      *
      * @param pack The {@link PackBuilder} to register the providers to.
      */
@@ -95,6 +102,20 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
                     @Override
                     protected void bootstrap(BootstapContext<BiomeData> context) {
                         bootstrapData(context);
+                    }
+                }
+        );
+
+        pack.addRegistryProvider(modCore ->
+                new WoverRegistryContentProvider<>(
+                        modCore,
+                        modCore.modId + " - Surface Rules",
+                        SurfaceRuleRegistry.SURFACE_RULES_REGISTRY
+                ) {
+
+                    @Override
+                    protected void bootstrap(BootstapContext<AssignedSurfaceRule> context) {
+                        bootstrapSurface(context);
                     }
                 }
         );
