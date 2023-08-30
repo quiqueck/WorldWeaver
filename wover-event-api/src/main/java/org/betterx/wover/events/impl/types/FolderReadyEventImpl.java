@@ -20,7 +20,6 @@ public class FolderReadyEventImpl extends AbstractEvent<OnFolderReady> {
                     + Integer.toHexString(value.hashCode())
                     + ", "
                     + value.getLevelId()
-                    + (newWorld ? ", NEW" : "")
                     + ")"
             );
 
