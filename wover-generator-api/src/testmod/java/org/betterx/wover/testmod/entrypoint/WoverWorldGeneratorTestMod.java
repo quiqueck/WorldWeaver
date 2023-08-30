@@ -9,6 +9,8 @@ import org.betterx.wover.feature.api.placed.PlacedConfiguredFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeBuilder;
+import org.betterx.wover.generator.api.preset.PresetsRegistry;
+import org.betterx.wover.preset.api.WorldPresetManager;
 
 import net.minecraft.world.level.levelgen.GenerationStep;
 
@@ -35,6 +37,6 @@ public class WoverWorldGeneratorTestMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        WorldPresetManager.suggestDefault(PresetsRegistry.WOVER_WORLD, 2000);
     }
 }

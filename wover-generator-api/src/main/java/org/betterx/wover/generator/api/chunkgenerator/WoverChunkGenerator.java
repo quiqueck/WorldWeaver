@@ -129,7 +129,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
 
     @Override
     public String toString() {
-        return "Wover - Chunk Generator (" + Integer.toHexString(hashCode()) + ")";
+        return "WoVer - Chunk Generator (" + Integer.toHexString(hashCode()) + ")";
     }
 
     // This method is injected by Terrablender.

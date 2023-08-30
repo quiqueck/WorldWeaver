@@ -8,6 +8,8 @@ import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnWorldConfig;
 import org.betterx.wover.events.impl.EventImpl;
+import org.betterx.wover.legacy.api.LegacyHelper;
+import org.betterx.wover.util.Pair;
 
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
@@ -20,9 +22,11 @@ import com.google.common.collect.Maps;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Mod-specific data-storage for a world.
@@ -42,11 +46,13 @@ public class WorldConfigImpl {
     public static void initialize() {
         WorldLifecycle.WORLD_FOLDER_READY.subscribe(WorldConfigImpl::loadForWorld);
         registerMod(ModCoreImpl.GLOBAL_MOD);
+        registerMod(LegacyHelper.BCLIB_CORE);
+        registerMod(LegacyHelper.WORLDS_TOGETHER_CORE);
     }
 
     private static void loadForWorld(LevelStorageSource.LevelStorageAccess levelStorageAccess) {
         dataDir = levelStorageAccess.getLevelPath(LevelResource.ROOT).resolve("data").toFile();
-
+        final List<Pair<ModCore, OnWorldConfig.State>> eventQueue = new ArrayList<>(MODS.size());
         MODS.stream()
             .parallel()
             .forEach(modCore -> {
@@ -55,28 +61,44 @@ public class WorldConfigImpl {
                     try {
                         CompoundTag root = NbtIo.readCompressed(file);
                         TAGS.put(modCore, root);
+                        eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.LOADED));
                     } catch (IOException e) {
                         WoverEvents.C.log.error("World data loading failed", e);
+                        eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.LOAD_FAILED));
                     }
+                } else {
+                    //the event will be emitted later, when all configs were loaded or created
+                    final var root = setupNewConfig(modCore, false);
+                    if (modCore == LegacyHelper.BCLIB_CORE) {
+                        root.putString("version", "9.9.9");
+                    }
+                    eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.CREATED));
                 }
             });
 
-        TAGS.forEach((modCore, root) -> {
-            EVENTS.computeIfPresent(modCore, (key, event) -> {
-                event.emit(subscriber -> subscriber.config(modCore, root, OnWorldConfig.State.LOADED));
+        eventQueue.forEach(pair -> {
+            EVENTS.computeIfPresent(pair.first, (key, event) -> {
+                event.emit(subscriber -> subscriber.config(key, TAGS.get(key), pair.second));
                 return event;
             });
         });
     }
 
-    private static void setupNewConfig(ModCore modCore, CompoundTag root) {
+    private static CompoundTag setupNewConfig(ModCore modCore, boolean emit) {
+        final CompoundTag root = new CompoundTag();
+        TAGS.put(modCore, root);
+
         root.putString(TAG_CREATED, modCore.getModVersion().toString());
         root.putString(TAG_MODIFIED, modCore.getModVersion().toString());
 
-        EVENTS.computeIfPresent(modCore, (key, event) -> {
-            event.emit(subscriber -> subscriber.config(modCore, root, OnWorldConfig.State.CREATED));
-            return event;
-        });
+        if (emit) {
+            EVENTS.computeIfPresent(modCore, (key, event) -> {
+                event.emit(subscriber -> subscriber.config(modCore, root, OnWorldConfig.State.CREATED));
+                return event;
+            });
+        }
+
+        return root;
     }
 
     public static void registerMod(ModCore modCore) {
@@ -94,9 +116,7 @@ public class WorldConfigImpl {
     public static CompoundTag getRootTag(ModCore modCore) {
         CompoundTag root = TAGS.get(modCore);
         if (root == null) {
-            root = new CompoundTag();
-            TAGS.put(modCore, root);
-            setupNewConfig(modCore, root);
+            root = setupNewConfig(modCore, true);
         }
         return root;
     }
@@ -105,7 +125,7 @@ public class WorldConfigImpl {
         return MODS.contains(modCore);
     }
 
-    public static CompoundTag getCompoundTag(ModCore modCore, String path) {
+    public static @NotNull CompoundTag getCompoundTag(ModCore modCore, String path) {
         String[] parts = path.split("\\.");
         CompoundTag tag = getRootTag(modCore);
         for (String part : parts) {

@@ -179,6 +179,11 @@ public final class ModCore implements Version.ModVersionProvider {
         return Objects.hash(modId, namespace);
     }
 
+    @Override
+    public String toString() {
+        return "ModCore: " + modId + " (" + namespace + ")";
+    }
+
     /**
      * Returns the instance of {@link ModCore} for the given mod id. Every mod id has a unique, single
      * instance. Calling this method multiple times with the same mod id is guaranteed to return

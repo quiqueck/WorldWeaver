@@ -77,8 +77,9 @@ public class WoverChunkGeneratorImpl {
     }
 
     private static LayeredRegistryAccess<RegistryLayer> repairBiomeSourceInAllDimensions(LayeredRegistryAccess<RegistryLayer> registries) {
-        final RegistryAccess.Frozen access = registries.compositeAccess();
+        WorldGeneratorConfigImpl.migrateGeneratorSettings();
 
+        final RegistryAccess.Frozen access = registries.compositeAccess();
         final Registry<LevelStem> dimensions = access.registryOrThrow(Registries.LEVEL_STEM);
 
         final BiomeRepairHelper biomeHelper = new BiomeRepairHelper();

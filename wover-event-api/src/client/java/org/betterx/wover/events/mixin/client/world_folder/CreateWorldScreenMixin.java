@@ -20,6 +20,7 @@ import java.util.Optional;
 public abstract class CreateWorldScreenMixin {
     @Inject(method = "createNewWorldDirectory", at = @At("RETURN"))
     void wover_captureStorage(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+        //called when a new world is created on the client
         WorldLifecycleImpl.WORLD_FOLDER_READY.emit(cir.getReturnValue().orElse(null));
     }
 }

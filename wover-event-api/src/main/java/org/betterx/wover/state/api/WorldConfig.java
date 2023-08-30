@@ -7,6 +7,8 @@ import org.betterx.wover.state.impl.WorldConfigImpl;
 
 import net.minecraft.nbt.CompoundTag;
 
+import org.jetbrains.annotations.NotNull;
+
 public class WorldConfig {
     /**
      * Register mod cache, world cache is located in world data folder.
@@ -43,7 +45,7 @@ public class WorldConfig {
      * @param path    path to tag, dot-separated.
      * @return {@link CompoundTag}
      */
-    public static CompoundTag getCompoundTag(ModCore modCore, String path) {
+    public static @NotNull CompoundTag getCompoundTag(ModCore modCore, String path) {
         return WorldConfigImpl.getCompoundTag(modCore, path);
     }
 

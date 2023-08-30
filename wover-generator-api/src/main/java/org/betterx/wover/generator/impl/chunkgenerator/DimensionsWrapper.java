@@ -1,9 +1,11 @@
 package org.betterx.wover.generator.impl.chunkgenerator;
 
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.state.api.WorldState;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +26,7 @@ class DimensionsWrapper {
                                 ResourceKey.codec(Registries.LEVEL_STEM),
                                 ChunkGenerator.CODEC
                         )
-                        .optionalFieldOf("dimensions", new HashMap<>())
+                        .optionalFieldOf(WorldGeneratorConfigImpl.TAG_DIMENSIONS, new HashMap<>())
                         .forGetter(o -> o.dimensions))
             .apply(instance, DimensionsWrapper::new));
     final Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions;
@@ -48,6 +51,22 @@ class DimensionsWrapper {
         return map;
     }
 
+    public static @Nullable Registry<LevelStem> getDimensions(ResourceKey<WorldPreset> key) {
+        RegistryAccess access = WorldState.allStageRegistryAccess();
+        if (access == null) {
+            WoverWorldGenerator.C.log.error("No valid registry found!");
+            return null;
+        }
+        final Optional<Holder.Reference<WorldPreset>> preset = access.registryOrThrow(Registries.WORLD_PRESET)
+                                                                     .getHolder(key);
+        return preset
+                .map(worldPresetReference -> worldPresetReference
+                        .value()
+                        .createWorldDimensions()
+                        .dimensions())
+                .orElse(null);
+    }
+
     public static @Nullable Registry<LevelStem> getDimensions(RegistryAccess access, ResourceKey<WorldPreset> key) {
         if (access == null) {
             WoverWorldGenerator.C.log.error("No valid registry found!");
@@ -67,6 +86,12 @@ class DimensionsWrapper {
             ResourceKey<WorldPreset> key
     ) {
         Registry<LevelStem> reg = getDimensions(access, key);
+        if (reg == null) return new HashMap<>();
+        return DimensionsWrapper.build(reg);
+    }
+
+    public static @NotNull Map<ResourceKey<LevelStem>, ChunkGenerator> getDimensionsMap(ResourceKey<WorldPreset> key) {
+        Registry<LevelStem> reg = getDimensions(key);
         if (reg == null) return new HashMap<>();
         return DimensionsWrapper.build(reg);
     }

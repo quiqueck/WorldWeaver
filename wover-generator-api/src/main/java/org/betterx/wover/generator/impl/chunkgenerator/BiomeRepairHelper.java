@@ -56,7 +56,7 @@ class BiomeRepairHelper {
             }
 
             CompoundTag presetNBT = WorldGeneratorConfigImpl.getPresetsNbt();
-            if (!presetNBT.contains("dimensions")) {
+            if (!presetNBT.contains(WorldGeneratorConfigImpl.TAG_DIMENSIONS)) {
                 return DEFAULT_DIMENSIONS_WRAPPER.dimensions;
             }
 

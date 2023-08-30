@@ -4,17 +4,24 @@ import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.legacy.api.LegacyHelper;
+import org.betterx.wover.state.api.WorldConfig;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.WorldDimensions;
+import net.minecraft.world.level.levelgen.presets.WorldPreset;
+import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -54,6 +61,19 @@ public class ChunkGeneratorManagerImpl {
     public static void initialize() {
         register(WoverChunkGenerator.ID, WoverChunkGenerator.CODEC);
         register(LEGACY_ID, LegacyHelper.wrap(WoverChunkGenerator.CODEC));
+        WorldConfig.registerMod(WoverWorldGenerator.C);
+
+        WorldLifecycle.CREATED_NEW_WORLD_FOLDER.subscribe(ChunkGeneratorManagerImpl::onWorldCreation, 2000);
+    }
+
+    private static void onWorldCreation(
+            LevelStorageSource.LevelStorageAccess storage,
+            RegistryAccess access,
+            Holder<WorldPreset> currentPreset,
+            WorldDimensions dimensions,
+            boolean recreated
+    ) {
+        WorldGeneratorConfigImpl.createWorldConfig(dimensions);
     }
 
     public static void register(ResourceLocation location, Codec<? extends ChunkGenerator> codec) {

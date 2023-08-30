@@ -25,6 +25,7 @@ public abstract class WorldOpenFlowsMixin {
             PackRepository packRepository,
             CallbackInfoReturnable<WorldStem> cir
     ) {
+        //called when a world is loaded on the client
         WorldLifecycleImpl.WORLD_FOLDER_READY.emit(levelStorageAccess);
     }
 }

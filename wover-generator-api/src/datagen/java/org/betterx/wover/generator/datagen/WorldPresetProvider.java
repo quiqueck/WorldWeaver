@@ -6,6 +6,7 @@ import org.betterx.wover.generator.api.biomesource.end.WoverEndConfig;
 import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
 import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.generator.api.preset.PresetsRegistry;
+import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.preset.api.SortableWorldPreset;
 import org.betterx.wover.preset.api.WorldPresetManager;
@@ -22,8 +23,6 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import java.util.Map;
 
 public class WorldPresetProvider extends WoverWorldPresetProvider {
-    private final static ResourceKey<WorldPreset> BCL_WORLD_17
-            = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.id("legacy_17"));
     private final static ResourceKey<WorldPreset> BCL_WORLD
             = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(PresetsRegistry.WOVER_WORLD));
     private final static ResourceKey<WorldPreset> BCL_WORLD_LARGE
@@ -48,7 +47,7 @@ public class WorldPresetProvider extends WoverWorldPresetProvider {
         ctx.register(PresetsRegistry.WOVER_WORLD_AMPLIFIED, createAmplified(ctx));
 
         //for compatibility with BCLib
-        ctx.register(BCL_WORLD_17, createLegacy(ctx));
+        ctx.register(PresetRegistryImpl.BCL_WORLD_17, createLegacy(ctx));
         ctx.register(BCL_WORLD, createNormal(ctx));
         ctx.register(BCL_WORLD_LARGE, createLarge(ctx));
         ctx.register(BCL_WORLD_AMPLIFIED, createAmplified(ctx));

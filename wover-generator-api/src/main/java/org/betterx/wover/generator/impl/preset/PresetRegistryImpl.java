@@ -6,6 +6,7 @@ import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
 import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
 import org.betterx.wover.generator.impl.biomesource.nether.WoverNetherBiomeSource;
+import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.context.WorldPresetBootstrapContext;
 
@@ -24,6 +25,8 @@ public class PresetRegistryImpl {
     public final static ResourceKey<WorldPreset> WOVER_WORLD_AMPLIFIED = WorldPresetManager.createKey(
             WoverWorldGenerator.C.id(
                     "amplified"));
+    public final static ResourceKey<WorldPreset> BCL_WORLD_17
+            = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.id("legacy_17"));
 
     @NotNull
     public static LevelStem makeWoverNetherStem(

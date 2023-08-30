@@ -20,7 +20,12 @@ public interface OnWorldConfig extends Subscriber {
         /**
          * The worldConfig is being loaded.
          */
-        LOADED
+        LOADED,
+        /**
+         * Something unexpected happened while loading the worldConfig.
+         */
+        LOAD_FAILED
+
     }
 
     /**

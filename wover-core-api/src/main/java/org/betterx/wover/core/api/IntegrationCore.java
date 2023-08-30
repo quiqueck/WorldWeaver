@@ -13,4 +13,6 @@ public class IntegrationCore {
     public static final boolean RUNS_NULLSCAPE = hasMod("nullscape");
 
     public static final ModCore MINECRAFT = ModCore.create("minecraft");
+    public static final ModCore BETTER_END = ModCore.create("betterend");
+    public static final ModCore BETTER_NETHER = ModCore.create("betternether");
 }
