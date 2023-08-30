@@ -4,6 +4,8 @@ import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
+import org.betterx.wover.feature.impl.placed.PlacedConfiguredFeatureKeyImpl;
+import org.betterx.wover.feature.impl.placed.PlacedFeatureKeyImpl;
 import org.betterx.wover.feature.impl.placed.PlacedFeatureManagerImpl;
 
 import net.minecraft.core.Holder;
@@ -45,7 +47,7 @@ public class PlacedFeatureManager {
      * @return The {@link PlacedFeatureKey}
      */
     public static PlacedFeatureKey createKey(ResourceLocation location) {
-        return new PlacedFeatureKey(location);
+        return new PlacedFeatureKeyImpl(location);
     }
 
     /**
@@ -60,12 +62,12 @@ public class PlacedFeatureManager {
      * @param <B>        The {@link FeatureConfigurator} for the {@link ConfiguredFeature}
      * @return The {@link PlacedFeatureKey}
      */
-    public static <FC extends FeatureConfiguration, F extends Feature<FC>, B extends FeatureConfigurator<FC, F>> PlacedFeatureKey.WithConfigured
+    public static <FC extends FeatureConfiguration, F extends Feature<FC>, B extends FeatureConfigurator<FC, F>> PlacedConfiguredFeatureKey
     createKey(
             ResourceLocation location,
             ResourceKey<ConfiguredFeature<?, ?>> configured
     ) {
-        return new PlacedFeatureKey.WithConfigured(location, configured);
+        return new PlacedConfiguredFeatureKeyImpl(location, configured);
     }
 
 
@@ -79,12 +81,12 @@ public class PlacedFeatureManager {
      * @param <B>                  The {@link FeatureConfigurator} for the {@link ConfiguredFeature}
      * @return The {@link PlacedFeatureKey}
      */
-    public static <B extends FeatureConfigurator<?, ?>> PlacedFeatureKey.WithConfigured
+    public static <B extends FeatureConfigurator<?, ?>> PlacedConfiguredFeatureKey
     createKey(
             ResourceLocation location,
             ConfiguredFeatureKey<B> configuredFeatureKey
     ) {
-        return new PlacedFeatureKey.WithConfigured(location, configuredFeatureKey);
+        return new PlacedConfiguredFeatureKeyImpl(location, configuredFeatureKey);
     }
 
     /**
@@ -96,11 +98,11 @@ public class PlacedFeatureManager {
      * @param <B>                  The {@link FeatureConfigurator} for the {@link ConfiguredFeature}
      * @return The {@link PlacedFeatureKey}
      */
-    public static <B extends FeatureConfigurator<?, ?>> PlacedFeatureKey.WithConfigured
+    public static <B extends FeatureConfigurator<?, ?>> PlacedConfiguredFeatureKey
     createKey(
             ConfiguredFeatureKey<B> configuredFeatureKey
     ) {
-        return new PlacedFeatureKey.WithConfigured(configuredFeatureKey.key.location(), configuredFeatureKey);
+        return new PlacedConfiguredFeatureKeyImpl(configuredFeatureKey.key.location(), configuredFeatureKey);
     }
 
     /**

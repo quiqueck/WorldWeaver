@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * directly to register arbitrary rule sources.
  */
 public interface SurfaceRuleBuilder extends BaseSurfaceRuleBuilder<SurfaceRuleBuilder> {
+
     /**
      * Start the builder
      *

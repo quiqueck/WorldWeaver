@@ -6,6 +6,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
 import org.betterx.wover.feature.api.configured.configurators.ForSimpleBlock;
+import org.betterx.wover.feature.api.placed.PlacedConfiguredFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 
@@ -36,15 +37,15 @@ public class WoverFeatureTestMod implements ModInitializer {
     public static final PlacedFeatureKey INLINE_FEATURE = PlacedFeatureManager.createKey(C.id("inline_feature"));
     public static final PlacedFeatureKey INLINE_FEATURE_ALL = PlacedFeatureManager.createKey(C.id("inline_feature_all"));
 
-    public static final PlacedFeatureKey.WithConfigured VANILLA_FEATURE = PlacedFeatureManager.createKey(
+    public static final PlacedConfiguredFeatureKey VANILLA_FEATURE = PlacedFeatureManager.createKey(
             C.id("vanilla_feature"),
             MiscOverworldFeatures.BLUE_ICE
     );
-    public static final PlacedFeatureKey.WithConfigured PLACED_REDSTONE_BLOCK = PlacedFeatureManager.createKey(
+    public static final PlacedConfiguredFeatureKey PLACED_REDSTONE_BLOCK = PlacedFeatureManager.createKey(
             CONFIGURED_REDSTONE_BLOCK
     );
 
-    public static final PlacedFeatureKey.WithConfigured PLACED_LAPIS_BLOCK = PlacedFeatureManager.createKey(
+    public static final PlacedConfiguredFeatureKey PLACED_LAPIS_BLOCK = PlacedFeatureManager.createKey(
             TEST_FEATURE_SIMPLE
     );
 

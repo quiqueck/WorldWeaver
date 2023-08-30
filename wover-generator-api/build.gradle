@@ -13,4 +13,5 @@ loom {
     accessWidenerPath = file('src/main/resources/wover-generator.accesswidener')
 }
 
-moduleDependencies(project, ['wover-core-api', 'wover-event-api', 'wover-biome-api', 'wover-preset-api'])
+moduleDependencies(project, ['wover-core-api', 'wover-event-api', 'wover-surface-api', 'wover-biome-api', 'wover-preset-api'])
+testDependencies(project, ['wover-feature-api', 'wover-structure-api'])

@@ -51,5 +51,14 @@ public class ResourceLocationSet extends HashSet<ResourceLocation> {
         public WildcardResourceLocation(ModCore mod) {
             super(mod.namespace, "*", null);
         }
+
+        public static ResourceLocation parse(String string) {
+            final var decomposed = ResourceLocation.decompose(string, ':');
+            if (decomposed[1].equals("*")) {
+                return new WildcardResourceLocation(decomposed[0]);
+            } else {
+                return new ResourceLocation(decomposed[0], decomposed[1]);
+            }
+        }
     }
 }

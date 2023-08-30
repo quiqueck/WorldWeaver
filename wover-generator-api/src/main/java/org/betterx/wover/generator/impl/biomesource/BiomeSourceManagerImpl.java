@@ -200,10 +200,10 @@ public class BiomeSourceManagerImpl {
             Consumer<ResourceLocation> adder
     ) {
         if (value.isJsonPrimitive()) {
-            adder.accept(new ResourceLocation(value.getAsString()));
+            adder.accept(ResourceLocationSet.WildcardResourceLocation.parse(value.getAsString()));
         } else if (value.isJsonArray()) {
             value.getAsJsonArray()
-                 .forEach(v -> adder.accept(new ResourceLocation(v.getAsString())));
+                 .forEach(v -> adder.accept(ResourceLocationSet.WildcardResourceLocation.parse(v.getAsString())));
         }
     }
 
@@ -227,7 +227,7 @@ public class BiomeSourceManagerImpl {
 
         if (root.has(NO_FABRIC_REGISTER_TAG)) {
             final JsonArray excludes = root.getAsJsonArray(NO_FABRIC_REGISTER_TAG);
-            excludes.forEach(v -> FABRIC_EXCLUDES.add(new ResourceLocation(v.getAsString())));
+            excludes.forEach(v -> FABRIC_EXCLUDES.add(ResourceLocationSet.WildcardResourceLocation.parse(v.getAsString())));
         }
     }
 

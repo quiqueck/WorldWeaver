@@ -8,7 +8,8 @@ import org.betterx.wover.testmod.entrypoint.WoverWorldGeneratorTestMod;
 public class WoverWorldGeneratorDatagenTestMod extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
-
+        globalPack.addMultiProvider(BiomeProvider::new);
+        globalPack.addMultiProvider(FeatureProvider::new);
     }
 
     @Override

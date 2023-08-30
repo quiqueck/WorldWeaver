@@ -5,6 +5,7 @@ import org.betterx.wover.biome.impl.modification.BiomeModificationImpl;
 import org.betterx.wover.biome.impl.modification.FeatureMap;
 import org.betterx.wover.biome.impl.modification.GenerationSettingsWorker;
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.feature.api.placed.BasePlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 
 import com.mojang.serialization.Codec;
@@ -432,7 +433,7 @@ public interface BiomeModification {
          * @param feature The feature.
          * @return This builder.
          */
-        public Builder addFeature(PlacedFeatureKey feature) {
+        public Builder addFeature(BasePlacedFeatureKey<?> feature) {
             if (bootstrapContext == null) {
                 throw new IllegalStateException(
                         "You can not add a PlacedFeatureKey to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");

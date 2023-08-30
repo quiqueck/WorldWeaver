@@ -4,11 +4,12 @@ import org.betterx.wover.biome.api.BiomeKey;
 import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.impl.builder.BiomeSurfaceRuleBuilderImpl;
 import org.betterx.wover.biome.mixin.BiomeGenerationSettingsAccessor;
-import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
+import org.betterx.wover.feature.api.placed.BasePlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 import org.betterx.wover.structure.api.StructureKey;
 import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
+import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -18,6 +19,7 @@ import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -202,7 +204,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             return this.temperatureAdjustment(Biome.TemperatureModifier.NONE);
         }
 
-        public B feature(PlacedFeatureKey feature) {
+        public B feature(BasePlacedFeatureKey<?> feature) {
             generationSettings.addFeature(
                     feature.getDecoration(),
                     feature.getHolder(bootstrapContext.lookup(Registries.PLACED_FEATURE))
@@ -314,6 +316,30 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
 
         public B music(Holder<SoundEvent> music, int minDelay, int maxDelay, boolean replaceCurrentMusic) {
             return music(new Music(music, minDelay, maxDelay, replaceCurrentMusic));
+        }
+
+        public final B isNetherBiome() {
+            return tag(BiomeTags.IS_NETHER);
+        }
+
+        public final B isEndHighlandBiome() {
+            return tag(CommonBiomeTags.IS_END_HIGHLAND);
+        }
+
+        public final B isEndMidlandBiome() {
+            return tag(CommonBiomeTags.IS_END_MIDLAND);
+        }
+
+        public final B isEndCenterIslandBiome() {
+            return tag(CommonBiomeTags.IS_END_CENTER);
+        }
+
+        public final B isEndBarrensBiome() {
+            return tag(CommonBiomeTags.IS_END_BARRENS);
+        }
+
+        public final B isEndSmallIslandBiome() {
+            return tag(CommonBiomeTags.IS_SMALL_END_ISLAND);
         }
 
         public <M extends Mob> B spawn(EntityType<M> entityType, int weight, int minGroupCount, int maxGroupCount) {

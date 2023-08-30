@@ -18,41 +18,6 @@ import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import org.jetbrains.annotations.NotNull;
 
 public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> implements BaseSurfaceRuleBuilder<T> {
-    /**
-     * {@code = 2900} - Default priority for steep surfaces. This is the highest priority Rule.
-     */
-    public static int STEEP_SURFACE_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 900;
-    /**
-     * {@code = 2800} - Default priority for surface blocks. This is the next priority after {@link #STEEP_SURFACE_PRIORITY}
-     */
-    public static int TOP_SURFACE_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 800;
-    /**
-     * {@code = 2700} - Default priority for ceiling blocks. This is the next priority after {@link #TOP_SURFACE_PRIORITY}
-     */
-    public static int CEILING_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 700;
-    /**
-     * {@code = 2600} - Default priority for sub surfaces blocks. This is the next priority after {@link #CEILING_PRIORITY}
-     */
-    public static int SUB_SURFACE_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 600;
-    /**
-     * {@code = 2500} - Default priority for floor blocks. This is the next priority after {@link #SUB_SURFACE_PRIORITY}
-     */
-    public static int FLOOR_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 500;
-
-    /**
-     * {@code = 2400} - Default priority for blocks below a floor. This is the next priority after {@link #FLOOR_PRIORITY}
-     */
-    public static int BELOW_FLOOR_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 400;
-
-    /**
-     * {@code = 2300} -  Default priority for blocks above a ceiling. This is the next priority after {@link #BELOW_FLOOR_PRIORITY}
-     */
-    public static int ABOVE_CEILING_PRIORITY = 2 * PriorityLinkedList.DEFAULT_PRIORITY + 300;
-    /**
-     * {@code = 900} -  Default priority for filler blocks. This is lower than the default priority for all other rules.
-     */
-    public static int FILLER_PRIORITY = PriorityLinkedList.DEFAULT_PRIORITY - 100;
-
     private final PriorityLinkedList<SurfaceRules.RuleSource> rules;
     protected ResourceKey<Biome> biomeKey;
     protected int sortPriority;
