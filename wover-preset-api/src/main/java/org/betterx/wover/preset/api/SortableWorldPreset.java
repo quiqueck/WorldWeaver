@@ -2,12 +2,14 @@ package org.betterx.wover.preset.api;
 
 import org.betterx.wover.preset.impl.SortableWorldPresetImpl;
 
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A {@link WorldPreset} that can be sorted and provides access to otherwise
@@ -63,4 +65,11 @@ public abstract class SortableWorldPreset extends WorldPreset {
     public static SortableWorldPreset of(Map<ResourceKey<LevelStem>, LevelStem> dimensions, int sortOrder) {
         return new SortableWorldPresetImpl(dimensions, sortOrder);
     }
+
+    public abstract SortableWorldPreset withDimensions(
+            Registry<LevelStem> dimensions,
+            @Nullable ResourceKey<WorldPreset> parentKey
+    );
+
+    public abstract ResourceKey<WorldPreset> parentKey();
 }

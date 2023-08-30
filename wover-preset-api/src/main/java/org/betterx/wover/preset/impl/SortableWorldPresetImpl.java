@@ -83,6 +83,10 @@ public class SortableWorldPresetImpl extends SortableWorldPreset {
         return new SortableWorldPresetImpl(map, sortOrder, parentKey);
     }
 
+    public ResourceKey<WorldPreset> parentKey() {
+        return parentKey;
+    }
+
 
     public static WorldDimensions buildWorldDimensions(Map<ResourceKey<LevelStem>, LevelStem> map) {
         Registry<LevelStem> registry = new MappedRegistry<>(Registries.LEVEL_STEM, Lifecycle.experimental());

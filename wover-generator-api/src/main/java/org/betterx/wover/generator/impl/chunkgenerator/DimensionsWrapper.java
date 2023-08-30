@@ -20,7 +20,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-class DimensionsWrapper {
+public class DimensionsWrapper {
     public static final Codec<DimensionsWrapper> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(Codec.unboundedMap(
                                 ResourceKey.codec(Registries.LEVEL_STEM),

@@ -19,6 +19,5 @@ public class WoverWorldGenerator implements ModInitializer {
         BiomeSourceManagerImpl.initialize();
         ChunkGeneratorManagerImpl.initialize();
         WoverChunkGeneratorImpl.initialize();
-
     }
 }

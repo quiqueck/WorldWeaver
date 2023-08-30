@@ -1,6 +1,7 @@
 package org.betterx.wover.events.api.client;
 
 import org.betterx.wover.events.api.Event;
+import org.betterx.wover.events.api.types.client.AfterWelcomeScreen;
 import org.betterx.wover.events.api.types.client.BeforeClientLoadScreen;
 import org.betterx.wover.events.impl.client.ClientWorldLifecycleImpl;
 
@@ -25,4 +26,6 @@ public class ClientWorldLifecycle {
      * that is passed as a parameter in {@link BeforeClientLoadScreen#process(LevelStorageSource, String, Consumer)}
      */
     public static Event<BeforeClientLoadScreen> BEFORE_CLIENT_LOAD_SCREEN = ClientWorldLifecycleImpl.BEFORE_CLIENT_LOAD_SCREEN;
+
+    public static Event<AfterWelcomeScreen> AFTER_WELCOME_SCREEN = ClientWorldLifecycleImpl.AFTER_WELCOME_SCREEN;
 }
