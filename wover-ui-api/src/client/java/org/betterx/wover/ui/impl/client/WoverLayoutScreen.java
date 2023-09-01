@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class WoverLayoutScreen extends LayoutScreenWithIcon {
-    public static final ResourceLocation WOVER_LOGO_LOCATION = WoverUi.C.id("icon.png");
+    public static final ResourceLocation WOVER_LOGO_LOCATION = WoverUi.C.id("icon_wover.png");
     public static final ResourceLocation WOVER_LOGO_WHITE_LOCATION = WoverUi.C.id("icon_bright.png");
 
     public WoverLayoutScreen(

@@ -18,6 +18,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
     public static final ResourceLocation BACKGROUND = WoverUi.C.id("header.jpg");
     public static final ResourceLocation ICON_BETTERNETHER = WoverUi.C.id("icon_betternether.png");
     public static final ResourceLocation ICON_BETTEREND = WoverUi.C.id("icon_betterend.png");
+    public static final ResourceLocation ICON_BCLIB = WoverUi.C.id("icon_bclib.png");
 
     public WelcomeScreen(Screen parent) {
         super(parent, translatable("wover.welcome.title"));
@@ -49,14 +50,11 @@ public class WelcomeScreen extends WoverLayoutScreen {
 
         // Do Update Checks
         Checkbox check = innerContent.addCheckbox(
-                                             fit(),
-                                             fit(),
+                                             fit(), fit(),
                                              translatable("title.config.wover.client.version.check"),
                                              ClientConfigs.CLIENT.checkForNewVersions.get()
                                      )
-                                     .onChange((cb, state) -> {
-                                         ClientConfigs.CLIENT.checkForNewVersions.set(state);
-                                     });
+                                     .onChange((cb, state) -> ClientConfigs.CLIENT.checkForNewVersions.set(state));
         innerContent.addSpacer(2);
         HorizontalStack dscBox = innerContent.indent(24);
         dscBox.addMultilineText(fill(), fit(), translatable("description.config.wover.client.version.check"))
@@ -66,14 +64,12 @@ public class WelcomeScreen extends WoverLayoutScreen {
         // Hide Experimental Dialog
         innerContent.addSpacer(8);
         Checkbox experimental = innerContent.addCheckbox(
-                                                    fit(),
-                                                    fit(),
+                                                    fit(), fit(),
                                                     translatable("title.config.wover.client.ui.suppressExperimentalDialogOnLoad"),
                                                     ClientConfigs.CLIENT.disableExperimentalWarning.get()
                                             )
-                                            .onChange((cb, state) -> {
-                                                ClientConfigs.CLIENT.disableExperimentalWarning.set(state);
-                                            });
+                                            .onChange((cb, state) -> ClientConfigs.CLIENT.disableExperimentalWarning.set(
+                                                    state));
         innerContent.addSpacer(2);
         dscBox = innerContent.indent(24);
         dscBox.addMultilineText(
@@ -87,14 +83,11 @@ public class WelcomeScreen extends WoverLayoutScreen {
         // Use BetterX WorldType
         innerContent.addSpacer(8);
         Checkbox betterx = innerContent.addCheckbox(
-                                               fit(),
-                                               fit(),
+                                               fit(), fit(),
                                                translatable("title.config.wover.client.ui.forceBetterXPreset"),
                                                ClientConfigs.CLIENT.forceBetterXPreset.get()
                                        )
-                                       .onChange((cb, state) -> {
-                                           ClientConfigs.CLIENT.forceBetterXPreset.set(state);
-                                       });
+                                       .onChange((cb, state) -> ClientConfigs.CLIENT.forceBetterXPreset.set(state));
         innerContent.addSpacer(2);
         dscBox = innerContent.indent(24);
         dscBox.addMultilineText(

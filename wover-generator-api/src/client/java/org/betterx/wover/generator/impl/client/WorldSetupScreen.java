@@ -57,8 +57,8 @@ public class WorldSetupScreen extends LayoutScreen {
     }
 
 
-    private Checkbox bclibEnd;
-    private Checkbox bclibNether;
+    private Checkbox woverEnd;
+    private Checkbox woverNether;
     Checkbox endLegacy;
     Checkbox endCustomTerrain;
     Checkbox generateEndVoid;
@@ -70,7 +70,7 @@ public class WorldSetupScreen extends LayoutScreen {
         VerticalStack content = new VerticalStack(fill(), fit()).centerHorizontal();
         content.addSpacer(8);
 
-        bclibNether = content.addCheckbox(
+        woverNether = content.addCheckbox(
                 fit(), fit(),
                 Component.translatable("title.screen.wover.worldgen.custom_nether_biome_source"),
                 netherConfig.mapVersion != WoverNetherConfig.NetherBiomeMapType.VANILLA
@@ -117,7 +117,7 @@ public class WorldSetupScreen extends LayoutScreen {
                 netherConfig.biomeSizeVertical / 16
         );
 
-        bclibNether.onChange((cb, state) -> {
+        woverNether.onChange((cb, state) -> {
             netherLegacy.setEnabled(state);
             netherAmplified.setEnabled(state);
             netherVertical.setEnabled(state);
@@ -125,9 +125,7 @@ public class WorldSetupScreen extends LayoutScreen {
             netherVerticalBiomeSize.setEnabled(state && netherVertical.isChecked());
         });
 
-        netherVertical.onChange((cb, state) -> {
-            netherVerticalBiomeSize.setEnabled(state && bclibNether.isChecked());
-        });
+        netherVertical.onChange((cb, state) -> netherVerticalBiomeSize.setEnabled(state && woverNether.isChecked()));
 
         content.addSpacer(8);
         return content.setDebugName("Nether page");
@@ -136,7 +134,7 @@ public class WorldSetupScreen extends LayoutScreen {
     public LayoutComponent<?, ?> endPage(WoverEndConfig endConfig) {
         VerticalStack content = new VerticalStack(fill(), fit()).centerHorizontal();
         content.addSpacer(8);
-        bclibEnd = content.addCheckbox(
+        woverEnd = content.addCheckbox(
                 fit(), fit(),
                 Component.translatable("title.screen.wover.worldgen.custom_end_biome_source"),
                 endConfig.mapVersion != WoverEndConfig.EndBiomeMapType.VANILLA
@@ -216,7 +214,7 @@ public class WorldSetupScreen extends LayoutScreen {
         );
 
 
-        bclibEnd.onChange((cb, state) -> {
+        woverEnd.onChange((cb, state) -> {
             endLegacy.setEnabled(state);
             endCustomTerrain.setEnabled(state);
             generateEndVoid.setEnabled(state);
@@ -234,9 +232,7 @@ public class WorldSetupScreen extends LayoutScreen {
             barrensBiomeSize.setEnabled(state);
         });
 
-        generateEndVoid.onChange((cb, state) -> {
-            voidBiomeSize.setEnabled(state && endCustomTerrain.isChecked());
-        });
+        generateEndVoid.onChange((cb, state) -> voidBiomeSize.setEnabled(state && endCustomTerrain.isChecked()));
 
         content.addSpacer(8);
         return content.setDebugName("End Page");
@@ -252,7 +248,7 @@ public class WorldSetupScreen extends LayoutScreen {
         WoverEndConfig.EndBiomeMapType endVersion = WoverEndConfig.DEFAULT.mapVersion;
 
 
-        if (bclibEnd.isChecked()) {
+        if (woverEnd.isChecked()) {
             WoverEndConfig endConfig = new WoverEndConfig(
                     endLegacy.isChecked()
                             ? WoverEndConfig.EndBiomeMapType.SQUARE
@@ -277,7 +273,7 @@ public class WorldSetupScreen extends LayoutScreen {
             updateConfiguration(LevelStem.END, BuiltinDimensionTypes.END, endGenerator);
         }
 
-        if (bclibNether.isChecked()) {
+        if (woverNether.isChecked()) {
             WoverNetherConfig netherConfig = new WoverNetherConfig(
                     netherLegacy.isChecked()
                             ? WoverNetherConfig.NetherBiomeMapType.SQUARE
@@ -407,9 +403,7 @@ public class WorldSetupScreen extends LayoutScreen {
             onClose();
         }).alignRight();
 
-        main.onPageChange((tabs, idx) -> {
-            targetT = 1 - idx;
-        });
+        main.onPageChange((tabs, idx) -> targetT = 1 - idx);
 
         return rows;
     }
