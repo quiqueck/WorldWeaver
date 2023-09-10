@@ -121,9 +121,11 @@ public class WoverChunkGeneratorImpl {
                 Lifecycle.stable()
         );
 
+        //copy all other dimensions
         for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : dimensionRegistry.entrySet()) {
             ResourceKey<LevelStem> resourceKey = entry.getKey();
-            if (resourceKey == dimensionKey) continue;
+            if (dimensionKey.location().equals(resourceKey.location())) continue;
+
             writableRegistry.register(
                     resourceKey,
                     entry.getValue(),

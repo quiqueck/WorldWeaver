@@ -13,31 +13,19 @@ targetCompatibility = JavaVersion.VERSION_17
 
 def moduleDependencies(project, List<String> depNames) {
     def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-    def depsClient = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'devClient') }
-
     project.dependencies {
         deps.each {
             api it
-        }
-
-        depsClient.each {
-            devClient it
-            datagenImplementation it
-            clientImplementation it
         }
     }
 }
 
 def testDependencies(project, List<String> depNames) {
     def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
-    def depsClient = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'devClient') }
 
     project.dependencies {
         deps.each {
             testmodImplementation it
-        }
-
-        depsClient.each {
             testmodClientImplementation it
         }
     }

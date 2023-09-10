@@ -1,18 +1,20 @@
 package org.betterx.wover.generator.impl.client;
 
+import de.ambertation.wunderlib.ui.ColorHelper;
 import de.ambertation.wunderlib.ui.layout.components.*;
 import de.ambertation.wunderlib.ui.layout.components.render.RenderHelper;
 import de.ambertation.wunderlib.ui.layout.values.Rectangle;
 import de.ambertation.wunderlib.ui.layout.values.Size;
+import de.ambertation.wunderlib.ui.layout.values.Value;
 import de.ambertation.wunderlib.ui.vanilla.LayoutScreen;
-import org.betterx.wover.generator.api.biomesource.end.WoverEndConfig;
-import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
-import org.betterx.wover.generator.api.preset.PresetsRegistry;
-import org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
-import org.betterx.wover.generator.impl.biomesource.nether.WoverNetherBiomeSource;
-import org.betterx.wover.generator.impl.chunkgenerator.DimensionsWrapper;
+import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConfigPanel;
+import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
+import org.betterx.wover.generator.impl.chunkgenerator.ConfiguredChunkGenerator;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
 import org.betterx.wover.preset.api.SortableWorldPreset;
+import org.betterx.wover.preset.api.WorldPresetTags;
+import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.ui.impl.client.WelcomeScreen;
 import org.betterx.wover.ui.impl.client.WoverLayoutScreen;
 
@@ -21,281 +23,239 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.Map;
+import java.util.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
-public class WorldSetupScreen extends LayoutScreen {
+public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigPanel.DimensionUpdater {
+    protected record DimensionValue(Holder<WorldPreset> preset, ResourceKey<WorldPreset> key, LevelStem dimension) {
+    }
+
+
+    public static class DimensionContent {
+        public final ResourceKey<LevelStem> dimensionKey;
+        public final ResourceKey<DimensionType> dimensionTypeKey;
+        private BiomeSourceConfigPanel<?, ?> configPanel;
+        private Component pageTitle;
+        private Component buttonTitle;
+        private DropDown<DimensionValue> generators;
+        private VerticalStack stack;
+        private int stackIndex = -1;
+
+        private DimensionContent(ResourceKey<LevelStem> dimensionKey, ResourceKey<DimensionType> dimensionTypeKey) {
+            this.dimensionKey = dimensionKey;
+            this.dimensionTypeKey = dimensionTypeKey;
+        }
+    }
+
+    private final List<ResourceKey<DimensionType>> sortedDimensions = List.of(
+            BuiltinDimensionTypes.NETHER,
+            BuiltinDimensionTypes.END
+    );
+
+    private final Map<ResourceKey<DimensionType>, DimensionContent> dimensions = Map.of(
+            BuiltinDimensionTypes.NETHER, new DimensionContent(LevelStem.NETHER, BuiltinDimensionTypes.NETHER),
+            BuiltinDimensionTypes.END, new DimensionContent(LevelStem.END, BuiltinDimensionTypes.END)
+    );
+
     private final WorldCreationContext context;
+
+    private final VerticalStack contentFallback;
+
     private final CreateWorldScreen createWorldScreen;
-    private Range<Integer> netherBiomeSize;
-    private Range<Integer> netherVerticalBiomeSize;
-    private Range<Integer> landBiomeSize;
-    private Range<Integer> voidBiomeSize;
-    private Range<Integer> centerBiomeSize;
-    private Range<Integer> barrensBiomeSize;
-    private Range<Integer> innerRadius;
 
     public WorldSetupScreen(@Nullable CreateWorldScreen parent, WorldCreationContext context) {
         super(parent, Component.translatable("title.screen.wover.worldgen.main"), 10, 10, 10);
         this.context = context;
         this.createWorldScreen = parent;
+
+        contentFallback = new VerticalStack(fit(), fit()).centerHorizontal();
+        contentFallback.addSpacer(16);
+        contentFallback.addText(
+                fit(), fit(),
+                Component.translatable("title.screen.wover.worldgen.no_generator_config")
+        ).centerVertical().setColor(ColorHelper.DARK_GRAY);
+    }
+
+    private void generatorChanged(
+            DimensionContent content,
+            DimensionValue selected
+    ) {
+        if (content.stack != null) {
+            final BiomeSource selectedBiomeSource = selected.dimension.generator().getBiomeSource();
+            if (selectedBiomeSource instanceof BiomeSourceWithConfigScreen<?, ?> bs) {
+                content.configPanel = bs.biomeSourceConfigPanel(this);
+                content.stack.replaceOrAdd(content.stackIndex, content.configPanel.getPanel());
+            } else {
+                content.configPanel = null;
+                content.stack.replaceOrAdd(content.stackIndex, contentFallback);
+            }
+
+            content.stack.recalculateLayout();
+        }
     }
 
 
-    private Checkbox woverEnd;
-    private Checkbox woverNether;
-    Checkbox endLegacy;
-    Checkbox endCustomTerrain;
-    Checkbox generateEndVoid;
-    Checkbox netherLegacy;
-    Checkbox netherVertical;
-    Checkbox netherAmplified;
+    @Nullable
+    private static ResourceKey<WorldPreset> getConfiguredGeneratorKey(
+            @Nullable Holder<WorldPreset> configuredPreset,
+            @NotNull ResourceKey<LevelStem> forDimension
+    ) {
+        ResourceKey<WorldPreset> configuredKey = null;
 
-    public LayoutComponent<?, ?> netherPage(WoverNetherConfig netherConfig) {
-        VerticalStack content = new VerticalStack(fill(), fit()).centerHorizontal();
-        content.addSpacer(8);
+        //see if the generator stores the preset key
+        if (configuredPreset != null && configuredPreset.value() instanceof SortableWorldPreset wp) {
+            final LevelStem dimension = wp.getDimension(forDimension);
+            if (dimension != null && dimension.generator() instanceof ConfiguredChunkGenerator cfg) {
+                configuredKey = cfg.wover_getConfiguredWorldPreset();
+            }
+        }
 
-        woverNether = content.addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.custom_nether_biome_source"),
-                netherConfig.mapVersion != WoverNetherConfig.NetherBiomeMapType.VANILLA
-        );
+        //see if the preset is a reference with a valid key
+        if (configuredKey == null && configuredPreset != null) {
+            configuredKey = configuredPreset.unwrapKey().orElse(null);
+        }
 
-        netherLegacy = content.indent(20).addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.legacy_square"),
-                netherConfig.mapVersion == WoverNetherConfig.NetherBiomeMapType.SQUARE
-        );
+        //see if the preset was derived from a registered one
+        if (configuredKey == null
+                && configuredPreset != null
+                && configuredPreset.value() instanceof SortableWorldPreset wp) {
+            configuredKey = wp.parentKey();
+        }
 
-        netherAmplified = content.indent(20).addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.nether_amplified"),
-                netherConfig.amplified
-        );
-
-        netherVertical = content.indent(20).addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.nether_vertical"),
-                netherConfig.useVerticalBiomes
-        );
-
-        content.addSpacer(12);
-        content.addText(fit(), fit(), Component.translatable("title.screen.wover.worldgen.avg_biome_size"))
-               .centerHorizontal();
-        content.addHorizontalSeparator(8).alignTop();
-
-        netherBiomeSize = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.nether_biome_size"),
-                1,
-                512,
-                netherConfig.biomeSize / 16
-        );
-
-        netherVerticalBiomeSize = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.nether_vertical_biome_size"),
-                1,
-                32,
-                netherConfig.biomeSizeVertical / 16
-        );
-
-        woverNether.onChange((cb, state) -> {
-            netherLegacy.setEnabled(state);
-            netherAmplified.setEnabled(state);
-            netherVertical.setEnabled(state);
-            netherBiomeSize.setEnabled(state);
-            netherVerticalBiomeSize.setEnabled(state && netherVertical.isChecked());
-        });
-
-        netherVertical.onChange((cb, state) -> netherVerticalBiomeSize.setEnabled(state && woverNether.isChecked()));
-
-        content.addSpacer(8);
-        return content.setDebugName("Nether page");
+        return configuredKey;
     }
 
-    public LayoutComponent<?, ?> endPage(WoverEndConfig endConfig) {
+    private String languageKey(Holder<WorldPreset> key) {
+        return languageKey(key.unwrapKey().orElseThrow().location());
+    }
+
+    private String languageKey(ResourceLocation key) {
+        return "generator." + key.getNamespace() + "." + key.getPath();
+    }
+
+    protected void populateGenerators(
+            @Nullable Holder<WorldPreset> configuredPreset,
+            @NotNull ResourceKey<LevelStem> forDimension,
+            @NotNull DropDown<DimensionValue> dimensions
+    ) {
+        ResourceKey<WorldPreset> finalConfiguredKey = getConfiguredGeneratorKey(configuredPreset, forDimension);
+        DimensionValue[] selectedStem = {null};
+
+        final Registry<WorldPreset> worldPresets = WorldState
+                .allStageRegistryAccess()
+                .registryOrThrow(Registries.WORLD_PRESET);
+
+        final Optional<HolderSet.Named<WorldPreset>> normal = worldPresets.getTag(WorldPresetTags.NORMAL);
+        if (normal.isPresent()) {
+            Set<ChunkGenerator> generators = new HashSet<>();
+            final Language language = Language.getInstance();
+
+            normal
+                    .get()
+                    .stream()
+                    .filter(preset -> preset.unwrapKey().isPresent())
+                    .sorted((a, b) -> language.getOrDefault(languageKey(a))
+                                              .compareTo(language.getOrDefault(languageKey(b))))
+                    .forEach(preset -> {
+                        final Optional<LevelStem> targetDimension = preset.value()
+                                                                          .createWorldDimensions()
+                                                                          .get(forDimension);
+                        final ResourceLocation key = preset.unwrapKey().orElseThrow().location();
+                        if (targetDimension.isPresent()) {
+                            final ChunkGenerator generator = targetDimension.get().generator();
+                            final DimensionValue dimensionValue = new DimensionValue(
+                                    preset,
+                                    preset.unwrapKey().orElseThrow(),
+                                    targetDimension.get()
+                            );
+                            if (!generators.contains(generator)) {
+                                generators.add(generator);
+                                dimensions.addOption(Component.translatable(languageKey(key)), dimensionValue);
+                            } else {
+                                WoverWorldGenerator.C.log.debug("Skipping duplicate generator for preset {}", key);
+                            }
+
+                            if (finalConfiguredKey != null && key.equals(finalConfiguredKey.location())) {
+                                selectedStem[0] = dimensionValue;
+                            }
+                        }
+                    });
+        }
+        if (selectedStem[0] != null) {
+            dimensions.select(selectedStem[0]);
+        }
+    }
+
+    private LayoutComponent<?, ?> contentPage(
+            Holder<WorldPreset> configuredPreset,
+            Component title,
+            DimensionContent contentData
+    ) {
         VerticalStack content = new VerticalStack(fill(), fit()).centerHorizontal();
-        content.addSpacer(8);
-        woverEnd = content.addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.custom_end_biome_source"),
-                endConfig.mapVersion != WoverEndConfig.EndBiomeMapType.VANILLA
-        );
-
-        endLegacy = content.indent(20).addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.legacy_square"),
-                endConfig.mapVersion == WoverEndConfig.EndBiomeMapType.SQUARE
-        );
-
-        endCustomTerrain = content.indent(20).addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.custom_end_terrain"),
-                endConfig.generatorVersion != WoverEndConfig.EndBiomeGeneratorType.VANILLA
-        );
-
-        generateEndVoid = content.indent(20).addCheckbox(
-                fit(), fit(),
-                Component.translatable("title.screen.wover.worldgen.end_void"),
-                endConfig.withVoidBiomes
-        );
-
-        content.addSpacer(12);
-        content.addText(fit(), fit(), Component.translatable("title.screen.wover.worldgen.avg_biome_size"))
-               .centerHorizontal();
+        content.setDebugName("Stack " + contentData.dimensionKey.location());
+        content.addSpacer(16);
+        content.addText(fit(), fit(), title).centerHorizontal();
         content.addHorizontalSeparator(8).alignTop();
 
-        landBiomeSize = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.land_biome_size"),
-                1,
-                512,
-                endConfig.landBiomesSize / 16
+        final HorizontalStack generatorRow = content.addRow(Value.fill(), Value.fit());
+        generatorRow.addText(
+                Value.fit(),
+                Value.fit(),
+                Component.translatable("title.screen.wover.worldgen.generator_template")
         );
 
-        voidBiomeSize = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.void_biome_size"),
-                1,
-                512,
-                endConfig.voidBiomesSize / 16
-        );
+        generatorRow.addSpacer(8);
+        final DropDown<DimensionValue> generators = generatorRow.addDropDown(Value.fixed(200), Value.fit());
+        generators.onChange((__unused, selected) -> generatorChanged(contentData, selected));
 
-        centerBiomeSize = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.center_biome_size"),
-                1,
-                512,
-                endConfig.centerBiomesSize / 16
-        );
+        contentData.stackIndex = content.size();
+        contentData.generators = generators;
+        contentData.stack = content;
 
-        barrensBiomeSize = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.barrens_biome_size"),
-                1,
-                512,
-                endConfig.barrensBiomesSize / 16
-        );
+        populateGenerators(configuredPreset, contentData.dimensionKey, generators);
 
-        content.addSpacer(12);
-        content.addText(fit(), fit(), Component.translatable("title.screen.wover.worldgen.other"))
-               .centerHorizontal();
-        content.addHorizontalSeparator(8).alignTop();
-
-        innerRadius = content.addRange(
-                fixed(200),
-                fit(),
-                Component.translatable("title.screen.wover.worldgen.central_radius"),
-                1,
-                512,
-                (int) Math.sqrt(endConfig.innerVoidRadiusSquared) / 16
-        );
-
-
-        woverEnd.onChange((cb, state) -> {
-            endLegacy.setEnabled(state);
-            endCustomTerrain.setEnabled(state);
-            generateEndVoid.setEnabled(state);
-
-            landBiomeSize.setEnabled(state && endCustomTerrain.isChecked());
-            voidBiomeSize.setEnabled(state && endCustomTerrain.isChecked() && generateEndVoid.isChecked());
-            centerBiomeSize.setEnabled(state && endCustomTerrain.isChecked());
-            barrensBiomeSize.setEnabled(state && endCustomTerrain.isChecked());
-        });
-
-        endCustomTerrain.onChange((cb, state) -> {
-            landBiomeSize.setEnabled(state);
-            voidBiomeSize.setEnabled(state && generateEndVoid.isChecked());
-            centerBiomeSize.setEnabled(state);
-            barrensBiomeSize.setEnabled(state);
-        });
-
-        generateEndVoid.onChange((cb, state) -> voidBiomeSize.setEnabled(state && endCustomTerrain.isChecked()));
-
-        content.addSpacer(8);
-        return content.setDebugName("End Page");
+        return content;
     }
 
     private void updateSettings() {
-        Map<ResourceKey<LevelStem>, ChunkGenerator> betterxDimensions = DimensionsWrapper.getDimensionsMap(
-                PresetsRegistry.WOVER_WORLD);
-        Map<ResourceKey<LevelStem>, ChunkGenerator> betterxAmplifiedDimensions = DimensionsWrapper.getDimensionsMap(
-                PresetsRegistry.WOVER_WORLD_AMPLIFIED);
-        Map<ResourceKey<LevelStem>, ChunkGenerator> vanillaDimensions = DimensionsWrapper.getDimensionsMap(
-                WorldPresets.NORMAL);
-        WoverEndConfig.EndBiomeMapType endVersion = WoverEndConfig.DEFAULT.mapVersion;
+        dimensions.values().forEach(content -> {
+            if (content.generators == null) return;
+            final DimensionValue value = content.generators.selectedOption();
+            if (value == null) return;
 
+            ChunkGenerator generator = value.dimension.generator();
 
-        if (woverEnd.isChecked()) {
-            WoverEndConfig endConfig = new WoverEndConfig(
-                    endLegacy.isChecked()
-                            ? WoverEndConfig.EndBiomeMapType.SQUARE
-                            : WoverEndConfig.EndBiomeMapType.HEX,
-                    endCustomTerrain.isChecked()
-                            ? WoverEndConfig.EndBiomeGeneratorType.PAULEVS
-                            : WoverEndConfig.EndBiomeGeneratorType.VANILLA,
-                    generateEndVoid.isChecked(),
-                    (int) Math.pow(innerRadius.getValue() * 16, 2),
-                    centerBiomeSize.getValue() * 16,
-                    voidBiomeSize.getValue() * 16,
-                    landBiomeSize.getValue() * 16,
-                    barrensBiomeSize.getValue() * 16
-            );
+            if (generator instanceof ConfiguredChunkGenerator cfg) {
+                cfg.wover_setConfiguredWorldPreset(value.key);
+            }
 
-            ChunkGenerator endGenerator = betterxDimensions.get(LevelStem.END);
-            ((WoverEndBiomeSource) endGenerator.getBiomeSource()).setBiomeSourceConfig(endConfig);
+            if (content.configPanel != null) {
+                generator = content.configPanel.updateSettings(generator);
+            }
 
-            updateConfiguration(LevelStem.END, BuiltinDimensionTypes.END, endGenerator);
-        } else {
-            ChunkGenerator endGenerator = vanillaDimensions.get(LevelStem.END);
-            updateConfiguration(LevelStem.END, BuiltinDimensionTypes.END, endGenerator);
-        }
-
-        if (woverNether.isChecked()) {
-            WoverNetherConfig netherConfig = new WoverNetherConfig(
-                    netherLegacy.isChecked()
-                            ? WoverNetherConfig.NetherBiomeMapType.SQUARE
-                            : WoverNetherConfig.NetherBiomeMapType.HEX,
-                    netherBiomeSize.getValue() * 16,
-                    netherVerticalBiomeSize.getValue() * 16,
-                    netherVertical.isChecked(),
-                    netherAmplified.isChecked()
-            );
-
-            ChunkGenerator netherGenerator = (
-                    netherAmplified.isChecked()
-                            ? betterxAmplifiedDimensions
-                            : betterxDimensions
-            ).get(LevelStem.NETHER);
-            ((WoverNetherBiomeSource) netherGenerator.getBiomeSource()).setBiomeSourceConfig(netherConfig);
-
-            updateConfiguration(LevelStem.NETHER, BuiltinDimensionTypes.NETHER, netherGenerator);
-        } else {
-            ChunkGenerator endGenerator = vanillaDimensions.get(LevelStem.NETHER);
-            updateConfiguration(LevelStem.NETHER, BuiltinDimensionTypes.NETHER, endGenerator);
-        }
+            this.updateConfiguration(LevelStem.NETHER, BuiltinDimensionTypes.NETHER, generator);
+        });
 
         final WorldCreationUiState acc = createWorldScreen.getUiState();
         final Holder<WorldPreset> configuredPreset = acc.getWorldType().preset();
@@ -317,7 +277,8 @@ public class WorldSetupScreen extends LayoutScreen {
     }
 
 
-    private void updateConfiguration(
+    @Override
+    public void updateConfiguration(
             ResourceKey<LevelStem> dimensionKey,
             ResourceKey<DimensionType> dimensionTypeKey,
             ChunkGenerator chunkGenerator
@@ -356,29 +317,45 @@ public class WorldSetupScreen extends LayoutScreen {
 
     @Override
     protected LayoutComponent<?, ?> initContent() {
-        WoverEndConfig endConfig = WoverEndConfig.VANILLA;
-        WoverNetherConfig netherConfig = WoverNetherConfig.VANILLA;
-
         final WorldCreationUiState acc = createWorldScreen.getUiState();
         final Holder<WorldPreset> configuredPreset = acc.getWorldType().preset();
-        if (configuredPreset.value() instanceof SortableWorldPreset wp) {
-            LevelStem endStem = wp.getDimension(LevelStem.END);
-            if (endStem != null && endStem.generator().getBiomeSource() instanceof WoverEndBiomeSource bs) {
-                endConfig = bs.getBiomeSourceConfig();
-            }
-            LevelStem netherStem = wp.getDimension(LevelStem.NETHER);
-            if (netherStem != null && netherStem.generator().getBiomeSource() instanceof WoverNetherBiomeSource bs) {
-                netherConfig = bs.getBiomeSourceConfig();
-            }
+        if (configuredPreset != null && configuredPreset.value() instanceof SortableWorldPreset wp) {
+            dimensions.values().forEach(content -> {
+                LevelStem stem = wp.getDimension(content.dimensionKey);
+                if (stem != null
+                        && stem.generator() instanceof ConfiguredChunkGenerator cfg
+                        && configuredPreset.unwrapKey().isPresent()) {
+                    if (cfg.wover_getConfiguredWorldPreset() == null)
+                        cfg.wover_setConfiguredWorldPreset(configuredPreset.unwrapKey().orElseThrow());
+                }
+            });
         }
 
-        LayoutComponent<?, ? extends LayoutComponent<?, ?>> netherPage = netherPage(netherConfig);
-        LayoutComponent<?, ? extends LayoutComponent<?, ?>> endPage = endPage(endConfig);
+        final Tabs main = new Tabs(fill(), fill()).setPadding(8, 0, 0, 0);
+        sortedDimensions
+                .stream()
+                .map(type -> dimensions.get(type))
+                .filter(content -> content != null)
+                .forEach(content -> {
+                    LayoutComponent<?, ? extends LayoutComponent<?, ?>> page = contentPage(
+                            configuredPreset,
+                            Component.translatable("title.screen.wover.worldgen."
+                                    + content.dimensionKey.location().getPath() + "_generator"),
+                            content
+                    );
 
-        Tabs main = new Tabs(fill(), fill()).setPadding(8, 0, 0, 0);
-        main.addPage(Component.translatable("title.wover.the_nether"), VerticalScroll.create(netherPage));
-        main.addSpacer(8);
-        main.addPage(Component.translatable("title.wover.the_end"), scroller = VerticalScroll.create(endPage));
+                    if (!main.isEmpty()) {
+                        main.addSpacer(8);
+                    }
+
+                    main.addPage(
+                            Component.translatable("title.wover." + content.dimensionKey.location().getPath()),
+                            this.scroller = VerticalScroll
+                                    .create(page)
+                                    .setDebugName(content.dimensionKey.location().getPath() + " scroll")
+                    );
+                });
+        
         netherButton = main.getButton(0);
         endButton = main.getButton(1);
 

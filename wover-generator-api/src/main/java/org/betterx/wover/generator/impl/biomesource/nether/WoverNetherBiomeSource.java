@@ -4,12 +4,16 @@ import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
 import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
 import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
+import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConfigPanel;
+import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
 import org.betterx.wover.generator.api.map.BiomeMap;
 import org.betterx.wover.generator.api.map.MapBuilderFunction;
+import org.betterx.wover.generator.impl.client.NetherConfigPage;
 import org.betterx.wover.generator.impl.map.MapStack;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
@@ -19,11 +23,15 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class WoverNetherBiomeSource extends WoverBiomeSource implements
-        BiomeSourceWithConfig<WoverNetherBiomeSource, WoverNetherConfig> {
+        BiomeSourceWithConfig<WoverNetherBiomeSource, WoverNetherConfig>,
+        BiomeSourceWithConfigScreen<WoverNetherBiomeSource, WoverNetherConfig> {
     public static final Codec<WoverNetherBiomeSource> CODEC = RecordCodecBuilder
             .create(instance -> instance
                     .group(
@@ -167,5 +175,13 @@ public class WoverNetherBiomeSource extends WoverBiomeSource implements
     public void setBiomeSourceConfig(WoverNetherConfig newConfig) {
         this.config = newConfig;
         initMap(currentSeed);
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public BiomeSourceConfigPanel<WoverNetherBiomeSource, WoverNetherConfig> biomeSourceConfigPanel(
+            @NotNull Screen parent
+    ) {
+        return new NetherConfigPage(config);
     }
 }

@@ -1,11 +1,10 @@
 package org.betterx.wover.datagen.api;
 
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.datagen.impl.AutoBiomeTagProvider;
-import org.betterx.wover.datagen.impl.AutoBlockTagProvider;
-import org.betterx.wover.datagen.impl.AutoItemTagProvider;
+import org.betterx.wover.datagen.impl.WoverDataGenEntryPointImpl;
 
 import net.minecraft.core.RegistrySetBuilder;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.network.chat.Component;
@@ -265,10 +264,8 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
         }
     }
 
-    private void addDefaultGlobalProviders(PackBuilder pack) {
-        pack.addProvider(AutoBlockTagProvider::new);
-        pack.addProvider(AutoItemTagProvider::new);
-        pack.addProvider(AutoBiomeTagProvider::new);
+    private void addDefaultGlobalProviders(PackBuilder globalPack) {
+        WoverDataGenEntryPointImpl.addDefaultGlobalProviders(globalPack);
     }
 
     /**
@@ -299,5 +296,16 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
         }
 
         onBuildRegistry(registryBuilder);
+    }
+
+    /**
+     * Register an automatic provider that is automatically added to all global packs
+     * in the {@link #onInitializeDataGenerator(FabricDataGenerator)} method.
+     *
+     * @param providerFactory The {@link PackBuilder.ProviderFactory} to register
+     * @param <T>             The type of the provider
+     */
+    public static <T extends DataProvider> void registerAutoProvider(PackBuilder.ProviderFactory<T> providerFactory) {
+        WoverDataGenEntryPointImpl.registerAutoProvider(providerFactory);
     }
 }

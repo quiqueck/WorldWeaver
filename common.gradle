@@ -37,21 +37,15 @@ allprojects { projIt ->
         withSourcesJar()
     }
 
-    loom {
-        if (projIt.name != 'bclib-legacy') {
-            splitEnvironmentSourceSets()
-        }
-    }
-
     sourceSets {
-        if (projIt.name == 'bclib-legacy') {
-            client {}
-        }
         main {
             resources {
                 srcDirs += [
                         'src/main/generated'
                 ]
+            }
+            java {
+                srcDirs += ['src/client/java', 'src/datagen/java']
             }
         }
 
@@ -68,43 +62,19 @@ allprojects { projIt ->
         testmodClient {
             compileClasspath += main.compileClasspath
             runtimeClasspath += main.runtimeClasspath
-            compileClasspath += client.compileClasspath
-            runtimeClasspath += client.runtimeClasspath
 
             compileClasspath += testmod.compileClasspath
             runtimeClasspath += testmod.runtimeClasspath
-        }
-
-        datagen {
-            compileClasspath += main.compileClasspath
-            runtimeClasspath += main.runtimeClasspath
-            compileClasspath += client.compileClasspath
-            runtimeClasspath += client.runtimeClasspath
-
-            compileClasspath += client.output
-            runtimeClasspath += client.output
-            compileClasspath += main.output
-            runtimeClasspath += main.output
-
-            resources {
-                srcDirs += [
-                        'src/main/resources'
-                ]
-            }
         }
 
         testmodDatagen {
             compileClasspath += main.compileClasspath
             runtimeClasspath += main.runtimeClasspath
-            compileClasspath += client.compileClasspath
-            runtimeClasspath += client.runtimeClasspath
 
             compileClasspath += testmod.compileClasspath
             runtimeClasspath += testmod.runtimeClasspath
             compileClasspath += testmodClient.compileClasspath
             runtimeClasspath += testmodClient.runtimeClasspath
-            compileClasspath += datagen.compileClasspath
-            runtimeClasspath += datagen.runtimeClasspath
         }
     }
 
@@ -178,7 +148,6 @@ allprojects { projIt ->
                         runDir "build/datagen"
                         name = "DataGen - ${projIt.name}"
                         ideConfigGenerated true
-                        source sourceSets.datagen
                     }
                 }
             }
@@ -192,18 +161,6 @@ allprojects { projIt ->
             canBeConsumed = true
             extendsFrom api
         }
-        devClient {
-            transitive true
-            canBeResolved = false
-            canBeConsumed = true
-            extendsFrom api
-        }
-        devMain {
-            transitive true
-            canBeResolved = false
-            canBeConsumed = true
-            extendsFrom api
-        }
     }
 
     dependencies {
@@ -212,28 +169,14 @@ allprojects { projIt ->
         modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
         dev sourceSets.main.output
-        dev sourceSets.client.output
-
-        devClient sourceSets.client.output
-        devMain sourceSets.main.output
 
         testmodImplementation sourceSets.main.output
         testmodClientImplementation sourceSets.main.output
-        testmodClientImplementation sourceSets.client.output
         testmodClientImplementation sourceSets.testmod.output
 
         testmodDatagenImplementation sourceSets.main.output
-        testmodDatagenImplementation sourceSets.client.output
         testmodDatagenImplementation sourceSets.testmod.output
         testmodDatagenImplementation sourceSets.testmodClient.output
-
-        datagenImplementation sourceSets.main.output
-        datagenImplementation sourceSets.client.output
-
-        if (projIt.name != "wover-datagen-api") {
-            datagenImplementation project(path: ":wover-datagen-api", configuration: "namedElements")
-            datagenImplementation project(path: ":wover-datagen-api", configuration: "devClient")
-        }
     }
 
     processResources {
@@ -251,48 +194,6 @@ allprojects { projIt ->
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
         it.options.release = 17
-    }
-
-    tasks.named("processDatagenResources", Copy) {
-        doLast {
-            if (project.hasProperty("baseNamespace")) {
-                println("DataGen Namespace: ${project.baseNamespace}")
-                def sourceDir = sourceSets.main.resources.srcDirs.first()
-                def datagenFile = "$sourceDir/../../datagen/java/org/betterx/wover/${project.baseNamespace}/datagen/${project.baseClass}Datagen.java"
-                if (file(datagenFile).exists()) {
-                    println("Add DataGen for: ${datagenFile}")
-                    def fabricJsonFile = fileTree(dir: sourceDir, include: "fabric.mod.json").files.first()
-
-                    if (fabricJsonFile.exists()) {
-                        // Read the entire content of the file into a string
-                        def fileContent = fabricJsonFile.text
-
-                        // Modify the JSON content
-                        def jsonSlurper = new groovy.json.JsonSlurper()
-                        def json = jsonSlurper.parseText(fileContent)
-
-                        def entrypoint = "org.betterx.wover.${project.baseNamespace}.datagen.${project.baseClass}Datagen"
-                        json.entrypoints = [
-                                "fabric-datagen": [
-                                        entrypoint
-                                ]
-                        ]
-
-                        // Convert the modified JSON back to a JSON string
-                        def alteredJsonString = groovy.json.JsonOutput.toJson(json)
-
-                        def processedFile = file("$destinationDir/fabric.mod.json")
-                        processedFile.text = alteredJsonString
-                    } else {
-                        println("No Fabric JSON File at ${sourceDir}")
-                    }
-                } else {
-                    println("No DataGen File at ${datagenFile}")
-                }
-            } else {
-                println("No DataGen Namespace in ${project.name}")
-            }
-        }
     }
 
     tasks.withType(AbstractArchiveTask).configureEach {
@@ -323,7 +224,6 @@ allprojects { projIt ->
 allprojects.each { p ->
     loom.mods.register(p.name) {
         sourceSet p.sourceSets.main
-        sourceSet p.sourceSets.client
     }
 
     loom.mods.register(p.name + "-testmod") {
@@ -352,16 +252,12 @@ dependencies {
 
     subprojects.each {
         api project(path: "${it.path}", configuration: "namedElements")
-        clientImplementation project(path: "${it.path}", configuration: "namedElements")
-        clientImplementation project(path: "${it.path}", configuration: "dev")
 
 //        testmodImplementation project("${it.path}").sourceSets.testmod.output
 //        testmodClientImplementation project("${it.path}").sourceSets.testmodClient.output
 //        testmodClientImplementation project("${it.path}").sourceSets.client.output
 //
 //        testmodDatagenImplementation project("${it.path}").sourceSets.testmodDatagen.output
-
-        datagenImplementation project("${it.path}").sourceSets.client.output
 
         include project("${it.path}")
     }
@@ -379,7 +275,6 @@ loom {
             vmArg "-Dfabric-api.datagen.modid=${project.archives_base_name}"
 
             runDir "build/datagen"
-            source sourceSets.datagen
         }
     }
 
@@ -435,10 +330,9 @@ javadoc {
 
     allprojects.each {
         source(it.sourceSets.main.allJava)
-        source(it.sourceSets.client.allJava)
     }
 
-    classpath = files(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath, sourceSets.main.runtimeClasspath, sourceSets.client.runtimeClasspath)
+    classpath = files(sourceSets.main.compileClasspath, sourceSets.main.runtimeClasspath)
     include("**/api/**")
     include("de/ambertation/**")
     include("org/betterx/wover/util/**")

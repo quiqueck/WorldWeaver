@@ -8,11 +8,15 @@ import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
 import org.betterx.wover.generator.api.biomesource.end.BiomeDecider;
 import org.betterx.wover.generator.api.biomesource.end.WoverEndConfig;
+import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConfigPanel;
+import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
 import org.betterx.wover.generator.api.map.BiomeMap;
+import org.betterx.wover.generator.impl.client.EndConfigPage;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
 import net.minecraft.core.SectionPos;
@@ -25,12 +29,16 @@ import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.levelgen.DensityFunction;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import java.awt.*;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class WoverEndBiomeSource extends WoverBiomeSource implements
-        BiomeSourceWithConfig<WoverEndBiomeSource, WoverEndConfig> {
+        BiomeSourceWithConfig<WoverEndBiomeSource, WoverEndConfig>,
+        BiomeSourceWithConfigScreen<WoverEndBiomeSource, WoverEndConfig> {
 
     public static Codec<WoverEndBiomeSource> CODEC
             = RecordCodecBuilder.create((instance) -> instance
@@ -313,5 +321,11 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
         this.config = newConfig;
         rebuildBiomes(true);
         this.initMap(currentSeed);
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    public BiomeSourceConfigPanel<WoverEndBiomeSource, WoverEndConfig> biomeSourceConfigPanel(@NotNull Screen parent) {
+        return new EndConfigPage(config);
     }
 }
