@@ -1,20 +1,15 @@
 package org.betterx.wover.preset.impl;
 
 import org.betterx.wover.preset.api.WorldPresetInfo;
-import org.betterx.wover.preset.mixin.WorldPresetAccessor;
 import org.betterx.wover.util.PriorityLinkedList;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,10 +33,7 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
 
     public static final WorldPresetInfo DEFAULT = new WorldPresetInfoImpl(
             PriorityLinkedList.DEFAULT_PRIORITY,
-            null,
-            null,
-            null,
-            null
+            null, null, null
     );
 
     private static WorldPresetInfo fromOptionals(
@@ -54,8 +46,7 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
                 sort,
                 overworld.orElse(null),
                 nether.orElse(null),
-                end.orElse(null),
-                null
+                end.orElse(null)
         );
     }
 
@@ -67,11 +58,8 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
     private @Nullable
     final ResourceKey<WorldPreset> endLike;
 
-    @Nullable
-    public final ResourceKey<WorldPreset> parentKey;
-
     public WorldPresetInfoImpl(int order) {
-        this(order, null, null, null, null);
+        this(order, null, null, null);
     }
 
 
@@ -79,31 +67,12 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
             int sortOrder,
             @Nullable ResourceKey<WorldPreset> overworldLike,
             @Nullable ResourceKey<WorldPreset> netherLike,
-            @Nullable ResourceKey<WorldPreset> endLike,
-            @Nullable ResourceKey<WorldPreset> parentKey
+            @Nullable ResourceKey<WorldPreset> endLike
     ) {
         this.sortOrder = sortOrder;
         this.overworldLike = overworldLike;
         this.netherLike = netherLike;
         this.endLike = endLike;
-        this.parentKey = parentKey;
-    }
-
-    public SortableWorldPresetImpl withDimensions(
-            Registry<LevelStem> dimensions,
-            @Nullable ResourceKey<WorldPreset> parentKey
-    ) {
-        Map<ResourceKey<LevelStem>, LevelStem> map = new HashMap<>();
-        for (var entry : dimensions.entrySet()) {
-            ResourceKey<LevelStem> key = entry.getKey();
-            LevelStem stem = entry.getValue();
-            map.put(key, stem);
-        }
-        return new SortableWorldPresetImpl(map, sortOrder, parentKey);
-    }
-
-    public ResourceKey<WorldPreset> parentKey() {
-        return parentKey;
     }
 
     public int sortOrder() {
@@ -131,16 +100,5 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
         if (key.location().equals(LevelStem.END.location()))
             return endPreset();
         return null;
-    }
-
-    public static Map<ResourceKey<LevelStem>, LevelStem> getDimensions(Holder<WorldPreset> preset) {
-        if (preset.value() instanceof WorldPresetAccessor acc)
-            return acc.wover_getDimensions();
-
-        return Map.of();
-    }
-
-    public static LevelStem getDimension(Holder<WorldPreset> preset, ResourceKey<LevelStem> key) {
-        return getDimensions(preset).get(key);
     }
 }

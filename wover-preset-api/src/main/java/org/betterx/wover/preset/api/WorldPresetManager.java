@@ -5,10 +5,14 @@ import org.betterx.wover.preset.api.event.OnBootstrapWorldPresets;
 import org.betterx.wover.preset.impl.WorldPresetsManagerImpl;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
+
+import java.util.Map;
 
 /**
  * Utility class for {@link WorldPreset}s.
@@ -67,6 +71,27 @@ public class WorldPresetManager {
         WorldPresetsManagerImpl.suggestDefault(preset, priority);
     }
 
+    public static WorldPreset withDimensions(
+            Registry<LevelStem> dimensions
+    ) {
+        return WorldPresetsManagerImpl.withDimensions(dimensions);
+    }
+
     private WorldPresetManager() {
+    }
+
+    public static Map<ResourceKey<LevelStem>, LevelStem> getDimensions(Holder<WorldPreset> preset) {
+        return WorldPresetsManagerImpl.getDimensions(preset);
+    }
+
+    /**
+     * Gets the {@link LevelStem} for the given {@link ResourceKey}.
+     *
+     * @param preset The preset to read
+     * @param key    The stems key
+     * @return The stem.
+     */
+    public static LevelStem getDimension(Holder<WorldPreset> preset, ResourceKey<LevelStem> key) {
+        return WorldPresetsManagerImpl.getDimension(preset, key);
     }
 }

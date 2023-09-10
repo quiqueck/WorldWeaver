@@ -13,9 +13,8 @@ import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConf
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
 import org.betterx.wover.generator.impl.chunkgenerator.ConfiguredChunkGenerator;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
-import org.betterx.wover.preset.api.SortableWorldPreset;
-import org.betterx.wover.preset.api.WorldPresetInfo;
 import org.betterx.wover.preset.api.WorldPresetInfoRegistry;
+import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.ui.impl.client.WelcomeScreen;
@@ -135,7 +134,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
 
         //see if the generator stores the preset key
         if (configuredPreset != null) {
-            final LevelStem dimension = WorldPresetInfo.getDimension(configuredPreset, forDimension);
+            final LevelStem dimension = WorldPresetManager.getDimension(configuredPreset, forDimension);
             if (dimension != null && dimension.generator() instanceof ConfiguredChunkGenerator cfg) {
                 configuredKey = cfg.wover_getConfiguredWorldPreset();
             }
@@ -144,13 +143,6 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         //see if the preset is a reference with a valid key
         if (configuredKey == null && configuredPreset != null) {
             configuredKey = configuredPreset.unwrapKey().orElse(null);
-        }
-
-        //see if the preset was derived from a registered one
-        if (configuredKey == null
-                && configuredPreset != null
-                && configuredPreset.value() instanceof SortableWorldPreset wp) {
-            configuredKey = wp.parentKey();
         }
 
         //see if the preset has an override for this dimension, if so find the real preset to use
@@ -294,24 +286,17 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
             this.updateConfiguration(content.dimensionKey, content.dimensionTypeKey, generator);
         });
 
+        final Registry<LevelStem> dims = createWorldScreen
+                .getUiState()
+                .getSettings()
+                .selectedDimensions()
+                .dimensions();
+        printDimensions(dims);
+
         final WorldCreationUiState acc = createWorldScreen.getUiState();
-        final Holder<WorldPreset> configuredPreset = acc.getWorldType().preset();
-        if (configuredPreset != null && configuredPreset.value() instanceof SortableWorldPreset worldPreset) {
-            ResourceKey<WorldPreset> key = configuredPreset.unwrapKey().orElse(null);
-            if (key == null) key = worldPreset.parentKey();
-
-            final Registry<LevelStem> dims = createWorldScreen
-                    .getUiState()
-                    .getSettings()
-                    .selectedDimensions()
-                    .dimensions();
-
-            acc.setWorldType(new WorldCreationUiState.WorldTypeEntry(Holder.direct(
-                    worldPreset.withDimensions(dims, key)
-            )));
-
-            printDimensions(dims);
-        }
+        acc.setWorldType(new WorldCreationUiState.WorldTypeEntry(Holder.direct(
+                WorldPresetManager.withDimensions(dims)
+        )));
     }
 
 
@@ -357,9 +342,9 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
     protected LayoutComponent<?, ?> initContent() {
         final WorldCreationUiState acc = createWorldScreen.getUiState();
         final Holder<WorldPreset> configuredPreset = acc.getWorldType().preset();
-        if (configuredPreset != null && configuredPreset.value() instanceof SortableWorldPreset wp) {
+        if (configuredPreset != null) {
             dimensions.values().forEach(content -> {
-                LevelStem stem = wp.getDimension(content.dimensionKey);
+                LevelStem stem = WorldPresetManager.getDimension(configuredPreset, content.dimensionKey);
                 if (stem != null
                         && stem.generator() instanceof ConfiguredChunkGenerator cfg
                         && configuredPreset.unwrapKey().isPresent()) {

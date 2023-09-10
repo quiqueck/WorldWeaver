@@ -52,10 +52,7 @@ public class WorldPresetInfoBuilderImpl implements WorldPresetInfoBuilder {
     public WorldPresetInfo build() {
         return new WorldPresetInfoImpl(
                 sortOrder,
-                overworldLike,
-                netherLike,
-                endLike,
-                null
+                overworldLike, netherLike, endLike
         );
     }
 
