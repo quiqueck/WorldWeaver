@@ -31,19 +31,19 @@ public class EndConfigPage implements BiomeSourceConfigPanel<WoverEndBiomeSource
         VerticalStack content = new VerticalStack(Value.fill(), Value.fit()).centerHorizontal();
         content.addSpacer(8);
 
-        endLegacy = content.indent(20).addCheckbox(
+        endLegacy = content.addCheckbox(
                 Value.fit(), Value.fit(),
                 Component.translatable("title.screen.wover.worldgen.legacy_square"),
                 endConfig.mapVersion == WoverEndConfig.EndBiomeMapType.SQUARE
         );
 
-        endCustomTerrain = content.indent(20).addCheckbox(
+        endCustomTerrain = content.addCheckbox(
                 Value.fit(), Value.fit(),
                 Component.translatable("title.screen.wover.worldgen.custom_end_terrain"),
                 endConfig.generatorVersion != WoverEndConfig.EndBiomeGeneratorType.VANILLA
         );
 
-        generateEndVoid = content.indent(20).addCheckbox(
+        generateEndVoid = content.addCheckbox(
                 Value.fit(), Value.fit(),
                 Component.translatable("title.screen.wover.worldgen.end_void"),
                 endConfig.withVoidBiomes

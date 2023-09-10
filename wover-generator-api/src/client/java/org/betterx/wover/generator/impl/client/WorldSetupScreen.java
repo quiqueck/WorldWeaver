@@ -7,16 +7,20 @@ import de.ambertation.wunderlib.ui.layout.values.Rectangle;
 import de.ambertation.wunderlib.ui.layout.values.Size;
 import de.ambertation.wunderlib.ui.layout.values.Value;
 import de.ambertation.wunderlib.ui.vanilla.LayoutScreen;
+import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConfigPanel;
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
 import org.betterx.wover.generator.impl.chunkgenerator.ConfiguredChunkGenerator;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
 import org.betterx.wover.preset.api.SortableWorldPreset;
+import org.betterx.wover.preset.api.WorldPresetInfo;
+import org.betterx.wover.preset.api.WorldPresetInfoRegistry;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.ui.impl.client.WelcomeScreen;
 import org.betterx.wover.ui.impl.client.WoverLayoutScreen;
+import org.betterx.wover.util.PriorityLinkedList;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -51,13 +55,10 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
     protected record DimensionValue(Holder<WorldPreset> preset, ResourceKey<WorldPreset> key, LevelStem dimension) {
     }
 
-
     public static class DimensionContent {
         public final ResourceKey<LevelStem> dimensionKey;
         public final ResourceKey<DimensionType> dimensionTypeKey;
         private BiomeSourceConfigPanel<?, ?> configPanel;
-        private Component pageTitle;
-        private Component buttonTitle;
         private DropDown<DimensionValue> generators;
         private VerticalStack stack;
         private int stackIndex = -1;
@@ -70,12 +71,14 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
 
     private final List<ResourceKey<DimensionType>> sortedDimensions = List.of(
             BuiltinDimensionTypes.NETHER,
-            BuiltinDimensionTypes.END
+            BuiltinDimensionTypes.END,
+            BuiltinDimensionTypes.OVERWORLD
     );
 
     private final Map<ResourceKey<DimensionType>, DimensionContent> dimensions = Map.of(
             BuiltinDimensionTypes.NETHER, new DimensionContent(LevelStem.NETHER, BuiltinDimensionTypes.NETHER),
-            BuiltinDimensionTypes.END, new DimensionContent(LevelStem.END, BuiltinDimensionTypes.END)
+            BuiltinDimensionTypes.END, new DimensionContent(LevelStem.END, BuiltinDimensionTypes.END),
+            BuiltinDimensionTypes.OVERWORLD, new DimensionContent(LevelStem.OVERWORLD, BuiltinDimensionTypes.OVERWORLD)
     );
 
     private final WorldCreationContext context;
@@ -84,8 +87,10 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
 
     private final CreateWorldScreen createWorldScreen;
 
+    private Tabs mainTabs;
+
     public WorldSetupScreen(@Nullable CreateWorldScreen parent, WorldCreationContext context) {
-        super(parent, Component.translatable("title.screen.wover.worldgen.main"), 10, 10, 10);
+        super(parent, Component.translatable("title.screen.wover.worldgen.main"), 8, 6, 10);
         this.context = context;
         this.createWorldScreen = parent;
 
@@ -102,6 +107,8 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
             DimensionValue selected
     ) {
         if (content.stack != null) {
+            final int selectedPage = mainTabs == null ? 0 : mainTabs.getSelectedPage();
+
             final BiomeSource selectedBiomeSource = selected.dimension.generator().getBiomeSource();
             if (selectedBiomeSource instanceof BiomeSourceWithConfigScreen<?, ?> bs) {
                 content.configPanel = bs.biomeSourceConfigPanel(this);
@@ -111,7 +118,10 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
                 content.stack.replaceOrAdd(content.stackIndex, contentFallback);
             }
 
-            content.stack.recalculateLayout();
+            if (mainTabs != null) {
+                content.stack.recalculateLayout();
+                mainTabs.selectPage(selectedPage);
+            }
         }
     }
 
@@ -124,8 +134,8 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         ResourceKey<WorldPreset> configuredKey = null;
 
         //see if the generator stores the preset key
-        if (configuredPreset != null && configuredPreset.value() instanceof SortableWorldPreset wp) {
-            final LevelStem dimension = wp.getDimension(forDimension);
+        if (configuredPreset != null) {
+            final LevelStem dimension = WorldPresetInfo.getDimension(configuredPreset, forDimension);
             if (dimension != null && dimension.generator() instanceof ConfiguredChunkGenerator cfg) {
                 configuredKey = cfg.wover_getConfiguredWorldPreset();
             }
@@ -141,6 +151,16 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
                 && configuredPreset != null
                 && configuredPreset.value() instanceof SortableWorldPreset wp) {
             configuredKey = wp.parentKey();
+        }
+
+        //see if the preset has an override for this dimension, if so find the real preset to use
+        int count = 10;
+        ResourceKey<WorldPreset> overrideKey = WorldPresetInfoRegistry.getFor(configuredKey)
+                                                                      .getPresetOverride(forDimension);
+        while (overrideKey != null && count > 0) {
+            configuredKey = overrideKey;
+            overrideKey = WorldPresetInfoRegistry.getFor(configuredKey).getPresetOverride(forDimension);
+            count--;
         }
 
         return configuredKey;
@@ -160,7 +180,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
             @NotNull DropDown<DimensionValue> dimensions
     ) {
         ResourceKey<WorldPreset> finalConfiguredKey = getConfiguredGeneratorKey(configuredPreset, forDimension);
-        DimensionValue[] selectedStem = {null};
+        DimensionValue selectedStem = null;
 
         final Registry<WorldPreset> worldPresets = WorldState
                 .allStageRegistryAccess()
@@ -170,40 +190,57 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         if (normal.isPresent()) {
             Set<ChunkGenerator> generators = new HashSet<>();
             final Language language = Language.getInstance();
-
+            PriorityLinkedList<DimensionValue> options = new PriorityLinkedList<>();
             normal
                     .get()
                     .stream()
                     .filter(preset -> preset.unwrapKey().isPresent())
+                    .filter(preset -> WorldPresetInfoRegistry.getFor(preset).getPresetOverride(forDimension) == null)
                     .sorted((a, b) -> language.getOrDefault(languageKey(a))
                                               .compareTo(language.getOrDefault(languageKey(b))))
                     .forEach(preset -> {
+                        final var info = WorldPresetInfoRegistry.getFor(preset);
+                        final ResourceLocation presetKey = preset.unwrapKey().orElseThrow().location();
                         final Optional<LevelStem> targetDimension = preset.value()
                                                                           .createWorldDimensions()
                                                                           .get(forDimension);
-                        final ResourceLocation key = preset.unwrapKey().orElseThrow().location();
+
                         if (targetDimension.isPresent()) {
                             final ChunkGenerator generator = targetDimension.get().generator();
-                            final DimensionValue dimensionValue = new DimensionValue(
-                                    preset,
-                                    preset.unwrapKey().orElseThrow(),
-                                    targetDimension.get()
-                            );
-                            if (!generators.contains(generator)) {
-                                generators.add(generator);
-                                dimensions.addOption(Component.translatable(languageKey(key)), dimensionValue);
-                            } else {
-                                WoverWorldGenerator.C.log.debug("Skipping duplicate generator for preset {}", key);
-                            }
 
-                            if (finalConfiguredKey != null && key.equals(finalConfiguredKey.location())) {
-                                selectedStem[0] = dimensionValue;
+                            if (!generators.contains(generator)) {
+                                final DimensionValue dimensionValue = new DimensionValue(
+                                        preset,
+                                        preset.unwrapKey().orElseThrow(),
+                                        targetDimension.get()
+                                );
+
+                                generators.add(generator);
+                                options.add(dimensionValue, -1 * info.sortOrder());
+                            } else {
+                                WoverWorldGenerator.C.log.debug(
+                                        "Skipping duplicate generator for preset {}",
+                                        presetKey
+                                );
                             }
                         }
                     });
+
+            for (DimensionValue dimensionValue : options) {
+                dimensions.addOption(Component.translatable(languageKey(dimensionValue.preset)), dimensionValue);
+                if (finalConfiguredKey != null && dimensionValue.key.location().equals(finalConfiguredKey.location())) {
+                    selectedStem = dimensionValue;
+                }
+            }
         }
-        if (selectedStem[0] != null) {
-            dimensions.select(selectedStem[0]);
+
+        boolean didSelect = false;
+        if (selectedStem != null) {
+            didSelect = dimensions.select(selectedStem);
+        }
+
+        if (!didSelect) {
+            dimensions.selectFirst();
         }
     }
 
@@ -246,15 +283,15 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
 
             ChunkGenerator generator = value.dimension.generator();
 
-            if (generator instanceof ConfiguredChunkGenerator cfg) {
-                cfg.wover_setConfiguredWorldPreset(value.key);
-            }
-
             if (content.configPanel != null) {
                 generator = content.configPanel.updateSettings(generator);
             }
 
-            this.updateConfiguration(LevelStem.NETHER, BuiltinDimensionTypes.NETHER, generator);
+            if (generator instanceof ConfiguredChunkGenerator cfg) {
+                cfg.wover_setConfiguredWorldPreset(value.key);
+            }
+
+            this.updateConfiguration(content.dimensionKey, content.dimensionTypeKey, generator);
         });
 
         final WorldCreationUiState acc = createWorldScreen.getUiState();
@@ -263,16 +300,17 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
             ResourceKey<WorldPreset> key = configuredPreset.unwrapKey().orElse(null);
             if (key == null) key = worldPreset.parentKey();
 
+            final Registry<LevelStem> dims = createWorldScreen
+                    .getUiState()
+                    .getSettings()
+                    .selectedDimensions()
+                    .dimensions();
+
             acc.setWorldType(new WorldCreationUiState.WorldTypeEntry(Holder.direct(
-                    worldPreset.withDimensions(
-                            createWorldScreen
-                                    .getUiState()
-                                    .getSettings()
-                                    .selectedDimensions()
-                                    .dimensions(),
-                            key
-                    )
+                    worldPreset.withDimensions(dims, key)
             )));
+
+            printDimensions(dims);
         }
     }
 
@@ -332,6 +370,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         }
 
         final Tabs main = new Tabs(fill(), fill()).setPadding(8, 0, 0, 0);
+        this.mainTabs = main;
         sortedDimensions
                 .stream()
                 .map(type -> dimensions.get(type))
@@ -355,9 +394,9 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
                                     .setDebugName(content.dimensionKey.location().getPath() + " scroll")
                     );
                 });
-        
-        netherButton = main.getButton(0);
-        endButton = main.getButton(1);
+
+        netherButton = main.getButton(sortedDimensions.indexOf(BuiltinDimensionTypes.NETHER));
+        endButton = main.getButton(sortedDimensions.indexOf(BuiltinDimensionTypes.END));
 
         title = new HorizontalStack(fit(), fit()).setDebugName("title bar").alignBottom();
         title.addImage(fixed(22), fixed(22), WoverLayoutScreen.WOVER_LOGO_WHITE_LOCATION, Size.of(256))
@@ -383,6 +422,29 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         main.onPageChange((tabs, idx) -> targetT = 1 - idx);
 
         return rows;
+    }
+
+    private static void printDimensions(Registry<LevelStem> dims) {
+        if (!Configs.MAIN.verboseLogging.get()) return;
+
+        StringBuilder output = new StringBuilder("Configured Dimensions: ");
+        for (var entry : dims.entrySet()) {
+            output.append("\n - ").append(entry.getKey().location()).append(": ")
+                  .append("\n     ").append(entry.getValue().generator()).append(" ")
+                  .append(
+                          entry.getValue()
+                               .generator()
+                               .getBiomeSource()
+                               .toString()
+                               .replace("\n", "\n     ")
+                  );
+
+            if (entry.getValue().generator() instanceof ConfiguredChunkGenerator cfg) {
+                output.append("\n     Reference: ").append(cfg.wover_getConfiguredWorldPreset());
+            }
+        }
+
+        WoverWorldGenerator.C.log.info(output.toString());
     }
 
     @Override

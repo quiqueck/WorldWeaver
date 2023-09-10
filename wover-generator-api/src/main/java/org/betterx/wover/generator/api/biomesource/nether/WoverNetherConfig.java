@@ -19,37 +19,32 @@ public class WoverNetherConfig implements BiomeSourceConfig<WoverNetherBiomeSour
             NetherBiomeMapType.VANILLA,
             256,
             86,
-            false,
             false
     );
     public static final WoverNetherConfig MINECRAFT_17 = new WoverNetherConfig(
             NetherBiomeMapType.SQUARE,
             256,
             86,
-            true,
-            false
+            true
     );
     public static final WoverNetherConfig MINECRAFT_18 = new WoverNetherConfig(
             NetherBiomeMapType.HEX,
             MINECRAFT_17.biomeSize,
             MINECRAFT_17.biomeSizeVertical,
-            MINECRAFT_17.useVerticalBiomes,
-            MINECRAFT_17.amplified
+            MINECRAFT_17.useVerticalBiomes
     );
 
     public static final WoverNetherConfig MINECRAFT_18_LARGE = new WoverNetherConfig(
             NetherBiomeMapType.HEX,
             MINECRAFT_18.biomeSize * 4,
             MINECRAFT_18.biomeSizeVertical * 2,
-            MINECRAFT_18.useVerticalBiomes,
-            MINECRAFT_17.amplified
+            MINECRAFT_18.useVerticalBiomes
     );
 
     public static final WoverNetherConfig MINECRAFT_18_AMPLIFIED = new WoverNetherConfig(
             NetherBiomeMapType.HEX,
             MINECRAFT_18.biomeSize,
             128,
-            true,
             true
     );
 
@@ -65,30 +60,24 @@ public class WoverNetherConfig implements BiomeSourceConfig<WoverNetherBiomeSour
                     Codec.INT.fieldOf("biome_size_vertical").orElse(DEFAULT.biomeSizeVertical)
                              .forGetter(o -> o.biomeSizeVertical),
                     Codec.BOOL.fieldOf("use_vertical_biomes").orElse(DEFAULT.useVerticalBiomes)
-                              .forGetter(o -> o.useVerticalBiomes),
-                    Codec.BOOL.fieldOf("amplified").orElse(DEFAULT.amplified)
-                              .forGetter(o -> o.amplified)
+                              .forGetter(o -> o.useVerticalBiomes)
             )
             .apply(instance, WoverNetherConfig::new));
     public final @NotNull NetherBiomeMapType mapVersion;
     public final int biomeSize;
     public final int biomeSizeVertical;
-
     public final boolean useVerticalBiomes;
-    public final boolean amplified;
 
     public WoverNetherConfig(
             @NotNull NetherBiomeMapType mapVersion,
             int biomeSize,
             int biomeSizeVertical,
-            boolean useVerticalBiomes,
-            boolean amplified
+            boolean useVerticalBiomes
     ) {
         this.mapVersion = mapVersion;
         this.biomeSize = Mth.clamp(biomeSize, 1, 8192);
         this.biomeSizeVertical = Mth.clamp(biomeSizeVertical, 1, 8192);
         this.useVerticalBiomes = useVerticalBiomes;
-        this.amplified = amplified;
     }
 
     @Override
@@ -96,7 +85,6 @@ public class WoverNetherConfig implements BiomeSourceConfig<WoverNetherBiomeSour
         return "NetherConfig{" +
                 "mapVersion=" + mapVersion +
                 ", useVerticalBiomes=" + useVerticalBiomes +
-                ", amplified=" + amplified +
                 ", biomeSize=" + biomeSize +
                 ", biomeSizeVertical=" + biomeSizeVertical +
                 '}';

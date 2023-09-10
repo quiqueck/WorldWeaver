@@ -21,6 +21,9 @@
     ],
     "client": [
       "org.betterx.wover.entrypoint.client.WoverWorldPresetClient"
+    ],
+    "fabric-datagen": [
+      "org.betterx.wover.preset.datagen.WoverWorldPresetDatagen"
     ]
   },
   "mixins": [

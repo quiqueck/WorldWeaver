@@ -1,5 +1,6 @@
 package org.betterx.wover.preset.impl.client;
 
+import org.betterx.wover.preset.api.client.WorldPresetsUI;
 import org.betterx.wover.preset.impl.SortableWorldPresetImpl;
 
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
@@ -10,33 +11,53 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class WorldPresetsClientImpl {
-    private static final Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> EDITORS = new HashMap<>();
 
-    public static void registerCustomUI(ResourceKey<WorldPreset> key, PresetEditor setupScreen) {
-        if (setupScreen != null) {
-            EDITORS.put(Optional.of(key), setupScreen);
+    private static final List<WorldPresetsUI.PresetEditorGetter> EDITORS = new ArrayList<>(4);
+
+    public static void registerCustomUI(WorldPresetsUI.PresetEditorGetter getter) {
+        if (getter != null) {
+            EDITORS.add(getter);
         }
     }
 
+    public static boolean isKey(Holder<WorldPreset> holder, ResourceKey<WorldPreset> keyToTest) {
+        return (holder != null && keyToTest.equals(holder.unwrapKey().orElse(null)));
+    }
+
+    public static boolean isParentKey(Holder<WorldPreset> holder, ResourceKey<WorldPreset> keyToTest) {
+        return (holder.isBound()
+                && holder.value() instanceof SortableWorldPresetImpl preset
+                && preset.parentKey != null
+                && preset.parentKey.equals(keyToTest)
+        );
+    }
+
+    public static void registerCustomUI(ResourceKey<WorldPreset> key, PresetEditor setupScreen) {
+        if (setupScreen != null) {
+            EDITORS.add(holder -> {
+                if (isKey(holder, key) || isParentKey(holder, key)) {
+                    return setupScreen;
+                }
+
+                return null;
+            });
+        }
+    }
+
+
     public static PresetEditor getSetupScreenForPreset(Holder<WorldPreset> holder) {
         if (holder != null) {
-            PresetEditor editor = EDITORS.get(holder.unwrapKey());
-
-            if (editor == null
-                    && holder.isBound()
-                    && holder.value() instanceof SortableWorldPresetImpl preset
-                    && preset.parentKey != null
-            ) {
-                editor = EDITORS.get(Optional.of(preset.parentKey));
+            for (WorldPresetsUI.PresetEditorGetter getter : EDITORS) {
+                PresetEditor editor = getter.get(holder);
+                if (editor != null) {
+                    return editor;
+                }
             }
-
-            return editor;
         }
         return null;
     }

@@ -1,6 +1,7 @@
 package org.betterx.wover.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.preset.impl.WorldPresetInfoRegistryImpl;
 import org.betterx.wover.preset.impl.WorldPresetsManagerImpl;
 import org.betterx.wover.preset.impl.flat.FlatLevelPresetManagerImpl;
 
@@ -11,6 +12,7 @@ public class WoverWorldPreset implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        WorldPresetInfoRegistryImpl.initialize();
         WorldPresetsManagerImpl.initialize();
         FlatLevelPresetManagerImpl.initialize();
     }

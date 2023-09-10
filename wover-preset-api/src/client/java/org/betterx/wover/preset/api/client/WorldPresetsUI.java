@@ -3,6 +3,7 @@ package org.betterx.wover.preset.api.client;
 import org.betterx.wover.preset.impl.client.WorldPresetsClientImpl;
 
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
@@ -15,6 +16,10 @@ import net.fabricmc.api.Environment;
  */
 @Environment(EnvType.CLIENT)
 public class WorldPresetsUI {
+    public interface PresetEditorGetter {
+        PresetEditor get(Holder<WorldPreset> holder);
+    }
+
     /**
      * Registers a custom Setup UI for a {@link WorldPreset}.
      *
@@ -23,5 +28,13 @@ public class WorldPresetsUI {
      */
     public static void registerCustomUI(ResourceKey<WorldPreset> key, PresetEditor setupScreen) {
         WorldPresetsClientImpl.registerCustomUI(key, setupScreen);
+    }
+
+    public static void registerCustomUI(WorldPresetsUI.PresetEditorGetter getter) {
+        WorldPresetsClientImpl.registerCustomUI(getter);
+    }
+
+    public static boolean isKey(Holder<WorldPreset> holder, ResourceKey<WorldPreset> keyToTest) {
+        return WorldPresetsClientImpl.isKey(holder, keyToTest);
     }
 }

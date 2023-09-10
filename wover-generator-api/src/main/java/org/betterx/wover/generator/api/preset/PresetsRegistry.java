@@ -14,6 +14,7 @@ public class PresetsRegistry {
     public final static ResourceKey<WorldPreset> WOVER_WORLD_LARGE = PresetRegistryImpl.WOVER_WORLD_LARGE;
     public final static ResourceKey<WorldPreset> WOVER_WORLD_AMPLIFIED = PresetRegistryImpl.WOVER_WORLD_AMPLIFIED;
 
+
     public static LevelStem makeWoverNetherStem(
             WorldPresetBootstrapContext.StemContext context,
             WoverNetherConfig config

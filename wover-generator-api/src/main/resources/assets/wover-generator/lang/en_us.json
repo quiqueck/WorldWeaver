@@ -21,7 +21,9 @@
   "title.screen.wover.worldgen.other": "Other Settings",
   "title.screen.wover.worldgen.the_end_generator": "End Generator",
   "title.screen.wover.worldgen.the_nether_generator": "Nether Generator",
+  "title.screen.wover.worldgen.overworld_generator": "Overworld Generator",
   "title.screen.wover.worldgen.void_biome_size": "Small Island Biomes",
   "title.wover.the_end": "End",
-  "title.wover.the_nether": "Nether"
+  "title.wover.the_nether": "Nether",
+  "title.wover.overworld": "Overworld"
 }

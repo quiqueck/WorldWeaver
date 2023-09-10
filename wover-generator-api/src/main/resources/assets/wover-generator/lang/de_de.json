@@ -19,9 +19,11 @@
   "title.screen.wover.worldgen.nether_vertical_biome_size": "Biomhöhe",
   "title.screen.wover.worldgen.no_generator_config": "Dieser Generator hat keine zusätzlichen Einstellungen.",
   "title.screen.wover.worldgen.other": "Sonstiges",
+  "title.screen.wover.worldgen.overworld_generator": "Oberwelt Generator",
   "title.screen.wover.worldgen.the_end_generator": "End Generator",
   "title.screen.wover.worldgen.the_nether_generator": "Nether Generator",
   "title.screen.wover.worldgen.void_biome_size": "Kleine Inseln",
+  "title.wover.overworld": "Obwerwelt",
   "title.wover.the_end": "Ende",
   "title.wover.the_nether": "Nether"
 }

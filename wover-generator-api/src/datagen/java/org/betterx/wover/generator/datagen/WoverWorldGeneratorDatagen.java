@@ -11,6 +11,7 @@ public class WoverWorldGeneratorDatagen extends WoverDataGenEntryPoint {
         globalPack.addRegistryProvider(WorldPresetProvider::new);
         globalPack.addRegistryProvider(NoiseGeneratorSettingsProvider::new);
         globalPack.addMultiProvider(WorldDataProvider::new);
+        globalPack.addRegistryProvider(WorldPresetInfoProvider::new);
     }
 
     @Override
