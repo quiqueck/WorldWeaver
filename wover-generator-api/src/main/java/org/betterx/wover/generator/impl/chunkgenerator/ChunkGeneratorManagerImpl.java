@@ -19,7 +19,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -84,7 +83,6 @@ public class ChunkGeneratorManagerImpl {
 
     public static void onWorldReCreate(
             LevelStorageSource.LevelStorageAccess storage,
-            LevelSettings levelSettings,
             WorldCreationContext context
     ) {
         final var configuredPreset = WorldGeneratorConfigImpl.getPresetsNbtFromFolder(storage);

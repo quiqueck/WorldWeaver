@@ -26,6 +26,6 @@ public class WorldListEntryMixin {
             LevelStorageSource.LevelStorageAccess levelStorageAccess,
             Pair<LevelSettings, WorldCreationContext> pair
     ) {
-        ChunkGeneratorManagerImpl.onWorldReCreate(levelStorageAccess, pair.getFirst(), pair.getSecond());
+        ChunkGeneratorManagerImpl.onWorldReCreate(levelStorageAccess, pair.getSecond());
     }
 }
