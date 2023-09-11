@@ -433,7 +433,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
     }
 
     @Override
-    protected void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderBackgroundLayer(GuiGraphics guiGraphics, int i, int j, float f) {
         guiGraphics.fill(0, 0, width, height, 0xBD343444);
     }
 
