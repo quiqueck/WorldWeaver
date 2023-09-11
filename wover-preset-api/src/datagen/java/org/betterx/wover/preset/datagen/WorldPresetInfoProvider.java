@@ -39,10 +39,14 @@ public class WorldPresetInfoProvider extends WoverRegistryContentProvider<WorldP
 
         WorldPresetInfoBuilder.start(context)
                               .order(11000)
+                              .overworldOverride(WorldPresets.NORMAL)
+                              .endOverride(WorldPresets.NORMAL)
+                              .netherOverride(WorldPresets.NORMAL)
                               .register(WorldPresets.FLAT);
 
         WorldPresetInfoBuilder.start(context)
                               .order(12000)
+                              .overworldOverride(WorldPresets.NORMAL)
                               .endOverride(WorldPresets.NORMAL)
                               .netherOverride(WorldPresets.NORMAL)
                               .register(WorldPresets.SINGLE_BIOME_SURFACE);

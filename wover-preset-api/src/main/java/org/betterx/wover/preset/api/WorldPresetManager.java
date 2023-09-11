@@ -71,6 +71,12 @@ public class WorldPresetManager {
         WorldPresetsManagerImpl.suggestDefault(preset, priority);
     }
 
+    /**
+     * Creates a new {@link WorldPreset} with thedimensions from the given registry.
+     *
+     * @param dimensions The dimensions registry.
+     * @return The {@link WorldPreset}.
+     */
     public static WorldPreset withDimensions(
             Registry<LevelStem> dimensions
     ) {
@@ -80,6 +86,12 @@ public class WorldPresetManager {
     private WorldPresetManager() {
     }
 
+    /**
+     * Returns a Map of all dimensions for the given preset.
+     *
+     * @param preset The preset to read
+     * @return The dimensions.
+     */
     public static Map<ResourceKey<LevelStem>, LevelStem> getDimensions(Holder<WorldPreset> preset) {
         return WorldPresetsManagerImpl.getDimensions(preset);
     }
