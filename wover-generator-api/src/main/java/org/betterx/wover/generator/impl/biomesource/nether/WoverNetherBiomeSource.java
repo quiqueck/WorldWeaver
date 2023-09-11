@@ -112,7 +112,7 @@ public class WoverNetherBiomeSource extends WoverBiomeSource implements
 
     @Override
     public String toString() {
-        return "\n" + toShortString() +
+        return toShortString() +
                 "\n    biomes     = " + possibleBiomes().size() +
                 "\n    namespaces = " + getNamespaces() +
                 "\n    seed       = " + currentSeed +

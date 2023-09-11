@@ -9,6 +9,7 @@ import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldConfig;
 import org.betterx.wover.state.api.WorldState;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -30,6 +31,7 @@ public class WorldGeneratorConfigImpl {
     public static final String TAG_PRESET = "preset";
     private static final String LEGACY_TAG_GENERATOR = "generator";
     public static final String TAG_DIMENSIONS = "dimensions";
+    public static final String TAG_DIMENSION_PRESETS = "world_presets";
     private static final String LEGACY_TAG_VERSION = "version";
     private static final String LEGACY_TAG_BN_GEN_VERSION = "generator_version";
 
@@ -156,7 +158,19 @@ public class WorldGeneratorConfigImpl {
         }
     }
 
-    public static void createWorldConfig(WorldDimensions dimensions) {
+    public static void createWorldConfig(Holder<WorldPreset> currentPreset, WorldDimensions dimensions) {
+        //make sure we store the preset key in the all generators that currently do not have one
+        if (currentPreset.unwrapKey().isPresent()) {
+            final ResourceKey<WorldPreset> presetKey = currentPreset.unwrapKey().orElseThrow();
+            for (var dimEntry : dimensions.dimensions().entrySet()) {
+                if (dimEntry.getValue().generator() instanceof ConfiguredChunkGenerator cfg) {
+                    if (cfg.wover_getConfiguredWorldPreset() == null) {
+                        cfg.wover_setConfiguredWorldPreset(presetKey);
+                    }
+                }
+            }
+        }
+        
         WoverWorldGenerator.C.log.verbose("Creating presets file for new world");
         writeWorldPresetSettingsDirect(DimensionsWrapper.build(dimensions.dimensions()));
     }

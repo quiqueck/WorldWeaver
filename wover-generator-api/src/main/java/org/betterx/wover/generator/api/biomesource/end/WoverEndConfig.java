@@ -224,11 +224,11 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
                 "mapVersion=" + mapVersion +
                 ", generatorVersion=" + generatorVersion +
                 ", withVoidBiomes=" + withVoidBiomes +
-                ", innerVoidRadiusSquared=" + innerVoidRadiusSquared +
-                ", voidBiomesSize=" + voidBiomesSize +
-                ", centerBiomesSize=" + centerBiomesSize +
-                ", landBiomesSize=" + landBiomesSize +
-                ", barrensBiomesSize=" + barrensBiomesSize +
+                ", innerVoidRadius=" + (int) Math.sqrt(innerVoidRadiusSquared) +
+                ", voidBiomesSize=" + voidBiomesSize / 16 +
+                ", centerBiomesSize=" + centerBiomesSize / 16 +
+                ", landBiomesSize=" + landBiomesSize / 16 +
+                ", barrensBiomesSize=" + barrensBiomesSize / 16 +
                 '}';
     }
 

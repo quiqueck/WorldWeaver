@@ -85,8 +85,8 @@ public class WoverNetherConfig implements BiomeSourceConfig<WoverNetherBiomeSour
         return "NetherConfig{" +
                 "mapVersion=" + mapVersion +
                 ", useVerticalBiomes=" + useVerticalBiomes +
-                ", biomeSize=" + biomeSize +
-                ", biomeSizeVertical=" + biomeSizeVertical +
+                ", biomeSize=" + biomeSize / 16 +
+                ", biomeSizeVertical=" + biomeSizeVertical / 16 +
                 '}';
     }
 

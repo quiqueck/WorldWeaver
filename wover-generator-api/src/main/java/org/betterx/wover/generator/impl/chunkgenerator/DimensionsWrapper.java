@@ -22,13 +22,21 @@ import org.jetbrains.annotations.Nullable;
 
 public class DimensionsWrapper {
     public static final Codec<DimensionsWrapper> CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(Codec.unboundedMap(
-                                ResourceKey.codec(Registries.LEVEL_STEM),
-                                ChunkGenerator.CODEC
-                        )
-                        .optionalFieldOf(WorldGeneratorConfigImpl.TAG_DIMENSIONS, new HashMap<>())
-                        .forGetter(o -> o.dimensions))
-            .apply(instance, DimensionsWrapper::new));
+            .group(
+                    Codec.unboundedMap(
+                                 ResourceKey.codec(Registries.LEVEL_STEM),
+                                 ChunkGenerator.CODEC
+                         )
+                         .optionalFieldOf(WorldGeneratorConfigImpl.TAG_DIMENSIONS, new HashMap<>())
+                         .forGetter(o -> o.dimensions),
+                    Codec.unboundedMap(
+                                 ResourceKey.codec(Registries.LEVEL_STEM),
+                                 ResourceKey.codec(Registries.WORLD_PRESET)
+                         )
+                         .optionalFieldOf(WorldGeneratorConfigImpl.TAG_DIMENSION_PRESETS, new HashMap<>())
+                         .forGetter(DimensionsWrapper::getDimensionPresets)
+            )
+            .apply(instance, DimensionsWrapper::fromCodec));
     final Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions;
 
     static Map<ResourceKey<LevelStem>, ChunkGenerator> build(Registry<LevelStem> dimensions) {
@@ -96,6 +104,19 @@ public class DimensionsWrapper {
         return DimensionsWrapper.build(reg);
     }
 
+    private static DimensionsWrapper fromCodec(
+            Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions,
+            Map<ResourceKey<LevelStem>, ResourceKey<WorldPreset>> presets
+    ) {
+        for (Map.Entry<ResourceKey<LevelStem>, ChunkGenerator> dimEntry : dimensions.entrySet()) {
+            final var preset = presets.get(dimEntry.getKey());
+            if (preset != null && dimEntry.getValue() instanceof ConfiguredChunkGenerator cfg) {
+                cfg.wover_setConfiguredWorldPreset(preset);
+            }
+        }
+        return new DimensionsWrapper(dimensions);
+    }
+
 
     DimensionsWrapper(Registry<LevelStem> dimensions) {
         this(build(dimensions));
@@ -103,5 +124,15 @@ public class DimensionsWrapper {
 
     DimensionsWrapper(Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions) {
         this.dimensions = dimensions;
+    }
+
+    public Map<ResourceKey<LevelStem>, ResourceKey<WorldPreset>> getDimensionPresets() {
+        final Map<ResourceKey<LevelStem>, ResourceKey<WorldPreset>> map = new HashMap<>();
+        for (Map.Entry<ResourceKey<LevelStem>, ChunkGenerator> dimEntry : dimensions.entrySet()) {
+            if (dimEntry.getValue() instanceof ConfiguredChunkGenerator cfg) {
+                map.put(dimEntry.getKey(), cfg.wover_getConfiguredWorldPreset());
+            }
+        }
+        return map;
     }
 }

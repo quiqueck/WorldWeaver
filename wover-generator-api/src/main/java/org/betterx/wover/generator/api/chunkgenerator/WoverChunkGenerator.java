@@ -9,6 +9,7 @@ import org.betterx.wover.common.generator.api.chunkgenerator.RestorableBiomeSour
 import org.betterx.wover.common.surface.api.InjectableSurfaceRules;
 import org.betterx.wover.core.api.IntegrationCore;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.generator.impl.chunkgenerator.ChunkGeneratorManagerImpl;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
 import org.betterx.wover.generator.mixin.generator.ChunkGeneratorAccessor;
 import org.betterx.wover.surface.impl.SurfaceRuleUtil;
@@ -129,7 +130,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
 
     @Override
     public String toString() {
-        return "WoVer - Chunk Generator (" + Integer.toHexString(hashCode()) + ")";
+        return ChunkGeneratorManagerImpl.printGeneratorInfo("WoVer - Chunk Generator", this);
     }
 
     // This method is injected by Terrablender.

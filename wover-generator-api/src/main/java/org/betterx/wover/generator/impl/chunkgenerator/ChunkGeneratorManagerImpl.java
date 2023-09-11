@@ -19,6 +19,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
+import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -31,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ChunkGeneratorManagerImpl {
     private static final ResourceLocation LEGACY_ID = LegacyHelper.BCLIB_CORE.convertNamespace(WoverChunkGenerator.ID);
@@ -73,7 +76,7 @@ public class ChunkGeneratorManagerImpl {
             WorldDimensions dimensions,
             boolean recreated
     ) {
-        WorldGeneratorConfigImpl.createWorldConfig(dimensions);
+        WorldGeneratorConfigImpl.createWorldConfig(currentPreset, dimensions);
     }
 
     public static void register(ResourceLocation location, Codec<? extends ChunkGenerator> codec) {
@@ -85,13 +88,43 @@ public class ChunkGeneratorManagerImpl {
         BuiltInRegistryManager.register(BuiltInRegistries.CHUNK_GENERATOR, location, codec);
     }
 
+    public static String printGeneratorInfo(@Nullable String className, @NotNull ChunkGenerator generator) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(className == null ? generator.getClass().getSimpleName() : className)
+          .append(" (")
+          .append(Integer.toHexString(generator.hashCode()))
+          .append(")");
+
+        if (generator instanceof ConfiguredChunkGenerator cfg) {
+            final var preset = cfg.wover_getConfiguredWorldPreset();
+            sb.append("\n    preset     = ").append(preset == null ? "none" : preset.location());
+        }
+
+        if (generator instanceof NoiseBasedChunkGenerator noise) {
+            final var key = noise.generatorSettings().unwrapKey();
+            sb.append("\n    noise      = ").append(key.isEmpty() ? "custom" : key.get().location());
+        }
+
+        return sb.toString();
+    }
+
     public static void printDimensionInfo(Registry<LevelStem> dimensionRegistry) {
         if (!Configs.MAIN.verboseLogging.get()) return;
 
-        StringBuilder output = new StringBuilder("World Dimensions: ");
+        printDimensionInfo("World Dimensions", dimensionRegistry);
+    }
+
+    public static void printDimensionInfo(String title, Registry<LevelStem> dimensionRegistry) {
+        StringBuilder output = new StringBuilder(title + ": ");
         for (var entry : dimensionRegistry.entrySet()) {
             output.append("\n - ").append(entry.getKey().location()).append(": ")
-                  .append("\n     ").append(entry.getValue().generator()).append(" ")
+                  .append("\n     ").append(
+                          entry.getValue()
+                               .generator()
+                               .toString()
+                               .replace("\n", "\n     ")
+                  )
+                  .append("\n     ")
                   .append(
                           entry.getValue()
                                .generator()

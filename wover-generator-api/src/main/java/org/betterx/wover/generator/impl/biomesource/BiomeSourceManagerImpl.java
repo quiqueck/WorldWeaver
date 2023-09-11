@@ -231,5 +231,10 @@ public class BiomeSourceManagerImpl {
         }
     }
 
-
+    public static String printBiomeSourceInfo(BiomeSource biomeSource) {
+        return biomeSource.getClass()
+                          .getSimpleName() + " (" + Integer.toHexString(biomeSource.hashCode()) + ")" +
+                "\n    biomes     = " + biomeSource.possibleBiomes().size() +
+                "\n    namespaces = " + WoverBiomeSourceImpl.getNamespaces(biomeSource.possibleBiomes());
+    }
 }

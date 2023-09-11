@@ -1,6 +1,6 @@
 package org.betterx.wover.generator.mixin.biomesource;
 
-import org.betterx.wover.generator.impl.biomesource.WoverBiomeSourceImpl;
+import org.betterx.wover.generator.impl.biomesource.BiomeSourceManagerImpl;
 
 import net.minecraft.world.level.biome.BiomeSource;
 
@@ -10,9 +10,6 @@ import org.spongepowered.asm.mixin.Mixin;
 public class BiomeSourcePrintMixin {
     @Override
     public String toString() {
-        BiomeSource self = (BiomeSource) (Object) this;
-        return "\n" + getClass().getSimpleName() + " (" + Integer.toHexString(hashCode()) + ")" +
-                "\n    biomes     = " + self.possibleBiomes().size() +
-                "\n    namespaces = " + WoverBiomeSourceImpl.getNamespaces(self.possibleBiomes());
+        return BiomeSourceManagerImpl.printBiomeSourceInfo((BiomeSource) (Object) this);
     }
 }

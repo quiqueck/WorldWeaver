@@ -11,6 +11,7 @@ import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConfigPanel;
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
+import org.betterx.wover.generator.impl.chunkgenerator.ChunkGeneratorManagerImpl;
 import org.betterx.wover.generator.impl.chunkgenerator.ConfiguredChunkGenerator;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
 import org.betterx.wover.preset.api.WorldPresetInfoRegistry;
@@ -411,25 +412,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
 
     private static void printDimensions(Registry<LevelStem> dims) {
         if (!Configs.MAIN.verboseLogging.get()) return;
-
-        StringBuilder output = new StringBuilder("Configured Dimensions: ");
-        for (var entry : dims.entrySet()) {
-            output.append("\n - ").append(entry.getKey().location()).append(": ")
-                  .append("\n     ").append(entry.getValue().generator()).append(" ")
-                  .append(
-                          entry.getValue()
-                               .generator()
-                               .getBiomeSource()
-                               .toString()
-                               .replace("\n", "\n     ")
-                  );
-
-            if (entry.getValue().generator() instanceof ConfiguredChunkGenerator cfg) {
-                output.append("\n     Reference: ").append(cfg.wover_getConfiguredWorldPreset());
-            }
-        }
-
-        WoverWorldGenerator.C.log.info(output.toString());
+        ChunkGeneratorManagerImpl.printDimensionInfo("Configured Dimensions", dims);
     }
 
     @Override

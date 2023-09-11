@@ -75,23 +75,20 @@ class BiomeRepairHelper {
             RegistryAccess registryAccess,
             Registry<LevelStem> dimensionRegistry
     ) {
-        Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions = loadWorldDimensions(registryAccess);
+        Map<ResourceKey<LevelStem>, ChunkGenerator> configuredDimensions = loadWorldDimensions(registryAccess);
         final Registry<Biome> biomes = registryAccess.registryOrThrow(Registries.BIOME);
 
         // we ensure that all biomes registered using fabric have the proper biome tags
         registerAllBiomesFromFabric(biomes);
-        for (var entry : dimensionRegistry.entrySet()) {
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : dimensionRegistry.entrySet()) {
             boolean didRepair = false;
             ResourceKey<LevelStem> key = entry.getKey();
             LevelStem loadedStem = entry.getValue();
 
-            ChunkGenerator referenceGenerator = dimensions.get(key);
+            final ChunkGenerator referenceGenerator = configuredDimensions.get(key);
+
             if (referenceGenerator instanceof EnforceableChunkGenerator<?> enforcer) {
                 final ChunkGenerator loadedChunkGenerator = loadedStem.generator();
-
-                // we ensure that all biomes with a dimensional Tag are properly added to the correct biome source
-                // using the correct type
-                //processBiomeTagsForDimension(key);
 
                 // if the loaded ChunkGenerator is not the one we expect from vanilla, we will load the vanilla
                 // ones and mark all modded biomes with the respective dimension
@@ -126,8 +123,27 @@ class BiomeRepairHelper {
             }
         }
 
+        // we ensure that all dimensions get the correct reference to the originally configured WorldPreset
+        copyWorldPresetReference(dimensionRegistry, configuredDimensions);
 
         return dimensionRegistry;
+    }
+
+    private static void copyWorldPresetReference(
+            Registry<LevelStem> dimensionRegistry,
+            Map<ResourceKey<LevelStem>, ChunkGenerator> configuredDimensions
+    ) {
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> loadedDimension : dimensionRegistry.entrySet()) {
+            final ChunkGenerator referenceGenerator = configuredDimensions.get(loadedDimension.getKey());
+
+            if (referenceGenerator instanceof ConfiguredChunkGenerator refCfg
+                    && loadedDimension.getValue().generator() instanceof ConfiguredChunkGenerator loadedCfg) {
+                if (loadedCfg.wover_getConfiguredWorldPreset() == null) {
+                    loadedCfg.wover_setConfiguredWorldPreset(refCfg.wover_getConfiguredWorldPreset());
+                }
+
+            }
+        }
     }
 
     private void registerAllBiomesFromFabric(
