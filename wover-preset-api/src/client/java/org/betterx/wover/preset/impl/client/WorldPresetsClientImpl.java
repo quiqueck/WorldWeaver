@@ -1,7 +1,6 @@
 package org.betterx.wover.preset.impl.client;
 
 import org.betterx.wover.preset.api.client.WorldPresetsUI;
-import org.betterx.wover.preset.impl.SortableWorldPresetImpl;
 
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.core.Holder;
@@ -29,18 +28,10 @@ public class WorldPresetsClientImpl {
         return (holder != null && keyToTest.equals(holder.unwrapKey().orElse(null)));
     }
 
-    public static boolean isParentKey(Holder<WorldPreset> holder, ResourceKey<WorldPreset> keyToTest) {
-        return (holder.isBound()
-                && holder.value() instanceof SortableWorldPresetImpl preset
-                && preset.parentKey != null
-                && preset.parentKey.equals(keyToTest)
-        );
-    }
-
     public static void registerCustomUI(ResourceKey<WorldPreset> key, PresetEditor setupScreen) {
         if (setupScreen != null) {
             EDITORS.add(holder -> {
-                if (isKey(holder, key) || isParentKey(holder, key)) {
+                if (isKey(holder, key)) {
                     return setupScreen;
                 }
 

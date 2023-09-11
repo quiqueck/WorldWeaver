@@ -2,7 +2,6 @@ package org.betterx.wover.testmod.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.WoverWorldPreset;
-import org.betterx.wover.preset.api.SortableWorldPreset;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.preset.api.flat.FlatLevelPresetManager;
@@ -35,7 +34,7 @@ public class WoverWorldPresetTestMod implements ModInitializer {
     public void onInitialize() {
         WorldPresetManager.BOOTSTRAP_WORLD_PRESETS.subscribe(
                 ctx -> {
-                    var preset = SortableWorldPreset.fromStems(ctx.endStem, ctx.overworldStem, ctx.netherStem);
+                    var preset = WorldPresetManager.fromStems(ctx.endStem, ctx.overworldStem, ctx.netherStem);
                     ctx.register(END_START, preset);
                 }
         );

@@ -94,4 +94,30 @@ public class WorldPresetManager {
     public static LevelStem getDimension(Holder<WorldPreset> preset, ResourceKey<LevelStem> key) {
         return WorldPresetsManagerImpl.getDimension(preset, key);
     }
+
+    /**
+     * Creates a new {@link WorldPreset} from the given stems.
+     *
+     * @param overworldStem The overworld stem.
+     * @param netherStem    The nether stem.
+     * @param endStem       The end stem.
+     * @return The {@link WorldPreset}.
+     */
+    public static WorldPreset fromStems(
+            LevelStem overworldStem,
+            LevelStem netherStem,
+            LevelStem endStem
+    ) {
+        return WorldPresetsManagerImpl.fromStems(overworldStem, netherStem, endStem);
+    }
+
+    /**
+     * Creates a new {@link WorldPreset} from a map of {@link LevelStem}s.
+     *
+     * @param dimensions The stems.
+     * @return The {@link WorldPreset}.
+     */
+    public static WorldPreset of(Map<ResourceKey<LevelStem>, LevelStem> dimensions) {
+        return new WorldPreset(dimensions);
+    }
 }

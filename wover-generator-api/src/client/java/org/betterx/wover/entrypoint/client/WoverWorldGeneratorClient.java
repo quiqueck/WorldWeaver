@@ -7,7 +7,6 @@ import org.betterx.wover.generator.impl.chunkgenerator.ConfiguredChunkGenerator;
 import org.betterx.wover.generator.impl.client.WorldSetupScreen;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.client.WorldPresetsUI;
-import org.betterx.wover.preset.mixin.WorldPresetAccessor;
 
 import net.minecraft.world.level.dimension.LevelStem;
 
@@ -35,13 +34,11 @@ public class WoverWorldGeneratorClient implements ClientModInitializer {
             if (WorldPresetsUI.isKey(holder, PresetsRegistry.WOVER_WORLD)) {
                 return WorldSetupScreen::new;
             }
-
-            if (holder.value() instanceof WorldPresetAccessor acc) {
-                for (LevelStem dim : acc.wover_getDimensions().values()) {
-                    if (dim.generator() instanceof ConfiguredChunkGenerator gen) {
-                        if (gen.wover_getConfiguredWorldPreset() != null) {
-                            return WorldSetupScreen::new;
-                        }
+            
+            for (LevelStem dim : WorldPresetManager.getDimensions(holder).values()) {
+                if (dim.generator() instanceof ConfiguredChunkGenerator gen) {
+                    if (gen.wover_getConfiguredWorldPreset() != null) {
+                        return WorldSetupScreen::new;
                     }
                 }
             }

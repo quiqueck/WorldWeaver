@@ -8,7 +8,6 @@ import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.generator.api.preset.PresetsRegistry;
 import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
-import org.betterx.wover.preset.api.SortableWorldPreset;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.preset.api.context.WorldPresetBootstrapContext;
@@ -113,16 +112,16 @@ public class WorldPresetProvider extends WoverWorldPresetProvider {
         );
     }
 
-    private static SortableWorldPreset buildPreset(
+    private static WorldPreset buildPreset(
             LevelStem overworldStem,
             WorldPresetBootstrapContext.StemContext netherContext,
             WoverNetherConfig netherConfig,
             WorldPresetBootstrapContext.StemContext endContext,
             WoverEndConfig endConfig
     ) {
-        return SortableWorldPreset.of(buildDimensionMap(
+        return WorldPresetManager.of(buildDimensionMap(
                 overworldStem, netherContext, netherConfig, endContext, endConfig
-        ), 1000);
+        ));
     }
 
     public static Map<ResourceKey<LevelStem>, LevelStem> buildDimensionMap(

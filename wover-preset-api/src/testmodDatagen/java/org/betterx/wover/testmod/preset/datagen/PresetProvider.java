@@ -2,7 +2,7 @@ package org.betterx.wover.testmod.preset.datagen;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.WoverWorldPresetProvider;
-import org.betterx.wover.preset.api.SortableWorldPreset;
+import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.preset.api.context.WorldPresetBootstrapContext;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
@@ -24,7 +24,7 @@ public class PresetProvider extends WoverWorldPresetProvider {
 
     @Override
     protected void bootstrap(WorldPresetBootstrapContext context) {
-        var preset = SortableWorldPreset.fromStems(
+        var preset = WorldPresetManager.fromStems(
                 context.netherStem,
                 context.overworldStem,
                 context.endStem

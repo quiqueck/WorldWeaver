@@ -84,4 +84,16 @@ public class WorldPresetsManagerImpl {
     public static LevelStem getDimension(Holder<WorldPreset> preset, ResourceKey<LevelStem> key) {
         return getDimensions(preset).get(key);
     }
+
+    public static WorldPreset fromStems(
+            LevelStem overworldStem,
+            LevelStem netherStem,
+            LevelStem endStem
+    ) {
+        return new WorldPreset(Map.of(
+                LevelStem.OVERWORLD, overworldStem,
+                LevelStem.NETHER, netherStem,
+                LevelStem.END, endStem
+        ));
+    }
 }
