@@ -47,16 +47,14 @@ public class SurfaceRuleUtil {
                            .toList();
 
         if (list.size() == 0) return List.of();
-        
+
         return List.of(SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), new SurfaceRules.SequenceRuleSource(list)));
     }
 
-    private static List<SurfaceRules.RuleSource> getRulesForBiomes(List<Biome> biomes) {
-        Registry<Biome> biomeRegistry = WorldState.registryAccess().registryOrThrow(Registries.BIOME);
+    private static List<SurfaceRules.RuleSource> getRulesForBiomes(List<Optional<ResourceKey<Biome>>> biomes) {
         List<ResourceKey<Biome>> biomeIDs = biomes.stream()
-                                                  .map(biomeRegistry::getResourceKey)
                                                   .filter(Optional::isPresent)
-                                                  .map(Optional::get)
+                                                  .map(Optional::orElseThrow)
                                                   .toList();
 
         return biomeIDs.stream()
@@ -103,11 +101,12 @@ public class SurfaceRuleUtil {
         }
 
         WoverSurface.C.LOG.verbose(
-                "Merged {} additional Surface Rules for {} => {} ({})",
+                "Merged {} additional Surface Rules for Dimension {} => {} ({}) using {}",
                 count,
-                source,
+                dimensionKey.location(),
                 additionalRules.size(),
-                sw.stop()
+                sw.stop(),
+                source
         );
 
         return new SurfaceRules.SequenceRuleSource(additionalRules);
@@ -126,7 +125,7 @@ public class SurfaceRuleUtil {
                     dimensionKey,
                     originalRules,
                     loadedBiomeSource,
-                    getRulesForBiomes(loadedBiomeSource.possibleBiomes().stream().map(Holder::value).toList())
+                    getRulesForBiomes(loadedBiomeSource.possibleBiomes().stream().map(Holder::unwrapKey).toList())
             ));
         }
     }
