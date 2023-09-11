@@ -6,18 +6,12 @@ import org.betterx.wover.common.generator.api.biomesource.ReloadableBiomeSource;
 import org.betterx.wover.common.generator.api.chunkgenerator.EnforceableChunkGenerator;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.impl.biomesource.end.TheEndBiomesHelper;
-import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
-import com.mojang.serialization.Dynamic;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
@@ -30,13 +24,9 @@ import net.fabricmc.fabric.api.biome.v1.NetherBiomes;
 import com.google.common.base.Stopwatch;
 
 import java.util.Map;
-import java.util.Optional;
-import org.jetbrains.annotations.NotNull;
 
 class BiomeRepairHelper {
     private Map<ResourceKey<LevelStem>, ChunkGenerator> vanillaDimensions = null;
-
-    static DimensionsWrapper DEFAULT_DIMENSIONS_WRAPPER = null;
 
     public static TagKey<Biome> getBiomeTagForDimension(ResourceKey<LevelStem> key) {
         if (key.equals(LevelStem.END)) return CommonBiomeTags.IS_END_HIGHLAND;
@@ -45,37 +35,14 @@ class BiomeRepairHelper {
         return null;
     }
 
-    public @NotNull Map<ResourceKey<LevelStem>, ChunkGenerator> loadWorldDimensions(RegistryAccess registryAccess) {
-        try {
-            final RegistryOps<Tag> registryOps = RegistryOps.create(NbtOps.INSTANCE, registryAccess);
-            if (DEFAULT_DIMENSIONS_WRAPPER == null) {
-                DEFAULT_DIMENSIONS_WRAPPER = new DimensionsWrapper(DimensionsWrapper.getDimensionsMap(
-                        registryAccess,
-                        WorldPresetManager.getDefault()
-                ));
-            }
-
-            CompoundTag presetNBT = WorldGeneratorConfigImpl.getPresetsNbt();
-            if (!presetNBT.contains(WorldGeneratorConfigImpl.TAG_DIMENSIONS)) {
-                return DEFAULT_DIMENSIONS_WRAPPER.dimensions;
-            }
-
-            Optional<DimensionsWrapper> oLevelStem = DimensionsWrapper.CODEC
-                    .parse(new Dynamic<>(registryOps, presetNBT))
-                    .resultOrPartial(WoverWorldGenerator.C.log::error);
-
-            return oLevelStem.orElse(DEFAULT_DIMENSIONS_WRAPPER).dimensions;
-        } catch (Exception e) {
-            WoverWorldGenerator.C.log.error("Failed to load Dimensions", e);
-            return DEFAULT_DIMENSIONS_WRAPPER.dimensions;
-        }
-    }
-
     public Registry<LevelStem> repairBiomeSourceInAllDimensions(
             RegistryAccess registryAccess,
             Registry<LevelStem> dimensionRegistry
     ) {
-        Map<ResourceKey<LevelStem>, ChunkGenerator> configuredDimensions = loadWorldDimensions(registryAccess);
+        Map<ResourceKey<LevelStem>, ChunkGenerator> configuredDimensions = WorldGeneratorConfigImpl.loadWorldDimensions(
+                registryAccess,
+                WorldGeneratorConfigImpl.getPresetsNbt()
+        );
         final Registry<Biome> biomes = registryAccess.registryOrThrow(Registries.BIOME);
 
         // we ensure that all biomes registered using fabric have the proper biome tags

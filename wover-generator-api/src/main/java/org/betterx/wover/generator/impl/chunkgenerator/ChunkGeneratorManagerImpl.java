@@ -8,15 +8,18 @@ import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldConfig;
+import org.betterx.wover.state.api.WorldState;
 
 import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.serialization.Codec;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
@@ -77,6 +80,28 @@ public class ChunkGeneratorManagerImpl {
             boolean recreated
     ) {
         WorldGeneratorConfigImpl.createWorldConfig(currentPreset, dimensions);
+    }
+
+    public static void onWorldReCreate(
+            LevelStorageSource.LevelStorageAccess storage,
+            LevelSettings levelSettings,
+            WorldCreationContext context
+    ) {
+        final var configuredPreset = WorldGeneratorConfigImpl.getPresetsNbtFromFolder(storage);
+        final var dimensions = WorldGeneratorConfigImpl.loadWorldDimensions(
+                WorldState.allStageRegistryAccess(),
+                configuredPreset
+        );
+
+        for (var dimEntry : context.selectedDimensions().dimensions().entrySet()) {
+            final var refDim = dimensions.get(dimEntry.getKey());
+            if (refDim instanceof ConfiguredChunkGenerator refGen
+                    && refGen.wover_getConfiguredWorldPreset() != null
+                    && dimEntry.getValue().generator() instanceof ConfiguredChunkGenerator loadGen
+                    && loadGen.wover_getConfiguredWorldPreset() == null) {
+                loadGen.wover_setConfiguredWorldPreset(refGen.wover_getConfiguredWorldPreset());
+            }
+        }
     }
 
     public static void register(ResourceLocation location, Codec<? extends ChunkGenerator> codec) {

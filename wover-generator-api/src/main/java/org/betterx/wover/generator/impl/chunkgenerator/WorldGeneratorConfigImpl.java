@@ -2,16 +2,21 @@ package org.betterx.wover.generator.impl.chunkgenerator;
 
 import de.ambertation.wunderlib.utils.Version;
 import org.betterx.wover.core.api.IntegrationCore;
+import org.betterx.wover.entrypoint.WoverEvents;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.preset.PresetsRegistry;
 import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
+import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.state.api.WorldConfig;
 import org.betterx.wover.state.api.WorldState;
 
+import com.mojang.serialization.Dynamic;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.RegistryOps;
@@ -21,10 +26,15 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.LevelStorageSource;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 public class WorldGeneratorConfigImpl {
@@ -34,9 +44,27 @@ public class WorldGeneratorConfigImpl {
     public static final String TAG_DIMENSION_PRESETS = "world_presets";
     private static final String LEGACY_TAG_VERSION = "version";
     private static final String LEGACY_TAG_BN_GEN_VERSION = "generator_version";
+    private static DimensionsWrapper DEFAULT_DIMENSIONS_WRAPPER = null;
 
     static @NotNull CompoundTag getPresetsNbt() {
         return WorldConfig.getCompoundTag(WoverWorldGenerator.C, TAG_PRESET);
+    }
+
+    static @NotNull CompoundTag getPresetsNbtFromFolder(LevelStorageSource.LevelStorageAccess levelStorageAccess) {
+        final File dataDir = levelStorageAccess.getLevelPath(LevelResource.ROOT).resolve("data").toFile();
+        File nbtFile = new File(dataDir, WoverWorldGenerator.C.modId + ".nbt");
+        CompoundTag root = null;
+        if (nbtFile.exists()) {
+            try {
+                root = NbtIo.readCompressed(nbtFile);
+            } catch (IOException e) {
+                WoverEvents.C.log.error("NBT loading failed", e);
+            }
+        }
+        if (root != null && root.contains(TAG_PRESET))
+            return root.getCompound(TAG_PRESET);
+
+        return new CompoundTag();
     }
 
     private static @NotNull CompoundTag getLegacyPresetsNbt() {
@@ -160,7 +188,7 @@ public class WorldGeneratorConfigImpl {
 
     public static void createWorldConfig(Holder<WorldPreset> currentPreset, WorldDimensions dimensions) {
         //make sure we store the preset key in the all generators that currently do not have one
-        if (currentPreset.unwrapKey().isPresent()) {
+        if (currentPreset != null && currentPreset.unwrapKey().isPresent()) {
             final ResourceKey<WorldPreset> presetKey = currentPreset.unwrapKey().orElseThrow();
             for (var dimEntry : dimensions.dimensions().entrySet()) {
                 if (dimEntry.getValue().generator() instanceof ConfiguredChunkGenerator cfg) {
@@ -170,8 +198,36 @@ public class WorldGeneratorConfigImpl {
                 }
             }
         }
-        
+
         WoverWorldGenerator.C.log.verbose("Creating presets file for new world");
         writeWorldPresetSettingsDirect(DimensionsWrapper.build(dimensions.dimensions()));
+    }
+
+    public static @NotNull Map<ResourceKey<LevelStem>, ChunkGenerator> loadWorldDimensions(
+            RegistryAccess registryAccess,
+            CompoundTag presetNBT
+    ) {
+        try {
+            final RegistryOps<Tag> registryOps = RegistryOps.create(NbtOps.INSTANCE, registryAccess);
+            if (DEFAULT_DIMENSIONS_WRAPPER == null) {
+                DEFAULT_DIMENSIONS_WRAPPER = new DimensionsWrapper(DimensionsWrapper.getDimensionsMap(
+                        registryAccess,
+                        WorldPresetManager.getDefault()
+                ));
+            }
+
+            if (presetNBT == null || !presetNBT.contains(TAG_DIMENSIONS)) {
+                return DEFAULT_DIMENSIONS_WRAPPER.dimensions;
+            }
+
+            Optional<DimensionsWrapper> oLevelStem = DimensionsWrapper.CODEC
+                    .parse(new Dynamic<>(registryOps, presetNBT))
+                    .resultOrPartial(WoverWorldGenerator.C.log::error);
+
+            return oLevelStem.orElse(DEFAULT_DIMENSIONS_WRAPPER).dimensions;
+        } catch (Exception e) {
+            WoverWorldGenerator.C.log.error("Failed to load Dimensions", e);
+            return DEFAULT_DIMENSIONS_WRAPPER.dimensions;
+        }
     }
 }

@@ -49,16 +49,6 @@ public class DimensionsWrapper {
         return map;
     }
 
-    static Map<ResourceKey<LevelStem>, ChunkGenerator> build(Map<ResourceKey<LevelStem>, LevelStem> input) {
-        Map<ResourceKey<LevelStem>, ChunkGenerator> map = new HashMap<>();
-        for (var entry : input.entrySet()) {
-            ResourceKey<LevelStem> key = entry.getKey();
-            LevelStem stem = entry.getValue();
-            map.put(key, stem.generator());
-        }
-        return map;
-    }
-
     public static @Nullable Registry<LevelStem> getDimensions(ResourceKey<WorldPreset> key) {
         RegistryAccess access = WorldState.allStageRegistryAccess();
         if (access == null) {
@@ -129,7 +119,8 @@ public class DimensionsWrapper {
     public Map<ResourceKey<LevelStem>, ResourceKey<WorldPreset>> getDimensionPresets() {
         final Map<ResourceKey<LevelStem>, ResourceKey<WorldPreset>> map = new HashMap<>();
         for (Map.Entry<ResourceKey<LevelStem>, ChunkGenerator> dimEntry : dimensions.entrySet()) {
-            if (dimEntry.getValue() instanceof ConfiguredChunkGenerator cfg) {
+            if (dimEntry.getValue() instanceof ConfiguredChunkGenerator cfg
+                    && cfg.wover_getConfiguredWorldPreset() != null) {
                 map.put(dimEntry.getKey(), cfg.wover_getConfiguredWorldPreset());
             }
         }
