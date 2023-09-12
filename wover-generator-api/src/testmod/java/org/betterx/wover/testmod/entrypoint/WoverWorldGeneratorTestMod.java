@@ -12,9 +12,17 @@ import org.betterx.wover.generator.api.biomesource.WoverBiomeBuilder;
 import org.betterx.wover.generator.api.preset.PresetsRegistry;
 import org.betterx.wover.preset.api.WorldPresetManager;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 import net.fabricmc.api.ModInitializer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WoverWorldGeneratorTestMod implements ModInitializer {
     // ModCore for the TestMod. TestMod's do not share the wover namespace,
@@ -23,6 +31,14 @@ public class WoverWorldGeneratorTestMod implements ModInitializer {
 
     public static final BiomeKey<WoverBiomeBuilder.WoverBiome> NETHER_TEST_BIOME
             = WoverBiomeBuilder.biomeKey(C.id("nether_test_biome"));
+
+    public static final BiomeKey<WoverBiomeBuilder.WoverBiome> NETHER_MAIN_BIOME = WoverBiomeBuilder.biomeKey(C.id(
+            "nether_main_biome"));
+    public static final BiomeKey<WoverBiomeBuilder.WoverBiome> NETHER_SUB_BIOME = WoverBiomeBuilder.biomeKey(C.id(
+            "nether_sub_biome"));
+    public static final BiomeKey<WoverBiomeBuilder.WoverBiome> NETHER_WASTE_SUB_BIOME = WoverBiomeBuilder.biomeKey(C.id(
+            "wastes_sub_biome"));
+
     public static final ConfiguredFeatureKey<NetherForrestVegetation> TEST_VEGETATION
             = ConfiguredFeatureManager.netherForrestVegetation(C.id("test_vegetation"));
 
@@ -38,5 +54,22 @@ public class WoverWorldGeneratorTestMod implements ModInitializer {
     @Override
     public void onInitialize() {
         WorldPresetManager.suggestDefault(PresetsRegistry.WOVER_WORLD, 2000);
+
+        Map<ResourceKey<Biome>, Integer> testMap = new HashMap<>();
+        ResourceKey<Biome> k2 = ResourceKey.create(
+                Registries.BIOME,
+                new ResourceLocation(Biomes.NETHER_WASTES.location().toString())
+        );
+        ResourceKey<Biome> k3 = ResourceKey.create(
+                Registries.BIOME,
+                new ResourceLocation(Biomes.NETHER_WASTES.location().toString())
+        );
+        testMap.put(Biomes.NETHER_WASTES, 10);
+        testMap.put(k2, 20);
+        if (testMap.containsKey(k3)) {
+            C.log.info("testMap contains NETHER_WASTES");
+        }
+
+        C.log.info("" + testMap.get(k3));
     }
 }

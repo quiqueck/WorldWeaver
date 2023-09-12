@@ -60,6 +60,12 @@ public class WrappedWoverDataBuilderImpl extends WoverBiomeBuilder.Wrapped {
     }
 
     @Override
+    public WoverBiomeBuilder.Wrapped parent(BiomeKey<?> parent) {
+        this.parent = parent.key;
+        return this;
+    }
+
+    @Override
     public WoverBiomeBuilder.Wrapped terrainHeight(float height) {
         this.terrainHeight = height;
         return this;

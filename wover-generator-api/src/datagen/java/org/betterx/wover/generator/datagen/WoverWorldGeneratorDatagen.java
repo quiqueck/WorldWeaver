@@ -10,7 +10,7 @@ public class WoverWorldGeneratorDatagen extends WoverDataGenEntryPoint {
     protected void onInitializeProviders(PackBuilder globalPack) {
         globalPack.addRegistryProvider(WorldPresetProvider::new);
         globalPack.addRegistryProvider(NoiseGeneratorSettingsProvider::new);
-        globalPack.addMultiProvider(WorldDataProvider::new);
+        globalPack.addMultiProvider(VanillaBiomeDataProvider::new);
         globalPack.addRegistryProvider(WorldPresetInfoProvider::new);
     }
 

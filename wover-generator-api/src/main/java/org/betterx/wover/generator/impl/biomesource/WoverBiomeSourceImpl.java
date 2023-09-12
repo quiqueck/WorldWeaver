@@ -78,7 +78,7 @@ public class WoverBiomeSourceImpl {
                 tag.stream()
                    .filter(holder -> holder.unwrapKey().isPresent())
                    .map(holder -> new Pair<>(holder, holder.unwrapKey().get()))
-                   .filter(pair -> !addedBiomes.contains(pair.first))
+                   .filter(pair -> !addedBiomes.contains(pair.second))
                    .filter(pair -> !excluded.contains(pair.second.location()))
                    .sorted(Comparator.comparing(pair -> pair.second.location().toString()))
                    .forEach(pair -> {
@@ -88,7 +88,7 @@ public class WoverBiomeSourceImpl {
                                pair.second
                        );
 
-                       if (data.isPickable()) {
+                       if (data != null && data.isPickable()) {
                            isPossible = pickerAdder.add(data, mapper.tag(), mapper.picker());
                        } else {
                            isPossible = true;

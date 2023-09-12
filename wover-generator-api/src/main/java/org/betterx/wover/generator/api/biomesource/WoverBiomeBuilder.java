@@ -19,6 +19,7 @@ public interface WoverBiomeBuilder<B extends BiomeBuilder<B>> {
 
     B edge(ResourceKey<Biome> edge);
     B parent(ResourceKey<Biome> parent);
+    B parent(BiomeKey<?> parent);
     B terrainHeight(float height);
     B genChance(float weight);
     B edgeSize(int size);
@@ -86,6 +87,12 @@ public interface WoverBiomeBuilder<B extends BiomeBuilder<B>> {
         @Override
         public T parent(ResourceKey<Biome> parent) {
             this.parent = parent;
+            return (T) this;
+        }
+
+        @Override
+        public T parent(BiomeKey<?> parent) {
+            this.parent = parent.key;
             return (T) this;
         }
 

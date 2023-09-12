@@ -6,6 +6,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -113,6 +114,17 @@ public class RandomizedWeightedList<T> {
             res.add(mapper.apply(e.getValue()), e.getWeight());
         }
         return res;
+    }
+
+    /**
+     * Iterates over all entries in the list.
+     *
+     * @param consumer the consumer which will accept the value and assigned weight
+     */
+    public void forEach(BiConsumer<T, Double> consumer) {
+        for (WeightedEntry<T> e : entries) {
+            consumer.accept(e.getValue(), e.getWeight());
+        }
     }
 
     @FunctionalInterface

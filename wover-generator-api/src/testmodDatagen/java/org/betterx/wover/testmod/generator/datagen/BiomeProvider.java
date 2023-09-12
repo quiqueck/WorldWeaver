@@ -6,6 +6,7 @@ import org.betterx.wover.datagen.api.provider.multi.WoverBiomeProvider;
 import org.betterx.wover.testmod.entrypoint.WoverWorldGeneratorTestMod;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 
 public class BiomeProvider extends WoverBiomeProvider {
@@ -35,6 +36,29 @@ public class BiomeProvider extends WoverBiomeProvider {
                 .feature(WoverWorldGeneratorTestMod.TEST_SCATTERED_PLACED)
                 .spawn(EntityType.CAMEL, 1, 2, 6)
                 .spawn(EntityType.DONKEY, 2, 1, 3)
+                .register();
+
+        WoverWorldGeneratorTestMod
+                .NETHER_MAIN_BIOME
+                .bootstrap(context)
+                .isNetherBiome()
+                .surface(Blocks.WHITE_CONCRETE)
+                .register();
+
+        WoverWorldGeneratorTestMod
+                .NETHER_SUB_BIOME
+                .bootstrap(context)
+                .isNetherBiome()
+                .surface(Blocks.GRAY_CONCRETE)
+                .parent(WoverWorldGeneratorTestMod.NETHER_MAIN_BIOME)
+                .register();
+
+        WoverWorldGeneratorTestMod
+                .NETHER_WASTE_SUB_BIOME
+                .bootstrap(context)
+                .isNetherBiome()
+                .surface(Blocks.ORANGE_CONCRETE)
+                .parent(Biomes.NETHER_WASTES)
                 .register();
     }
 }

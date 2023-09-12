@@ -1,6 +1,7 @@
 package org.betterx.wover.generator.api.biomesource;
 
 import org.betterx.wover.biome.api.data.BiomeData;
+import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.util.RandomizedWeightedList;
 
@@ -12,17 +13,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.WorldgenRandom;
 
-import com.google.common.collect.Lists;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 public class WoverBiomePicker {
     private final Map<BiomeData, PickableBiome> registeredBiomes = new HashMap<>();
     public final HolderGetter<Biome> biomeRegistry;
-    private final List<PickableBiome> biomes = Lists.newArrayList();
+    private final Set<PickableBiome> biomes = new HashSet<>();
     public final PickableBiome fallbackBiome;
     private RandomizedWeightedList<PickableBiome>.SearchTree tree;
 
@@ -41,12 +38,27 @@ public class WoverBiomePicker {
 
     public WoverBiomePicker(HolderGetter<Biome> biomeRegistry, ResourceKey<Biome> fallbackBiome) {
         this.biomeRegistry = biomeRegistry;
-        this.fallbackBiome = create(BiomeData.of(fallbackBiome));
+        this.fallbackBiome = create(BiomeData.tempOf(fallbackBiome));
+    }
+
+    public static void consumeSubBiomesForSource(
+            BiomeData sourceBiome,
+            BiConsumer<BiomeData, Float> consumeChild
+    ) {
+        final Registry<BiomeData> reg = WoverBiomeData.getDataRegistry("biome alternatives", sourceBiome.biomeKey);
+
+        for (Map.Entry<ResourceKey<BiomeData>, BiomeData> entry : reg.entrySet()) {
+            if (entry.getValue() instanceof WoverBiomeData b
+                    && sourceBiome.isSame(b.parent)
+            ) {
+                consumeChild.accept(b, b.genChance);
+            }
+        }
     }
 
     private boolean isAllowed(BiomeData biomeData) {
         if (biomeData == null) return false;
-        return biomeData.isPickable();
+        return true;
     }
 
     private BiomeData nullIfNotAllowed(BiomeData biomeData) {
@@ -56,6 +68,14 @@ public class WoverBiomePicker {
     private PickableBiome create(BiomeData biomeData) {
         if (biomeData == null) return null;
         PickableBiome e = registeredBiomes.get(biomeData);
+
+        //the current instance is only a temporary object which we can replace with
+        //real one now
+        if (e != null && e.biomeData.isTemp() && !biomeData.isTemp()) {
+            registeredBiomes.remove(e);
+            e = null;
+        }
+
         if (e != null) return e;
         return new PickableBiome(biomeData);
     }
@@ -86,6 +106,29 @@ public class WoverBiomePicker {
             list.add(fallbackBiome, 1);
         }
 
+        //make sure we load all subBiomes as well
+        if (WorldState.allStageRegistryAccess() != null) {
+            ;
+            final int beforeSize = registeredBiomes.size();
+            final ArrayList<PickableBiome> beforeList = new ArrayList<>(registeredBiomes.values());
+            for (PickableBiome builtBiome : beforeList) {
+                consumeSubBiomesForSource(
+                        builtBiome.biomeData,
+                        (biomeData, weight) -> builtBiome.subbiomes.add(create(biomeData), weight)
+                );
+            }
+
+            if (registeredBiomes.size() != beforeSize) {
+                WoverWorldGenerator.C.log.verbose("Added " + (registeredBiomes.size() - beforeSize) + " Biomes");
+
+                for (PickableBiome builtBiome : new ArrayList<>(registeredBiomes.values())) {
+                    if (!beforeList.contains(builtBiome)) {
+                        WoverWorldGenerator.C.log.verbose(" - " + builtBiome.biomeData.biomeKey.location() + ", subbiomes=" + builtBiome.subbiomes.size());
+                    }
+                }
+            }
+        }
+
         //we do not actually want the list, but the search tree for it
         tree = list.buildSearchTree();
     }
@@ -109,17 +152,16 @@ public class WoverBiomePicker {
             this.biome = (biomeRegistry != null) ? biomeRegistry.getOrThrow(biomeData.biomeKey) : null;
             this.isValid = biome != null && biome.isBound();
 
-            if (biomeData instanceof WoverBiomeData wData) {
-                subbiomes = wData
-                        .createBiomeAlternatives(WoverBiomePicker.this::isAllowed)
-                        .map(WoverBiomePicker.this::create);
+            this.subbiomes = new RandomizedWeightedList<>();
 
+            if (biomeData instanceof WoverBiomeData wData) {
+                subbiomes.add(this, wData.genChance);
                 edge = create(nullIfNotAllowed(wData.getEdgeData()));
                 parent = create(wData.getParentData());
                 edgeSize = wData.edgeSize;
                 isVertical = wData.vertical;
             } else {
-                subbiomes = RandomizedWeightedList.of(this);
+                subbiomes.add(this, 1.0f);
                 edge = null;
                 parent = null;
                 edgeSize = 0;

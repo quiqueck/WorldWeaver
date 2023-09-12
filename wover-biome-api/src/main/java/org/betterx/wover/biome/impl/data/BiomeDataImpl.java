@@ -10,6 +10,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Climate;
 
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 public class BiomeDataImpl {
     public static class CodecAttributes<T extends BiomeData> {
@@ -23,52 +24,19 @@ public class BiomeDataImpl {
                                             .optionalFieldOf("parameter_points", List.of())
                                             .forGetter((T o) -> o.parameterPoints);
     }
-//    private static class CodecAttributes<T extends BiomeData> {
-//        public RecordCodecBuilder<T, Float> t0 = Codec.FLOAT.optionalFieldOf("terrainHeight"), 0.1f)
-//                                                            .forGetter((T o1) -> o1.settings.terrainHeight);
-//
-//        public RecordCodecBuilder<T, Float> t1 = Codec.FLOAT.optionalFieldOf("fogDensity", 1.0f)
-//                                                            .forGetter((T o1) -> o1.settings.fogDensity);
-//        public RecordCodecBuilder<T, Float> t2 = Codec.FLOAT.optionalFieldOf("genChance", 1.0f)
-//                                                            .forGetter((T o1) -> o1.settings.genChance);
-//        public RecordCodecBuilder<T, Integer> t3 = Codec.INT.optionalFieldOf("edgeSize", 0)
-//                                                            .forGetter((T o1) -> o1.settings.edgeSize);
-//        public RecordCodecBuilder<T, Boolean> t4 = Codec.BOOL.optionalFieldOf("vertical", false)
-//                                                             .forGetter((T o1) -> o1.settings.vertical);
-//        public RecordCodecBuilder<T, Optional<ResourceLocation>> t5 =
-//                ResourceLocation.CODEC
-//                        .optionalFieldOf("edge")
-//                        .orElse(Optional.empty())
-//                        .forGetter((T o1) -> ((BCLBiome) o1).edge == null
-//                                ? Optional.empty()
-//                                : Optional.of(((BCLBiome) o1).edge));
-//        public RecordCodecBuilder<T, ResourceLocation> t6 =
-//                ResourceLocation.CODEC.fieldOf("biome")
-//                                      .forGetter((T o) -> ((BCLBiome) o).biomeID);
-//        public RecordCodecBuilder<T, Optional<List<Climate.ParameterPoint>>> t7 =
-//                Climate.ParameterPoint.CODEC.listOf()
-//                                            .optionalFieldOf("parameter_points")
-//                                            .orElse(Optional.of(List.of()))
-//                                            .forGetter((T o) ->
-//                                                    o.parameterPoints == null || o.parameterPoints.isEmpty()
-//                                                            ? Optional.empty()
-//                                                            : Optional.of(o.parameterPoints));
-//
-//        public RecordCodecBuilder<T, Optional<ResourceLocation>> t8 =
-//                ResourceLocation.CODEC.optionalFieldOf("parent")
-//                                      .orElse(Optional.empty())
-//                                      .forGetter(
-//                                              (T o1) ->
-//                                                      ((BCLBiome) o1).biomeParent == null
-//                                                              ? Optional.empty()
-//                                                              : Optional.of(
-//                                                                      ((BCLBiome) o1).biomeParent));
-//        public RecordCodecBuilder<T, Optional<String>> t10 =
-//                Codec.STRING.optionalFieldOf("intended_for")
-//                            .orElse(Optional.of(BiomeAPI.BiomeType.NONE.getName()))
-//                            .forGetter((T o) ->
-//                                    ((BCLBiome) o).intendedType == null
-//                                            ? Optional.empty()
-//                                            : Optional.of(((BCLBiome) o).intendedType.getName()));
-//    }
+
+    public static class InMemoryBiomeData extends BiomeData {
+
+        public InMemoryBiomeData(
+                float fogDensity,
+                @NotNull ResourceKey<Biome> biome,
+                @NotNull List<Climate.ParameterPoint> parameterPoints
+        ) {
+            super(fogDensity, biome, parameterPoints);
+        }
+
+        public boolean isTemp() {
+            return true;
+        }
+    }
 }

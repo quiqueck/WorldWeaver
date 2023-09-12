@@ -5,7 +5,6 @@ import org.betterx.wover.biome.api.data.BiomeDataRegistry;
 import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.generator.impl.biomesource.WoverBiomeDataImpl;
 import org.betterx.wover.state.api.WorldState;
-import org.betterx.wover.util.RandomizedWeightedList;
 
 import com.mojang.datafixers.util.*;
 import com.mojang.serialization.Codec;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.biome.Climate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,6 +65,10 @@ public class WoverBiomeData extends BiomeData {
 
     public static WoverBiomeData withEdge(ResourceKey<Biome> biome, ResourceKey<Biome> edge) {
         return new WoverBiomeData(1.0f, biome, List.of(), 0.1f, 1.0f, 4, false, edge, null);
+    }
+
+    public static WoverBiomeData tempWithEdge(ResourceKey<Biome> biome, ResourceKey<Biome> edge) {
+        return new WoverBiomeData.InMemoryWoverBiomeData(1.0f, biome, List.of(), 0.1f, 1.0f, 4, false, edge, null);
     }
 
     public static <T extends WoverBiomeData> Codec<T> codec(
@@ -195,22 +197,26 @@ public class WoverBiomeData extends BiomeData {
     }
 
 
-    public @NotNull Registry<BiomeData> getDataRegistry(String forWhat) throws IllegalStateException {
+    public static @NotNull Registry<BiomeData> getDataRegistry(
+            String forWhat,
+            ResourceKey<Biome> ofBiome
+    ) throws IllegalStateException {
         RegistryAccess acc = WorldState.registryAccess();
 
         if (acc == null) {
             if (WorldState.allStageRegistryAccess() == null) {
-                throw new IllegalStateException("Accessing " + forWhat + " of " + biomeKey + " before any registry is ready!");
+                throw new IllegalStateException("Accessing " + forWhat + " of " + ofBiome + " before any registry is ready!");
             }
             if (preFinalAccessWarning++ < 5)
-                WoverBiome.C.log.verboseWarning("Accessing " + forWhat + " of " + biomeKey + " before registry is ready!");
+                WoverBiome.C.log.verboseWarning("Accessing " + forWhat + " of " + ofBiome + " before registry is ready!");
             acc = WorldState.allStageRegistryAccess();
         }
         final Registry<BiomeData> reg = acc != null
                 ? acc.registry(BiomeDataRegistry.BIOME_DATA_REGISTRY).orElse(null)
                 : null;
+
         if (reg == null)
-            throw new IllegalStateException("Accessing " + forWhat + " of " + biomeKey + " before biome data registry is ready!");
+            throw new IllegalStateException("Accessing " + forWhat + " of " + ofBiome + " before biome data registry is ready!");
 
         return reg;
     }
@@ -221,7 +227,7 @@ public class WoverBiomeData extends BiomeData {
         //null means, that we did not yet check for an edge parent
         if (edgeParent != null) return edgeParent.orElse(null);
 
-        final Registry<BiomeData> reg = getDataRegistry("edge parent");
+        final Registry<BiomeData> reg = getDataRegistry("edge parent", biomeKey);
 
         for (Map.Entry<ResourceKey<BiomeData>, BiomeData> entry : reg.entrySet()) {
             if (entry.getValue() instanceof WoverBiomeData b && this.isSame(b.edge)) {
@@ -232,20 +238,6 @@ public class WoverBiomeData extends BiomeData {
 
         edgeParent = Optional.empty();
         return null;
-    }
-
-    public RandomizedWeightedList<BiomeData> createBiomeAlternatives(Predicate<WoverBiomeData> isAllowed) {
-        final Registry<BiomeData> reg = getDataRegistry("biome alternatives");
-        final RandomizedWeightedList<BiomeData> alternatives = new RandomizedWeightedList<>();
-
-        alternatives.add(this, genChance);
-        for (Map.Entry<ResourceKey<BiomeData>, BiomeData> entry : reg.entrySet()) {
-            if (entry.getValue() instanceof WoverBiomeData b && this.isSame(b.parent) && isAllowed.test(b)) {
-                alternatives.add(b, b.genChance);
-            }
-        }
-
-        return alternatives;
     }
 
     /**
@@ -260,13 +252,13 @@ public class WoverBiomeData extends BiomeData {
 
     public BiomeData getEdgeData() {
         if (edgeData == null) return null;
-        final Registry<BiomeData> reg = getDataRegistry("edge biome");
+        final Registry<BiomeData> reg = getDataRegistry("edge biome", biomeKey);
         return reg.get(edgeData);
     }
 
     public BiomeData getParentData() {
         if (edgeData == null) return null;
-        final Registry<BiomeData> reg = getDataRegistry("parent biome");
+        final Registry<BiomeData> reg = getDataRegistry("parent biome", biomeKey);
         return reg.get(parentData);
     }
 
@@ -274,4 +266,24 @@ public class WoverBiomeData extends BiomeData {
         return KEY_CODEC;
     }
 
+    public static class InMemoryWoverBiomeData extends WoverBiomeData {
+        private InMemoryWoverBiomeData(
+                float fogDensity,
+                @NotNull ResourceKey<Biome> biome,
+                @NotNull List<Climate.ParameterPoint> parameterPoints,
+                float terrainHeight,
+                float genChance,
+                int edgeSize,
+                boolean vertical,
+                @Nullable ResourceKey<Biome> edge,
+                @Nullable ResourceKey<Biome> parent
+        ) {
+            super(fogDensity, biome, parameterPoints, terrainHeight, genChance, edgeSize, vertical, edge, parent);
+        }
+
+        @Override
+        public boolean isTemp() {
+            return true;
+        }
+    }
 }

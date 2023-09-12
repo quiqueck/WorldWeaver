@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 public class BiomeDataRegistryImpl {
     public static final EventImpl<OnBootstrapRegistry<BiomeData>> BOOTSTRAP_BIOME_DATA_REGISTRY
@@ -33,10 +34,10 @@ public class BiomeDataRegistryImpl {
             = new CustomRegistryData.DataKey<>(WoverBiome.C.id("temp_biome_data"));
 
     public static BiomeData getFromRegistryOrTemp(ResourceKey<Biome> key) {
-        return getFromRegistryOrTemp(key, BiomeData::of);
+        return getFromRegistryOrTemp(key, BiomeData::tempOf);
     }
 
-    public static BiomeData getFromRegistryOrTemp(
+    public static @Nullable BiomeData getFromRegistryOrTemp(
             ResourceKey<Biome> key,
             Function<ResourceKey<Biome>, BiomeData> factory
     ) {
@@ -50,13 +51,13 @@ public class BiomeDataRegistryImpl {
             Registry<BiomeData> registry,
             ResourceKey<Biome> key
     ) {
-        return getFromRegistryOrTemp(registry, key, BiomeData::of);
+        return getFromRegistryOrTemp(registry, key, BiomeData::tempOf);
     }
 
-    public static BiomeData getFromRegistryOrTemp(
+    public static @Nullable BiomeData getFromRegistryOrTemp(
             Registry<BiomeData> registry,
             ResourceKey<Biome> key,
-            Function<ResourceKey<Biome>, BiomeData> factory
+            Function<ResourceKey<Biome>, BiomeData> defaultFactory
     ) {
         final ResourceKey<BiomeData> dataKey = createKey(key.location());
         if (registry != null) {
@@ -73,10 +74,10 @@ public class BiomeDataRegistryImpl {
                     k -> new HashMap<>()
             );
 
-            return customData.computeIfAbsent(dataKey, k -> BiomeData.of(key));
+            return customData.computeIfAbsent(dataKey, k -> BiomeData.tempOf(key));
         }
 
-        return factory.apply(key);
+        return defaultFactory.apply(key);
     }
 
     @ApiStatus.Internal

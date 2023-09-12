@@ -8,13 +8,13 @@ import org.betterx.wover.generator.api.biomesource.WoverBiomeBuilder;
 
 import net.minecraft.world.level.biome.Biomes;
 
-public class WorldDataProvider extends WoverBiomeProvider {
+public class VanillaBiomeDataProvider extends WoverBiomeProvider {
     /**
      * Creates a new instance of {@link WoverRegistryContentProvider}.
      *
      * @param modCore The ModCore instance of the Mod that is providing this instance.
      */
-    public WorldDataProvider(
+    public VanillaBiomeDataProvider(
             ModCore modCore
     ) {
         super(modCore);
@@ -30,13 +30,11 @@ public class WorldDataProvider extends WoverBiomeProvider {
 
         WoverBiomeBuilder.wrappedKey(Biomes.END_MIDLANDS)
                          .bootstrap(context)
-                         .parent(Biomes.END_HIGHLANDS)
                          .genChance(0.5f)
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.END_BARRENS)
                          .bootstrap(context)
-                         .parent(Biomes.END_HIGHLANDS)
                          .genChance(0.3f)
                          .register();
     }

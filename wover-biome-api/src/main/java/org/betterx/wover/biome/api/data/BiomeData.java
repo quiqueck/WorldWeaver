@@ -16,6 +16,7 @@ import net.minecraft.world.level.biome.Climate;
 
 import java.util.List;
 import java.util.Objects;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,8 +44,12 @@ public class BiomeData {
         this.parameterPoints = parameterPoints;
     }
 
-    public static BiomeData of(ResourceKey<Biome> biome) {
+    public static @NotNull BiomeData of(ResourceKey<Biome> biome) {
         return new BiomeData(1.0f, biome, List.of());
+    }
+
+    public static @NotNull BiomeData tempOf(ResourceKey<Biome> biome) {
+        return new BiomeDataImpl.InMemoryBiomeData(1.0f, biome, List.of());
     }
 
     public static <T extends BiomeData> Codec<T> codec(
@@ -326,6 +331,11 @@ public class BiomeData {
         return 1.0f;
     }
 
+    @ApiStatus.Internal
+    public boolean isTemp() {
+        return false;
+    }
+
     /**
      * Tests if the given biome is the same as this one.
      *
@@ -333,10 +343,22 @@ public class BiomeData {
      * @return true if the given biome is the same as this one, false otherwise.
      */
     public boolean isSame(ResourceKey<Biome> biome) {
-        if (biome != null && this.biomeKey != null) {
-            return biome.location().equals(this.biomeKey.location());
-        }
-        return false;
+        return BiomeData.isSame(this.biomeKey, biome);
+    }
+
+    /**
+     * Tests if the given biome is the same as this one.
+     *
+     * @param biomeA the biome to test
+     * @param biomeB the second biome to test
+     * @return true if the given biome is the same as this one, false otherwise.
+     */
+    public static boolean isSame(ResourceKey<Biome> biomeA, ResourceKey<Biome> biomeB) {
+        if (biomeA == null && biomeB == null) return true;
+        if (biomeA == null || biomeB == null) return false;
+
+
+        return biomeA.location().equals(biomeB.location());
     }
 
     /**

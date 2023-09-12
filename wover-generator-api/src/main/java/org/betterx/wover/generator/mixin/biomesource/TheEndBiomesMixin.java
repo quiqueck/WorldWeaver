@@ -36,7 +36,7 @@ public class TheEndBiomesMixin {
     ) {
         BiomeDataRegistryImpl.getFromRegistryOrTemp(
                 highlands,
-                (key) -> WoverBiomeData.withEdge(key, midlands)
+                (key) -> WoverBiomeData.tempWithEdge(key, midlands)
         );
 
         TheEndBiomesHelper.add(CommonBiomeTags.IS_END_MIDLAND, midlands);
