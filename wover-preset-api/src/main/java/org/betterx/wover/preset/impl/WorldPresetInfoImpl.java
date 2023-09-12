@@ -1,6 +1,7 @@
 package org.betterx.wover.preset.impl;
 
 import org.betterx.wover.preset.api.WorldPresetInfo;
+import org.betterx.wover.preset.api.WorldPresetInfoRegistry;
 import org.betterx.wover.util.PriorityLinkedList;
 
 import com.mojang.serialization.Codec;
@@ -100,5 +101,23 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
         if (key.location().equals(LevelStem.END.location()))
             return endPreset();
         return null;
+    }
+
+    @Override
+    public @Nullable ResourceKey<WorldPreset> getPresetOverrideRecursive(
+            ResourceKey<LevelStem> forDimension,
+            int count
+    ) {
+        //see if the preset has an override for this dimension, if so find the real preset to use
+        ResourceKey<WorldPreset> configuredKey = null;
+        ResourceKey<WorldPreset> overrideKey = this.getPresetOverride(forDimension);
+        
+        while (overrideKey != null && count > 0) {
+            configuredKey = overrideKey;
+            overrideKey = WorldPresetInfoRegistry.getFor(configuredKey).getPresetOverride(forDimension);
+            count--;
+        }
+
+        return configuredKey;
     }
 }

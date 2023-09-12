@@ -12,5 +12,10 @@ public interface WorldPresetInfo {
     @Nullable ResourceKey<WorldPreset> netherPreset();
     @Nullable ResourceKey<WorldPreset> endPreset();
 
-    @Nullable ResourceKey<WorldPreset> getPresetOverride(ResourceKey<LevelStem> key);
+    @Nullable ResourceKey<WorldPreset> getPresetOverride(ResourceKey<LevelStem> forDimension);
+    @Nullable ResourceKey<WorldPreset> getPresetOverrideRecursive(ResourceKey<LevelStem> forDimension, int maxDepth);
+
+    default @Nullable ResourceKey<WorldPreset> getPresetOverrideRecursive(ResourceKey<LevelStem> key) {
+        return getPresetOverrideRecursive(key, 10);
+    }
 }

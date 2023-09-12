@@ -147,16 +147,11 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         }
 
         //see if the preset has an override for this dimension, if so find the real preset to use
-        int count = 10;
-        ResourceKey<WorldPreset> overrideKey = WorldPresetInfoRegistry.getFor(configuredKey)
-                                                                      .getPresetOverride(forDimension);
-        while (overrideKey != null && count > 0) {
-            configuredKey = overrideKey;
-            overrideKey = WorldPresetInfoRegistry.getFor(configuredKey).getPresetOverride(forDimension);
-            count--;
-        }
+        final ResourceKey<WorldPreset> overrideKey = WorldPresetInfoRegistry
+                .getFor(configuredKey)
+                .getPresetOverrideRecursive(forDimension);
 
-        return configuredKey;
+        return overrideKey != null ? overrideKey : configuredKey;
     }
 
     private String languageKey(Holder<WorldPreset> key) {
@@ -188,7 +183,8 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
                     .get()
                     .stream()
                     .filter(preset -> preset.unwrapKey().isPresent())
-                    .filter(preset -> WorldPresetInfoRegistry.getFor(preset).getPresetOverride(forDimension) == null)
+                    .filter(preset -> WorldPresetInfoRegistry.getFor(preset)
+                                                             .getPresetOverride(forDimension) == null)
                     .sorted((a, b) -> language.getOrDefault(languageKey(a))
                                               .compareTo(language.getOrDefault(languageKey(b))))
                     .forEach(preset -> {

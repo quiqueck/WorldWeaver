@@ -7,6 +7,8 @@ import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.generator.api.preset.PresetsRegistry;
 import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
+import org.betterx.wover.preset.api.WorldPresetInfo;
+import org.betterx.wover.preset.api.WorldPresetInfoRegistry;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.state.api.WorldConfig;
 import org.betterx.wover.state.api.WorldState;
@@ -189,11 +191,13 @@ public class WorldGeneratorConfigImpl {
     public static void createWorldConfig(Holder<WorldPreset> currentPreset, WorldDimensions dimensions) {
         //make sure we store the preset key in the all generators that currently do not have one
         if (currentPreset != null && currentPreset.unwrapKey().isPresent()) {
+            final WorldPresetInfo info = WorldPresetInfoRegistry.getFor(currentPreset);
             final ResourceKey<WorldPreset> presetKey = currentPreset.unwrapKey().orElseThrow();
             for (var dimEntry : dimensions.dimensions().entrySet()) {
                 if (dimEntry.getValue().generator() instanceof ConfiguredChunkGenerator cfg) {
+                    final ResourceKey<WorldPreset> secondaryPreset = info.getPresetOverrideRecursive(dimEntry.getKey());
                     if (cfg.wover_getConfiguredWorldPreset() == null) {
-                        cfg.wover_setConfiguredWorldPreset(presetKey);
+                        cfg.wover_setConfiguredWorldPreset(secondaryPreset != null ? secondaryPreset : presetKey);
                     }
                 }
             }
