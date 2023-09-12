@@ -3,7 +3,6 @@ package org.betterx.wover.generator.impl.chunkgenerator;
 import org.betterx.wover.common.generator.api.chunkgenerator.RestorableBiomeSource;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.events.api.WorldLifecycle;
-import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldState;
 

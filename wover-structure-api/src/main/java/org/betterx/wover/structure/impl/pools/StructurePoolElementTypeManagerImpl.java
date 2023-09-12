@@ -29,7 +29,9 @@ public class StructurePoolElementTypeManagerImpl {
             Codec<P> codec
     ) {
         final StructurePoolElementType<P> res = register(location, codec);
-        register(LegacyHelper.BCLIB_CORE.convertNamespace(location), codec);
+        if (LegacyHelper.isLegacyEnabled()) {
+            register(LegacyHelper.BCLIB_CORE.convertNamespace(location), LegacyHelper.wrap(codec));
+        }
         return res;
     }
 

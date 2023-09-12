@@ -43,7 +43,9 @@ public class FeatureManagerImpl {
     ) {
         final var key = createKey(id);
         F res = register(key, feature.apply(codec));
-        register(LegacyHelper.BCLIB_CORE.convertNamespace(key.location()), feature.apply(codec));
+        if (LegacyHelper.isLegacyEnabled()) {
+            register(LegacyHelper.BCLIB_CORE.convertNamespace(key.location()), feature.apply(codec));
+        }
         return res;
     }
 

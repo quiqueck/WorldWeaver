@@ -2,8 +2,9 @@ package org.betterx.wover.generator.datagen;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
-import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
+import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
+import org.betterx.wover.legacy.api.LegacyHelper;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -28,9 +29,11 @@ public class NoiseGeneratorSettingsProvider extends WoverRegistryContentProvider
                 WoverChunkGenerator.amplifiedNether(bootstrapContext)
         );
 
-        bootstrapContext.register(
-                WoverChunkGeneratorImpl.LEGACY_AMPLIFIED_NETHER,
-                WoverChunkGenerator.amplifiedNether(bootstrapContext)
-        );
+        if (LegacyHelper.isLegacyEnabled()) {
+            bootstrapContext.register(
+                    WoverChunkGeneratorImpl.LEGACY_AMPLIFIED_NETHER,
+                    WoverChunkGenerator.amplifiedNether(bootstrapContext)
+            );
+        }
     }
 }

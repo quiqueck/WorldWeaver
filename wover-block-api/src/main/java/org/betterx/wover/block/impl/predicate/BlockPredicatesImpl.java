@@ -17,16 +17,20 @@ public class BlockPredicatesImpl {
             IsFullShape.CODEC
     );
 
-    private static final BlockPredicateType<IsFullShape> FULL_SHAPE_LEGACY = register(
-            LegacyHelper.BCLIB_CORE.id("full_shape"),
-            IsFullShape.CODEC
-    );
-
     public static <P extends BlockPredicate> BlockPredicateType<P> register(ResourceLocation location, Codec<P> codec) {
         return Registry.register(BuiltInRegistries.BLOCK_PREDICATE_TYPE, location, () -> codec);
     }
 
     public static void ensureStaticInitialization() {
 
+    }
+
+    static {
+        if (LegacyHelper.isLegacyEnabled()) {
+            final BlockPredicateType<IsFullShape> FULL_SHAPE_LEGACY = register(
+                    LegacyHelper.BCLIB_CORE.id("full_shape"),
+                    IsFullShape.CODEC
+            );
+        }
     }
 }

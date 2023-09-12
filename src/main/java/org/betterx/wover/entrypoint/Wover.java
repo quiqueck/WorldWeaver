@@ -10,6 +10,6 @@ public class Wover implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        C.LOG.info("Hello Fabric world!");
+        C.LOG.info("Hello Fabric world !!!");
     }
 }

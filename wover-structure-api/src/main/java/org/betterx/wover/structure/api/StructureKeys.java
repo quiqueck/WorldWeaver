@@ -112,7 +112,6 @@ public class StructureKeys {
      *
      * @param location         The location of the {@link StructureTypeKey}
      * @param structureFactory The {@link StructureTypeKey.StructureFactory}
-     * @param codec            The {@link Codec} for Structure class
      * @param <S>              The {@link Structure} type
      * @return The {@link StructureTypeKey}
      */

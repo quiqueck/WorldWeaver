@@ -7,7 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 
 /**
  * Used for subscribers of the
- * {@link org.betterx.wover.events.api.WorldLifecycle#WORLD_CONFIG_READY}
+ * {@link org.betterx.wover.state.api.WorldConfig#event(ModCore)}
  * event.
  */
 @FunctionalInterface

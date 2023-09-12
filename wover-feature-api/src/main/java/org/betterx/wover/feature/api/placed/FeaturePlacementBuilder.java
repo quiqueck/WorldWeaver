@@ -7,6 +7,7 @@ import org.betterx.wover.feature.api.placed.modifiers.EveryLayer;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Vec3i;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -40,8 +41,8 @@ import java.util.List;
  *
  * @see PlacedFeatureKey#place(BootstapContext, Holder)
  * @see PlacedFeatureKey#place(BootstapContext, ResourceKey)
- * @see PlacedFeatureKey.WithConfigured#place(BootstapContext)
- * @see PlacedFeatureKey.WithConfigured#place(BootstapContext, net.minecraft.core.HolderGetter)
+ * @see PlacedConfiguredFeatureKey#place(BootstapContext)
+ * @see PlacedConfiguredFeatureKey#place(BootstapContext, HolderGetter)
  * @see FeatureConfigurator#inlinePlace()
  */
 public interface FeaturePlacementBuilder {

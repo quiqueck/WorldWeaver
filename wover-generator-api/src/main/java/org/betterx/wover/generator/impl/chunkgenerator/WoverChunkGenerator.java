@@ -1,4 +1,4 @@
-package org.betterx.wover.generator.api.chunkgenerator;
+package org.betterx.wover.generator.impl.chunkgenerator;
 
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithNoiseRelatedSettings;
 import org.betterx.wover.common.generator.api.biomesource.MergeableBiomeSource;
@@ -9,8 +9,6 @@ import org.betterx.wover.common.generator.api.chunkgenerator.RestorableBiomeSour
 import org.betterx.wover.common.surface.api.InjectableSurfaceRules;
 import org.betterx.wover.core.api.IntegrationCore;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
-import org.betterx.wover.generator.impl.chunkgenerator.ChunkGeneratorManagerImpl;
-import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGeneratorImpl;
 import org.betterx.wover.generator.mixin.generator.ChunkGeneratorAccessor;
 import org.betterx.wover.surface.impl.SurfaceRuleUtil;
 

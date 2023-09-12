@@ -1,5 +1,6 @@
 package org.betterx.wover.structure.api;
 
+import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.structure.api.builders.BaseStructureBuilder;
 import org.betterx.wover.tag.api.TagManager;
 
@@ -41,7 +42,8 @@ public abstract class StructureKey<S extends Structure, T extends BaseStructureB
 
     /**
      * Define a BiomeTag that will be used to determine if the structure can spawn in a biome. You can
-     * build a new Structure tag by using {@link TagManager#BIOMES#makeStructureTag(ResourceLocation)}.
+     * build a new Structure tag by using {@link org.betterx.wover.tag.api.BiomeTagRegistry#makeStructureTag(ModCore, String)}
+     * from {@link TagManager#BIOMES}.
      *
      * @param biomeTag The biome tag to set
      * @return The same instance for chaining

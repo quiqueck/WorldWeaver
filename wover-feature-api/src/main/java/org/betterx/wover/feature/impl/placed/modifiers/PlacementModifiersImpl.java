@@ -81,17 +81,6 @@ public class PlacementModifiersImpl {
             EveryLayer.CODEC
     );
 
-    private static final PlacementModifierType<EveryLayer> ON_EVERY_LAYER_LEGACY = register(
-            LegacyHelper.BCLIB_CORE.id("on_every_layer"),
-            EveryLayer.CODEC,
-            false
-    );
-    private static final PlacementModifierType<EveryLayer> UNDER_EVERY_LAYER_LEGACY = register(
-            LegacyHelper.BCLIB_CORE.id("under_every_layer"),
-            EveryLayer.CODEC_LEGACY_UNDER,
-            false
-    );
-
 
     private static <P extends PlacementModifier> PlacementModifierType<P> registerLegacy(String path, Codec<P> codec) {
         var id = WoverFeature.C.id(path);
@@ -114,7 +103,7 @@ public class PlacementModifiersImpl {
                 () -> codec
         );
 
-        if (withLegacyBCLib) {
+        if (withLegacyBCLib && LegacyHelper.isLegacyEnabled()) {
             Registry.<PlacementModifierType<?>, PlacementModifierType<P>>register(
                     BuiltInRegistries.PLACEMENT_MODIFIER_TYPE,
                     LegacyHelper.BCLIB_CORE.convertNamespace(location),
@@ -127,6 +116,21 @@ public class PlacementModifiersImpl {
     @ApiStatus.Internal
     public static void ensureStaticInitialization() {
 
+    }
+
+    static {
+        if (LegacyHelper.isLegacyEnabled()) {
+            final PlacementModifierType<EveryLayer> ON_EVERY_LAYER_LEGACY = register(
+                    LegacyHelper.BCLIB_CORE.id("on_every_layer"),
+                    EveryLayer.CODEC,
+                    false
+            );
+            final PlacementModifierType<EveryLayer> UNDER_EVERY_LAYER_LEGACY = register(
+                    LegacyHelper.BCLIB_CORE.id("under_every_layer"),
+                    EveryLayer.CODEC_LEGACY_UNDER,
+                    false
+            );
+        }
     }
 }
 

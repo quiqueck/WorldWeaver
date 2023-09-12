@@ -28,7 +28,7 @@ public class MaterialConditionRegistryImpl {
             boolean withBCLibLegacy
     ) {
         BuiltInRegistryManager.register(BuiltInRegistries.MATERIAL_CONDITION, key, codec);
-        if (withBCLibLegacy) {
+        if (withBCLibLegacy && LegacyHelper.isLegacyEnabled()) {
             BuiltInRegistryManager.register(
                     BuiltInRegistries.MATERIAL_CONDITION,
                     LegacyHelper.BCLIB_CORE.convertNamespace(key.location()),

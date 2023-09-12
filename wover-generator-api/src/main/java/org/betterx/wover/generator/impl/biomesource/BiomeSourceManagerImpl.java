@@ -63,10 +63,16 @@ public class BiomeSourceManagerImpl {
     @ApiStatus.Internal
     public static void initialize() {
         register(WoverWorldGenerator.C.id("nether_biome_source"), WoverNetherBiomeSource.CODEC);
-        register(LegacyHelper.BCLIB_CORE.id("nether_biome_source"), LegacyHelper.wrap(WoverNetherBiomeSource.CODEC));
 
         register(WoverWorldGenerator.C.id("end_biome_source"), WoverEndBiomeSource.CODEC);
-        register(LegacyHelper.BCLIB_CORE.id("end_biome_source"), LegacyHelper.wrap(WoverEndBiomeSource.CODEC));
+
+        if (LegacyHelper.isLegacyEnabled()) {
+            register(
+                    LegacyHelper.BCLIB_CORE.id("nether_biome_source"),
+                    LegacyHelper.wrap(WoverNetherBiomeSource.CODEC)
+            );
+            register(LegacyHelper.BCLIB_CORE.id("end_biome_source"), LegacyHelper.wrap(WoverEndBiomeSource.CODEC));
+        }
 
         WorldLifecycle.RESOURCES_LOADED.subscribe(BiomeSourceManagerImpl::onResourcesLoaded);
         WorldLifecycle.WORLD_REGISTRY_READY.subscribeReadOnly(BiomeSourceManagerImpl::registerBiomesWithFabric, 100);

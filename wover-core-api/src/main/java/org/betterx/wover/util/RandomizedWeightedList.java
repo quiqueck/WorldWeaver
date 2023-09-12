@@ -174,7 +174,7 @@ public class RandomizedWeightedList<T> {
     /**
      * Returns whether the list is empty.
      *
-     * @return @{code true} if the list is empty, {@code false} otherwise
+     * @return {@code true} if the list is empty, {@code false} otherwise
      */
     public boolean isEmpty() {
         return entries.isEmpty();
@@ -283,7 +283,7 @@ public class RandomizedWeightedList<T> {
         /**
          * Returns whether the tree is empty.
          *
-         * @return @{code true} if the tree is empty, {@code false} otherwise
+         * @return {@code true} if the tree is empty, {@code false} otherwise
          */
         public boolean isEmpty() {
             return root == null || (root instanceof Leaf l && l.biome == null);

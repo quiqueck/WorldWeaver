@@ -29,4 +29,8 @@ public class LegacyHelper {
 
     public static final ModCore WORLDS_TOGETHER_CORE = ModCore.create("worlds_together");
     public static final ModCore BCLIB_CORE = ModCore.create("bclib");
+
+    public static boolean isLegacyEnabled() {
+        return false;
+    }
 }

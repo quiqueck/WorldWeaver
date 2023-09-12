@@ -22,10 +22,12 @@ public class NumericProviderRegistryImpl {
             Codec<? extends NumericProvider> codec
     ) {
         NumericProviderRegistry.register(key, codec);
-        NumericProviderRegistry.register(
-                LegacyHelper.BCLIB_CORE.convertNamespace(key.location()),
-                LegacyHelper.wrap(codec)
-        );
+        if (LegacyHelper.isLegacyEnabled()) {
+            NumericProviderRegistry.register(
+                    LegacyHelper.BCLIB_CORE.convertNamespace(key.location()),
+                    LegacyHelper.wrap(codec)
+            );
+        }
     }
 
     @ApiStatus.Internal

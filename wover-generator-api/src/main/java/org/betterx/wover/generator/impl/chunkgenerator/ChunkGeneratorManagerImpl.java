@@ -5,7 +5,6 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.events.api.WorldLifecycle;
-import org.betterx.wover.generator.api.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldConfig;
 import org.betterx.wover.state.api.WorldState;
@@ -65,7 +64,9 @@ public class ChunkGeneratorManagerImpl {
     @ApiStatus.Internal
     public static void initialize() {
         register(WoverChunkGenerator.ID, WoverChunkGenerator.CODEC);
-        register(LEGACY_ID, LegacyHelper.wrap(WoverChunkGenerator.CODEC));
+        if (LegacyHelper.isLegacyEnabled()) {
+            register(LEGACY_ID, LegacyHelper.wrap(WoverChunkGenerator.CODEC));
+        }
         WorldConfig.registerMod(WoverWorldGenerator.C);
 
         WorldLifecycle.CREATED_NEW_WORLD_FOLDER.subscribe(ChunkGeneratorManagerImpl::onWorldCreation, 2000);
