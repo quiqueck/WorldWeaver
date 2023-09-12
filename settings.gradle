@@ -8,23 +8,14 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
-rootProject.name = 'WorldWeaver'
-
+rootProject.name = 'world-weaver'
 //include 'bclib-legacy'
-include 'wover-common-api'
-include 'wover-core-api'
-include 'wover-math-api'
-include 'wover-event-api'
-include 'wover-surface-api'
-include 'wover-ui-api'
-include 'wover-datagen-api'
-include 'wover-tag-api'
-include 'wover-preset-api'
-include 'wover-block-api'
-include 'wover-feature-api'
-include 'wover-structure-api'
-include 'wover-biome-api'
-include 'wover-generator-api'
+
+apply from: "module-include.gradle"
+ext.knownWoverModules.each { module->
+    include module
+}
+
 
 include 'WunderLib'
 project(':WunderLib').buildFileName = './wunderlib-include.gradle'

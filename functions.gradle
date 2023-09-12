@@ -1,0 +1,41 @@
+def moduleDependencies(project, List<String> depNames) {
+    def deps = getDependencies(project, depNames,'namedElements')
+    project.dependencies {
+        deps.each {
+            api it
+        }
+    }
+}
+
+def testDependencies(project, List<String> depNames) {
+    def deps = getDependencies(project, depNames,'namedElements')
+
+    project.dependencies {
+        deps.each {
+            testmodImplementation it
+            testmodClientImplementation it
+        }
+    }
+}
+
+def datagenDependencies(project, List<String> depNames) {
+    def deps = getDependencies(project, depNames,'namedElements')
+    def depsClient = getDependencies(project, depNames,'devClient')
+
+    project.dependencies {
+        deps.each {
+            datagenImplementation it
+        }
+
+        depsClient.each {
+            datagenImplementation it
+        }
+    }
+}
+
+// Export methods by turning them into closures
+ext {
+    moduleDependencies = this.&moduleDependencies
+    testDependencies = this.&testDependencies
+    datagenDependencies = this.&datagenDependencies
+}
