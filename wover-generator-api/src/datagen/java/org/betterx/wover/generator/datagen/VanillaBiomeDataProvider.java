@@ -24,7 +24,7 @@ public class VanillaBiomeDataProvider extends WoverBiomeProvider {
     protected void bootstrap(BiomeBootstrapContext context) {
         WoverBiomeBuilder.wrappedKey(Biomes.END_HIGHLANDS)
                          .bootstrap(context)
-                         .edge(Biomes.END_MIDLANDS)
+                         .genChance(2.0f)
                          .edgeSize(4)
                          .register();
 
