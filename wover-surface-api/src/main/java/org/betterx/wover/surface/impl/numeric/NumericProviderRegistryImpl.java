@@ -12,9 +12,9 @@ import org.jetbrains.annotations.ApiStatus;
 
 public class NumericProviderRegistryImpl {
 
-    static final ResourceKey<Codec<? extends NumericProvider>> RANDOM_INT
+    public static final ResourceKey<Codec<? extends NumericProvider>> RANDOM_INT
             = NumericProviderRegistry.createKey(WoverSurface.C.id("rnd_int"));
-    static final ResourceKey<Codec<? extends NumericProvider>> NETHER_NOISE
+    public static final ResourceKey<Codec<? extends NumericProvider>> NETHER_NOISE
             = NumericProviderRegistry.createKey(WoverSurface.C.id("nether_noise"));
 
     public static void registerWithBCLib(

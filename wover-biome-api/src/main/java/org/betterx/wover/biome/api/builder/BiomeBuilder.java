@@ -1,5 +1,6 @@
 package org.betterx.wover.biome.api.builder;
 
+import de.ambertation.wunderlib.ui.ColorHelper;
 import org.betterx.wover.biome.api.BiomeKey;
 import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.impl.builder.BiomeSurfaceRuleBuilderImpl;
@@ -13,7 +14,9 @@ import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -94,6 +98,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
 
     public B structure(StructureKey<?, ?> structure) {
         return tag(structure.getBiomeTag());
+    }
+
+    public B structure(TagKey<Biome> structureTag) {
+        return tag(structureTag);
     }
 
     @SafeVarargs
@@ -225,6 +233,35 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             return (B) this;
         }
 
+        /**
+         * Will add features into biome, used for vanilla feature adding functions.
+         *
+         * @param featureAdd {@link Consumer} with {@link BiomeGenerationSettings.Builder}.
+         * @return same builder.
+         */
+        public B feature(Consumer<BiomeGenerationSettings.Builder> featureAdd) {
+            featureAdd.accept(generationSettings);
+            return (B) this;
+        }
+
+        /**
+         * Adds vanilla Mushrooms.
+         *
+         * @return same builder.
+         */
+        public B defaultMushrooms() {
+            return feature(BiomeDefaultFeatures::addDefaultMushrooms);
+        }
+
+        /**
+         * Adds vanilla Nether Ores.
+         *
+         * @return same builder.
+         */
+        public B netherDefaultOres() {
+            return feature(BiomeDefaultFeatures::addNetherDefaultOres);
+        }
+
         public B carver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carver) {
             generationSettings.addCarver(
                     step,
@@ -240,6 +277,11 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
 
         public B fogColor(int color) {
             fx.fogColor(color);
+            return (B) this;
+        }
+
+        public B fogColor(int r, int g, int b) {
+            fx.fogColor(ColorHelper.color(r, g, b));
             return (B) this;
         }
 
@@ -273,10 +315,24 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             return (B) this;
         }
 
+
+        /**
+         * Adds ambient particles .
+         *
+         * @param particle    {@link ParticleOptions} particles (or {@link net.minecraft.core.particles.ParticleType}).
+         * @param probability particle spawn probability, should have low value (example: 0.01F).
+         * @return this builder.
+         */
+        public B particles(ParticleOptions particle, float probability) {
+            particles(new AmbientParticleSettings(particle, probability));
+            return (B) this;
+        }
+
         public B particles(AmbientParticleSettings ambientParticleSettings) {
             fx.ambientParticle(ambientParticleSettings);
             return (B) this;
         }
+
 
         public B loop(Holder<SoundEvent> holder) {
             fx.ambientLoopSound(holder);
@@ -303,6 +359,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
 
         public B additions(Holder<SoundEvent> additions, float intensity) {
             return additions(new AmbientAdditionsSettings(additions, intensity));
+        }
+
+        public B additions(Holder<SoundEvent> additions) {
+            return additions(additions, 0.0111F);
         }
 
         public B music(@Nullable Music music) {

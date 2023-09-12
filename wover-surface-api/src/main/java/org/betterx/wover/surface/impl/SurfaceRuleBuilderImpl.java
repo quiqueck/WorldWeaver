@@ -274,6 +274,23 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
         return (T) this;
     }
 
+    public T chancedFloor(BlockState surfaceBlockA, SurfaceRules.RuleSource surfaceBlockB, NoiseCondition noise) {
+        SurfaceRules.RuleSource rule =
+                SurfaceRules.ifTrue(
+                        SurfaceRules.ON_FLOOR,
+                        SurfaceRules.sequence(
+                                SurfaceRules.ifTrue(
+                                        noise,
+                                        SurfaceRules.state(
+                                                surfaceBlockA)
+                                ),
+                                surfaceBlockB
+                        )
+                );
+        rules.add(rule, FLOOR_PRIORITY);
+        return (T) this;
+    }
+
     /**
      * Change the sorting order of this rule. Higher priority rules are applied first if there are multiple rules for a
      * specific biome. By default the Priority is set to {@link PriorityLinkedList#DEFAULT_PRIORITY}
