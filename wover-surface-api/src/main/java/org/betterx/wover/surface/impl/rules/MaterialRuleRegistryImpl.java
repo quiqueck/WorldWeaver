@@ -38,10 +38,12 @@ public class MaterialRuleRegistryImpl {
     public static void bootstrap() {
         register(SWITCH_RULE, SwitchRuleSource.CODEC);
 
-        Registry.register(
-                BuiltInRegistries.MATERIAL_RULE,
-                "bclib_switch_rule",
-                LegacyHelper.wrap(SwitchRuleSource.CODEC)
-        );
+        if (LegacyHelper.isLegacyEnabled()) {
+            Registry.register(
+                    BuiltInRegistries.MATERIAL_RULE,
+                    "bclib_switch_rule",
+                    LegacyHelper.wrap(SwitchRuleSource.CODEC)
+            );
+        }
     }
 }
