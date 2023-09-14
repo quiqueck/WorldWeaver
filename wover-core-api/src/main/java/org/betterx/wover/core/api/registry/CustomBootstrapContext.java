@@ -12,7 +12,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class CustomBootstrapContext<T, C extends CustomBootstrapContext<T, C>> {
+public abstract class CustomBootstrapContext<T, C extends CustomBootstrapContext<T, C>> implements LookupProvider {
     protected BootstapContext<?> lookupContext;
 
     @ApiStatus.Internal
@@ -20,6 +20,7 @@ public abstract class CustomBootstrapContext<T, C extends CustomBootstrapContext
         this.lookupContext = lookupContext;
     }
 
+    @Override
     public <S> @Nullable HolderGetter<S> lookup(@NotNull ResourceKey<? extends Registry<? extends S>> registryKey) {
         if (lookupContext == null) return null;
         return lookupContext.lookup(registryKey);
