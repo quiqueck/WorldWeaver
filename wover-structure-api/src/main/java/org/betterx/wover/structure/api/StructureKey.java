@@ -51,7 +51,7 @@ public interface StructureKey<
      * @param biomeTag The biome tag to set
      * @return The same instance for chaining
      */
-    R setBiomeTag(@Nullable TagKey<Biome> biomeTag);
+    R biomeTag(@Nullable TagKey<Biome> biomeTag);
 
     /**
      * Returns the BiomeTag that was set for this structure. If no tag was set, it will return

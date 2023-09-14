@@ -148,17 +148,19 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
         return false;
     }
 
+    protected String getTitle() {
+        return this.getClass().getSimpleName();
+    }
 
     @Override
     public FabricTagProvider<T> getProvider(
             FabricDataOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
-        String baseName = this.getClass().getSimpleName();
         return new FabricTagProvider<T>(output, tagRegistry.registryKey(), registriesFuture) {
             @Override
             public String getName() {
-                return baseName + " (" + super.getName() + ")";
+                return getTitle() + " (" + super.getName() + ")";
             }
 
             @Override

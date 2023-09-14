@@ -115,6 +115,10 @@ public abstract class WoverStructureProvider implements WoverMultiProvider {
 
         pack.addProvider(modCore ->
                 new WoverTagProvider.ForBiomes(modCore) {
+                    @Override
+                    protected String getTitle() {
+                        return "Structure Provider";
+                    }
 
                     @Override
                     protected void prepareTags(TagBootstrapContext<Biome> provider) {

@@ -2,6 +2,8 @@ package org.betterx.wover.structure.api.sets;
 
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
+import org.betterx.wover.structure.api.StructureKey;
+import org.betterx.wover.structure.api.builders.BaseStructureBuilder;
 import org.betterx.wover.structure.impl.sets.StructureSetManagerImpl;
 
 import net.minecraft.core.Holder;
@@ -39,6 +41,44 @@ public class StructureSetManager {
             ResourceLocation location
     ) {
         return new StructureSetKey(location);
+    }
+
+
+    /**
+     * Creates a {@link StructureSetKey} for the given {@link StructureKey}.
+     *
+     * @param structure The {@link StructureKey} to create the {@link StructureSetKey} for
+     * @return The {@link StructureSetKey}
+     */
+    public static StructureSetKey createKey(
+            StructureKey<?, ?, ?> structure
+    ) {
+        return createKey(structure.key().location());
+    }
+
+    /**
+     * Creates a {@link StructureSetKey} for the given {@link Structure} and starts
+     * the bootstrap process by adding the {@link Structure} to the {@link StructureSet}.
+     * <p>
+     * The ID of the set will be the same as the ID of the passed structure. This call is a
+     * shortcut for {@code createKey(structure).bootstrap(context).addStructure(structure)}.
+     *
+     * @param structure The {@link Structure} to create the {@link StructureSetKey} for
+     * @param context   The {@link BootstapContext} to bootstrap the {@link StructureSet} with
+     * @param <S>       The {@link Structure} type
+     * @param <T>       The Builder Ttype
+     * @param <R>       The {@link StructureKey} type
+     * @return The {@link StructureSetBuilder} for the newly created set.
+     */
+    public static <
+            S extends Structure,
+            T extends BaseStructureBuilder<S, T>,
+            R extends StructureKey<S, T, R>
+            > StructureSetBuilder bootstrap(
+            R structure,
+            BootstapContext<StructureSet> context
+    ) {
+        return createKey(structure).bootstrap(context).addStructure(structure);
     }
 
     /**

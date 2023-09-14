@@ -63,6 +63,10 @@ public class StructureSetBuilder {
         return addStructure(structure, 1);
     }
 
+    public StructureSetBuilder randomPlacement(int spacing, int seperation) {
+        return randomPlacement().spacing(spacing).separation(seperation).finishPlacement();
+    }
+
     public RandomSpreadStructurePlacementBuilder randomPlacement() {
         return new RandomSpreadStructurePlacementBuilder(key);
     }
@@ -134,7 +138,7 @@ public class StructureSetBuilder {
         protected int salt;
         protected Optional<StructurePlacement.ExclusionZone> exclusionZone;
 
-        public abstract StructureSetBuilder setPlacement();
+        public abstract StructureSetBuilder finishPlacement();
 
         @NotNull
         public R locateOffset(Vec3i offset) {
@@ -172,7 +176,7 @@ public class StructureSetBuilder {
             frequency = 1.0f;
             exclusionZone = Optional.empty();
 
-            salt = baseKey.location().hashCode();
+            salt = Math.abs(baseKey.location().hashCode());
         }
     }
 
@@ -207,7 +211,7 @@ public class StructureSetBuilder {
         }
 
         @Override
-        public StructureSetBuilder setPlacement() {
+        public StructureSetBuilder finishPlacement() {
             return StructureSetBuilder.this.setPlacement(new RandomSpreadStructurePlacement(
                     locateOffset,
                     frequencyReductionMethod,
@@ -267,7 +271,7 @@ public class StructureSetBuilder {
         }
 
         @Override
-        public StructureSetBuilder setPlacement() {
+        public StructureSetBuilder finishPlacement() {
             return StructureSetBuilder.this.setPlacement(new ConcentricRingsStructurePlacement(
                     locateOffset,
                     frequencyReductionMethod,

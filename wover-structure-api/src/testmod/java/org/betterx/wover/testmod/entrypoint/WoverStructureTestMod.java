@@ -20,12 +20,12 @@ public class WoverStructureTestMod implements ModInitializer {
 
     public static final StructureKey.Simple<TestStructure> TEST_STRUCTURE
             = StructureKeys.structure(C.id("test_structure"), TestStructure::new)
-                           .setBiomeTag(TagManager.BIOMES.makeStructureTag(C, "test_structure"))
+                           .biomeTag(TagManager.BIOMES.makeStructureTag(C, "test_structure"))
                            .step(GenerationStep.Decoration.VEGETAL_DECORATION);
 
     public static final StructureKey.Jigsaw JIGSAW_STRUCTURE
             = StructureKeys.jigsaw(C.id("jigsaw_structure"))
-                           .setBiomeTag(TEST_STRUCTURE.biomeTag())
+                           .biomeTag(TEST_STRUCTURE.biomeTag())
                            .step(GenerationStep.Decoration.SURFACE_STRUCTURES);
 
     public static final StructureSetKey TEST_STRUCTURE_SET

@@ -42,7 +42,7 @@ public abstract class StructureKeyImpl<
     }
 
     @Override
-    public R setBiomeTag(@Nullable TagKey<Biome> biomeTag) {
+    public R biomeTag(@Nullable TagKey<Biome> biomeTag) {
         this.biomeTag = biomeTag;
         return (R) this;
     }
