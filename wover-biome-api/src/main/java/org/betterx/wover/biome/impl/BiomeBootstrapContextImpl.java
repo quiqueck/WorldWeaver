@@ -25,11 +25,6 @@ public class BiomeBootstrapContextImpl extends CustomBootstrapContext<Biome, Bio
         registeredBuilders.add(builder);
     }
 
-    @Override
-    public void register(@NotNull BiomeBuilder<?> builder) {
-        this.register(builder, Lifecycle.stable());
-    }
-
     @ApiStatus.Internal
     public final void bootstrapBiome(BootstapContext<Biome> context) {
         for (BiomeBuilder<?> builder : registeredBuilders) {

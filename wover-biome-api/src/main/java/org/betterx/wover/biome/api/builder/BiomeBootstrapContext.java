@@ -11,6 +11,10 @@ import org.jetbrains.annotations.NotNull;
 
 public interface BiomeBootstrapContext extends LookupProvider {
     void register(@NotNull BiomeBuilder<?> builder, Lifecycle lifecycle);
-    void register(@NotNull BiomeBuilder<?> builder);
+
+    default void register(@NotNull BiomeBuilder<?> builder) {
+        this.register(builder, Lifecycle.stable());
+    }
+    
     <S> HolderGetter<S> lookup(@NotNull ResourceKey<? extends Registry<? extends S>> registryKey);
 }
