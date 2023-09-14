@@ -73,7 +73,7 @@ public abstract class StructureKey<S extends Structure, T extends BaseStructureB
      *
      * @return The decoration
      */
-    public GenerationStep.@NotNull Decoration getDecoration() {
+    public GenerationStep.@NotNull Decoration getStep() {
         return decoration;
     }
 
@@ -83,7 +83,7 @@ public abstract class StructureKey<S extends Structure, T extends BaseStructureB
      * @param decoration The decoration to set
      * @return This {@link StructureKey} for chaining
      */
-    public StructureKey<S, T> setDecoration(GenerationStep.Decoration decoration) {
+    public StructureKey<S, T> step(GenerationStep.Decoration decoration) {
         this.decoration = decoration;
         return this;
     }

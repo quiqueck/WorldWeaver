@@ -1,6 +1,8 @@
 package org.betterx.wover.testmod.entrypoint;
 
 import org.betterx.wover.biome.api.BiomeKey;
+import org.betterx.wover.biome.api.BiomeManager;
+import org.betterx.wover.biome.api.builder.BiomeBuilder;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
@@ -15,8 +17,10 @@ import org.betterx.wover.preset.api.WorldPresetManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
 
 import net.fabricmc.api.ModInitializer;
@@ -71,5 +75,19 @@ public class WoverWorldGeneratorTestMod implements ModInitializer {
         }
 
         C.log.info("" + testMap.get(k3));
+
+        final BiomeKey<BiomeBuilder.Vanilla> RUNTIME_TEST_BIOME = BiomeManager.vanilla(C.id(
+                "runtime_test_biome"));
+        
+        BiomeManager.BOOTSTRAP_BIOMES_WITH_DATA.subscribe(context -> {
+            RUNTIME_TEST_BIOME
+                    .bootstrap(context)
+                    .surface(Blocks.AMETHYST_BLOCK)
+                    .fogDensity(2.0F)
+                    .isNetherBiome()
+                    .hasPrecipitation(false)
+                    .structure(BiomeTags.HAS_RUINED_PORTAL_NETHER)
+                    .register();
+        });
     }
 }

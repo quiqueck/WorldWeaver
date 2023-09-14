@@ -21,9 +21,9 @@ public class WoverBiomeTestMod implements ModInitializer {
 
     public static final BiomeKey<BiomeBuilder.Vanilla> TEST_BIOME = BiomeManager.vanilla(C.id("test_biome"));
 
+
     @Override
     public void onInitialize() {
-
         BiomeModificationRegistry.BOOTSTRAP_BIOME_MODIFICATION_REGISTRY.subscribe(context -> {
             var features = context.lookup(Registries.PLACED_FEATURE);
 

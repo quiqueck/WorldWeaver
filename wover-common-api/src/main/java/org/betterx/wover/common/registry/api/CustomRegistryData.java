@@ -16,7 +16,7 @@ public interface CustomRegistryData {
         public @NotNull
         final ResourceLocation id;
 
-        public DataKey(@NotNull ResourceLocation id) {
+        private DataKey(@NotNull ResourceLocation id) {
             this.id = id;
         }
 
@@ -31,6 +31,17 @@ public interface CustomRegistryData {
         public int hashCode() {
             return Objects.hash(id);
         }
+    }
+
+    /**
+     * Create a new DataKey. A Key is a unique identifier for a custom Datapoint in a Registry.
+     *
+     * @param id  The Data ID
+     * @param <T> The Data Type
+     * @return The DataKey
+     */
+    static <T> DataKey<T> createKey(ResourceLocation id) {
+        return new DataKey<>(id);
     }
 
     /**

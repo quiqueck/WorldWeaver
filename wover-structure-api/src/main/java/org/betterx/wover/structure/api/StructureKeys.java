@@ -36,6 +36,16 @@ public class StructureKeys {
     }
 
     /**
+     * Alias for {@link StructureSetManager#createKey(ResourceLocation)}.
+     *
+     * @param structure The structure this set is for
+     * @return The {@link StructureSetKey}
+     */
+    public static StructureSetKey set(StructureKey<?, ?> structure) {
+        return set(structure.key.location());
+    }
+
+    /**
      * Alias for {@link StructureProcessorManager#createKey(ResourceLocation)}.
      *
      * @param location The location of the {@link StructureProcessorList}

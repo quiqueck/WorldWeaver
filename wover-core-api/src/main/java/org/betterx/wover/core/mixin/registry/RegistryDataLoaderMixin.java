@@ -1,6 +1,7 @@
 package org.betterx.wover.core.mixin.registry;
 
 import org.betterx.wover.core.impl.registry.DatapackRegistryBuilderImpl;
+import org.betterx.wover.entrypoint.WoverCore;
 
 import com.mojang.serialization.Decoder;
 import net.minecraft.core.Registry;
@@ -33,9 +34,12 @@ public class RegistryDataLoaderMixin {
     private static void wover_init(CallbackInfo ci) {
         List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList<>(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + 1);
         enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES);
+        WoverCore.C.log.debug("Enhanced RegistryDataLoader.WORLDGEN_REGISTRIES");
         DatapackRegistryBuilderImpl.forEach((key, codec) -> {
-            if (codec != null)
+            if (codec != null) {
+                WoverCore.C.log.debug("    - Adding " + key.location());
                 enhanced.add(new RegistryDataLoader.RegistryData(key, codec));
+            }
         });
 
         wt_set_WORLDGEN_REGISTRIES(enhanced);

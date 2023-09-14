@@ -425,12 +425,6 @@ public interface BiomeModification {
             return this.addFeature(decoration, holder);
         }
 
-        public Builder addStructure(
-                StructureKey<?, ?> structure
-        ) {
-            return this;
-        }
-
         /**
          * Adds a feature to the modification. This feature will be added to the {@link GenerationStep.Decoration}
          * of all Biomes that match the {@link #predicate}.
@@ -466,6 +460,28 @@ public interface BiomeModification {
                         "You can not add a PlacedFeatureKey to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");
             }
             return this.addFeature(feature.getDecoration(), feature.getHolder(bootstrapContext));
+        }
+
+        public Builder addStructureSet(
+                StructureKey<?, ?> structure
+        ) {
+            if (bootstrapContext == null) {
+                throw new IllegalStateException(
+                        "You can not add a Structure to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");
+            }
+
+            return this.addToTag(structure.getBiomeTag());
+        }
+
+        public Builder addStructureSet(
+                TagKey<Biome> structureSet
+        ) {
+            if (bootstrapContext == null) {
+                throw new IllegalStateException(
+                        "You can not add a Structure to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");
+            }
+
+            return this.addToTag(structureSet);
         }
 
 

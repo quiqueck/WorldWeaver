@@ -55,7 +55,7 @@ public abstract class BaseStructureBuilderImpl<S extends Structure, R extends Ba
         return new Structure.StructureSettings(
                 context.lookup(Registries.BIOME).getOrThrow(key.getBiomeTag()),
                 spawnOverrides,
-                key.getDecoration(),
+                key.getStep(),
                 terrainAdjustment
         );
     }

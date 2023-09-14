@@ -1,5 +1,7 @@
 package org.betterx.wover.core.api.registry;
 
+import org.betterx.wover.entrypoint.WoverCore;
+
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +23,7 @@ public class BuiltInRegistryManager {
             ResourceKey<? extends Registry<T>> resourceKey,
             Function<Registry<T>, T> registryBootstrap
     ) {
+        WoverCore.C.log.debug("Creating registry: " + resourceKey.location());
         return BuiltInRegistries.registerSimple(resourceKey, registryBootstrap::apply);
     }
 

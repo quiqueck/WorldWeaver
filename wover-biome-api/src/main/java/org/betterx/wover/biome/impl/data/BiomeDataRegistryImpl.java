@@ -31,7 +31,7 @@ public class BiomeDataRegistryImpl {
     }
 
     private static final CustomRegistryData.DataKey<Map<ResourceKey<BiomeData>, BiomeData>> TEMP_BIOME_DATA
-            = new CustomRegistryData.DataKey<>(WoverBiome.C.id("temp_biome_data"));
+            = CustomRegistryData.createKey(WoverBiome.C.id("temp_biome_data"));
 
     public static BiomeData getFromRegistryOrTemp(ResourceKey<Biome> key) {
         return getFromRegistryOrTemp(key, BiomeData::tempOf);
@@ -82,6 +82,7 @@ public class BiomeDataRegistryImpl {
 
     @ApiStatus.Internal
     public static void initialize() {
+        System.out.println("Initializing BiomeDataRegistry");
         DatapackRegistryBuilder.register(
                 BiomeDataRegistry.BIOME_DATA_REGISTRY,
                 BiomeCodecRegistryImpl.CODEC,
