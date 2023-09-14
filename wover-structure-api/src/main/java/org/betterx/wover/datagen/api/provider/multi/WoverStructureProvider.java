@@ -61,7 +61,7 @@ public abstract class WoverStructureProvider implements WoverMultiProvider {
      *
      * @param context The context to add the elements to.
      */
-    protected abstract void bootstrapPorcessors(BootstapContext<StructureProcessorList> context);
+    protected abstract void bootstrapProcessors(BootstapContext<StructureProcessorList> context);
 
     /**
      * Called, when the Tags need to be set up.
@@ -108,7 +108,7 @@ public abstract class WoverStructureProvider implements WoverMultiProvider {
                 new WoverStructureProcessorProvider(modCore) {
                     @Override
                     protected void bootstrap(BootstapContext<StructureProcessorList> context) {
-                        bootstrapPorcessors(context);
+                        bootstrapProcessors(context);
                     }
                 }
         );

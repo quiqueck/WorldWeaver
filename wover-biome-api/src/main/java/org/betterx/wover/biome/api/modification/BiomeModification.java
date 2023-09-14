@@ -1,12 +1,15 @@
 package org.betterx.wover.biome.api.modification;
 
+import de.ambertation.wunderlib.configs.ConfigFile;
 import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 import org.betterx.wover.biome.impl.modification.BiomeModificationImpl;
 import org.betterx.wover.biome.impl.modification.FeatureMap;
 import org.betterx.wover.biome.impl.modification.GenerationSettingsWorker;
+import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.feature.api.placed.BasePlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
+import org.betterx.wover.structure.api.StructureKey;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -385,6 +389,23 @@ public interface BiomeModification {
         }
 
         /**
+         * Creates a predicate that tests if the given value from a config file matches the targetValue.
+         * <p>
+         * The {@link ConfigFile} that provides the value has to be registered using
+         * {@link org.betterx.wover.config.api.Configs#register(Supplier)} or
+         * {@link org.betterx.wover.config.api.Configs#register(ModCore, String, Configs.ConfigSupplier)}.
+         * Otherwise it will not be found.
+         *
+         * @param value       the value from a config file
+         * @param targetValue the target value to compare against
+         * @return This builder.
+         * @see BiomePredicate#hasConfig(ConfigFile.Value, Object)
+         */
+        public <T, R extends ConfigFile.Value<T, R>> Builder hasConfig(ConfigFile.Value<T, R> value, T targetValue) {
+            return predicate(BiomePredicate.hasConfig(value, targetValue));
+        }
+
+        /**
          * Adds a feature to the modification. This feature will be added to the {@link GenerationStep.Decoration}
          * of all Biomes that match the {@link #predicate}.
          *
@@ -402,6 +423,12 @@ public interface BiomeModification {
             }
             var holder = bootstrapContext.lookup(Registries.PLACED_FEATURE).getOrThrow(featureKey);
             return this.addFeature(decoration, holder);
+        }
+
+        public Builder addStructure(
+                StructureKey<?, ?> structure
+        ) {
+            return this;
         }
 
         /**

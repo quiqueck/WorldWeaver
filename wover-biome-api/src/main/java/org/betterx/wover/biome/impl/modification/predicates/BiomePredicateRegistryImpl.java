@@ -54,6 +54,7 @@ public class BiomePredicateRegistryImpl {
         register(registry, WoverBiome.C.id("has_structure"), HasStructure.CODEC);
         register(registry, WoverBiome.C.id("has_placed_feature"), HasPlacedFeature.CODEC);
         register(registry, WoverBiome.C.id("has_configured_feature"), HasConfiguredFeature.CODEC);
+        register(registry, WoverBiome.C.id("config_is"), ConfigIs.CODEC);
 
         return register(registry, all, Always.CODEC);
     }

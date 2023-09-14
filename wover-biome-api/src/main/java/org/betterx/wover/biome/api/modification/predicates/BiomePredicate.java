@@ -1,6 +1,8 @@
 package org.betterx.wover.biome.api.modification.predicates;
 
+import de.ambertation.wunderlib.configs.ConfigFile;
 import org.betterx.wover.biome.impl.modification.predicates.*;
+import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.core.api.ModCore;
 
 import com.mojang.serialization.Codec;
@@ -22,6 +24,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -267,6 +270,22 @@ public interface BiomePredicate {
      */
     static BiomePredicate notInNamespace(ModCore core) {
         return not(new IsNamespace(core.namespace));
+    }
+
+    /**
+     * Creates a predicate that tests if the given value from a config file matches the targetValue.
+     * <p>
+     * The {@link ConfigFile} that provides the value has to be registered using
+     * {@link org.betterx.wover.config.api.Configs#register(Supplier)} or
+     * {@link org.betterx.wover.config.api.Configs#register(ModCore, String, Configs.ConfigSupplier)}.
+     * Otherwise it will not be found.
+     *
+     * @param value       the value from a config file
+     * @param targetValue the target value to compare against
+     * @return the predicate
+     */
+    static <T, R extends ConfigFile.Value<T, R>> BiomePredicate hasConfig(ConfigFile.Value<T, R> value, T targetValue) {
+        return ConfigIs.of(value, targetValue);
     }
 
     /**

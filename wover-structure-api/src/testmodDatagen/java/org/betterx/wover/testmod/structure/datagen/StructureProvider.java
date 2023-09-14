@@ -82,7 +82,7 @@ public class StructureProvider extends WoverStructureProvider {
     }
 
     @Override
-    protected void bootstrapPorcessors(BootstapContext<StructureProcessorList> context) {
+    protected void bootstrapProcessors(BootstapContext<StructureProcessorList> context) {
         WoverStructureTestMod.TEST_STRUCTURE_PROCESSOR
                 .bootstrap(context)
 
