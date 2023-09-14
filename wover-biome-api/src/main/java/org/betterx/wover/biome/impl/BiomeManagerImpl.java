@@ -5,8 +5,8 @@ import org.betterx.wover.biome.api.builder.BiomeBuilder;
 import org.betterx.wover.biome.api.builder.event.OnBootstrapBiomes;
 import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.impl.data.BiomeDataRegistryImpl;
+import org.betterx.wover.core.api.registry.CustomBootstrapContext;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
-import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
@@ -15,7 +15,6 @@ import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 import org.betterx.wover.tag.api.TagManager;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
-import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -63,26 +62,12 @@ public class BiomeManagerImpl {
         );
     }
 
-
-    private static HolderGetter<Biome> lastBiomeGetter = null;
-    private static BiomeBootstrapContextImpl bootstrapContext = null;
-
-    private static <T> BiomeBootstrapContextImpl initContext(BootstapContext<T> lookupContext) {
-        if (lookupContext == null) return bootstrapContext;
-
-        final HolderGetter<Biome> biomeGetter = lookupContext.lookup(Registries.BIOME);
-        if (biomeGetter != lastBiomeGetter) {
-            lastBiomeGetter = biomeGetter;
-            WoverBiome.C.log.debug("Biome getter changed, resetting bootstrap context");
-            bootstrapContext = new BiomeBootstrapContextImpl();
-            bootstrapContext.setLookupContext(lookupContext);
-
-            BOOTSTRAP_BIOMES_WITH_DATA.emit(c -> c.bootstrap(bootstrapContext));
-        } else {
-            bootstrapContext.setLookupContext(lookupContext);
-        }
-
-        return bootstrapContext;
+    private static <B> BiomeBootstrapContextImpl initContext(BootstapContext<B> lookupContext) {
+        return CustomBootstrapContext.initContext(
+                lookupContext,
+                Registries.BIOME,
+                BiomeBootstrapContextImpl::new
+        );
     }
 
     private static void onBootstrapBiomeDataRegistry(BootstapContext<BiomeData> biomeDataBootstapContext) {
@@ -103,10 +88,10 @@ public class BiomeManagerImpl {
     private static void onBootstrapTags(TagBootstrapContext<Biome> biomeTagBootstrapContext) {
         final BiomeBootstrapContextImpl context = initContext(null);
         context.prepareTags(biomeTagBootstrapContext);
-
+        
         //preparing tags is the last step of the bootstrap process, when we are done
         // we can invalidate the context
-        bootstrapContext = null;
+        CustomBootstrapContext.invalidateContext(Registries.BIOME);
     }
 
     public static ResourceKey<Biome> createKey(

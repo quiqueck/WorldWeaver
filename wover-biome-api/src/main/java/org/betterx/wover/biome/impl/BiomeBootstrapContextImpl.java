@@ -3,14 +3,13 @@ package org.betterx.wover.biome.impl;
 import org.betterx.wover.biome.api.builder.BiomeBootstrapContext;
 import org.betterx.wover.biome.api.builder.BiomeBuilder;
 import org.betterx.wover.biome.api.data.BiomeData;
+import org.betterx.wover.core.api.registry.CustomBootstrapContext;
+import org.betterx.wover.entrypoint.WoverBiome;
 import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.LinkedList;
@@ -18,14 +17,8 @@ import java.util.List;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class BiomeBootstrapContextImpl implements BiomeBootstrapContext {
+public class BiomeBootstrapContextImpl extends CustomBootstrapContext<Biome, BiomeBootstrapContextImpl> implements BiomeBootstrapContext {
     private final List<BiomeBuilder<?>> registeredBuilders = new LinkedList<>();
-    private BootstapContext<?> lookupContext;
-
-    @ApiStatus.Internal
-    public final void setLookupContext(BootstapContext<?> lookupContext) {
-        this.lookupContext = lookupContext;
-    }
 
     @Override
     public void register(@NotNull BiomeBuilder<?> builder, Lifecycle lifecycle) {
@@ -35,12 +28,6 @@ public class BiomeBootstrapContextImpl implements BiomeBootstrapContext {
     @Override
     public void register(@NotNull BiomeBuilder<?> builder) {
         this.register(builder, Lifecycle.stable());
-    }
-
-    @Override
-    public <S> HolderGetter<S> lookup(@NotNull ResourceKey<? extends Registry<? extends S>> registryKey) {
-        if (lookupContext == null) return null;
-        return lookupContext.lookup(registryKey);
     }
 
     @ApiStatus.Internal
@@ -68,5 +55,11 @@ public class BiomeBootstrapContextImpl implements BiomeBootstrapContext {
         for (BiomeBuilder<?> builder : registeredBuilders) {
             builder.registerBiomeTags(context);
         }
+    }
+
+    @Override
+    public void onBootstrapContextChange(BiomeBootstrapContextImpl bootstrapContext) {
+        WoverBiome.C.log.debug("Biome getter changed, resetting bootstrap context");
+        BiomeManagerImpl.BOOTSTRAP_BIOMES_WITH_DATA.emit(c -> c.bootstrap(bootstrapContext));
     }
 }
