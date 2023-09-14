@@ -2,10 +2,8 @@ package org.betterx.wover.structure.api;
 
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
-import org.betterx.wover.structure.api.builders.JigsawBuilder;
-import org.betterx.wover.structure.api.builders.StructureBuilder;
 import org.betterx.wover.structure.impl.JigsawKeyImpl;
-import org.betterx.wover.structure.impl.StructureKeyImpl;
+import org.betterx.wover.structure.impl.SimpleStructureKeyImpl;
 import org.betterx.wover.structure.impl.StructureManagerImpl;
 
 import com.mojang.serialization.Codec;
@@ -18,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
-import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,11 +39,11 @@ public class StructureManager {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+    public static <S extends Structure> StructureKey.Simple<S> structure(
             ResourceLocation location,
             @NotNull StructureTypeKey<S> type
     ) {
-        return new StructureKeyImpl<>(location, type);
+        return new SimpleStructureKeyImpl<>(location, type);
     }
 
     /**
@@ -55,12 +52,12 @@ public class StructureManager {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+    public static <S extends Structure> StructureKey.Simple<S> structure(
             ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
             @NotNull Codec<S> codec
     ) {
-        return new StructureKeyImpl<>(location, registerType(location, structureFactory, codec));
+        return new SimpleStructureKeyImpl<>(location, registerType(location, structureFactory, codec));
     }
 
     /**
@@ -73,11 +70,11 @@ public class StructureManager {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+    public static <S extends Structure> StructureKey.Simple<S> structure(
             ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory
     ) {
-        return new StructureKeyImpl<>(
+        return new SimpleStructureKeyImpl<>(
                 location,
                 registerType(
                         location,
@@ -93,7 +90,7 @@ public class StructureManager {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<JigsawStructure, JigsawBuilder> jigsaw(ResourceLocation location) {
+    public static <S extends Structure> StructureKey.Jigsaw jigsaw(ResourceLocation location) {
         return new JigsawKeyImpl(location);
     }
 

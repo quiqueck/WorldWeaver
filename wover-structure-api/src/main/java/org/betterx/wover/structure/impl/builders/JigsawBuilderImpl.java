@@ -19,7 +19,9 @@ import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
 import java.util.Optional;
 
-public class JigsawBuilderImpl extends BaseStructureBuilderImpl<JigsawStructure, JigsawBuilder> implements JigsawBuilder {
+public class JigsawBuilderImpl
+        extends BaseStructureBuilderImpl<JigsawStructure, JigsawBuilder, StructureKey.Jigsaw>
+        implements JigsawBuilder {
     private Holder<StructureTemplatePool> startPool;
     private Optional<ResourceLocation> startJigsawName;
     private int maxDepth;
@@ -29,7 +31,7 @@ public class JigsawBuilderImpl extends BaseStructureBuilderImpl<JigsawStructure,
     private int maxDistanceFromCenter;
 
     public JigsawBuilderImpl(
-            StructureKey<JigsawStructure, JigsawBuilder> key,
+            StructureKey.Jigsaw key,
             BootstapContext<Structure> context
     ) {
         super(key, context);
@@ -98,7 +100,7 @@ public class JigsawBuilderImpl extends BaseStructureBuilderImpl<JigsawStructure,
     @Override
     protected Structure build() {
         if (startPool == null) {
-            throw new IllegalStateException("Start pool must be set for " + key.key.location());
+            throw new IllegalStateException("Start pool must be set for " + key.key().location());
         }
         return new JigsawStructure(
                 buildSettings(),

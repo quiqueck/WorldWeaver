@@ -1,33 +1,87 @@
 package org.betterx.wover.structure.impl;
 
 import org.betterx.wover.structure.api.StructureKey;
-import org.betterx.wover.structure.api.StructureTypeKey;
-import org.betterx.wover.structure.api.builders.StructureBuilder;
-import org.betterx.wover.structure.impl.builders.StructureBuilderImpl;
+import org.betterx.wover.structure.api.StructureManager;
+import org.betterx.wover.structure.api.builders.BaseStructureBuilder;
+import org.betterx.wover.tag.api.TagManager;
 
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.levelgen.structure.StructureType;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class StructureKeyImpl<S extends Structure> extends StructureKey<S, StructureBuilder<S>> {
+
+public abstract class StructureKeyImpl<
+        S extends Structure,
+        T extends BaseStructureBuilder<S, T>,
+        R extends StructureKey<S, T, R>>
+        implements StructureKey<S, T, R> {
+    /**
+     * The key for the {@link Structure} you can use to reference it.
+     */
     @NotNull
-    public final StructureTypeKey<S> typeKey;
+    public final ResourceKey<Structure> key;
 
-    public StructureKeyImpl(@NotNull ResourceLocation loc, @NotNull StructureTypeKey<S> type) {
-        super(loc);
-        this.typeKey = type;
+    @Nullable
+    private TagKey<Biome> biomeTag;
+
+    @NotNull
+    private GenerationStep.Decoration decoration;
+
+
+    @Override
+    public final ResourceKey<Structure> key() {
+        return this.key;
     }
 
     @Override
-    public StructureType<S> type() {
-        return typeKey.type;
+    public R setBiomeTag(@Nullable TagKey<Biome> biomeTag) {
+        this.biomeTag = biomeTag;
+        return (R) this;
     }
 
+
     @Override
-    public StructureBuilder<S> bootstrap(BootstapContext<Structure> context) {
-        return new StructureBuilderImpl<>(this, context);
+    @NotNull
+    public TagKey<Biome> biomeTag() {
+        if (biomeTag == null) {
+            biomeTag = TagManager.BIOMES.makeStructureTag(key);
+        }
+
+        return biomeTag;
     }
+
+
+    @Override
+    public GenerationStep.@NotNull Decoration step() {
+        return decoration;
+    }
+
+
+    @Override
+    public R step(GenerationStep.Decoration decoration) {
+        this.decoration = decoration;
+        return (R) this;
+    }
+
+    /**
+     * For internal use only. Use {@link StructureManager} instead.
+     * <p>
+     * Creates a new {@link StructureKey} with the given {@link ResourceLocation}.
+     *
+     * @param structureId The structure id
+     */
+    @ApiStatus.Internal
+    protected StructureKeyImpl(@NotNull ResourceLocation structureId) {
+        this.key = ResourceKey.create(Registries.STRUCTURE, structureId);
+        this.decoration = GenerationStep.Decoration.SURFACE_STRUCTURES;
+    }
+
 }

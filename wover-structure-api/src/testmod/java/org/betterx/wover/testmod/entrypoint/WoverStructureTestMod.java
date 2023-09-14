@@ -3,8 +3,6 @@ package org.betterx.wover.testmod.entrypoint;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.structure.api.StructureKey;
 import org.betterx.wover.structure.api.StructureKeys;
-import org.betterx.wover.structure.api.builders.JigsawBuilder;
-import org.betterx.wover.structure.api.builders.StructureBuilder;
 import org.betterx.wover.structure.api.pools.StructurePoolKey;
 import org.betterx.wover.structure.api.processors.StructureProcessorKey;
 import org.betterx.wover.structure.api.sets.StructureSetKey;
@@ -12,7 +10,6 @@ import org.betterx.wover.tag.api.TagManager;
 import org.betterx.wover.testmod.structure.TestStructure;
 
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -21,14 +18,14 @@ public class WoverStructureTestMod implements ModInitializer {
     // but (like other Mods that include Wover) have a unique one
     public static final ModCore C = ModCore.create("wover-structure-testmod");
 
-    public static final StructureKey<TestStructure, StructureBuilder<TestStructure>> TEST_STRUCTURE
+    public static final StructureKey.Simple<TestStructure> TEST_STRUCTURE
             = StructureKeys.structure(C.id("test_structure"), TestStructure::new)
                            .setBiomeTag(TagManager.BIOMES.makeStructureTag(C, "test_structure"))
                            .step(GenerationStep.Decoration.VEGETAL_DECORATION);
 
-    public static final StructureKey<JigsawStructure, JigsawBuilder> JIGSAW_STRUCTURE
+    public static final StructureKey.Jigsaw JIGSAW_STRUCTURE
             = StructureKeys.jigsaw(C.id("jigsaw_structure"))
-                           .setBiomeTag(TEST_STRUCTURE.getBiomeTag())
+                           .setBiomeTag(TEST_STRUCTURE.biomeTag())
                            .step(GenerationStep.Decoration.SURFACE_STRUCTURES);
 
     public static final StructureSetKey TEST_STRUCTURE_SET

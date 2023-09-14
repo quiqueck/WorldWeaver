@@ -1,7 +1,5 @@
 package org.betterx.wover.structure.api;
 
-import org.betterx.wover.structure.api.builders.JigsawBuilder;
-import org.betterx.wover.structure.api.builders.StructureBuilder;
 import org.betterx.wover.structure.api.pools.StructurePoolKey;
 import org.betterx.wover.structure.api.pools.StructurePoolManager;
 import org.betterx.wover.structure.api.processors.StructureProcessorKey;
@@ -15,7 +13,6 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
-import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +38,8 @@ public class StructureKeys {
      * @param structure The structure this set is for
      * @return The {@link StructureSetKey}
      */
-    public static StructureSetKey set(StructureKey<?, ?> structure) {
-        return set(structure.key.location());
+    public static StructureSetKey set(StructureKey<?, ?, ?> structure) {
+        return set(structure.key().location());
     }
 
     /**
@@ -73,7 +70,7 @@ public class StructureKeys {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+    public static <S extends Structure> StructureKey.Simple<S> structure(
             ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
             @NotNull Codec<S> codec
@@ -87,7 +84,7 @@ public class StructureKeys {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+    public static <S extends Structure> StructureKey.Simple<S> structure(
             ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory
     ) {
@@ -100,7 +97,7 @@ public class StructureKeys {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<S, StructureBuilder<S>> structure(
+    public static <S extends Structure> StructureKey.Simple<S> structure(
             ResourceLocation location,
             @NotNull StructureTypeKey<S> type
     ) {
@@ -113,7 +110,7 @@ public class StructureKeys {
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey<JigsawStructure, JigsawBuilder> jigsaw(ResourceLocation location) {
+    public static <S extends Structure> StructureKey.Jigsaw jigsaw(ResourceLocation location) {
         return StructureManager.jigsaw(location);
     }
 

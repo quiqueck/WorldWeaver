@@ -463,14 +463,14 @@ public interface BiomeModification {
         }
 
         public Builder addStructureSet(
-                StructureKey<?, ?> structure
+                StructureKey<?, ?, ?> structure
         ) {
             if (bootstrapContext == null) {
                 throw new IllegalStateException(
                         "You can not add a Structure to a Biome Modification if no Bootstrap Context was supplied (" + key + ").");
             }
 
-            return this.addToTag(structure.getBiomeTag());
+            return this.addToTag(structure.biomeTag());
         }
 
         public Builder addStructureSet(

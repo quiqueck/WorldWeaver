@@ -96,8 +96,8 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         return (B) this;
     }
 
-    public B structure(StructureKey<?, ?> structure) {
-        return tag(structure.getBiomeTag());
+    public B structure(StructureKey<?, ?, ?> structure) {
+        return tag(structure.biomeTag());
     }
 
     public B structure(TagKey<Biome> structureTag) {

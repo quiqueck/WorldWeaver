@@ -12,7 +12,9 @@ import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
 import org.jetbrains.annotations.NotNull;
 
-public class JigsawKeyImpl extends StructureKey<JigsawStructure, JigsawBuilder> {
+public class JigsawKeyImpl
+        extends StructureKeyImpl<JigsawStructure, JigsawBuilder, StructureKey.Jigsaw>
+        implements StructureKey.Jigsaw {
     public JigsawKeyImpl(
             @NotNull ResourceLocation structureId
     ) {

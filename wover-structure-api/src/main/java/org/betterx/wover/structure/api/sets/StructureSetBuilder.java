@@ -50,15 +50,15 @@ public class StructureSetBuilder {
         return addStructure(structure, 1);
     }
 
-    public <S extends Structure, T extends BaseStructureBuilder<S, T>> StructureSetBuilder addStructure(
-            StructureKey<S, T> structure,
+    public <S extends Structure, T extends BaseStructureBuilder<S, T>, K extends StructureKey<S, T, K>> StructureSetBuilder addStructure(
+            K structure,
             int weight
     ) {
-        return addStructure(structure.key, weight);
+        return addStructure(structure.key(), weight);
     }
 
-    public <S extends Structure, T extends BaseStructureBuilder<S, T>> StructureSetBuilder addStructure(
-            StructureKey<S, T> structure
+    public <S extends Structure, T extends BaseStructureBuilder<S, T>, K extends StructureKey<S, T, K>> StructureSetBuilder addStructure(
+            K structure
     ) {
         return addStructure(structure, 1);
     }

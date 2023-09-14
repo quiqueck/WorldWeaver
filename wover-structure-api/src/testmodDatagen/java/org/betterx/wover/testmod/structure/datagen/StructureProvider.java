@@ -98,7 +98,7 @@ public class StructureProvider extends WoverStructureProvider {
 
     @Override
     protected void prepareBiomeTags(TagBootstrapContext<Biome> context) {
-        context.add(WoverStructureTestMod.TEST_STRUCTURE.getBiomeTag(),
+        context.add(WoverStructureTestMod.TEST_STRUCTURE.biomeTag(),
                 Biomes.SAVANNA, Biomes.END_HIGHLANDS, Biomes.END_MIDLANDS, Biomes.NETHER_WASTES
         );
     }

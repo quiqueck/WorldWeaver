@@ -15,8 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class BaseStructureBuilderImpl<S extends Structure, R extends BaseStructureBuilder<S, R>> implements BaseStructureBuilder<S, R> {
-    protected final StructureKey<S, R> key;
+public abstract class BaseStructureBuilderImpl<
+        S extends Structure,
+        R extends BaseStructureBuilder<S, R>,
+        K extends StructureKey<S, R, K>
+        >
+        implements BaseStructureBuilder<S, R> {
+    protected final K key;
 
     protected final BootstapContext<Structure> context;
 
@@ -26,7 +31,7 @@ public abstract class BaseStructureBuilderImpl<S extends Structure, R extends Ba
     @NotNull
     protected final Map<MobCategory, StructureSpawnOverride> spawnOverrides = new HashMap<>();
 
-    public BaseStructureBuilderImpl(StructureKey<S, R> key, BootstapContext<Structure> context) {
+    public BaseStructureBuilderImpl(K key, BootstapContext<Structure> context) {
         this.key = key;
         this.context = context;
 
@@ -41,7 +46,7 @@ public abstract class BaseStructureBuilderImpl<S extends Structure, R extends Ba
 
     @Override
     public Holder<Structure> register() {
-        return context.register(key.key, build());
+        return context.register(key.key(), build());
     }
 
     @Override
@@ -53,9 +58,9 @@ public abstract class BaseStructureBuilderImpl<S extends Structure, R extends Ba
 
     protected Structure.StructureSettings buildSettings() {
         return new Structure.StructureSettings(
-                context.lookup(Registries.BIOME).getOrThrow(key.getBiomeTag()),
+                context.lookup(Registries.BIOME).getOrThrow(key.biomeTag()),
                 spawnOverrides,
-                key.getStep(),
+                key.step(),
                 terrainAdjustment
         );
     }
