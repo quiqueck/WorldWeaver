@@ -91,9 +91,9 @@ public class RandomNbtStructure extends Structure {
                 }
         );
         if (result.isEmpty()) {
-            WoverStructure.C.log.debug("Rejected RandomNbtStructure in " + sw.getTime() + "ms");
+            WoverStructure.C.log.debug("Rejected RandomNbtStructure " + element.nbtLocation() + " in " + sw.getTime() + "ms");
         } else {
-            WoverStructure.C.log.debug("Accepted RandomNbtStructure in " + sw.getTime() + "ms");
+            WoverStructure.C.log.debug("Accepted RandomNbtStructure " + element.nbtLocation() + " in " + sw.getTime() + "ms");
         }
         return result;
     }
