@@ -174,6 +174,480 @@ public class RandomizedWeightedList<T> {
         return l;
     }
 
+    public static <E> RandomizedWeightedList<E> of(E e0, Double w0, E e1, Double w1) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(E e0, Double w0, E e1, Double w1, E e2, Double w2) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(E e0, Double w0, E e1, Double w1, E e2, Double w2, E e3, Double w3) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9,
+            E e10,
+            Double w10
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        l.add(e10, w10);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9,
+            E e10,
+            Double w10,
+            E e11,
+            Double w11
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        l.add(e10, w10);
+        l.add(e11, w11);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9,
+            E e10,
+            Double w10,
+            E e11,
+            Double w11,
+            E e12,
+            Double w12
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        l.add(e10, w10);
+        l.add(e11, w11);
+        l.add(e12, w12);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9,
+            E e10,
+            Double w10,
+            E e11,
+            Double w11,
+            E e12,
+            Double w12,
+            E e13,
+            Double w13
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        l.add(e10, w10);
+        l.add(e11, w11);
+        l.add(e12, w12);
+        l.add(e13, w13);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9,
+            E e10,
+            Double w10,
+            E e11,
+            Double w11,
+            E e12,
+            Double w12,
+            E e13,
+            Double w13,
+            E e14,
+            Double w14
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        l.add(e10, w10);
+        l.add(e11, w11);
+        l.add(e12, w12);
+        l.add(e13, w13);
+        l.add(e14, w14);
+        return l;
+    }
+
+    public static <E> RandomizedWeightedList<E> of(
+            E e0,
+            Double w0,
+            E e1,
+            Double w1,
+            E e2,
+            Double w2,
+            E e3,
+            Double w3,
+            E e4,
+            Double w4,
+            E e5,
+            Double w5,
+            E e6,
+            Double w6,
+            E e7,
+            Double w7,
+            E e8,
+            Double w8,
+            E e9,
+            Double w9,
+            E e10,
+            Double w10,
+            E e11,
+            Double w11,
+            E e12,
+            Double w12,
+            E e13,
+            Double w13,
+            E e14,
+            Double w14,
+            E e15,
+            Double w15
+    ) {
+        var l = new RandomizedWeightedList<E>();
+        l.add(e0, w0);
+        l.add(e1, w1);
+        l.add(e2, w2);
+        l.add(e3, w3);
+        l.add(e4, w4);
+        l.add(e5, w5);
+        l.add(e6, w6);
+        l.add(e7, w7);
+        l.add(e8, w8);
+        l.add(e9, w9);
+        l.add(e10, w10);
+        l.add(e11, w11);
+        l.add(e12, w12);
+        l.add(e13, w13);
+        l.add(e14, w14);
+        l.add(e15, w15);
+        return l;
+    }
+
     /**
      * Returns the number of elements stored in the list
      *
