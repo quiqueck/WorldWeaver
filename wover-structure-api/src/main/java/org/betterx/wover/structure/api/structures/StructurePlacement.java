@@ -97,7 +97,7 @@ public enum StructurePlacement implements StringRepresentable {
                 ctx,
                 BlockBehaviour.BlockStateBase::isAir,
                 state -> Heightmap.Types.WORLD_SURFACE_WG.isOpaque().test(state) && !state.liquid(),
-                1
+                1, 0
         );
 
         if (y == FAIL_HEIGHT) {
@@ -119,7 +119,7 @@ public enum StructurePlacement implements StringRepresentable {
                 ctx,
                 state -> Heightmap.Types.WORLD_SURFACE_WG.isOpaque().test(state),
                 BlockBehaviour.BlockStateBase::isAir,
-                1
+                1, 0
         );
 
         if (y == FAIL_HEIGHT) {
@@ -134,6 +134,7 @@ public enum StructurePlacement implements StringRepresentable {
             int x, int startY, int z,
             List<BlockPos> positions,
             int maxDeltaY,
+            int airAtOffset,
             Structure.GenerationContext ctx,
             BiConsumer<BlockPos, StructurePiecesBuilder> consumer
     ) {
@@ -146,7 +147,7 @@ public enum StructurePlacement implements StringRepresentable {
                     ctx,
                     BlockBehaviour.BlockStateBase::isAir,
                     state -> Heightmap.Types.WORLD_SURFACE_WG.isOpaque().test(state) && !state.liquid(),
-                    1
+                    1, airAtOffset
             );
 
             if (y == FAIL_HEIGHT) {
@@ -189,16 +190,13 @@ public enum StructurePlacement implements StringRepresentable {
             Structure.GenerationContext ctx,
             Predicate<BlockState> testAir,
             Predicate<BlockState> testSurface,
-            int minMatches
+            int minMatches,
+            int airAtOffset
     ) {
         return findYDownward(
-                startY,
-                ctx.heightAccessor().getMinBuildHeight() + 4,
-                testColumns,
-                ctx,
-                testAir,
-                testSurface,
-                minMatches
+                startY, ctx.heightAccessor().getMinBuildHeight() + 4,
+                testColumns, ctx,
+                testAir, testSurface, minMatches, airAtOffset
         );
     }
 
@@ -209,9 +207,9 @@ public enum StructurePlacement implements StringRepresentable {
             Structure.GenerationContext ctx,
             Predicate<BlockState> testAir,
             Predicate<BlockState> testSurface,
-            int minMatches
+            int minMatches,
+            int airAtOffset
     ) {
-
         final List<NoiseColumnWithState> noiseColumns = testColumns
                 .stream()
                 .map(p -> new NoiseColumnWithState(ctx
@@ -223,6 +221,8 @@ public enum StructurePlacement implements StringRepresentable {
                         ), startY)
                 ).toList();
 
+        int res = FAIL_HEIGHT;
+        outerLoop:
         for (int y = startY - 1; y > stopY; y--) {
             int matchCount = 0;
             for (NoiseColumnWithState noiseColumn : noiseColumns) {
@@ -230,7 +230,8 @@ public enum StructurePlacement implements StringRepresentable {
                 if (testAir.test(noiseColumn.lastState)) {
                     if (testSurface.test(state)) {
                         if (++matchCount == minMatches) {
-                            return y;
+                            res = y;
+                            break outerLoop;
                         }
                     }
                 }
@@ -238,7 +239,19 @@ public enum StructurePlacement implements StringRepresentable {
             }
         }
 
-        return FAIL_HEIGHT;
+        if (airAtOffset != 0) {
+            int matchCount = 0;
+            for (NoiseColumnWithState noiseColumn : noiseColumns) {
+                if (testAir.test(noiseColumn.getBlock(res + airAtOffset))) {
+                    if (++matchCount == minMatches) {
+                        return res;
+                    }
+                }
+            }
+            return FAIL_HEIGHT;
+        }
+
+        return res;
     }
 
     public static boolean hasValidBiomeAtRandomHeight(Structure.GenerationContext ctx, int x, int z) {
@@ -369,7 +382,7 @@ public enum StructurePlacement implements StringRepresentable {
         return onMinHeightNetherSurface(
                 x, Mth.randomBetweenInclusive(ctx.random(), seaLevel, maxHeight), z,
                 list,
-                maxDeltaY, ctx, consumer
+                maxDeltaY, (int) (boundingBox.getYSpan() * 0.8), ctx, consumer
         );
     }
 
@@ -408,7 +421,7 @@ public enum StructurePlacement implements StringRepresentable {
                 list, ctx,
                 BlockBehaviour.BlockStateBase::isAir,
                 state -> state.is(Blocks.LAVA),
-                list.size()
+                list.size(), 0
         );
 
         if (y == FAIL_HEIGHT)

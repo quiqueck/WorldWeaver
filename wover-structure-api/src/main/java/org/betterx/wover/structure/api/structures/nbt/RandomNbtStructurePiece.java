@@ -1,30 +1,20 @@
 package org.betterx.wover.structure.api.structures.nbt;
 
-import org.betterx.wover.block.api.BlockHelper;
 import org.betterx.wover.structure.impl.StructureManagerImpl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.StructureManager;
-import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockIgnoreProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
-
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
 
 public class RandomNbtStructurePiece extends TemplateStructurePiece {
     private final boolean keepAir;
@@ -118,43 +108,43 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
 
     }
 
-    @Override
-    public void postProcess(
-            WorldGenLevel worldGenLevel,
-            StructureManager structureManager,
-            ChunkGenerator chunkGenerator,
-            RandomSource randomSource,
-            BoundingBox writableBounds,
-            ChunkPos chunkPos,
-            BlockPos blockPos
-    ) {
-        super.postProcess(
-                worldGenLevel,
-                structureManager,
-                chunkGenerator,
-                randomSource,
-                writableBounds,
-                chunkPos,
-                blockPos
-        );
-        List<BlockPos> list2 = ImmutableList.of(
-                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.minZ()),
-                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.minZ()),
-                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.maxZ()),
-                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.maxZ())
-        );
-
-        list2.forEach(pos -> worldGenLevel.setBlock(
-                pos,
-                Blocks.OXIDIZED_COPPER.defaultBlockState(),
-                BlockHelper.SET_SILENT
-        ));
-
-        worldGenLevel.setBlock(templatePosition, Blocks.AMETHYST_BLOCK.defaultBlockState(), BlockHelper.SET_SILENT);
-        worldGenLevel.setBlock(
-                templatePosition.offset(this.placeSettings.getRotationPivot()),
-                Blocks.NETHERITE_BLOCK.defaultBlockState(),
-                BlockHelper.SET_SILENT
-        );
-    }
+//    @Override
+//    public void postProcess(
+//            WorldGenLevel worldGenLevel,
+//            StructureManager structureManager,
+//            ChunkGenerator chunkGenerator,
+//            RandomSource randomSource,
+//            BoundingBox writableBounds,
+//            ChunkPos chunkPos,
+//            BlockPos blockPos
+//    ) {
+//        super.postProcess(
+//                worldGenLevel,
+//                structureManager,
+//                chunkGenerator,
+//                randomSource,
+//                writableBounds,
+//                chunkPos,
+//                blockPos
+//        );
+//        List<BlockPos> list2 = ImmutableList.of(
+//                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.minZ()),
+//                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.minZ()),
+//                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.maxZ()),
+//                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.maxZ())
+//        );
+//
+//        list2.forEach(pos -> worldGenLevel.setBlock(
+//                pos,
+//                Blocks.OXIDIZED_COPPER.defaultBlockState(),
+//                BlockHelper.SET_SILENT
+//        ));
+//
+//        worldGenLevel.setBlock(templatePosition, Blocks.AMETHYST_BLOCK.defaultBlockState(), BlockHelper.SET_SILENT);
+//        worldGenLevel.setBlock(
+//                templatePosition.offset(this.placeSettings.getRotationPivot()),
+//                Blocks.NETHERITE_BLOCK.defaultBlockState(),
+//                BlockHelper.SET_SILENT
+//        );
+//    }
 }
