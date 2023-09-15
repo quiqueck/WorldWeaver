@@ -28,6 +28,10 @@ public class WoverStructureTestMod implements ModInitializer {
                            .biomeTag(TEST_STRUCTURE.biomeTag())
                            .step(GenerationStep.Decoration.SURFACE_STRUCTURES);
 
+    public static final StructureKey.RandomNbt RND_STRUCTURE
+            = StructureKeys.randomNbt(C.id("rnd_structure"))
+                           .step(GenerationStep.Decoration.SURFACE_STRUCTURES);
+
     public static final StructureSetKey TEST_STRUCTURE_SET
             = StructureKeys.set(C.id("test_structure_set"));
 
@@ -39,6 +43,7 @@ public class WoverStructureTestMod implements ModInitializer {
             = StructureKeys.pool(C.id("terminal"));
     public static final StructureProcessorKey TEST_STRUCTURE_PROCESSOR
             = StructureKeys.processor(C.id("test_structure_processor"));
+
 
     @Override
     public void onInitialize() {

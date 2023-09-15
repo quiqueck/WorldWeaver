@@ -2,7 +2,9 @@ package org.betterx.wover.structure.api;
 
 import org.betterx.wover.structure.api.builders.BaseStructureBuilder;
 import org.betterx.wover.structure.api.builders.JigsawBuilder;
+import org.betterx.wover.structure.api.builders.RandomNbtBuilder;
 import org.betterx.wover.structure.api.builders.StructureBuilder;
+import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructure;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -35,6 +37,9 @@ public interface StructureKey<
     interface Jigsaw extends StructureKey<JigsawStructure, JigsawBuilder, Jigsaw> {
     }
 
+    interface RandomNbt extends StructureKey<RandomNbtStructure, RandomNbtBuilder, RandomNbt> {
+    }
+
 
     /**
      * Returns the {@link ResourceKey} for the {@link Structure}.
@@ -46,7 +51,7 @@ public interface StructureKey<
     /**
      * Define a BiomeTag that will be used to determine if the structure can spawn in a biome. You can
      * build a new Structure tag by using {@link org.betterx.wover.tag.api.BiomeTagRegistry#makeStructureTag(ModCore, String)}
-     * from {@link TagManager#BIOMES}.
+     * from {@link org.betterx.wover.tag.api.TagManager#BIOMES}.
      *
      * @param biomeTag The biome tag to set
      * @return The same instance for chaining

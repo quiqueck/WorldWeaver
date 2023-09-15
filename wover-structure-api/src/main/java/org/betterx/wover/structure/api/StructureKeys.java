@@ -115,6 +115,16 @@ public class StructureKeys {
     }
 
     /**
+     * Alias for {@link StructureManager#randomNbt(ResourceLocation)}.
+     *
+     * @param location The location of the {@link Structure}
+     * @return The {@link StructureKey}
+     */
+    public static <S extends Structure> StructureKey.RandomNbt randomNbt(ResourceLocation location) {
+        return StructureManager.randomNbt(location);
+    }
+
+    /**
      * Alias for {@link StructureManager#registerType(ResourceLocation, StructureTypeKey.StructureFactory)}.
      *
      * @param location         The location of the {@link StructureTypeKey}

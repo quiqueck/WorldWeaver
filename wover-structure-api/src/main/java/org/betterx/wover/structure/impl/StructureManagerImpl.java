@@ -1,9 +1,13 @@
 package org.betterx.wover.structure.impl;
 
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
+import org.betterx.wover.entrypoint.WoverStructure;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
+import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.structure.api.StructureTypeKey;
+import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructure;
+import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructurePiece;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
@@ -26,6 +30,16 @@ import org.jetbrains.annotations.Nullable;
 public class StructureManagerImpl {
     public static final EventImpl<OnBootstrapRegistry<Structure>> BOOTSTRAP_STRUCTURES =
             new EventImpl<>("BOOTSTRAP_STRUCTURES");
+
+    public static final StructureType<RandomNbtStructure> RANDOM_NBT_STRUCTURE_TYPE = registerType(
+            WoverStructure.C.id("random_nbt_structure"),
+            RandomNbtStructure.simpleRandomCodec(RandomNbtStructure::new)
+    );
+
+    public static final StructurePieceType RANDOM_NBT_STRUCTURE_PIECE = registerPiece(
+            WoverStructure.C.id("random_nbt_structure_piece"),
+            RandomNbtStructurePiece::new
+    );
 
     @Nullable
     public static Holder<Structure> getHolder(
@@ -65,10 +79,33 @@ public class StructureManagerImpl {
         return new StructureTypeKeyImpl<>(key, type, structureFactory);
     }
 
+    public static <S extends Structure> @NotNull StructureType<S> registerType(
+            @NotNull ResourceLocation location,
+            @NotNull Codec<S> codec
+    ) {
+        final ResourceKey<StructureType<?>> key = ResourceKey.create(Registries.STRUCTURE_TYPE, location);
+        @SuppressWarnings("unchecked") final StructureType<S> type = (StructureType<S>) Registry.register(
+                BuiltInRegistries.STRUCTURE_TYPE,
+                key,
+                () -> (Codec<Structure>) codec
+        );
+
+        return type;
+    }
+
     public static @NotNull StructurePieceType registerPiece(
             @NotNull ResourceLocation location,
             @NotNull StructurePieceType pieceType
     ) {
         return Registry.register(BuiltInRegistries.STRUCTURE_PIECE, location, pieceType);
+    }
+
+    static {
+        if (LegacyHelper.isLegacyEnabled()) {
+            registerPiece(
+                    LegacyHelper.BCLIB_CORE.id("template_piece"),
+                    RandomNbtStructurePiece::new
+            );
+        }
     }
 }

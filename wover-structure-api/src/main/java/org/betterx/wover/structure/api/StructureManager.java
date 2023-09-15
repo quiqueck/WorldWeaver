@@ -2,7 +2,9 @@ package org.betterx.wover.structure.api;
 
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
+import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructure;
 import org.betterx.wover.structure.impl.JigsawKeyImpl;
+import org.betterx.wover.structure.impl.RandomNbtKeyImpl;
 import org.betterx.wover.structure.impl.SimpleStructureKeyImpl;
 import org.betterx.wover.structure.impl.StructureManagerImpl;
 
@@ -15,6 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,8 +33,14 @@ public class StructureManager {
      * in the data generator whenever possible (see WoverRegistryProvider)
      * for Details.
      */
-    public static final Event<OnBootstrapRegistry<Structure>> BOOTSTRAP_STRUCTURES =
-            StructureManagerImpl.BOOTSTRAP_STRUCTURES;
+    public static final Event<OnBootstrapRegistry<Structure>> BOOTSTRAP_STRUCTURES
+            = StructureManagerImpl.BOOTSTRAP_STRUCTURES;
+
+    public static final StructureType<RandomNbtStructure> RANDOM_NBT_STRUCTURE_TYPE
+            = StructureManagerImpl.RANDOM_NBT_STRUCTURE_TYPE;
+
+    public static final StructurePieceType RANDOM_NBT_STRUCTURE_PIECE
+            = StructureManagerImpl.RANDOM_NBT_STRUCTURE_PIECE;
 
     /**
      * Creates a {@link StructureKey} for the given {@link ResourceLocation}.
@@ -85,13 +94,24 @@ public class StructureManager {
     }
 
     /**
-     * Creates a {@link StructureKey} for the given {@link ResourceLocation}.
+     * Creates a {@link StructureKey} for a {@link net.minecraft.world.level.levelgen.structure.structures.JigsawStructure}
+     * at the given {@link ResourceLocation}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
     public static <S extends Structure> StructureKey.Jigsaw jigsaw(ResourceLocation location) {
         return new JigsawKeyImpl(location);
+    }
+
+    /**
+     * Creates a {@link StructureKey} for the given {@link ResourceLocation}.
+     *
+     * @param location The location of the {@link Structure}
+     * @return The {@link StructureKey}
+     */
+    public static <S extends Structure> StructureKey.RandomNbt randomNbt(ResourceLocation location) {
+        return new RandomNbtKeyImpl(location);
     }
 
     /**
