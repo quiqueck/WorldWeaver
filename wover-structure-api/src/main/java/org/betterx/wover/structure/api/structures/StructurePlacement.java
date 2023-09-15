@@ -46,6 +46,8 @@ public enum StructurePlacement implements StringRepresentable {
     LAVA(StructurePlacement::findGenerationPointNetherLava),
     SURFACE(StructurePlacement::findGenerationPointSurface),
     LEGACY_FLOOR("floor", StructurePlacement::findGenerationPointNetherFloor),
+    LEGACY_CEIL("ceil", StructurePlacement::findGenerationPointNetherFloor),
+    NETHER_CEIL(StructurePlacement::findGenerationPointNetherCeil),
     NETHER_SURFACE(StructurePlacement::findGenerationPointNetherFloor),
     NETHER_SURFACE_FLAT_0((a, b, c, d, e) -> StructurePlacement.findGenerationPointNetherFloorFlat(a, b, c, d, e, 0)),
     NETHER_SURFACE_FLAT_2((a, b, c, d, e) -> StructurePlacement.findGenerationPointNetherFloorFlat(a, b, c, d, e, 2)),
@@ -95,6 +97,28 @@ public enum StructurePlacement implements StringRepresentable {
                 ctx,
                 BlockBehaviour.BlockStateBase::isAir,
                 state -> Heightmap.Types.WORLD_SURFACE_WG.isOpaque().test(state) && !state.liquid(),
+                1
+        );
+
+        if (y == FAIL_HEIGHT) {
+            return Optional.empty();
+        }
+
+        final BlockPos pos = new BlockPos(x, y, z);
+        return Optional.of(new Structure.GenerationStub(pos, builder -> consumer.accept(pos, builder)));
+    }
+
+    public static Optional<Structure.GenerationStub> onNetherCeiling(
+            int x, int startY, int z,
+            Structure.GenerationContext ctx,
+            BiConsumer<BlockPos, StructurePiecesBuilder> consumer
+    ) {
+        final int y = findYDownward(
+                startY,
+                List.of(new BlockPos(x, startY, z)),
+                ctx,
+                state -> Heightmap.Types.WORLD_SURFACE_WG.isOpaque().test(state),
+                BlockBehaviour.BlockStateBase::isAir,
                 1
         );
 
@@ -261,6 +285,30 @@ public enum StructurePlacement implements StringRepresentable {
             BiConsumer<BlockPos, StructurePiecesBuilder> consumer
     ) {
         return onChunkCenterWorldSurface(ctx, Heightmap.Types.WORLD_SURFACE_WG, consumer);
+    }
+
+    private static @NotNull Optional<Structure.GenerationStub> findGenerationPointNetherCeil(
+            Structure.GenerationContext ctx,
+            Rotation rotation,
+            Mirror mirror,
+            RandomNbtStructureElement element,
+            BiConsumer<BlockPos, StructurePiecesBuilder> consumer
+    ) {
+        final ChunkPos chunkPos = ctx.chunkPos();
+        final int x = chunkPos.getMiddleBlockX();
+        final int z = chunkPos.getMiddleBlockZ();
+
+        if (!StructurePlacement.hasValidBiomeAtRandomHeight(ctx, x, z))
+            return Optional.empty();
+
+        final ChunkGenerator generator = ctx.chunkGenerator();
+        final int maxHeight = generator.getGenDepth() - 20;
+        final int seaLevel = generator.getSeaLevel();
+
+        return onNetherCeiling(
+                x, Mth.randomBetweenInclusive(ctx.random(), seaLevel, maxHeight), z,
+                ctx, consumer
+        );
     }
 
     private static @NotNull Optional<Structure.GenerationStub> findGenerationPointNetherFloor(
