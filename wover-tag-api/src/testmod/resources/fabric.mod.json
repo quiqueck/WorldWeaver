@@ -20,7 +20,7 @@
       "org.betterx.wover.testmod.entrypoint.WoverTagTestMod"
     ],
     "fabric-datagen": [
-      "org.betterx.wover.testmod.tag.datagen.WoverTagDatagen"
+      "org.betterx.wover.testmod.tag.datagen.WoverTagDatagenTestMod"
     ]
   },
   "mixins": [],

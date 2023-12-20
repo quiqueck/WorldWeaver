@@ -159,7 +159,7 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.add(
                 CommonBlockTags.PLANT,
                 Blocks.MANGROVE_LEAVES,
-                Blocks.GRASS,
+                Blocks.SHORT_GRASS,
                 Blocks.FERN,
                 Blocks.DANDELION,
                 Blocks.TORCHFLOWER,
