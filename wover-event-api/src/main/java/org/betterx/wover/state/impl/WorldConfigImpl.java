@@ -13,6 +13,7 @@ import org.betterx.wover.util.Pair;
 
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -59,7 +60,7 @@ public class WorldConfigImpl {
                 File file = new File(dataDir, modCore.modId + ".nbt");
                 if (file.exists()) {
                     try {
-                        CompoundTag root = NbtIo.readCompressed(file);
+                        CompoundTag root = NbtIo.readCompressed(file.toPath(), NbtAccounter.create(0x200000L));
                         TAGS.put(modCore, root);
                         eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.LOADED));
                     } catch (IOException e) {
@@ -154,11 +155,11 @@ public class WorldConfigImpl {
             tag.putString(TAG_MODIFIED, modCore.getModVersion().toString());
 
             final File tempFile = new File(dataDir, modCore.modId + "_temp.nbt");
-            NbtIo.writeCompressed(tag, tempFile);
+            NbtIo.writeCompressed(tag, tempFile.toPath());
 
             final File oldFile = new File(dataDir, modCore.modId + "_old.nbt");
             final File dataFile = new File(dataDir, modCore.modId + ".nbt");
-            Util.safeReplaceFile(dataFile, tempFile, oldFile);
+            Util.safeReplaceFile(dataFile.toPath(), tempFile.toPath(), oldFile.toPath());
         } catch (IOException e) {
             WoverEvents.C.log.error("World data saving failed", e);
         }
