@@ -8,12 +8,11 @@ import net.fabricmc.api.ClientModInitializer;
 public class WoverUiClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClientWorldLifecycle.BEFORE_CLIENT_LOAD_SCREEN.subscribe((source, id, goOn) -> {
+        ClientWorldLifecycle.ALLOW_EXPERIMENTAL_WARNING_SCREEN.subscribe((show) -> {
             if (ClientConfigs.CLIENT.disableExperimentalWarning.get()) {
-                goOn.accept(false);
                 return false;
             }
-            return true;
+            return show;
         });
 
         ClientConfigs.saveConfigs();
