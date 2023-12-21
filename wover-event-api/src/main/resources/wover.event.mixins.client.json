@@ -4,9 +4,12 @@
   "package": "org.betterx.wover.events.mixin.client",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "before_client_load/WorldOpenFlowsMixin", "create_new_world_folder/CreateWorldScreenMixin",
-    "world_folder/CreateWorldScreenMixin", "world_folder/WorldOpenFlowsMixin",
-    "world_registry/CreateWorldScreenMixin"
+    "allow_experimental_warning_screen.WorldOpenFlowsMixin",
+    "before_client_load.WorldOpenFlowsMixin",
+    "create_new_world_folder.CreateWorldScreenMixin",
+    "world_folder.CreateWorldScreenMixin",
+    "world_folder.WorldOpenFlowsMixin",
+    "world_registry.CreateWorldScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

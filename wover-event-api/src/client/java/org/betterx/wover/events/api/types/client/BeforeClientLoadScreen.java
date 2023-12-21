@@ -4,8 +4,6 @@ import org.betterx.wover.events.api.Subscriber;
 
 import net.minecraft.world.level.storage.LevelStorageSource;
 
-import java.util.function.Consumer;
-
 /**
  * Used for subscribers of the
  * {@link org.betterx.wover.events.api.client.ClientWorldLifecycle#BEFORE_CLIENT_LOAD_SCREEN}
@@ -14,20 +12,26 @@ import java.util.function.Consumer;
 @FunctionalInterface
 public interface BeforeClientLoadScreen extends Subscriber {
     /**
+     * Used to continue the loading process with the next registered step.
+     */
+    interface ContinueWith {
+        /**
+         * Will immediately continue the loading process with the next registered step.
+         */
+        void loadingScreen();
+    }
+
+    /**
      * Called when the event is emitted.
      * <p>
-     * Subscribers can request to cancel the continuation of the clients loading
-     * process by returning {@code false}. If one subscriber cancels the loading
-     * process, the loading screen will not be shown and no other subscribers will
-     * be called.
-     * It is the responsibility of the subscriber to call the {@code callLoadScreen}
-     * function to continue the loading process.
+     * It is the responsibility of the subscriber to <b>call the {@code continueWith}
+     * function</b> to continue the loading process. For example, if your processing method shows a UI, you need to
+     * call {@code continueWith} when the user closes the UI. If you just need to do some synchronous processing, you
+     * can call {@code continueWith} immediately when you are finished.
      *
-     * @param levelSource    the storage source that can be used to open the world folder.
-     * @param levelID        the id of the level that is being loaded.
-     * @param callLoadScreen a function that can be called to continue the loading process. This method should only
-     *                       get called, when the subscriber cancels the loading process.
-     * @return {@code false} if the subscriber cancels the loading process.
+     * @param levelAccess  the access object for the world folder.
+     * @param continueWith Your implementation needs to call this function at some point. Otherwise, loading will not
+     *                     continue.
      */
-    boolean process(LevelStorageSource levelSource, String levelID, Consumer<Boolean> callLoadScreen);
+    void process(LevelStorageSource.LevelStorageAccess levelAccess, ContinueWith continueWith);
 }

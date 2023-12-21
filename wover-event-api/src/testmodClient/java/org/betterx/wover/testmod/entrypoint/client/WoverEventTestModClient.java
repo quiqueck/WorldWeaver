@@ -7,9 +7,23 @@ import net.fabricmc.api.ClientModInitializer;
 public class WoverEventTestModClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ClientWorldLifecycle.BEFORE_CLIENT_LOAD_SCREEN.subscribe((levelSource, levelID, callLoadScreen) -> {
-            System.out.println("Before client load screen: \n - " + levelSource + "\n - " + levelID + "\n - " + callLoadScreen);
-            callLoadScreen.accept(false);
+        ClientWorldLifecycle.BEFORE_CLIENT_LOAD_SCREEN.subscribe((levelStorageAccess, continueWith) -> {
+            System.out.println("Before client load screen: \n - " + levelStorageAccess + "\n - " + continueWith);
+            continueWith.loadingScreen();
+        });
+
+        ClientWorldLifecycle.BEFORE_CLIENT_LOAD_SCREEN.subscribe((levelStorageAccess, continueWith) -> {
+            System.out.println("Before client load screen II: \n - " + levelStorageAccess + "\n - " + continueWith);
+            continueWith.loadingScreen();
+        });
+
+        ClientWorldLifecycle.BEFORE_CLIENT_LOAD_SCREEN.subscribe((levelStorageAccess, continueWith) -> {
+            System.out.println("Before client load screen III: \n - " + levelStorageAccess + "\n - " + continueWith);
+            continueWith.loadingScreen();
+        });
+
+        ClientWorldLifecycle.ALLOW_EXPERIMENTAL_WARNING_SCREEN.subscribe((bl) -> {
+            System.out.println("Allow experimental warning screen: " + bl);
             return false;
         });
     }
