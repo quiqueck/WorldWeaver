@@ -20,7 +20,11 @@ import org.jetbrains.annotations.NotNull;
  * to the input position before the test is performed
  */
 public class IsFullShape implements BlockPredicate {
+    /**
+     * Tests if the block at the current position has a full collision shape.
+     */
     public static final IsFullShape HERE = new IsFullShape();
+    
     /**
      * Codec for this block predicate.
      */
