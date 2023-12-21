@@ -1,5 +1,6 @@
 package org.betterx.wover.feature.api.placed;
 
+import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 
@@ -50,6 +51,22 @@ public interface PlacedFeatureKey extends BasePlacedFeatureKey<PlacedFeatureKey>
     public FeaturePlacementBuilder place(
             BootstapContext<PlacedFeature> bootstrapContext,
             Holder<ConfiguredFeature<?, ?>> holder
+    );
+
+    /**
+     * Creates a new builder for a {@link PlacedFeature}.
+     * <p>
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
+     * to add it to the registry.
+     *
+     * @param bootstrapContext The {@link BootstapContext} to use
+     * @param key              The {@link ConfiguredFeature} to place. Will use the passed bootstrapContext
+     *                         to get the holder from the {@link ConfiguredFeatureKey}.
+     * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
+     */
+    public <B extends FeatureConfigurator<?, ?>> FeaturePlacementBuilder place(
+            @NotNull BootstapContext<PlacedFeature> bootstrapContext,
+            ConfiguredFeatureKey<B> key
     );
 
     /**

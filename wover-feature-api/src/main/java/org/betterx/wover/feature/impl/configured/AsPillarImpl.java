@@ -99,13 +99,13 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
     @Override
     public @NotNull PillarFeatureConfig createConfiguration() {
         if (this.transformer == null) {
-            throwStateError("A Pillar Features need a transformer");
+            throwStateError("A Pillar Feature needs a transformer");
         }
         if (stateProvider == null) {
-            throwStateError("A Pillar Features need a stateProvider");
+            throwStateError("A Pillar Feature needs a stateProvider");
         }
         if (maxHeight == null) {
-            throwStateError("A Pillar Features need a height");
+            throwStateError("A Pillar Feature needs a height");
         }
         if (minHeight == null) minHeight = ConstantInt.of(0);
         return new PillarFeatureConfig(

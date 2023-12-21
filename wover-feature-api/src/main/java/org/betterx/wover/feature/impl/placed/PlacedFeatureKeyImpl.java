@@ -1,6 +1,8 @@
 package org.betterx.wover.feature.impl.placed;
 
+import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
+import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.impl.configured.InlineBuilderImpl;
@@ -38,6 +40,14 @@ public class PlacedFeatureKeyImpl extends BaseFeatureKeyImpl<PlacedFeatureKey> i
             Holder<ConfiguredFeature<?, ?>> holder
     ) {
         return super.place(bootstrapContext, holder);
+    }
+
+    @Override
+    public <B extends FeatureConfigurator<?, ?>> FeaturePlacementBuilder place(
+            @NotNull BootstapContext<PlacedFeature> bootstrapContext,
+            ConfiguredFeatureKey<B> key
+    ) {
+        return super.place(bootstrapContext, key.getHolder(bootstrapContext));
     }
 
     @Override

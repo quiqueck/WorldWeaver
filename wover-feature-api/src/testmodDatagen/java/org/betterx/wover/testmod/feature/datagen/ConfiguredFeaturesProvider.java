@@ -1,5 +1,6 @@
 package org.betterx.wover.testmod.feature.datagen;
 
+import org.betterx.wover.block.api.predicate.BlockPredicates;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
@@ -11,6 +12,7 @@ import org.betterx.wover.testmod.entrypoint.WoverFeatureTestMod;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.util.valueproviders.BiasedToBottomInt;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -55,5 +57,17 @@ public class ConfiguredFeaturesProvider extends WoverRegistryContentProvider<Con
 //                                          .isEmpty()
 //                                          .inRandomPatch()
 //                                          .register(context);
+
+        ConfiguredFeatureManager
+                .pillar(modCore.id("patch_basalt_stalactite"))
+                .bootstrap(context)
+                .transformer(PillarFeatureConfig.KnownTransformers.SIZE_DECREASE)
+                .direction(Direction.DOWN)
+                .blockState(Blocks.SMOOTH_BASALT)
+                .maxHeight(BiasedToBottomInt.of(4, 11))
+                .inlinePlace()
+                .isEmptyAndUnder(BlockPredicates.ONLY_NETHER_GROUND_AND_BASALT)
+                .inRandomPatch()
+                .register();
     }
 }
