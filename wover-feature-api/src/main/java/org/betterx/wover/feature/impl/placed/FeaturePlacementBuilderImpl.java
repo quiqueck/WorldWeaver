@@ -371,13 +371,51 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
     }
 
     @Override
+    public FeaturePlacementBuilderImpl extendXYZ(
+            int xzSpread,
+            float centerDensity,
+            float borderDensity,
+            int height,
+            boolean square
+    ) {
+        return this.modifier(new ExtendXYZ(
+                ConstantInt.of(xzSpread),
+                ConstantFloat.of(centerDensity),
+                ConstantFloat.of(borderDensity),
+                square,
+                ConstantInt.of(Math.abs(height)),
+                height < 0 ? ExtendXYZ.HeightPropagation.SPIKES_DOWN : ExtendXYZ.HeightPropagation.SPIKES_UP
+        ));
+    }
+
+
+    @Override
+    public FeaturePlacementBuilder extendXYZ(
+            IntProvider xzSpread,
+            FloatProvider centerDensity,
+            FloatProvider borderDensity,
+            IntProvider height,
+            boolean square,
+            boolean up
+    ) {
+        return this.modifier(new ExtendXYZ(
+                xzSpread,
+                centerDensity,
+                borderDensity,
+                square,
+                height,
+                up ? ExtendXYZ.HeightPropagation.SPIKES_UP : ExtendXYZ.HeightPropagation.SPIKES_DOWN
+        ));
+    }
+
+    @Override
     public FeaturePlacementBuilderImpl extendXZ(
             int xzSpread,
             float centerDensity,
             float borderDensity,
             boolean square
     ) {
-        return this.modifier(new ExtendXZ(
+        return this.modifier(new ExtendXYZ(
                 ConstantInt.of(xzSpread),
                 ConstantFloat.of(centerDensity),
                 ConstantFloat.of(borderDensity),
@@ -392,7 +430,7 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
             FloatProvider borderDensity,
             boolean square
     ) {
-        return this.modifier(new ExtendXZ(
+        return this.modifier(new ExtendXYZ(
                 xzSpread,
                 centerDensity,
                 borderDensity,

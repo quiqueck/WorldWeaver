@@ -79,7 +79,14 @@ public class WoverFeatureTestMod implements ModInitializer {
                    .heightmap()
                    .onlyInBiome()
                    .offset(ConstantInt.of(0), UniformInt.of(3, 12), ConstantInt.of(0))
-                   .extendXZ(UniformInt.of(4, 8), ConstantFloat.of(1.0f), UniformFloat.of(0.1f, 0.3f), false)
+                   .extendXYZ(
+                           UniformInt.of(4, 8),
+                           ConstantFloat.of(1.0f),
+                           UniformFloat.of(0.1f, 0.3f),
+                           UniformInt.of(10, 20),
+                           false,
+                           false
+                   )
                    .register();
 
             PLACED_LAPIS_BLOCK

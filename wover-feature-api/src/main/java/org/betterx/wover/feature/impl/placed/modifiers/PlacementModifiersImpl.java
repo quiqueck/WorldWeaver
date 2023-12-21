@@ -71,9 +71,9 @@ public class PlacementModifiersImpl {
             Extend.CODEC
     );
 
-    public static final PlacementModifierType<ExtendXZ> EXTEND_XZ = register(
-            "extend_xz",
-            ExtendXZ.CODEC
+    public static final PlacementModifierType<ExtendXYZ> EXTEND_XZ = register(
+            "extend_xyz",
+            ExtendXYZ.CODEC
     );
 
     public static final PlacementModifierType<EveryLayer> EVERY_LAYER = register(

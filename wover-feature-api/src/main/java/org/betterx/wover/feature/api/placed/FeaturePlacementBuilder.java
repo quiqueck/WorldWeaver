@@ -4,6 +4,7 @@ import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
 import org.betterx.wover.feature.api.placed.modifiers.EveryLayer;
+import org.betterx.wover.feature.impl.placed.FeaturePlacementBuilderImpl;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -521,6 +522,49 @@ public interface FeaturePlacementBuilder {
             FloatProvider centerDensity,
             FloatProvider borderDensity,
             boolean square
+    );
+
+    /**
+     * Similar to {@link #extendXZ(int, float, float, boolean)}, the surface positions are also extended up (for
+     * positive height) or down (for negative height). Each generated position will grow connected
+     * spikes in the given direction. Spikes at the center will grow longer than spikes at the border.
+     *
+     * @param xzSpread      the radius provider in the xz-plane
+     * @param centerDensity the density provider at the input position
+     * @param borderDensity the density provider at the border of the radius
+     * @param height        the maximum height of the spikes in y-direction
+     * @param square        if {@code true}, the positions will be created in a square,
+     *                      otherwise in a circle
+     * @return this builder
+     */
+    FeaturePlacementBuilderImpl extendXYZ(
+            int xzSpread,
+            float centerDensity,
+            float borderDensity,
+            int height,
+            boolean square
+    );
+
+    /**
+     * Similar to {@link #extendXYZ(int, float, float, int, boolean)}, but the numeric values can
+     * be number Providers, allowing you to randomize the values per feature
+     *
+     * @param xzSpread      the radius provider in the xz-plane
+     * @param centerDensity the density provider at the input position
+     * @param borderDensity the density provider at the border of the radius
+     * @param height        the maximum height provider of the spikes in y-direction
+     * @param square        if {@code true}, the positions will be created in a square,
+     *                      otherwise in a circle
+     * @param up            if {@code true}, the spikes will grow up, otherwise down
+     * @return this builder
+     */
+    FeaturePlacementBuilder extendXYZ(
+            IntProvider xzSpread,
+            FloatProvider centerDensity,
+            FloatProvider borderDensity,
+            IntProvider height,
+            boolean square,
+            boolean up
     );
 
     /**
