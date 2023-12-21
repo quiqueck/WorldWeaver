@@ -8,10 +8,11 @@ import org.betterx.wover.entrypoint.WoverUi;
 import org.betterx.wover.events.impl.client.ClientWorldLifecycleImpl;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+
+import org.jetbrains.annotations.NotNull;
 
 public class WelcomeScreen extends WoverLayoutScreen {
     public static final ResourceLocation BETTERX_LOCATION = WoverUi.C.id("betterx.png");
@@ -20,8 +21,8 @@ public class WelcomeScreen extends WoverLayoutScreen {
     public static final ResourceLocation ICON_BETTEREND = WoverUi.C.id("icon_betterend.png");
     public static final ResourceLocation ICON_BCLIB = WoverUi.C.id("icon_bclib.png");
 
-    public WelcomeScreen(Screen parent) {
-        super(parent, translatable("wover.welcome.title"));
+    public WelcomeScreen(@NotNull Runnable onClose) {
+        super(onClose, translatable("wover.welcome.title"));
     }
 
     @Override
@@ -143,7 +144,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
     }
 
     @Override
-    protected void renderBackgroundLayer(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackgroundLayer(GuiGraphics guiGraphics, int i, int j, float f) {
         guiGraphics.fill(0, 0, width, height, 0xBD343444);
 //        Rectangle BANNER_UV = new Rectangle(0, 0, 427, 100);
 //        Size BANNER_RESOURCE_SIZE = BANNER_UV.size();

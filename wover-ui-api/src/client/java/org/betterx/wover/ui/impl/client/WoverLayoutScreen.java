@@ -3,11 +3,10 @@ package org.betterx.wover.ui.impl.client;
 import de.ambertation.wunderlib.ui.vanilla.LayoutScreenWithIcon;
 import org.betterx.wover.entrypoint.WoverUi;
 
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class WoverLayoutScreen extends LayoutScreenWithIcon {
     public static final ResourceLocation WOVER_LOGO_LOCATION = WoverUi.C.id("icon_wover.png");
@@ -20,19 +19,19 @@ public abstract class WoverLayoutScreen extends LayoutScreenWithIcon {
     }
 
     public WoverLayoutScreen(
-            @Nullable Screen parent,
+            @NotNull Runnable onClose,
             Component component
     ) {
-        super(parent, WOVER_LOGO_LOCATION, component);
+        super(onClose, WOVER_LOGO_LOCATION, component);
     }
 
     public WoverLayoutScreen(
-            @Nullable Screen parent,
+            @NotNull Runnable onClose,
             Component component,
             int topPadding,
             int bottomPadding,
             int sidePadding
     ) {
-        super(parent, WOVER_LOGO_LOCATION, component, topPadding, bottomPadding, sidePadding);
+        super(onClose, WOVER_LOGO_LOCATION, component, topPadding, bottomPadding, sidePadding);
     }
 }
