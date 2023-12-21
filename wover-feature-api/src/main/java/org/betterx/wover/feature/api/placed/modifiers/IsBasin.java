@@ -5,6 +5,7 @@ import org.betterx.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,9 +38,9 @@ public class IsBasin extends PlacementFilter {
                     BlockPredicate.CODEC
                             .fieldOf("predicate")
                             .forGetter(cfg -> cfg.predicate),
-                    BlockPredicate.CODEC
-                            .optionalFieldOf("top_predicate", null)
-                            .forGetter(cfg -> cfg.topPredicate)
+                    ExtraCodecs
+                            .strictOptionalField(BlockPredicate.CODEC, "top_predicate")
+                            .forGetter(cfg -> Optional.ofNullable(cfg.topPredicate))
             )
             .apply(instance, IsBasin::new));
 
@@ -46,6 +48,10 @@ public class IsBasin extends PlacementFilter {
     private final BlockPredicate predicate;
     @Nullable
     private final BlockPredicate topPredicate;
+
+    private IsBasin(@NotNull BlockPredicate predicate, @NotNull Optional<BlockPredicate> topPredicate) {
+        this(predicate, topPredicate.orElse(null));
+    }
 
     /**
      * Constructs a new instance.
@@ -66,7 +72,7 @@ public class IsBasin extends PlacementFilter {
      * @param predicate The predicate to test the basin blocks with
      */
     public static PlacementFilter simple(BlockPredicate predicate) {
-        return new IsBasin(predicate, null);
+        return new IsBasin(predicate, (BlockPredicate) null);
     }
 
     /**
