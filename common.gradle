@@ -360,3 +360,17 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     dev javadocJar
 }
+
+idea {
+    module {
+        excludeDirs += file('javadoc')
+        excludeDirs += file('gradle')
+        excludeDirs += file('public')
+        excludeDirs += file('tools')
+        excludeDirs += file('bin')
+        subprojects.each {
+            excludeDirs += it.file('run')
+            excludeDirs += it.file('run-server')
+        }
+    }
+}
