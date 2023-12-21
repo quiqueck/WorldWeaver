@@ -4,6 +4,7 @@ import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.client.AfterWelcomeScreen;
 import org.betterx.wover.events.api.types.client.BeforeClientLoadScreen;
 import org.betterx.wover.events.api.types.client.ShowExperimentalWarningScreen;
+import org.betterx.wover.events.api.types.client.StartupScreenProvider;
 import org.betterx.wover.events.impl.client.ClientWorldLifecycleImpl;
 
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -34,6 +35,27 @@ public class ClientWorldLifecycle {
      * passed to the next subscriber.
      */
     public static Event<ShowExperimentalWarningScreen> ALLOW_EXPERIMENTAL_WARNING_SCREEN = ClientWorldLifecycleImpl.ALLOW_EXPERIMENTAL_WARNING_SCREEN;
+
+    /**
+     * This event is called, when Minecraft builds the list of Startup Screens.
+     * <p>
+     * Your subscriber will receive a {@link Runnable}-Object that needs to be called
+     * once the returned Screen was closed. The <code>LayoutScreen</code> classes
+     * are already set up accordingly. For your own Screen implementation you would
+     * have to ensure the correct behaviour.
+     * <p>
+     * Assume you have the following class:
+     * <pre class="java>public class HelloScreen extends WoverLayoutScreen {
+     *      public WoverLayoutScreen(@NotNull Runnable onClose){
+     *          super(onClose, translatable("screen.welcome.title"))
+     *      }
+     * }
+     * </pre>
+     * You can register the Screen using <code>ClientWorldLifecycle.ENUMERATE_STARTUP_SCREENS.subscribe(HelloScreen::new);</code>
+     * <p>
+     * All custom screens are displayed <b>after</b> the vanilla screens.
+     */
+    public static Event<StartupScreenProvider> ENUMERATE_STARTUP_SCREENS = ClientWorldLifecycleImpl.ENUMERATE_STARTUP_SCREENS;
 
     public static Event<AfterWelcomeScreen> AFTER_WELCOME_SCREEN = ClientWorldLifecycleImpl.AFTER_WELCOME_SCREEN;
 }
