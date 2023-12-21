@@ -17,10 +17,7 @@ import com.mojang.serialization.Dynamic;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -58,7 +55,7 @@ public class WorldGeneratorConfigImpl {
         CompoundTag root = null;
         if (nbtFile.exists()) {
             try {
-                root = NbtIo.readCompressed(nbtFile);
+                root = NbtIo.readCompressed(nbtFile.toPath(), NbtAccounter.create(0x200000L));
             } catch (IOException e) {
                 WoverEvents.C.log.error("NBT loading failed", e);
             }
