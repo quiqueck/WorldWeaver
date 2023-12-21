@@ -8,7 +8,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasBinding;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
+
+import java.util.List;
 
 public interface JigsawBuilder extends BaseStructureBuilder<JigsawStructure, JigsawBuilder> {
     JigsawBuilder projectStartToHeightmap(Heightmap.Types value);
@@ -28,4 +31,7 @@ public interface JigsawBuilder extends BaseStructureBuilder<JigsawStructure, Jig
     JigsawBuilder startPool(ResourceKey<StructureTemplatePool> pool);
 
     JigsawBuilder startPool(StructurePoolKey pool);
+
+    JigsawBuilder addAliasBindings(List<PoolAliasBinding> aliasBindings);
+    JigsawBuilder addAliasBinding(PoolAliasBinding aliasBinding);
 }

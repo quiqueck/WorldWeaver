@@ -15,8 +15,10 @@ import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
+import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasBinding;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
 
+import java.util.List;
 import java.util.Optional;
 
 public class JigsawBuilderImpl
@@ -29,6 +31,7 @@ public class JigsawBuilderImpl
     private boolean useExpansionHack;
     private Optional<Heightmap.Types> projectStartToHeightmap;
     private int maxDistanceFromCenter;
+    private List<PoolAliasBinding> aliasBindings;
 
     public JigsawBuilderImpl(
             StructureKey.Jigsaw key,
@@ -98,10 +101,25 @@ public class JigsawBuilderImpl
     }
 
     @Override
+    public JigsawBuilder addAliasBindings(List<PoolAliasBinding> aliasBindings) {
+        if (this.aliasBindings == null) this.aliasBindings = aliasBindings;
+        else {
+            this.aliasBindings.addAll(aliasBindings);
+        }
+        return this;
+    }
+
+    @Override
+    public JigsawBuilder addAliasBinding(PoolAliasBinding aliasBinding) {
+        return this.addAliasBindings(List.of(aliasBinding));
+    }
+
+    @Override
     protected Structure build() {
         if (startPool == null) {
             throw new IllegalStateException("Start pool must be set for " + key.key().location());
         }
+
         return new JigsawStructure(
                 buildSettings(),
                 startPool,
@@ -110,7 +128,8 @@ public class JigsawBuilderImpl
                 startHeight,
                 useExpansionHack,
                 projectStartToHeightmap,
-                maxDistanceFromCenter
+                maxDistanceFromCenter,
+                aliasBindings == null ? List.of() : aliasBindings
         );
     }
 
