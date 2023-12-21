@@ -376,15 +376,16 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
             float centerDensity,
             float borderDensity,
             int height,
-            boolean square
+            boolean square,
+            ExtendXYZ.HeightPropagation propagation
     ) {
         return this.modifier(new ExtendXYZ(
                 ConstantInt.of(xzSpread),
                 ConstantFloat.of(centerDensity),
                 ConstantFloat.of(borderDensity),
                 square,
-                ConstantInt.of(Math.abs(height)),
-                height < 0 ? ExtendXYZ.HeightPropagation.SPIKES_DOWN : ExtendXYZ.HeightPropagation.SPIKES_UP
+                ConstantFloat.of(Math.abs(height) / (float) xzSpread),
+                propagation
         ));
     }
 
@@ -394,17 +395,17 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
             IntProvider xzSpread,
             FloatProvider centerDensity,
             FloatProvider borderDensity,
-            IntProvider height,
+            FloatProvider heightScale,
             boolean square,
-            boolean up
+            ExtendXYZ.HeightPropagation propagation
     ) {
         return this.modifier(new ExtendXYZ(
                 xzSpread,
                 centerDensity,
                 borderDensity,
                 square,
-                height,
-                up ? ExtendXYZ.HeightPropagation.SPIKES_UP : ExtendXYZ.HeightPropagation.SPIKES_DOWN
+                heightScale,
+                propagation
         ));
     }
 

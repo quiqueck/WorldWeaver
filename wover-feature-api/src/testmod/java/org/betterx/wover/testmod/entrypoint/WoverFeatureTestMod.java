@@ -9,6 +9,7 @@ import org.betterx.wover.feature.api.configured.configurators.ForSimpleBlock;
 import org.betterx.wover.feature.api.placed.PlacedConfiguredFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
+import org.betterx.wover.feature.api.placed.modifiers.ExtendXYZ;
 
 import net.minecraft.data.worldgen.features.MiscOverworldFeatures;
 import net.minecraft.util.valueproviders.ConstantFloat;
@@ -83,9 +84,9 @@ public class WoverFeatureTestMod implements ModInitializer {
                            UniformInt.of(4, 8),
                            ConstantFloat.of(1.0f),
                            UniformFloat.of(0.1f, 0.3f),
-                           UniformInt.of(10, 20),
+                           UniformFloat.of(1.0f, 10),
                            false,
-                           false
+                           ExtendXYZ.HeightPropagation.SPHERE_UP
                    )
                    .register();
 

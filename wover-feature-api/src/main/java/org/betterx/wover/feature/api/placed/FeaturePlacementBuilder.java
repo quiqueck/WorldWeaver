@@ -4,6 +4,7 @@ import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.api.configured.configurators.RandomPatch;
 import org.betterx.wover.feature.api.placed.modifiers.EveryLayer;
+import org.betterx.wover.feature.api.placed.modifiers.ExtendXYZ;
 import org.betterx.wover.feature.impl.placed.FeaturePlacementBuilderImpl;
 
 import net.minecraft.core.Direction;
@@ -526,8 +527,8 @@ public interface FeaturePlacementBuilder {
 
     /**
      * Similar to {@link #extendXZ(int, float, float, boolean)}, the surface positions are also extended up (for
-     * positive height) or down (for negative height). Each generated position will grow connected
-     * spikes in the given direction. Spikes at the center will grow longer than spikes at the border.
+     * positive height) or down (for negative height). Each generated position will grow in y-Direction by
+     * {@code height} blocks. The shape and density of the height distribution can be controlled by the {@code centerDensity} and
      *
      * @param xzSpread      the radius provider in the xz-plane
      * @param centerDensity the density provider at the input position
@@ -535,6 +536,9 @@ public interface FeaturePlacementBuilder {
      * @param height        the maximum height of the spikes in y-direction
      * @param square        if {@code true}, the positions will be created in a square,
      *                      otherwise in a circle
+     * @param propagation   The type of height propagation to use. See
+     *                      {@link org.betterx.wover.feature.api.placed.modifiers.ExtendXYZ.HeightPropagation} for
+     *                      Details.
      * @return this builder
      */
     FeaturePlacementBuilderImpl extendXYZ(
@@ -542,29 +546,32 @@ public interface FeaturePlacementBuilder {
             float centerDensity,
             float borderDensity,
             int height,
-            boolean square
+            boolean square,
+            ExtendXYZ.HeightPropagation propagation
     );
 
     /**
-     * Similar to {@link #extendXYZ(int, float, float, int, boolean)}, but the numeric values can
-     * be number Providers, allowing you to randomize the values per feature
+     * Similar to {@link #extendXYZ(int, float, float, int, boolean, ExtendXYZ.HeightPropagation)}, but the numeric
+     * values can be number Providers, allowing you to randomize the values per feature
      *
      * @param xzSpread      the radius provider in the xz-plane
      * @param centerDensity the density provider at the input position
      * @param borderDensity the density provider at the border of the radius
-     * @param height        the maximum height provider of the spikes in y-direction
+     * @param heightScale   the maximum height of the spikes in y-direction is the provided xzSpread times this value
      * @param square        if {@code true}, the positions will be created in a square,
      *                      otherwise in a circle
-     * @param up            if {@code true}, the spikes will grow up, otherwise down
+     * @param propagation   The type of height propagation to use. See
+     *                      {@link org.betterx.wover.feature.api.placed.modifiers.ExtendXYZ.HeightPropagation} for
+     *                      Details.
      * @return this builder
      */
     FeaturePlacementBuilder extendXYZ(
             IntProvider xzSpread,
             FloatProvider centerDensity,
             FloatProvider borderDensity,
-            IntProvider height,
+            FloatProvider heightScale,
             boolean square,
-            boolean up
+            ExtendXYZ.HeightPropagation propagation
     );
 
     /**

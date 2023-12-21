@@ -8,7 +8,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.valueproviders.ConstantFloat;
-import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
@@ -118,18 +117,18 @@ public class ExtendXYZ extends PlacementModifier {
                     IntProvider.codec(0, 16)
                                .fieldOf("radius")
                                .forGetter(cfg -> cfg.radius),
-                    FloatProvider.codec(0, 1)
+                    FloatProvider.codec(0, 2)
                                  .optionalFieldOf("center_density", ConstantFloat.of(1))
                                  .forGetter(cfg -> cfg.centerDensity),
-                    FloatProvider.codec(0, 1)
+                    FloatProvider.codec(0, 2)
                                  .optionalFieldOf("border_density", ConstantFloat.of(0.05f))
                                  .forGetter(cfg -> cfg.borderDensity),
                     Codec.BOOL
                             .optionalFieldOf("square", false)
                             .forGetter(cfg -> cfg.square),
-                    IntProvider.codec(0, 16)
-                               .optionalFieldOf("height", ConstantInt.of(0))
-                               .forGetter(cfg -> cfg.height),
+                    FloatProvider.codec(0.0f, 30.0f)
+                                 .optionalFieldOf("height", ConstantFloat.of(1.0f))
+                                 .forGetter(cfg -> cfg.heightScale),
                     HeightPropagation.CODEC
                             .optionalFieldOf("height_propagation", HeightPropagation.NONE)
                             .forGetter(cfg -> cfg.heightPropagation)
@@ -141,7 +140,7 @@ public class ExtendXYZ extends PlacementModifier {
     private final boolean square;
 
 
-    private final IntProvider height;
+    private final FloatProvider heightScale;
     private final HeightPropagation heightPropagation;
 
     /**
@@ -154,7 +153,7 @@ public class ExtendXYZ extends PlacementModifier {
      * @param square            if {@code true}, the positions will be created in a square
      *                          with edge length {@code 2*xzSpread+1} centered on the input position.
      *                          If {@code false}, the positions will be created in a circle.
-     * @param height            the height to extend the positions in the y-direction
+     * @param heightScale       the height of the extension in the y-direction is the radius times this value
      * @param heightPropagation the {@link HeightPropagation} to use
      */
     public ExtendXYZ(
@@ -162,14 +161,14 @@ public class ExtendXYZ extends PlacementModifier {
             FloatProvider centerDensity,
             FloatProvider borderDensity,
             boolean square,
-            IntProvider height,
+            FloatProvider heightScale,
             HeightPropagation heightPropagation
     ) {
         this.radius = radius;
         this.centerDensity = centerDensity;
         this.borderDensity = borderDensity;
         this.square = square;
-        this.height = height;
+        this.heightScale = heightScale;
         this.heightPropagation = heightPropagation;
 
     }
@@ -186,7 +185,7 @@ public class ExtendXYZ extends PlacementModifier {
      *                      If {@code false}, the positions will be created in a circle.
      */
     public ExtendXYZ(IntProvider radius, FloatProvider centerDensity, FloatProvider borderDensity, boolean square) {
-        this(radius, centerDensity, borderDensity, square, ConstantInt.of(0), HeightPropagation.NONE);
+        this(radius, centerDensity, borderDensity, square, ConstantFloat.of(1.0f), HeightPropagation.NONE);
     }
 
     /**
@@ -210,16 +209,16 @@ public class ExtendXYZ extends PlacementModifier {
      * @param radius        the radius to extend the input position by
      * @param centerDensity the density at the input position
      * @param borderDensity the density at the border of the radius
-     * @param height        the height to extend the positions in the y-direction
+     * @param heightScale   the height of the extension in the y-direction is the radius times this value
      * @return a new instance
      */
     public static ExtendXYZ spikedCircle(
             IntProvider radius,
             FloatProvider centerDensity,
             FloatProvider borderDensity,
-            IntProvider height
+            FloatProvider heightScale
     ) {
-        return new ExtendXYZ(radius, centerDensity, borderDensity, false, height, HeightPropagation.SPIKES_DOWN);
+        return new ExtendXYZ(radius, centerDensity, borderDensity, false, heightScale, HeightPropagation.SPIKES_DOWN);
     }
 
     /**
@@ -332,7 +331,7 @@ public class ExtendXYZ extends PlacementModifier {
         final float r2 = r * r;
         final float d0 = centerDensity.sample(randomSource);
         final float d1 = borderDensity.sample(randomSource);
-        final int height = this.height.sample(randomSource);
+        final int height = (int) (r * this.heightScale.sample(randomSource));
 
         float currentR2, density, lambda;
         BlockPos now;
