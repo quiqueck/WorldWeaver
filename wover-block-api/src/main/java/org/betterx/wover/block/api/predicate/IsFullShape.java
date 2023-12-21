@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * to the input position before the test is performed
  */
 public class IsFullShape implements BlockPredicate {
-    static final IsFullShape HERE = new IsFullShape();
+    public static final IsFullShape HERE = new IsFullShape();
     /**
      * Codec for this block predicate.
      */

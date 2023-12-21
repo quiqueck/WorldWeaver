@@ -31,7 +31,9 @@ public class AsSequenceImpl extends FeatureConfiguratorImpl<SequenceFeatureConfi
 
     @Override
     public AsSequence add(PlacedFeatureKey featureKey) {
-        features.add(featureKey.getHolder(bootstrapContext));
+        features.add(featureKey.getHolder(bootstrapContext != null
+                ? bootstrapContext
+                : getTransitiveBootstrapContext()));
         return this;
     }
 
