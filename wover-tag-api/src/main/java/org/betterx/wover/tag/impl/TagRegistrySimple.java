@@ -12,7 +12,7 @@ public class TagRegistrySimple<T> extends TagRegistryImpl.WithRegistry<T, TagBoo
 
     @Override
     public TagBootstrapContext<T> createBootstrapContext(boolean initAll) {
-        return new TagBootstrapContextImpl<>(this, initAll);
+        return TagBootstrapContextImpl.create(this, initAll);
     }
 }
 

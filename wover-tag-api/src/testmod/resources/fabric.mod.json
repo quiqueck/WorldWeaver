@@ -19,6 +19,9 @@
     "main": [
       "org.betterx.wover.testmod.entrypoint.WoverTagTestMod"
     ],
+    "client": [
+      "org.betterx.wover.testmod.entrypoint.client.WoverTagClientTestMod"
+    ],
     "fabric-datagen": [
       "org.betterx.wover.testmod.tag.datagen.WoverTagDatagenTestMod"
     ]

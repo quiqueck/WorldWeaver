@@ -14,20 +14,48 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implements TagBootstrapContext<T> {
     private final Map<TagKey<T>, TagSet<T>> tags = new ConcurrentHashMap<>();
     private final @Nullable TagRegistryImpl<T, P> tagRegistry;
 
-    TagBootstrapContextImpl(@Nullable TagRegistryImpl<T, P> tagRegistry, boolean initAll) {
+    protected TagBootstrapContextImpl(@Nullable TagRegistryImpl<T, P> tagRegistry) {
         this.tagRegistry = tagRegistry;
+    }
 
-        if (initAll) {
-            for (var tag : tagRegistry.tags) {
-                initializeTag(tag);
-            }
+    private void clearAll() {
+        if (tagRegistry == null) return;
+        for (var tag : tagRegistry.tags) {
+            initializeTag(tag);
         }
+    }
+
+    protected static final ConcurrentHashMap<TagRegistry, TagBootstrapContextImpl> CACHE = new ConcurrentHashMap<>();
+
+    public static void invalidateCaches() {
+        WoverTag.C.log.debug("Invalidating TagBootstrapContext Caches");
+        CACHE.clear();
+    }
+
+    protected static <T, P extends TagBootstrapContext<T>, R extends TagRegistryImpl<T, P>> TagBootstrapContextImpl<T, P> create(
+            @NotNull R tagRegistry,
+            boolean initAll,
+            Function<R, TagBootstrapContextImpl<T, P>> factory
+    ) {
+        final TagBootstrapContextImpl<?, ?> registry
+                = CACHE.computeIfAbsent(tagRegistry, (r) -> factory.apply(tagRegistry));
+        if (initAll) registry.clearAll();
+        return (TagBootstrapContextImpl<T, P>) registry;
+    }
+
+    static <T, P extends TagBootstrapContext<T>> TagBootstrapContextImpl<T, P> create(
+            @NotNull TagRegistryImpl<T, P> tagRegistry,
+            boolean initAll
+    ) {
+        return create(tagRegistry, initAll, TagBootstrapContextImpl::new);
     }
 
     protected void initializeTag(TagKey<T> tag) {

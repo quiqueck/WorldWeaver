@@ -56,7 +56,7 @@ public class TagManagerImpl {
                 ) {
                     @Override
                     public TagBootstrapContext<T> createBootstrapContext(boolean initAll) {
-                        return new TagBootstrapContextImpl<>(this, initAll);
+                        return TagBootstrapContextImpl.create(this, initAll);
                     }
                 }
         );

@@ -31,7 +31,7 @@ public class BiomeTagRegistryImpl extends TagRegistryImpl<Biome, TagBootstrapCon
 
     @Override
     public TagBootstrapContext<Biome> createBootstrapContext(boolean initAll) {
-        return new TagBootstrapContextImpl<>(this, initAll);
+        return TagBootstrapContextImpl.create(this, initAll);
     }
 
 //    public void apply(Map<ResourceLocation, List<TagLoader.EntryWithSource>> tagsMap) {

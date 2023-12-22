@@ -6,11 +6,19 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemTagBootstrapContextImpl extends TagBootstrapContextImpl<Item, ItemTagBootstrapContext> implements ItemTagBootstrapContext {
-    ItemTagBootstrapContextImpl(@Nullable ItemTagRegistryImpl tagRegistry, boolean initAll) {
-        super(tagRegistry, initAll);
+    protected ItemTagBootstrapContextImpl(@Nullable ItemTagRegistryImpl tagRegistry) {
+        super(tagRegistry);
+    }
+
+    static ItemTagBootstrapContextImpl create(
+            @NotNull ItemTagRegistryImpl tagRegistry,
+            boolean initAll
+    ) {
+        return (ItemTagBootstrapContextImpl) TagBootstrapContextImpl.create(tagRegistry, initAll, ItemTagBootstrapContextImpl::new);
     }
 
     @SafeVarargs

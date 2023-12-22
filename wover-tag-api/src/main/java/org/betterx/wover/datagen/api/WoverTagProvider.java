@@ -138,7 +138,7 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
      * <p>
      * Only Tags that are initialized will be written to disk. Tags are automatically
      * initialized when elements are added to them. If this method returns {@code true}
-     * from the {@link TagRegistry} will be initialized.
+     * all elements from the {@link TagRegistry} will be initialized.
      * <p>
      * The default implementation returns {@code false}.
      *

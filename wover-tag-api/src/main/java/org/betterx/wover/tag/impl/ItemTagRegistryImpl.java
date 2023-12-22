@@ -13,6 +13,6 @@ public class ItemTagRegistryImpl extends TagRegistryImpl.WithRegistry<Item, Item
 
     @Override
     public ItemTagBootstrapContext createBootstrapContext(boolean initAll) {
-        return new ItemTagBootstrapContextImpl(this, initAll);
+        return ItemTagBootstrapContextImpl.create(this, initAll);
     }
 }
