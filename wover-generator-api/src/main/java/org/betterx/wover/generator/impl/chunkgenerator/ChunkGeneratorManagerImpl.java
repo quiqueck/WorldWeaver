@@ -5,6 +5,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
 import org.betterx.wover.entrypoint.WoverWorldGenerator;
 import org.betterx.wover.events.api.WorldLifecycle;
+import org.betterx.wover.generator.mixin.generator.ChunkGeneratorAccessor;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldConfig;
 import org.betterx.wover.state.api.WorldState;
@@ -18,10 +19,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.FeatureSorter;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.WorldDimensions;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
@@ -112,6 +115,46 @@ public class ChunkGeneratorManagerImpl {
         BuiltInRegistryManager.register(BuiltInRegistries.CHUNK_GENERATOR, location, codec);
     }
 
+    public static String enumerateFeatureNamespaces(@NotNull ChunkGenerator chunkGenerator) {
+        if (chunkGenerator instanceof ChunkGeneratorAccessor acc) {
+            var supplier = acc.wover_getFeaturesPerStep();
+            if (supplier != null) {
+                List<FeatureSorter.StepFeatureData> list = supplier.get();
+                final HashMap<String, Integer> namespaces = new HashMap<>();
+                if (list != null) {
+                    for (var features : list)
+                        if (features != null) {
+                            for (PlacedFeature feature : features.features()) {
+                                if (feature != null && feature.feature() != null) {
+                                    final String namespace;
+                                    if (feature.feature()
+                                               .unwrapKey()
+                                               .isPresent()) {
+                                        namespace = feature
+                                                .feature()
+                                                .unwrapKey()
+                                                .get()
+                                                .location()
+                                                .getNamespace();
+                                    } else {
+                                        namespace = "direct_holder";
+                                    }
+
+                                    namespaces.put(namespace, namespaces.getOrDefault(namespace, 0) + 1);
+                                }
+                            }
+                        }
+                }
+                return namespaces.entrySet()
+                                 .stream()
+                                 .map(entry -> entry.getKey() + "(" + entry.getValue() + ")")
+                                 .reduce((a, b) -> a + ", " + b)
+                                 .orElse("none");
+            }
+        }
+        return "unknown";
+    }
+
     public static String printGeneratorInfo(@Nullable String className, @NotNull ChunkGenerator generator) {
         StringBuilder sb = new StringBuilder();
         sb.append(className == null ? generator.getClass().getSimpleName() : className)
@@ -127,6 +170,10 @@ public class ChunkGeneratorManagerImpl {
         if (generator instanceof NoiseBasedChunkGenerator noise) {
             final var key = noise.generatorSettings().unwrapKey();
             sb.append("\n    noise      = ").append(key.isEmpty() ? "custom" : key.get().location());
+        }
+
+        if (generator instanceof ChunkGeneratorAccessor) {
+            sb.append("\n    features   = ").append(enumerateFeatureNamespaces(generator));
         }
 
         return sb.toString();
