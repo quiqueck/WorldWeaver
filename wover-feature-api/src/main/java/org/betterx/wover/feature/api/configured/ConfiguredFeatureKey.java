@@ -3,12 +3,16 @@ package org.betterx.wover.feature.api.configured;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -71,6 +75,37 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
     public Holder<ConfiguredFeature<?, ?>> getHolder(@NotNull BootstapContext<?> context) {
         return getHolder(context.lookup(Registries.CONFIGURED_FEATURE));
     }
+
+    /**
+     * Gets the {@link Holder} for the {@link ConfiguredFeature} from the given getter.
+     *
+     * <p>
+     * This method internally looks up {@link Registries#CONFIGURED_FEATURE}. If you need to retrieve
+     * a lot of holders, it is recommended to manually lookup the
+     * Registry first and use {@link #getHolder(HolderGetter)} instead.
+     *
+     * @param access The {@link RegistryAccess} to get the holder from
+     * @return The holder for the {@link ConfiguredFeature} or {@code null} if it is not present
+     */
+    @Nullable
+    public Holder<ConfiguredFeature<?, ?>> getHolder(@NotNull RegistryAccess access) {
+        return getHolder(access.lookupOrThrow(Registries.CONFIGURED_FEATURE));
+    }
+
+    public boolean placeInWorld(
+            @Nullable RegistryAccess access,
+            @NotNull ServerLevel level,
+            @NotNull BlockPos pos,
+            @NotNull RandomSource random
+    ) {
+        if (access == null) return false;
+        final Holder<ConfiguredFeature<?, ?>> holder = getHolder(access);
+        if (holder != null) {
+            return ConfiguredFeatureManager.placeInWorld(holder.value(), level, pos, random, false);
+        }
+        return false;
+    }
+
 
     /**
      * Creates a new {@link FeatureConfigurator} for this Feature.

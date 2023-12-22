@@ -6,12 +6,15 @@ import org.betterx.wover.feature.api.configured.configurators.*;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 import org.betterx.wover.feature.impl.configured.*;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -383,6 +386,17 @@ public abstract class ConfiguredFeatureManager {
     ) {
         return getHolder(context.lookup(Registries.CONFIGURED_FEATURE), key);
     }
+
+    public static boolean placeInWorld(
+            ConfiguredFeature<?, ?> feature,
+            ServerLevel level,
+            BlockPos pos,
+            RandomSource random,
+            boolean unchanged
+    ) {
+        return ConfiguredFeatureManagerImpl.placeInWorld(feature, level, pos, random, unchanged);
+    }
+
 
     private ConfiguredFeatureManager() {
     }
