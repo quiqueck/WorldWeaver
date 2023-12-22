@@ -5,6 +5,7 @@ import org.betterx.wover.feature.api.placed.FeaturePlacementBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -45,6 +46,14 @@ public class BaseFeatureKeyImpl<K extends BasePlacedFeatureKey<K>> implements Ba
     @Nullable
     public Holder<PlacedFeature> getHolder(@Nullable HolderGetter<PlacedFeature> getter) {
         return PlacedFeatureManagerImpl.getHolder(getter, key);
+    }
+
+    @Nullable
+    public Holder<PlacedFeature> getHolder(@Nullable RegistryAccess access) {
+        if (access == null) {
+            return null;
+        }
+        return this.getHolder(access.lookupOrThrow(Registries.PLACED_FEATURE));
     }
 
     @Nullable

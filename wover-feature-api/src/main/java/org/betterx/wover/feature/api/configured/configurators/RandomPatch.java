@@ -1,5 +1,6 @@
 package org.betterx.wover.feature.api.configured.configurators;
 
+import org.betterx.wover.feature.api.placed.BasePlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;
@@ -22,7 +23,7 @@ public interface RandomPatch extends FeatureConfigurator<RandomPatchConfiguratio
      *                       {@link org.betterx.wover.feature.api.placed.PlacedFeatureManager#createKey(net.minecraft.resources.ResourceLocation)}
      * @return the same instance
      */
-    RandomPatch featureToPlace(PlacedFeatureKey featureToPlace);
+    <K extends BasePlacedFeatureKey<K>> RandomPatch featureToPlace(BasePlacedFeatureKey<K> featureToPlace);
 
     /**
      * The feature that should be placed in the patch.
