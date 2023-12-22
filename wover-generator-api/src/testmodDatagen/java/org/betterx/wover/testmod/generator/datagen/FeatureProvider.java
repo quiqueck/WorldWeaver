@@ -25,7 +25,7 @@ public class FeatureProvider extends WoverFeatureProvider {
         WoverWorldGeneratorTestMod
                 .TEST_VEGETATION
                 .bootstrap(context)
-                .add(Blocks.GRASS, 180)
+                .add(Blocks.SHORT_GRASS, 180)
                 .addAllStatesFor(BlockStateProperties.AGE_7, Blocks.WHEAT, 20)
                 .register();
     }
@@ -45,7 +45,7 @@ public class FeatureProvider extends WoverFeatureProvider {
                 .add(Blocks.MOSSY_COBBLESTONE, 1)
                 .add(Blocks.COBBLESTONE, 4)
                 .inlinePlace()
-                .betterNetherGround(5)
+                .betterNetherGround(100)
                 .register();
     }
 }

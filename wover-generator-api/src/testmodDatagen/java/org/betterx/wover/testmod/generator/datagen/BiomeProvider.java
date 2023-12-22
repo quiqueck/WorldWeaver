@@ -28,7 +28,7 @@ public class BiomeProvider extends WoverBiomeProvider {
                 .addNetherClimate(2.0f, 0.0f)
                 .startSurface()
                 .chancedFloor(Blocks.FARMLAND.defaultBlockState(), Blocks.DIRT.defaultBlockState())
-                .subsurface(Blocks.DIAMOND_BLOCK, 3)
+                //.subsurface(Blocks.DIAMOND_BLOCK, 3)
                 .finishSurface()
                 .genChance(2.0f)
                 .fogDensity(8.0f)
