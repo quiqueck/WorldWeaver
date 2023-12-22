@@ -18,6 +18,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.FeatureSorter;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -125,19 +126,29 @@ public class ChunkGeneratorManagerImpl {
                     for (var features : list)
                         if (features != null) {
                             for (PlacedFeature feature : features.features()) {
-                                if (feature != null && feature.feature() != null) {
-                                    final String namespace;
-                                    if (feature.feature()
-                                               .unwrapKey()
-                                               .isPresent()) {
+                                if (feature != null) {
+                                    String namespace = null;
+                                    if (WorldState.registryAccess() != null) {
+                                        final ResourceLocation location = WorldState.registryAccess()
+                                                                                    .registryOrThrow(Registries.PLACED_FEATURE)
+                                                                                    .getKey(feature);
+                                        if (location != null) {
+                                            namespace = location.getNamespace();
+                                        }
+                                    }
+                                    if (namespace == null
+                                            && feature.feature() != null
+                                            && feature.feature().unwrapKey().isPresent()) {
                                         namespace = feature
                                                 .feature()
                                                 .unwrapKey()
                                                 .get()
                                                 .location()
                                                 .getNamespace();
-                                    } else {
-                                        namespace = "direct_holder";
+                                    }
+
+                                    if (namespace == null) {
+                                        namespace = "none";
                                     }
 
                                     namespaces.put(namespace, namespaces.getOrDefault(namespace, 0) + 1);
