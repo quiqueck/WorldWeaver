@@ -172,7 +172,7 @@ public class BiomeSourceManagerImpl {
         EXCLUSIONS.clear();
         FABRIC_EXCLUDES.clear();
 
-        //ensure vanilla biomes will net be registered with fabric
+        //ensure vanilla biomes will not be registered with fabric
         FABRIC_EXCLUDES.add(MINECRAFT_WILDCARD);
 
         DatapackConfigs
