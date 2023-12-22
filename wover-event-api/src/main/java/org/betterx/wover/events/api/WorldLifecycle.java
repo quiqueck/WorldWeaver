@@ -49,6 +49,14 @@ public class WorldLifecycle {
     public static final Event<CreatedNewWorldFolder> CREATED_NEW_WORLD_FOLDER = WorldLifecycleImpl.CREATED_NEW_WORLD_FOLDER;
 
     /**
+     * Called before the game starts to load resources.
+     * <p>
+     * You can subscribe to this Event with methods that adhere to {@link BeforeLoadingResources}.
+     */
+    public static final Event<BeforeLoadingResources> BEFORE_LOADING_RESOURCES = WorldLifecycleImpl.BEFORE_LOADING_RESOURCES;
+
+
+    /**
      * This event is fired when a new {@link net.minecraft.server.WorldStem} is created. It is the
      * first time the final {@link net.minecraft.core.RegistryAccess} object is available. You can use this
      * event to modify/amend the world Dimensions before they are actually loaded.
@@ -75,6 +83,19 @@ public class WorldLifecycle {
      */
     public static final Event<BeforeCreatingLevels> BEFORE_CREATING_LEVELS = WorldLifecycleImpl.BEFORE_CREATING_LEVELS;
 
+    /**
+     * This event is fired when a server level was fully initialized.
+     * <p>
+     * You can subscribe to this Event with methods that adhere to {@link OnServerLevelReady}.
+     */
+    public static final Event<OnServerLevelReady> SERVER_LEVEL_READY = WorldLifecycleImpl.SERVER_LEVEL_READY;
+
+
+    /**
+     * Called when the {@link net.minecraft.server.packs.resources.ResourceManager} is available
+     * <p>
+     * You can subscribe to this Event with methods that adhere to {@link OnResourceLoad}.
+     */
     public static final Event<OnResourceLoad> RESOURCES_LOADED = WorldLifecycleImpl.RESOURCES_LOADED;
 
 

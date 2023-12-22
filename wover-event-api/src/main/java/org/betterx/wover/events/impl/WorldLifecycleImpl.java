@@ -18,6 +18,10 @@ public class WorldLifecycleImpl {
     public static final RegistryReadyEventImpl WORLD_REGISTRY_READY =
             new RegistryReadyEventImpl("WORLD_REGISTRY_READY");
 
+
+    public static final EventImpl<BeforeLoadingResources> BEFORE_LOADING_RESOURCES =
+            new EventImpl<>("BEFORE_LOADING_RESOURCES");
+
     public static final ChainedEventImpl<LayeredRegistryAccess<RegistryLayer>, OnDimensionLoad> ON_DIMENSION_LOAD =
             new ChainedEventImpl<>("ON_DIMENSION_LOAD");
 
@@ -25,6 +29,8 @@ public class WorldLifecycleImpl {
             new EventImpl<>("BEFORE_CREATING_LEVELS");
     public static final EventImpl<OnMinecraftServerReady> MINECRAFT_SERVER_READY =
             new EventImpl<>("MINECRAFT_SERVER_READY");
+    public static final EventImpl<OnServerLevelReady> SERVER_LEVEL_READY =
+            new EventImpl<>("SERVER_LEVEL_READY");
 
     public static final EventImpl<OnResourceLoad> RESOURCES_LOADED =
             new EventImpl<>("RESOURCES_LOADED");
