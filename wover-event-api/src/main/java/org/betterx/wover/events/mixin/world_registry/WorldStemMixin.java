@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
-@Mixin(value = WorldStem.class, priority = 1502)
+@Mixin(value = WorldStem.class, priority = 450)
 public class WorldStemMixin {
     @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/lang/Record;<init>()V", shift = At.Shift.AFTER))
     void wover_captureRegistry(
