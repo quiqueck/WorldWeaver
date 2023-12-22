@@ -113,4 +113,15 @@ public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherF
             return new NetherForrestVegetationImpl(ctx, key);
         }
     }
+
+    public static class KeyBonemeal extends ConfiguredFeatureKey<NetherForrestVegetation> {
+        public KeyBonemeal(ResourceLocation id) {
+            super(id);
+        }
+
+        @Override
+        public NetherForrestVegetation bootstrap(@NotNull BootstapContext<ConfiguredFeature<?, ?>> ctx) {
+            return new NetherForrestVegetationImpl(ctx, key).spreadHeight(1).spreadWidth(3);
+        }
+    }
 }

@@ -194,14 +194,26 @@ public abstract class ConfiguredFeatureManager {
 
     /**
      * Places blocks (by weight) with the default bonemeal distribution. You can use this to
-     * generate features that are used when applying bonemeal
+     * generate features when bone-mealing ground.
      *
      * @param id the id of the {@link ConfiguredFeature}
      * @return the new key
      * @see WeightedBlockPatch
      */
-    public static ConfiguredFeatureKey<WeightedBlockPatch> bonemealPatch(ResourceLocation id) {
+    public static ConfiguredFeatureKey<WeightedBlockPatch> bonemeal(ResourceLocation id) {
         return new WeightedBlockPatchImpl.KeyBonemeal(id);
+    }
+
+    /**
+     * Places blocks (by weight) with the default bonemeal distribution used in a nether forrest.
+     * You can use this to generate features by bone-mealing ground in the nether.
+     *
+     * @param id the id of the {@link ConfiguredFeature}
+     * @return the new key
+     * @see WeightedBlockPatch
+     */
+    public static ConfiguredFeatureKey<NetherForrestVegetation> bonemealNetherForrest(ResourceLocation id) {
+        return new NetherForrestVegetationImpl.KeyBonemeal(id);
     }
 
     /**
@@ -312,7 +324,7 @@ public abstract class ConfiguredFeatureManager {
          * Creates a new bonemeal patch feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#bonemealPatch(ResourceLocation)
+         * @see ConfiguredFeatureManager#bonemeal(ResourceLocation)
          */
         WeightedBlockPatch bonemealPatch();
         /**
