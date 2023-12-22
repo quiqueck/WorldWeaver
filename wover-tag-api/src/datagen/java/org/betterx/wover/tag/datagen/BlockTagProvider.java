@@ -82,7 +82,10 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
                 Blocks.RED_SAND,
                 Blocks.GLOWSTONE,
                 Blocks.BONE_BLOCK,
-                Blocks.SCULK
+                Blocks.SCULK,
+                Blocks.DIRT,
+                Blocks.FARMLAND,
+                Blocks.GRASS_BLOCK
         );
         ctx.add(
                 CommonBlockTags.TERRAIN,
