@@ -545,7 +545,6 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
         return this.randomHeight4FromFloorCeil()
                    .count(countPerLayer)
                    .squarePlacement()
-                   .onlyInBiome()
                    .onEveryLayerMin4()
                    .onlyInBiome();
     }
