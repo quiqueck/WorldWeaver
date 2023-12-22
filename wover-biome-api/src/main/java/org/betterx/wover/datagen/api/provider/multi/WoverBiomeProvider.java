@@ -2,29 +2,28 @@ package org.betterx.wover.datagen.api.provider.multi;
 
 import org.betterx.wover.biome.api.builder.BiomeBootstrapContext;
 import org.betterx.wover.biome.api.data.BiomeData;
-import org.betterx.wover.biome.api.data.BiomeDataRegistry;
 import org.betterx.wover.biome.impl.BiomeBootstrapContextImpl;
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.api.AbstractMultiProvider;
 import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverMultiProvider;
-import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import org.betterx.wover.datagen.api.WoverTagProvider;
+import org.betterx.wover.datagen.api.provider.WoverBiomeDataProvider;
+import org.betterx.wover.datagen.api.provider.WoverBiomeOnlyProvider;
+import org.betterx.wover.datagen.api.provider.WoverSurfaceRuleProvider;
 import org.betterx.wover.surface.api.AssignedSurfaceRule;
-import org.betterx.wover.surface.api.SurfaceRuleRegistry;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link WoverMultiProvider} for {@link Biome}s and {@link BiomeData}.
  */
-public abstract class WoverBiomeProvider implements WoverMultiProvider {
-    /**
-     * The {@link ModCore} of the Mod.
-     */
-    protected final ModCore modCore;
+public abstract class WoverBiomeProvider extends AbstractMultiProvider {
     private BiomeBootstrapContextImpl context;
 
     /**
@@ -32,8 +31,18 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
      *
      * @param modCore The {@link ModCore} of the Mod.
      */
-    public WoverBiomeProvider(ModCore modCore) {
-        this.modCore = modCore;
+    public WoverBiomeProvider(@NotNull ModCore modCore) {
+        super(modCore);
+    }
+
+    /**
+     * Creates a new instance of {@link WoverBiomeProvider}.
+     *
+     * @param modCore    The {@link ModCore} of the Mod.
+     * @param providerId The id of the provider. Every Provider (for the same Registry)
+     */
+    public WoverBiomeProvider(@NotNull ModCore modCore, ResourceLocation providerId) {
+        super(modCore, providerId);
     }
 
     /**
@@ -83,8 +92,7 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
     @Override
     public void registerAllProviders(PackBuilder pack) {
         pack.addRegistryProvider(modCore ->
-                new WoverRegistryContentProvider<>(modCore, modCore.modId + " - Biomes", Registries.BIOME) {
-
+                new WoverBiomeOnlyProvider(modCore, providerId) {
                     @Override
                     protected void bootstrap(BootstapContext<Biome> context) {
                         bootstrapBiomes(context);
@@ -93,12 +101,7 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
         );
 
         pack.addRegistryProvider(modCore ->
-                new WoverRegistryContentProvider<>(
-                        modCore,
-                        modCore.modId + " - Biome Data",
-                        BiomeDataRegistry.BIOME_DATA_REGISTRY
-                ) {
-
+                new WoverBiomeDataProvider(modCore, providerId) {
                     @Override
                     protected void bootstrap(BootstapContext<BiomeData> context) {
                         bootstrapData(context);
@@ -107,12 +110,7 @@ public abstract class WoverBiomeProvider implements WoverMultiProvider {
         );
 
         pack.addRegistryProvider(modCore ->
-                new WoverRegistryContentProvider<>(
-                        modCore,
-                        modCore.modId + " - Surface Rules",
-                        SurfaceRuleRegistry.SURFACE_RULES_REGISTRY
-                ) {
-
+                new WoverSurfaceRuleProvider(modCore, providerId) {
                     @Override
                     protected void bootstrap(BootstapContext<AssignedSurfaceRule> context) {
                         bootstrapSurface(context);

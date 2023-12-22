@@ -1,31 +1,41 @@
 package org.betterx.wover.datagen.api.provider.multi;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.api.AbstractMultiProvider;
 import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverMultiProvider;
 import org.betterx.wover.datagen.api.provider.WoverConfiguredFeatureProvider;
 import org.betterx.wover.datagen.api.provider.WoverPlacedFeatureProvider;
 
 import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link WoverMultiProvider} for {@link ConfiguredFeature}s and {@link PlacedFeature}s.
  */
-public abstract class WoverFeatureProvider implements WoverMultiProvider {
-    /**
-     * The {@link ModCore} of the Mod.
-     */
-    protected final ModCore modCore;
-
+public abstract class WoverFeatureProvider extends AbstractMultiProvider {
     /**
      * Creates a new instance of {@link WoverFeatureProvider}.
      *
      * @param modCore The {@link ModCore} of the Mod.
      */
-    public WoverFeatureProvider(ModCore modCore) {
-        this.modCore = modCore;
+    public WoverFeatureProvider(@NotNull ModCore modCore) {
+        super(modCore);
+    }
+
+    /**
+     * Creates a new instance of {@link WoverFeatureProvider}.
+     *
+     * @param modCore    The {@link ModCore} of the Mod.
+     * @param providerId The id of the provider. Every Provider (for the same Registry)
+     *                   needs a unique id.
+     */
+    public WoverFeatureProvider(@NotNull ModCore modCore, @NotNull ResourceLocation providerId) {
+        super(modCore, providerId);
     }
 
     /**
@@ -50,7 +60,7 @@ public abstract class WoverFeatureProvider implements WoverMultiProvider {
     @Override
     public void registerAllProviders(PackBuilder pack) {
         pack.addRegistryProvider(modCore ->
-                new WoverConfiguredFeatureProvider(modCore) {
+                new WoverConfiguredFeatureProvider(modCore, providerId) {
 
                     @Override
                     protected void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
@@ -60,7 +70,7 @@ public abstract class WoverFeatureProvider implements WoverMultiProvider {
         );
 
         pack.addRegistryProvider(modCore ->
-                new WoverPlacedFeatureProvider(modCore) {
+                new WoverPlacedFeatureProvider(modCore, providerId) {
 
                     @Override
                     protected void bootstrap(BootstapContext<PlacedFeature> context) {
