@@ -20,4 +20,8 @@ public interface ChunkGeneratorAccessor {
     @Accessor("featuresPerStep")
     @Mutable
     void wover_setFeaturesPerStep(Supplier<List<FeatureSorter.StepFeatureData>> supplier);
+
+    @Accessor("featuresPerStep")
+    @Mutable
+    Supplier<List<FeatureSorter.StepFeatureData>> wover_getFeaturesPerStep();
 }
