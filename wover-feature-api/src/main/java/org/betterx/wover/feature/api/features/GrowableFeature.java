@@ -5,7 +5,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
-public interface UserGrowableFeature<FC extends FeatureConfiguration> {
+public interface GrowableFeature<FC extends FeatureConfiguration> {
     boolean grow(
             ServerLevelAccessor level,
             BlockPos pos,

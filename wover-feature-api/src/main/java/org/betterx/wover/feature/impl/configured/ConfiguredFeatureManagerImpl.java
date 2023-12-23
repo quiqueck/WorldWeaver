@@ -1,6 +1,6 @@
 package org.betterx.wover.feature.impl.configured;
 
-import org.betterx.wover.feature.api.features.UserGrowableFeature;
+import org.betterx.wover.feature.api.features.GrowableFeature;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -39,7 +39,7 @@ public class ConfiguredFeatureManagerImpl {
                 config = configured.config();
             }
 
-            if (feature instanceof UserGrowableFeature growable) {
+            if (feature instanceof GrowableFeature growable) {
                 return growable.grow(level, pos, random, config);
             }
         }
