@@ -1,5 +1,6 @@
 package org.betterx.wover.feature.api.configured;
 
+import org.betterx.wover.feature.api.FeatureUtils;
 import org.betterx.wover.feature.api.configured.configurators.FeatureConfigurator;
 import org.betterx.wover.feature.impl.configured.FeatureConfiguratorImpl;
 
@@ -101,7 +102,7 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
         if (access == null) return false;
         final Holder<ConfiguredFeature<?, ?>> holder = getHolder(access);
         if (holder != null) {
-            return ConfiguredFeatureManager.placeInWorld(holder.value(), level, pos, random, false);
+            return FeatureUtils.placeInWorld(holder.value(), level, pos, random, false);
         }
         return false;
     }

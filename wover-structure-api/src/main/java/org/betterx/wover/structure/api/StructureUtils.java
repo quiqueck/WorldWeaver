@@ -8,6 +8,9 @@ import net.minecraft.world.level.levelgen.structure.Structure;
  * Utility class for Structures
  */
 public class StructureUtils {
+    private StructureUtils() {
+    }
+
     /**
      * runs the {@code PieceGeneratorSupplier.Context::validBiome} from the given context at
      * height=5 in the middle of the chunk.
