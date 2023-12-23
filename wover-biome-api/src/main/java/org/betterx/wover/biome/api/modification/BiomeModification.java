@@ -5,6 +5,7 @@ import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 import org.betterx.wover.biome.impl.modification.BiomeModificationImpl;
 import org.betterx.wover.biome.impl.modification.FeatureMap;
 import org.betterx.wover.biome.impl.modification.GenerationSettingsWorker;
+import org.betterx.wover.biome.impl.modification.MobSettingsWorker;
 import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.feature.api.placed.BasePlacedFeatureKey;
@@ -20,7 +21,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -59,7 +62,10 @@ public interface BiomeModification {
                     TagKey.codec(Registries.BIOME)
                           .listOf()
                           .optionalFieldOf("biome_tags", List.of())
-                          .forGetter(BiomeModification::biomeTags)
+                          .forGetter(BiomeModification::biomeTags),
+                    Codec.list(MobSpawnSettings.SpawnerData.CODEC)
+                         .optionalFieldOf("spawns", List.of())
+                         .forGetter(BiomeModification::spawns)
             ).apply(instance, BiomeModificationImpl::new)
     );
 
@@ -80,6 +86,12 @@ public interface BiomeModification {
      */
     List<List<Holder<PlacedFeature>>> features();
 
+    /**
+     * The spawns that should be added to the biome.
+     *
+     * @return all spawns
+     */
+    List<MobSpawnSettings.SpawnerData> spawns();
 
     /**
      * The biome tags the biome should be added to
@@ -91,10 +103,11 @@ public interface BiomeModification {
     /**
      * For <b>internal</b> use only! Called when the modification should be applied to a biome.
      *
-     * @param worker The worker that can be used to apply the modification to the biome
+     * @param worker    The worker that can be used to apply the modification to the biome
+     * @param mobWorker The worker that can be used to apply the modification to the mob spawns
      */
     @ApiStatus.Internal
-    void apply(GenerationSettingsWorker worker);
+    void apply(GenerationSettingsWorker worker, MobSettingsWorker mobWorker);
 
     /**
      * Creates a new {@link Builder} for a {@link BiomeModification}.
@@ -135,6 +148,7 @@ public interface BiomeModification {
         private final BootstapContext<BiomeModification> bootstrapContext;
         private BiomePredicate predicate;
         private final FeatureMap features;
+        private final List<MobSpawnSettings.SpawnerData> spawns;
         private final Set<TagKey<Biome>> tags = new HashSet<>();
 
         private final ResourceKey<BiomeModification> key;
@@ -147,6 +161,7 @@ public interface BiomeModification {
             this.key = key;
             this.predicate = BiomePredicate.always();
             this.features = FeatureMap.of(new ArrayList<>(GenerationStep.Decoration.values().length));
+            this.spawns = new ArrayList<>(2);
         }
 
         /**
@@ -484,12 +499,45 @@ public interface BiomeModification {
             return this.addToTag(structureSet);
         }
 
+        /**
+         * Add a Mob-Spawn to the Biome
+         *
+         * @param entityType    The {@link EntityType} of the mob
+         * @param weight        The weight for this pawn entry
+         * @param minGroupCount The minimum number of mobs that spawn in a group
+         * @param maxGroupCount The maximum number of mobs that spawn in a group
+         * @param <M>           The type of the mob
+         * @return This builder.
+         */
+        public <M extends Mob> Builder addSpawn(
+                EntityType<M> entityType,
+                int weight,
+                int minGroupCount,
+                int maxGroupCount
+        ) {
+            return addSpawn(new MobSpawnSettings.SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+        }
+
+        /**
+         * Add a Mob-Spawn to the Biome
+         *
+         * @param spawnerData The Spawn definition
+         * @param <M>         The type of the mob
+         * @return This builder.
+         */
+        public <M extends Mob> Builder addSpawn(
+                MobSpawnSettings.SpawnerData spawnerData
+        ) {
+            this.spawns.add(spawnerData);
+            return this;
+        }
+
 
         /**
          * Adds the Biome into a given Tag.
          *
          * @param tag
-         * @return
+         * @return This builder.
          */
         public Builder addToTag(TagKey<Biome> tag) {
             tags.add(tag);
@@ -526,7 +574,8 @@ public interface BiomeModification {
             return new BiomeModificationImpl(
                     predicate,
                     features.generic(),
-                    tags != null ? tags.stream().toList() : null
+                    tags != null ? tags.stream().toList() : null,
+                    spawns
             );
         }
     }

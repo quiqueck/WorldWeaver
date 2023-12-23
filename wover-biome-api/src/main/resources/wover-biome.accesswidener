@@ -8,3 +8,5 @@ accessible	field	net/minecraft/world/level/biome/BiomeGenerationSettings	flowerF
 mutable	field	net/minecraft/world/level/biome/BiomeGenerationSettings	flowerFeatures	Ljava/util/function/Supplier;
 accessible	field	net/minecraft/world/level/biome/BiomeGenerationSettings	featureSet	Ljava/util/function/Supplier;
 mutable	field	net/minecraft/world/level/biome/BiomeGenerationSettings	featureSet	Ljava/util/function/Supplier;
+accessible field net/minecraft/world/level/biome/MobSpawnSettings spawners Ljava/util/Map;
+mutable field net/minecraft/world/level/biome/MobSpawnSettings spawners Ljava/util/Map;

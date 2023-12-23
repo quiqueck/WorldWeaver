@@ -89,11 +89,15 @@ public class BiomeModificationRegistryImpl {
 
             biomesProcessed++;
             GenerationSettingsWorker worker = null;
+            MobSettingsWorker mobWorker = null;
             boolean didChangeBiome = false;
             for (BiomeModification modification : biomeModifications) {
                 if (modification.predicate().test(context)) {
                     if (worker == null) {
                         worker = new GenerationSettingsWorker(registryAccess, context.biome);
+                    }
+                    if (mobWorker == null) {
+                        mobWorker = new MobSettingsWorker(context.biome);
                     }
 
                     if (modification.biomeTags() != null) {
@@ -105,7 +109,7 @@ public class BiomeModificationRegistryImpl {
                         }
                     }
 
-                    modification.apply(worker);
+                    modification.apply(worker, mobWorker);
                     modifiersApplied++;
                 }
             }
@@ -114,6 +118,14 @@ public class BiomeModificationRegistryImpl {
                 //this call has an important side effect of re-freezing the features and carvers
                 // make sure it is not bypassed due to lazy evaluation
                 if (worker.finished()) {
+                    didChangeBiome = true;
+                }
+            }
+
+            if (mobWorker != null) {
+                //this call has an important side effect of re-freezing the features and carvers
+                // make sure it is not bypassed due to lazy evaluation
+                if (mobWorker.finished()) {
                     didChangeBiome = true;
                 }
             }
