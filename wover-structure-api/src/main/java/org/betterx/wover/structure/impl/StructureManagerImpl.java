@@ -10,9 +10,7 @@ import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructure;
 import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructurePiece;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -57,6 +55,27 @@ public class StructureManagerImpl {
         DatapackRegistryBuilder.addBootstrap(
                 Registries.STRUCTURE,
                 StructureManagerImpl::onBootstrap
+        );
+    }
+
+
+    public static boolean isValidBiome(Structure.GenerationContext context) {
+        return isValidBiome(context, 5);
+    }
+
+
+    public static boolean isValidBiome(Structure.GenerationContext context, int yPos) {
+        BlockPos blockPos = context.chunkPos().getMiddleBlockPosition(yPos);
+        return context.validBiome().test(
+                context
+                        .chunkGenerator()
+                        .getBiomeSource()
+                        .getNoiseBiome(
+                                QuartPos.fromBlock(blockPos.getX()),
+                                QuartPos.fromBlock(blockPos.getY()),
+                                QuartPos.fromBlock(blockPos.getZ()),
+                                context.randomState().sampler()
+                        )
         );
     }
 
