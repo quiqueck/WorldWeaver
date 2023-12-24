@@ -45,7 +45,7 @@ public class ClientWorldLifecycle {
      * have to ensure the correct behaviour.
      * <p>
      * Assume you have the following class:
-     * <pre class="java>public class HelloScreen extends WoverLayoutScreen {
+     * <pre class="java">public class HelloScreen extends WoverLayoutScreen {
      *      public WoverLayoutScreen(@NotNull Runnable onClose){
      *          super(onClose, translatable("screen.welcome.title"))
      *      }

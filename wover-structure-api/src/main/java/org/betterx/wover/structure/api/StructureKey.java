@@ -68,7 +68,7 @@ public interface StructureKey<
     TagKey<Biome> biomeTag();
 
     /**
-     * Get the {@link GenerationStep.Decoration} for the {@link PlacedFeature}.
+     * Get the {@link GenerationStep.Decoration} for the {@link Structure}.
      *
      * @return The decoration
      */
