@@ -17,10 +17,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.test.wover.WoverTestMod"
+      "org.betterx.test.wover.TestModWover"
     ],
     "client": [
-      "org.betterx.test.wover.client.WoverClientTestMod"
+      "org.betterx.test.wover.client.TestModWoverClient"
     ],
     "fabric-datagen": [
       "org.betterx.datagen.betterapi.Generator"

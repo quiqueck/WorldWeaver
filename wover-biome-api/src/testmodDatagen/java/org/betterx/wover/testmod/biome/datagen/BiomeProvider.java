@@ -4,7 +4,7 @@ import org.betterx.wover.biome.api.builder.BiomeBootstrapContext;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.multi.WoverBiomeProvider;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
-import org.betterx.wover.testmod.entrypoint.WoverBiomeTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverBiome;
 
 public class BiomeProvider extends WoverBiomeProvider {
     /**
@@ -18,7 +18,7 @@ public class BiomeProvider extends WoverBiomeProvider {
 
     @Override
     protected void bootstrap(BiomeBootstrapContext context) {
-        WoverBiomeTestMod.TEST_BIOME
+        TestModWoverBiome.TEST_BIOME
                 .bootstrap(context)
                 .tag(CommonBiomeTags.IS_END_HIGHLAND)
                 .register();

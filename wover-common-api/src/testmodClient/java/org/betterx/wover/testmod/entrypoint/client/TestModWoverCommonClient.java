@@ -1,11 +1,11 @@
-package org.betterx.wover{postfix}.entrypoint.client;
+package org.betterx.wover.testmod.entrypoint.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
-public class {clientClass} implements ClientModInitializer {
+public class TestModWoverCommonClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 

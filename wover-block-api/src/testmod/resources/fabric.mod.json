@@ -17,13 +17,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.WoverBlockAndItemTestMod"
+      "org.betterx.wover.testmod.entrypoint.TestModWoverBlockAndItem"
     ],
     "fabric-datagen": [
-      "org.betterx.wover.testmod.block.datagen.WoverBlockAndItemDatagenTestMod"
+      "org.betterx.wover.testmod.block.datagen.TestModWoverBlockAndItemDatagen"
     ],
     "client": [
-      "org.betterx.wover.testmod.entrypoint.client.WoverBlockAndItemClientTestMod"
+      "org.betterx.wover.testmod.entrypoint.client.TestModWoverBlockAndItemClient"
     ]
   },
   "mixins": [],

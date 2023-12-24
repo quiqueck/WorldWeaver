@@ -2,7 +2,7 @@ package org.betterx.wover.testmod.generator.datagen;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.multi.WoverFeatureProvider;
-import org.betterx.wover.testmod.entrypoint.WoverWorldGeneratorTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverWorldGenerator;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.world.level.block.Blocks;
@@ -22,7 +22,7 @@ public class FeatureProvider extends WoverFeatureProvider {
 
     @Override
     protected void bootstrapConfigured(BootstapContext<ConfiguredFeature<?, ?>> context) {
-        WoverWorldGeneratorTestMod
+        TestModWoverWorldGenerator
                 .TEST_VEGETATION
                 .bootstrap(context)
                 .add(Blocks.SHORT_GRASS, 180)
@@ -32,13 +32,13 @@ public class FeatureProvider extends WoverFeatureProvider {
 
     @Override
     protected void bootstrapPlaced(BootstapContext<PlacedFeature> context) {
-        WoverWorldGeneratorTestMod
+        TestModWoverWorldGenerator
                 .TEST_VEGETATION_PLACED
                 .place(context)
                 .vanillaNetherGround(24)
                 .register();
 
-        WoverWorldGeneratorTestMod
+        TestModWoverWorldGenerator
                 .TEST_SCATTERED_PLACED
                 .inlineConfiguration(context)
                 .randomBlock()

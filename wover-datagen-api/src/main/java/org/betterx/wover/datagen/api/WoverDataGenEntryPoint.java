@@ -109,7 +109,7 @@ import org.jetbrains.annotations.ApiStatus;
  * {@code AddonSurfaceRuleProvider} will look like this
  * <pre class="java"> public class AddonSurfaceRuleProvider extends WoverRegistryContentProvider&lt;AssignedSurfaceRule> {
  *     public static final ResourceKey&lt;AssignedSurfaceRule> TEST_MEADOW
- *             = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-meadow"));
+ *             = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-meadow"));
  *
  *     public AddonSurfaceRuleProvider(ModCore modCore) {
  *         super(modCore, "Additional Surface Rules", SurfaceRuleRegistry.SURFACE_RULES_REGISTRY);

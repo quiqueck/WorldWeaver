@@ -4,7 +4,7 @@ import org.betterx.wover.biome.api.modification.BiomeModification;
 import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
-import org.betterx.wover.testmod.entrypoint.WoverFeatureTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverFeature;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
@@ -31,7 +31,7 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
                 .isBiome(Biomes.DESERT)
                 .addFeature(
                         GenerationStep.Decoration.VEGETAL_DECORATION,
-                        WoverFeatureTestMod.PLACED_REDSTONE_BLOCK.getHolder(features)
+                        TestModWoverFeature.PLACED_REDSTONE_BLOCK.getHolder(features)
                 )
                 .register();
     }

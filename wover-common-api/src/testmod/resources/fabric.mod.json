@@ -17,10 +17,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.WoverCommonTestMod"
+      "org.betterx.wover.testmod.entrypoint.TestModWoverCommon"
     ],
     "client": [
-      "org.betterx.wover.testmod.entrypoint.client.WoverCommonClientTestMod"
+      "org.betterx.wover.testmod.entrypoint.client.TestModWoverCommonClient"
     ]
   },
   "mixins": [],

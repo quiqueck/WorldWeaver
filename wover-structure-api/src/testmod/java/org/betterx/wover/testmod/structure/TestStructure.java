@@ -1,6 +1,6 @@
 package org.betterx.wover.testmod.structure;
 
-import org.betterx.wover.testmod.entrypoint.WoverStructureTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverStructure;
 
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -21,6 +21,6 @@ public class TestStructure extends Structure {
 
     @Override
     public @NotNull StructureType<?> type() {
-        return WoverStructureTestMod.TEST_STRUCTURE.type();
+        return TestModWoverStructure.TEST_STRUCTURE.type();
     }
 }

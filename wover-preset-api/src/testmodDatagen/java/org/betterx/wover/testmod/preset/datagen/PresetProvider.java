@@ -6,7 +6,7 @@ import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.preset.api.context.WorldPresetBootstrapContext;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
-import org.betterx.wover.testmod.entrypoint.WoverWorldPresetTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverWorldPreset;
 
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
@@ -29,11 +29,11 @@ public class PresetProvider extends WoverWorldPresetProvider {
                 context.overworldStem,
                 context.endStem
         );
-        context.register(WoverWorldPresetTestMod.NETHER_START, preset);
+        context.register(TestModWoverWorldPreset.NETHER_START, preset);
     }
 
     @Override
     protected void prepareTags(TagBootstrapContext<WorldPreset> provider) {
-        provider.add(WorldPresetTags.NORMAL, WoverWorldPresetTestMod.NETHER_START);
+        provider.add(WorldPresetTags.NORMAL, TestModWoverWorldPreset.NETHER_START);
     }
 }

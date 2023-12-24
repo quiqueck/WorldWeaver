@@ -4,7 +4,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import org.betterx.wover.surface.api.*;
 import org.betterx.wover.surface.api.noise.NumericProviders;
-import org.betterx.wover.testmod.entrypoint.WoverSurfaceTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverSurface;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -17,17 +17,17 @@ import java.util.List;
 
 public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSurfaceRule> {
     public static final ResourceKey<AssignedSurfaceRule> TEST_PLAINS
-            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-plains"));
+            = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-plains"));
     public static final ResourceKey<AssignedSurfaceRule> TEST_PLAINS_BELOW
-            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-plains-below"));
+            = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-plains-below"));
     public static final ResourceKey<AssignedSurfaceRule> TEST_BEACH
-            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-beach"));
+            = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-beach"));
 
     public static final ResourceKey<AssignedSurfaceRule> TEST_DESERT
-            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-desert"));
+            = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-desert"));
 
     public static final ResourceKey<AssignedSurfaceRule> TEST_FLOWER_FORREST
-            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-flower-forrest"));
+            = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-flower-forrest"));
 
     public SurfaceRuleProvider(ModCore modCore) {
         super(

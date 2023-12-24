@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.WoverDatagenTestMod"
+      "org.betterx.wover.testmod.entrypoint.TestModWoverDatagen"
     ]
   },
   "depends": {

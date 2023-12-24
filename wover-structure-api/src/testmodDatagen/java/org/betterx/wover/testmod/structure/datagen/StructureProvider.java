@@ -5,7 +5,7 @@ import org.betterx.wover.datagen.api.provider.multi.WoverStructureProvider;
 import org.betterx.wover.structure.api.sets.StructureSetManager;
 import org.betterx.wover.structure.api.structures.StructurePlacement;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
-import org.betterx.wover.testmod.entrypoint.WoverStructureTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverStructure;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.world.level.biome.Biome;
@@ -20,7 +20,7 @@ import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 public class StructureProvider extends WoverStructureProvider {
-    private final ModCore C = WoverStructureTestMod.C;
+    private final ModCore C = TestModWoverStructure.C;
 
     /**
      * Creates a new instance of {@link WoverStructureProvider}.
@@ -33,70 +33,70 @@ public class StructureProvider extends WoverStructureProvider {
 
     @Override
     protected void bootstrapSturctures(BootstapContext<Structure> context) {
-        WoverStructureTestMod.TEST_STRUCTURE
+        TestModWoverStructure.TEST_STRUCTURE
                 .bootstrap(context)
                 .adjustment(TerrainAdjustment.BEARD_BOX)
                 .register();
 
-        WoverStructureTestMod.JIGSAW_STRUCTURE
+        TestModWoverStructure.JIGSAW_STRUCTURE
                 .bootstrap(context)
-                .startPool(WoverStructureTestMod.TEST_STRUCTURE_POOL_START)
+                .startPool(TestModWoverStructure.TEST_STRUCTURE_POOL_START)
                 .maxDepth(5)
                 .projectStartToHeightmap(Heightmap.Types.MOTION_BLOCKING)
                 .adjustment(TerrainAdjustment.BEARD_BOX)
                 .register();
 
-        WoverStructureTestMod.RND_STRUCTURE
+        TestModWoverStructure.RND_STRUCTURE
                 .bootstrap(context)
-                .addElement(WoverStructureTestMod.C.id("simple"), 1, 2.0)
+                .addElement(TestModWoverStructure.C.id("simple"), 1, 2.0)
                 .placement(StructurePlacement.NETHER_SURFACE_FLAT_2)
                 .register();
     }
 
     @Override
     protected void bootstrapSets(BootstapContext<StructureSet> context) {
-        WoverStructureTestMod.TEST_STRUCTURE_SET
+        TestModWoverStructure.TEST_STRUCTURE_SET
                 .bootstrap(context)
-                .addStructure(WoverStructureTestMod.TEST_STRUCTURE)
-                .addStructure(WoverStructureTestMod.JIGSAW_STRUCTURE)
+                .addStructure(TestModWoverStructure.TEST_STRUCTURE)
+                .addStructure(TestModWoverStructure.JIGSAW_STRUCTURE)
                 .randomPlacement()
                 .spreadType(RandomSpreadType.TRIANGULAR)
                 .finishPlacement()
                 .register();
 
         StructureSetManager
-                .bootstrap(WoverStructureTestMod.RND_STRUCTURE, context)
+                .bootstrap(TestModWoverStructure.RND_STRUCTURE, context)
                 .randomPlacement(16, 4)
                 .register();
     }
 
     @Override
     protected void bootstrapPools(BootstapContext<StructureTemplatePool> context) {
-        WoverStructureTestMod.TEST_STRUCTURE_POOL_START
+        TestModWoverStructure.TEST_STRUCTURE_POOL_START
                 .bootstrap(context)
-                .terminator(WoverStructureTestMod.TEST_STRUCTURE_POOL_TERMINAL)
+                .terminator(TestModWoverStructure.TEST_STRUCTURE_POOL_TERMINAL)
                 .startSingle(C.id("street"))
                 .endElement()
                 .projection(StructureTemplatePool.Projection.TERRAIN_MATCHING)
                 .register();
 
-        WoverStructureTestMod.TEST_STRUCTURE_POOL_HOUSE
+        TestModWoverStructure.TEST_STRUCTURE_POOL_HOUSE
                 .bootstrap(context)
                 .startSingle(C.id("house"))
                 .endElement()
                 .register();
 
-        WoverStructureTestMod.TEST_STRUCTURE_POOL_TERMINAL
+        TestModWoverStructure.TEST_STRUCTURE_POOL_TERMINAL
                 .bootstrap(context)
                 .startSingle(C.id("terminator"))
-                .processor(WoverStructureTestMod.TEST_STRUCTURE_PROCESSOR)
+                .processor(TestModWoverStructure.TEST_STRUCTURE_PROCESSOR)
                 .endElement()
                 .register();
     }
 
     @Override
     protected void bootstrapProcessors(BootstapContext<StructureProcessorList> context) {
-        WoverStructureTestMod.TEST_STRUCTURE_PROCESSOR
+        TestModWoverStructure.TEST_STRUCTURE_PROCESSOR
                 .bootstrap(context)
 
                 .startRule()
@@ -111,11 +111,13 @@ public class StructureProvider extends WoverStructureProvider {
 
     @Override
     protected void prepareBiomeTags(TagBootstrapContext<Biome> context) {
-        context.add(WoverStructureTestMod.TEST_STRUCTURE.biomeTag(),
+        context.add(
+                TestModWoverStructure.TEST_STRUCTURE.biomeTag(),
                 Biomes.SAVANNA, Biomes.END_HIGHLANDS, Biomes.END_MIDLANDS, Biomes.NETHER_WASTES
         );
 
-        context.add(WoverStructureTestMod.RND_STRUCTURE.biomeTag(),
+        context.add(
+                TestModWoverStructure.RND_STRUCTURE.biomeTag(),
                 Biomes.NETHER_WASTES, Biomes.CRIMSON_FOREST, Biomes.WARPED_FOREST, Biomes.SOUL_SAND_VALLEY
         );
     }

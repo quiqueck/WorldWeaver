@@ -7,7 +7,7 @@ import org.betterx.wover.feature.api.configured.ConfiguredFeatureKey;
 import org.betterx.wover.feature.api.configured.ConfiguredFeatureManager;
 import org.betterx.wover.feature.api.configured.configurators.AsPillar;
 import org.betterx.wover.feature.api.features.config.PillarFeatureConfig;
-import org.betterx.wover.testmod.entrypoint.WoverFeatureTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverFeature;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -27,12 +27,12 @@ public class ConfiguredFeaturesProvider extends WoverRegistryContentProvider<Con
 
     @Override
     protected void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
-        WoverFeatureTestMod.CONFIGURED_REDSTONE_BLOCK
+        TestModWoverFeature.CONFIGURED_REDSTONE_BLOCK
                 .bootstrap(context)
                 .block(Blocks.REDSTONE_BLOCK)
                 .register();
 
-        WoverFeatureTestMod.TEST_RANDOM_SIMPLE
+        TestModWoverFeature.TEST_RANDOM_SIMPLE
                 .bootstrap(context)
                 .block(Blocks.AMETHYST_BLOCK)
                 .inlinePlace()

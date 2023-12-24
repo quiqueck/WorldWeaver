@@ -17,13 +17,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.WoverSurfaceTestMod"
+      "org.betterx.wover.testmod.entrypoint.TestModWoverSurface"
     ],
     "client": [
-      "org.betterx.wover.testmod.entrypoint.client.WoverSurfaceClientTestMod"
+      "org.betterx.wover.testmod.entrypoint.client.TestModWoverSurfaceClient"
     ],
     "fabric-datagen": [
-      "org.betterx.wover.testmod.surface.datagen.WoverSurfaceDatagenTestMod"
+      "org.betterx.wover.testmod.surface.datagen.TestModWoverSurfaceDatagen"
     ]
   },
   "depends": {

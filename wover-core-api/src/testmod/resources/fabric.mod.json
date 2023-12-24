@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.WoverWorldCoreTestMod"
+      "org.betterx.wover.testmod.entrypoint.TestModWoverWorldCore"
     ]
   },
   "mixins": [],

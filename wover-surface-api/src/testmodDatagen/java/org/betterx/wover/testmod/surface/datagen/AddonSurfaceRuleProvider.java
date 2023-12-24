@@ -5,7 +5,7 @@ import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
 import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.surface.api.SurfaceRuleBuilder;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
-import org.betterx.wover.testmod.entrypoint.WoverSurfaceTestMod;
+import org.betterx.wover.testmod.entrypoint.TestModWoverSurface;
 
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Blocks;
 
 public class AddonSurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSurfaceRule> {
     public static final ResourceKey<AssignedSurfaceRule> TEST_MEADOW
-            = SurfaceRuleRegistry.createKey(WoverSurfaceTestMod.C.id("test-meadow"));
+            = SurfaceRuleRegistry.createKey(TestModWoverSurface.C.id("test-meadow"));
 
     public AddonSurfaceRuleProvider(ModCore modCore) {
         super(
