@@ -3,7 +3,7 @@ package org.betterx.wover.generator.datagen;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverDataGenEntryPoint;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 
 public class WoverWorldGeneratorDatagen extends WoverDataGenEntryPoint {
     @Override
@@ -16,7 +16,7 @@ public class WoverWorldGeneratorDatagen extends WoverDataGenEntryPoint {
 
     @Override
     protected ModCore modCore() {
-        return WoverWorldGenerator.C;
+        return LibWoverWorldGenerator.C;
     }
 
 }

@@ -2,7 +2,7 @@ package org.betterx.wover.biome.api.data;
 
 import org.betterx.wover.biome.impl.data.BiomeCodecRegistryImpl;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
-import org.betterx.wover.entrypoint.WoverSurface;
+import org.betterx.wover.entrypoint.LibWoverSurface;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -12,7 +12,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 
 public class BiomeCodecRegistry {
     public static final ResourceKey<Registry<Codec<? extends BiomeData>>> BIOME_CODEC_REGISTRY =
-            DatapackRegistryBuilder.createRegistryKey(WoverSurface.C.id("wover/biome_codec"));
+            DatapackRegistryBuilder.createRegistryKey(LibWoverSurface.C.id("wover/biome_codec"));
 
     public static final Registry<Codec<? extends BiomeData>> BIOME_CODECS = BiomeCodecRegistryImpl.BIOME_CODECS;
 

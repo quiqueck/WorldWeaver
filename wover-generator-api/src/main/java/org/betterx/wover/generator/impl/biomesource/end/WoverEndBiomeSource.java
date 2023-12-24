@@ -3,7 +3,7 @@ package org.betterx.wover.generator.impl.biomesource.end;
 import org.betterx.wover.biome.impl.data.BiomeDataRegistryImpl;
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
 import org.betterx.wover.generator.api.biomesource.end.BiomeDecider;
@@ -215,23 +215,23 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
 
         if (endVoidBiomePicker.isEmpty()) {
             if (!ModCore.isDatagen() && WorldState.allStageRegistryAccess() != null)
-                WoverWorldGenerator.C.log.verbose("No Void Biomes found. Disabling by using barrens");
+                LibWoverWorldGenerator.C.log.verbose("No Void Biomes found. Disabling by using barrens");
             endVoidBiomePicker = endBarrensBiomePicker;
         }
         if (endBarrensBiomePicker.isEmpty()) {
             if (!ModCore.isDatagen() && WorldState.allStageRegistryAccess() != null)
-                WoverWorldGenerator.C.log.verbose("No Barrens Biomes found. Disabling by using land Biomes");
+                LibWoverWorldGenerator.C.log.verbose("No Barrens Biomes found. Disabling by using land Biomes");
             endBarrensBiomePicker = endLandBiomePicker;
             endVoidBiomePicker = endLandBiomePicker;
         }
         if (endCenterBiomePicker.isEmpty()) {
             if (!ModCore.isDatagen() && WorldState.allStageRegistryAccess() != null)
-                WoverWorldGenerator.C.log.verbose("No Center Island Biomes found. Forcing use of vanilla center.");
+                LibWoverWorldGenerator.C.log.verbose("No Center Island Biomes found. Forcing use of vanilla center.");
             endCenterBiomePicker.addBiome(BiomeDataRegistryImpl.getFromRegistryOrTemp(Biomes.THE_END));
             endCenterBiomePicker.rebuild();
             if (endCenterBiomePicker.isEmpty()) {
                 if (!ModCore.isDatagen() && WorldState.allStageRegistryAccess() != null)
-                    WoverWorldGenerator.C.log.verbose(
+                    LibWoverWorldGenerator.C.log.verbose(
                             "Unable to force vanilla central Island. Falling back to land Biomes...");
                 endCenterBiomePicker = endLandBiomePicker;
             }

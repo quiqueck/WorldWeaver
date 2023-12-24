@@ -1,6 +1,6 @@
 package org.betterx.wover.events.impl.types;
 
-import org.betterx.wover.entrypoint.WoverEvents;
+import org.betterx.wover.entrypoint.LibWoverEvents;
 import org.betterx.wover.events.api.ChainableSubscriber;
 import org.betterx.wover.events.impl.AbstractEvent;
 
@@ -10,7 +10,7 @@ public class ChainedEventImpl<R, T extends ChainableSubscriber<R>> extends Abstr
     }
 
     public final R process(R input) {
-        WoverEvents.C.LOG.debug("Emitting event: " + eventName);
+        LibWoverEvents.C.LOG.debug("Emitting event: " + eventName);
         for (var subscriber : handlers) {
             input = subscriber.task.chain(input);
         }

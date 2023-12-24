@@ -1,6 +1,6 @@
 package org.betterx.wover.config.api;
 
-import org.betterx.wover.entrypoint.WoverCore;
+import org.betterx.wover.entrypoint.LibWoverCore;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -40,7 +40,7 @@ public class DatapackConfigs {
                 if (obj != null)
                     handler.onLoad(entry.getKey(), obj);
             } catch (Exception e) {
-                WoverCore.C.log.error(
+                LibWoverCore.C.log.error(
                         "Error occurred while loading resource json " + entry.getKey(),
                         e
                 );

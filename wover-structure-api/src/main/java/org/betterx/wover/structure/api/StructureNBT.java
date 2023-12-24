@@ -1,7 +1,7 @@
 package org.betterx.wover.structure.api;
 
 import org.betterx.wover.block.api.BlockHelper;
-import org.betterx.wover.entrypoint.WoverStructure;
+import org.betterx.wover.entrypoint.LibWoverStructure;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -87,7 +87,7 @@ public class StructureNBT {
     @Nullable
     private BlockPos getCenteredPos(BlockPos pos, Rotation rotation, Mirror mirror) {
         if (structure == null) {
-            WoverStructure.C.log.error("No structure: " + location.toString());
+            LibWoverStructure.C.log.error("No structure: " + location.toString());
             return null;
         }
 
@@ -175,7 +175,7 @@ public class StructureNBT {
             try {
                 uri = url.toURI();
             } catch (URISyntaxException e) {
-                WoverStructure.C.log.error("Unable to load Resources: ", e);
+                LibWoverStructure.C.log.error("Unable to load Resources: ", e);
                 return null;
             }
             Path myPath;
@@ -187,7 +187,7 @@ public class StructureNBT {
                     try {
                         fileSystem = FileSystems.newFileSystem(uri, new HashMap<>());
                     } catch (IOException e) {
-                        WoverStructure.C.log.error("Unable to load Filesystem: ", e);
+                        LibWoverStructure.C.log.error("Unable to load Filesystem: ", e);
                         return null;
                     }
                 }
@@ -215,17 +215,17 @@ public class StructureNBT {
                                 ))
                                 .sorted(Comparator.comparing(ResourceLocation::toString))
                                 .map(r -> {
-                                    WoverStructure.C.log.info("Loading Structure: " + r);
+                                    LibWoverStructure.C.log.info("Loading Structure: " + r);
                                     try {
                                         return StructureNBT.create(r);
                                     } catch (Exception e) {
-                                        WoverStructure.C.log.error("Unable to load Structure " + r, e);
+                                        LibWoverStructure.C.log.error("Unable to load Structure " + r, e);
                                     }
                                     return null;
                                 })
                                 .toList();
                 } catch (IOException e) {
-                    WoverStructure.C.log.error("Unable to load Resources: ", e);
+                    LibWoverStructure.C.log.error("Unable to load Resources: ", e);
                     return null;
                 }
             }

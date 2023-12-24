@@ -4,8 +4,8 @@ import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverMath implements ModInitializer {
-    public static final ModCore C = ModCore.create("wover-math", "wover");
+public class LibWoverDatagen implements ModInitializer {
+    public static final ModCore C = ModCore.create("wover-datagen", "wover");
 
     @Override
     public void onInitialize() {

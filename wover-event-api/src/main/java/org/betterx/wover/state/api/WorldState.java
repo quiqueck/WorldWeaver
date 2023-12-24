@@ -1,6 +1,6 @@
 package org.betterx.wover.state.api;
 
-import org.betterx.wover.entrypoint.WoverEvents;
+import org.betterx.wover.entrypoint.LibWoverEvents;
 import org.betterx.wover.state.impl.WorldStateImpl;
 
 import net.minecraft.core.RegistryAccess;
@@ -70,7 +70,7 @@ public class WorldState {
                 : access.registryOrThrow(Registries.BIOME).getKey(biome);
 
         if (id == null) {
-            WoverEvents.C.log.error("Unable to get ResourceLocation for " + biome + ".");
+            LibWoverEvents.C.log.error("Unable to get ResourceLocation for " + biome + ".");
         }
 
         return id;

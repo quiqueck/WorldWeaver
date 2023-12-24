@@ -5,7 +5,7 @@ import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverBlockAndItem implements ModInitializer {
+public class LibWoverBlockAndItem implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-block", "wover");
 
     @Override

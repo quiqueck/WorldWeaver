@@ -3,7 +3,7 @@ package org.betterx.wover.tag.datagen;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.PackBuilder;
 import org.betterx.wover.datagen.api.WoverDataGenEntryPoint;
-import org.betterx.wover.entrypoint.WoverTag;
+import org.betterx.wover.entrypoint.LibWoverTag;
 
 public class WoverTagDatagen extends WoverDataGenEntryPoint {
     @Override
@@ -16,6 +16,6 @@ public class WoverTagDatagen extends WoverDataGenEntryPoint {
 
     @Override
     protected ModCore modCore() {
-        return WoverTag.C;
+        return LibWoverTag.C;
     }
 }

@@ -2,7 +2,7 @@ package org.betterx.wover.biome.impl.modification;
 
 import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 import org.betterx.wover.biome.mixin.HolderSetNamedAccessor;
-import org.betterx.wover.entrypoint.WoverBiome;
+import org.betterx.wover.entrypoint.LibWoverBiome;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -46,7 +46,7 @@ public class BiomeTagModificationWorker {
 
             return true;
         } else {
-            WoverBiome.C.log.warn("Failed to alter BiomeTag {}", tag.location());
+            LibWoverBiome.C.log.warn("Failed to alter BiomeTag {}", tag.location());
         }
         return false;
     }

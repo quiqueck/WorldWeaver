@@ -5,7 +5,7 @@ import org.betterx.wover.biome.api.modification.BiomeModificationRegistry;
 import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 import org.betterx.wover.common.generator.api.biomesource.ReloadableBiomeSource;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
-import org.betterx.wover.entrypoint.WoverBiome;
+import org.betterx.wover.entrypoint.LibWoverBiome;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
@@ -83,7 +83,7 @@ public class BiomeModificationRegistryImpl {
         for (ResourceKey<Biome> biomeKey : keys) {
             BiomePredicate.Context context = BiomePredicate.Context.of(registryAccess, biomeKey);
             if (context == null) {
-                WoverBiome.C.log.warn("Failed to get biome context for {}", biomeKey.location());
+                LibWoverBiome.C.log.warn("Failed to get biome context for {}", biomeKey.location());
                 continue;
             }
 
@@ -146,7 +146,7 @@ public class BiomeModificationRegistryImpl {
         }
 
         if (biomesProcessed > 0) {
-            WoverBiome.C.log.info(
+            LibWoverBiome.C.log.info(
                     "Applied {} biome modifications and added {} tags to {} of {} biomes in {}",
                     modifiersApplied,
                     tagsAdded,

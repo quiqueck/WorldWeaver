@@ -9,7 +9,7 @@ import org.betterx.wover.surface.impl.rules.MaterialRuleRegistryImpl;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverSurface implements ModInitializer {
+public class LibWoverSurface implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-surface", "wover");
 
     @Override

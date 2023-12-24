@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverSurface"
+      "org.betterx.wover.entrypoint.LibWoverSurface"
     ],
     "fabric-datagen": [
       "org.betterx.wover.surface.datagen.WoverSurfaceDatagen"

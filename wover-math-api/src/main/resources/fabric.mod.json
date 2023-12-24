@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverMath"
+      "org.betterx.wover.entrypoint.LibWoverMath"
     ]
   },
   "mixins": [

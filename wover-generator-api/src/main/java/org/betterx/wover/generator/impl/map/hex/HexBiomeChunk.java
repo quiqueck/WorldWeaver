@@ -1,6 +1,6 @@
 package org.betterx.wover.generator.impl.map.hex;
 
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.WoverBiomePicker;
 import org.betterx.wover.generator.api.map.BiomeChunk;
 
@@ -87,7 +87,7 @@ public class HexBiomeChunk implements BiomeChunk {
             }
 
             if (outBuffer[index] == null) {
-                WoverWorldGenerator.C.log.error("Invalid Biome at " + index + ", " + lastAction + ", " + lBiome);
+                LibWoverWorldGenerator.C.log.error("Invalid Biome at " + index + ", " + lastAction + ", " + lBiome);
             }
         }
 

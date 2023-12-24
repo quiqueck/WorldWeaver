@@ -1,7 +1,7 @@
 package org.betterx.wover.preset.api;
 
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
-import org.betterx.wover.entrypoint.WoverWorldPreset;
+import org.betterx.wover.entrypoint.LibWoverWorldPreset;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.preset.impl.WorldPresetInfoImpl;
@@ -26,7 +26,7 @@ public class WorldPresetInfoRegistry {
     }
 
     public static final ResourceKey<Registry<WorldPresetInfo>> WORLD_PRESET_INFO_REGISTRY =
-            DatapackRegistryBuilder.createRegistryKey(WoverWorldPreset.C.id("wover/world_preset_info"));
+            DatapackRegistryBuilder.createRegistryKey(LibWoverWorldPreset.C.id("wover/world_preset_info"));
 
     public static ResourceKey<WorldPresetInfo> createKey(
             ResourceLocation ruleID

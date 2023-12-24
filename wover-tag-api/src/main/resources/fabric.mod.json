@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverTag"
+      "org.betterx.wover.entrypoint.LibWoverTag"
     ],
     "fabric-datagen": [
       "org.betterx.wover.tag.datagen.WoverTagDatagen"

@@ -2,7 +2,7 @@ package org.betterx.wover.entrypoint.client;
 
 import net.fabricmc.api.ClientModInitializer;
 
-public class WoverCommonClient implements ClientModInitializer {
+public class LibWoverCommonClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 

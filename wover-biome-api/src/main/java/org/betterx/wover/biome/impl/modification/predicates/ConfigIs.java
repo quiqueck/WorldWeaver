@@ -3,7 +3,7 @@ package org.betterx.wover.biome.impl.modification.predicates;
 import de.ambertation.wunderlib.configs.ConfigFile;
 import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 import org.betterx.wover.config.api.Configs;
-import org.betterx.wover.entrypoint.WoverCore;
+import org.betterx.wover.entrypoint.LibWoverCore;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -47,13 +47,13 @@ public record ConfigIs(ResourceLocation configFile, String path, String key,
     public boolean test(Context ctx) {
         final ConfigFile config = Configs.get(configFile);
         if (config == null) {
-            WoverCore.C.log.verboseWarning("Config file %s not found", configFile);
+            LibWoverCore.C.log.verboseWarning("Config file %s not found", configFile);
             return false;
         }
 
         final ConfigFile.Value<?, ? extends ConfigFile.Value<?, ?>> value = config.getValue(path, key);
         if (value == null) {
-            WoverCore.C.log.verboseWarning("Config value %s.%s not found in %s", path, key, configFile);
+            LibWoverCore.C.log.verboseWarning("Config value %s.%s not found in %s", path, key, configFile);
             return false;
         }
 

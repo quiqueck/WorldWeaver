@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverDatagen"
+      "org.betterx.wover.entrypoint.LibWoverDatagen"
     ]
   },
   "mixins": [

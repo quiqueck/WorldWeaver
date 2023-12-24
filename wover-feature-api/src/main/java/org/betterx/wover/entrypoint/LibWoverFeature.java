@@ -8,7 +8,7 @@ import org.betterx.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverFeature implements ModInitializer {
+public class LibWoverFeature implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-feature", "wover");
 
     @Override

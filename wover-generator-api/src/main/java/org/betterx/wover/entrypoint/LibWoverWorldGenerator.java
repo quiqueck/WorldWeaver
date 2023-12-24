@@ -9,7 +9,7 @@ import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverWorldGenerator implements ModInitializer {
+public class LibWoverWorldGenerator implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-generator", "wover");
 
     @Override

@@ -7,7 +7,7 @@ import org.betterx.wover.preset.impl.flat.FlatLevelPresetManagerImpl;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverWorldPreset implements ModInitializer {
+public class LibWoverWorldPreset implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-preset", "wover");
 
     @Override

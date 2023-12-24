@@ -3,7 +3,7 @@ package org.betterx.wover.biome.impl.data;
 import org.betterx.wover.biome.api.data.BiomeCodecRegistry;
 import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
-import org.betterx.wover.entrypoint.WoverBiome;
+import org.betterx.wover.entrypoint.LibWoverBiome;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -37,7 +37,7 @@ public class BiomeCodecRegistryImpl {
     }
 
     private static Codec<? extends BiomeData> onBootstrap(Registry<Codec<? extends BiomeData>> registry) {
-        final var biomeData = WoverBiome.C.id("vanilla_data");
+        final var biomeData = LibWoverBiome.C.id("vanilla_data");
         if (registry.containsKey(biomeData)) {
             return registry.get(biomeData);
         }

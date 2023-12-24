@@ -8,7 +8,7 @@ import org.betterx.wover.common.generator.api.chunkgenerator.EnforceableChunkGen
 import org.betterx.wover.common.generator.api.chunkgenerator.RestorableBiomeSource;
 import org.betterx.wover.common.surface.api.InjectableSurfaceRules;
 import org.betterx.wover.core.api.IntegrationCore;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.mixin.generator.ChunkGeneratorAccessor;
 import org.betterx.wover.surface.impl.SurfaceRuleUtil;
 
@@ -43,12 +43,12 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
         RestorableBiomeSource<WoverChunkGenerator>,
         InjectableSurfaceRules<WoverChunkGenerator>,
         EnforceableChunkGenerator<WoverChunkGenerator> {
-    public static final ResourceLocation ID = WoverWorldGenerator.C.id("betterx");
+    public static final ResourceLocation ID = LibWoverWorldGenerator.C.id("betterx");
 
     protected static final NoiseSettings NETHER_NOISE_SETTINGS_AMPLIFIED = NoiseSettings.create(0, 256, 1, 4);
     public static final ResourceKey<NoiseGeneratorSettings> AMPLIFIED_NETHER = ResourceKey.create(
             Registries.NOISE_SETTINGS,
-            WoverWorldGenerator.C.id("amplified_nether")
+            LibWoverWorldGenerator.C.id("amplified_nether")
     );
 
     public static final Codec<WoverChunkGenerator> CODEC = RecordCodecBuilder
@@ -80,7 +80,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
         }
 
         if (IntegrationCore.RUNS_TERRABLENDER) {
-            WoverWorldGenerator.C.log.info("Make sure features are loaded from terrablender:"
+            LibWoverWorldGenerator.C.log.info("Make sure features are loaded from terrablender:"
                     + biomeSource.getClass().getName());
             //terrablender is invalidating the feature initialization
             //we redo it at this point, otherwise we will get blank biomes
@@ -145,7 +145,9 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
             ChunkGenerator loadedChunkGenerator,
             Registry<LevelStem> dimensionRegistry
     ) {
-        WoverWorldGenerator.C.log.info("Enforcing Correct Generator for " + dimensionKey.location().toString() + ".");
+        LibWoverWorldGenerator.C.log.info("Enforcing Correct Generator for " + dimensionKey
+                .location()
+                .toString() + ".");
 
         ChunkGenerator referenceGenerator = this;
         if (loadedChunkGenerator instanceof ChunkGeneratorAccessor generator) {

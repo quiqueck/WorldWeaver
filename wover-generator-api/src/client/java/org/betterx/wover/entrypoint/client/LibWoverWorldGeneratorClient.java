@@ -12,7 +12,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 
 import net.fabricmc.api.ClientModInitializer;
 
-public class WoverWorldGeneratorClient implements ClientModInitializer {
+public class LibWoverWorldGeneratorClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientWorldLifecycle.AFTER_WELCOME_SCREEN.subscribe(() -> {
@@ -34,7 +34,7 @@ public class WoverWorldGeneratorClient implements ClientModInitializer {
             if (WorldPresetsUI.isKey(holder, PresetsRegistry.WOVER_WORLD)) {
                 return WorldSetupScreen::new;
             }
-            
+
             for (LevelStem dim : WorldPresetManager.getDimensions(holder).values()) {
                 if (dim.generator() instanceof ConfiguredChunkGenerator gen) {
                     if (gen.wover_getConfiguredWorldPreset() != null) {

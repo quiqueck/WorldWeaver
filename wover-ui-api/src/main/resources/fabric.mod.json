@@ -17,10 +17,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverUi"
+      "org.betterx.wover.entrypoint.LibWoverUi"
     ],
     "client": [
-      "org.betterx.wover.entrypoint.client.WoverUiClient"
+      "org.betterx.wover.entrypoint.client.LibWoverUiClient"
     ]
   },
   "mixins": [

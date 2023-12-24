@@ -6,7 +6,7 @@ import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithNoiseRe
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithSeed;
 import org.betterx.wover.common.generator.api.biomesource.MergeableBiomeSource;
 import org.betterx.wover.common.generator.api.biomesource.ReloadableBiomeSource;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.impl.biomesource.WoverBiomeSourceImpl;
 import org.betterx.wover.state.api.WorldState;
 
@@ -65,7 +65,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
     @Override
     final public void setSeed(long seed) {
         if (seed != currentSeed) {
-            WoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> new seed = " + seed);
+            LibWoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> new seed = " + seed);
             this.currentSeed = seed;
             initMap(seed);
         }
@@ -78,7 +78,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
      */
     final public void setMaxHeight(int maxHeight) {
         if (this.maxHeight != maxHeight) {
-            WoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> new height = " + maxHeight);
+            LibWoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> new height = " + maxHeight);
             this.maxHeight = maxHeight;
             onHeightChange(maxHeight);
         }
@@ -144,7 +144,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
     protected final void rebuildBiomes(boolean force) {
         if (!force && didCreatePickers) return;
 
-        WoverWorldGenerator.C.log.verbose("Updating Pickers for " + this.toShortString());
+        LibWoverWorldGenerator.C.log.verbose("Updating Pickers for " + this.toShortString());
 
         final List<TagToPicker> pickers = createFreshPickerMap();
         this.dynamicPossibleBiomes = WoverBiomeSourceImpl.populateBiomePickers(
@@ -171,7 +171,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
     }
 
     protected final void initMap(long seed) {
-        WoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> Map Update");
+        LibWoverWorldGenerator.C.log.debug(this.toShortString() + "\n    --> Map Update");
         onInitMap(seed);
     }
 
@@ -182,9 +182,9 @@ public abstract class WoverBiomeSource extends BiomeSource implements
         if (access == null) {
             access = WorldState.allStageRegistryAccess();
             if (access != null) {
-                WoverWorldGenerator.C.log.verbose("Registries were not finalized before merging biome sources!");
+                LibWoverWorldGenerator.C.log.verbose("Registries were not finalized before merging biome sources!");
             } else {
-                WoverWorldGenerator.C.log.error("Unable to merge Biome Sources");
+                LibWoverWorldGenerator.C.log.error("Unable to merge Biome Sources");
                 return this;
             }
         }
@@ -207,14 +207,14 @@ public abstract class WoverBiomeSource extends BiomeSource implements
 
             biomeTagWorker.finished();
         } catch (RuntimeException e) {
-            WoverWorldGenerator.C.log.error("Error while rebuilding BiomeSources!", e);
+            LibWoverWorldGenerator.C.log.error("Error while rebuilding BiomeSources!", e);
         } catch (Exception e) {
-            WoverWorldGenerator.C.log.error("Error while rebuilding BiomeSources!", e);
+            LibWoverWorldGenerator.C.log.error("Error while rebuilding BiomeSources!", e);
         }
 
         this.reloadBiomes();
         if (biomesAdded > 0) {
-            WoverWorldGenerator.C.log.info("Merged {} biomes to {} in {}", biomesAdded, toShortString(), sw);
+            LibWoverWorldGenerator.C.log.info("Merged {} biomes to {} in {}", biomesAdded, toShortString(), sw);
         }
         return this;
     }

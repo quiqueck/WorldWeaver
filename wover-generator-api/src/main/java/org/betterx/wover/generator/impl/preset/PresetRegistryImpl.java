@@ -1,6 +1,6 @@
 package org.betterx.wover.generator.impl.preset;
 
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.end.WoverEndConfig;
 import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
 import org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
@@ -18,12 +18,12 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public class PresetRegistryImpl {
-    public final static ResourceKey<WorldPreset> WOVER_WORLD = WorldPresetManager.createKey(WoverWorldGenerator.C.id(
+    public final static ResourceKey<WorldPreset> WOVER_WORLD = WorldPresetManager.createKey(LibWoverWorldGenerator.C.id(
             "normal"));
-    public final static ResourceKey<WorldPreset> WOVER_WORLD_LARGE = WorldPresetManager.createKey(WoverWorldGenerator.C.id(
+    public final static ResourceKey<WorldPreset> WOVER_WORLD_LARGE = WorldPresetManager.createKey(LibWoverWorldGenerator.C.id(
             "large"));
     public final static ResourceKey<WorldPreset> WOVER_WORLD_AMPLIFIED = WorldPresetManager.createKey(
-            WoverWorldGenerator.C.id(
+            LibWoverWorldGenerator.C.id(
                     "amplified"));
     public final static ResourceKey<WorldPreset> BCL_WORLD_17
             = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.id("legacy_17"));

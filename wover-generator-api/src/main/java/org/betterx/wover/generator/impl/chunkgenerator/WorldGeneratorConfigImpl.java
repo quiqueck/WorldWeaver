@@ -2,8 +2,8 @@ package org.betterx.wover.generator.impl.chunkgenerator;
 
 import de.ambertation.wunderlib.utils.Version;
 import org.betterx.wover.core.api.IntegrationCore;
-import org.betterx.wover.entrypoint.WoverEvents;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverEvents;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.api.preset.PresetsRegistry;
 import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
@@ -46,18 +46,18 @@ public class WorldGeneratorConfigImpl {
     private static DimensionsWrapper DEFAULT_DIMENSIONS_WRAPPER = null;
 
     static @NotNull CompoundTag getPresetsNbt() {
-        return WorldConfig.getCompoundTag(WoverWorldGenerator.C, TAG_PRESET);
+        return WorldConfig.getCompoundTag(LibWoverWorldGenerator.C, TAG_PRESET);
     }
 
     static @NotNull CompoundTag getPresetsNbtFromFolder(LevelStorageSource.LevelStorageAccess levelStorageAccess) {
         final File dataDir = levelStorageAccess.getLevelPath(LevelResource.ROOT).resolve("data").toFile();
-        File nbtFile = new File(dataDir, WoverWorldGenerator.C.modId + ".nbt");
+        File nbtFile = new File(dataDir, LibWoverWorldGenerator.C.modId + ".nbt");
         CompoundTag root = null;
         if (nbtFile.exists()) {
             try {
                 root = NbtIo.readCompressed(nbtFile.toPath(), NbtAccounter.create(0x200000L));
             } catch (IOException e) {
-                WoverEvents.C.log.error("NBT loading failed", e);
+                LibWoverEvents.C.log.error("NBT loading failed", e);
             }
         }
         if (root != null && root.contains(TAG_PRESET))
@@ -90,13 +90,13 @@ public class WorldGeneratorConfigImpl {
         final var encodeResult = DimensionsWrapper.CODEC.encodeStart(registryOps, wrapper);
 
         if (encodeResult.result().isPresent()) {
-            final CompoundTag settingsNbt = WorldConfig.getRootTag(WoverWorldGenerator.C);
+            final CompoundTag settingsNbt = WorldConfig.getRootTag(LibWoverWorldGenerator.C);
             settingsNbt.put(TAG_PRESET, encodeResult.result().get());
         } else {
-            WoverWorldGenerator.C.log.error("Unable to encode world generator settings for level.dat.");
+            LibWoverWorldGenerator.C.log.error("Unable to encode world generator settings for level.dat.");
         }
 
-        WorldConfig.saveFile(WoverWorldGenerator.C);
+        WorldConfig.saveFile(LibWoverWorldGenerator.C);
     }
 
     public static void migrateGeneratorSettings() {
@@ -105,19 +105,19 @@ public class WorldGeneratorConfigImpl {
         if (settingsNbt.isEmpty()) {
             CompoundTag wtGen = getLegacyPresetsNbt();
             if (wtGen != null && wtGen.contains(TAG_DIMENSIONS)) {
-                WoverWorldGenerator.C.log.info("Found World with WorldsTogether Settings.");
+                LibWoverWorldGenerator.C.log.info("Found World with WorldsTogether Settings.");
                 CompoundTag newPresets = getPresetsNbt();
                 newPresets.put(TAG_DIMENSIONS, wtGen.get(TAG_DIMENSIONS));
 
-                WorldConfig.saveFile(WoverWorldGenerator.C);
+                WorldConfig.saveFile(LibWoverWorldGenerator.C);
                 return;
             }
 
             CompoundTag oldGen = getLegacyGeneratorNbt();
             if (oldGen != null) {
                 if (oldGen.contains("type")) {
-                    WoverWorldGenerator.C.log.info("Found World with beta generator Settings.");
-                    if ("bclib:bcl_world_preset_settings".equals(oldGen.getString("type"))) {
+                    LibWoverWorldGenerator.C.log.info("Found World with beta generator Settings.");
+                    if ("bclib:bcl_world_preset_settings" .equals(oldGen.getString("type"))) {
                         int netherVersion = 18;
                         int endVersion = 18;
                         if (oldGen.contains("minecraft:the_nether"))
@@ -149,7 +149,7 @@ public class WorldGeneratorConfigImpl {
                 }
             }
 
-            WoverWorldGenerator.C.log.info("Found World without generator Settings. Setting up data...");
+            LibWoverWorldGenerator.C.log.info("Found World without generator Settings. Setting up data...");
             ResourceKey<WorldPreset> biomeSourceVersion = PresetsRegistry.WOVER_WORLD;
 
             // WorldConfig will set the version tag to 9.9.9 if the bclib file does not exist.
@@ -163,24 +163,24 @@ public class WorldGeneratorConfigImpl {
             boolean isPre18 = !bclVersion.isLargerOrEqualVersion("1.0.0");
 
             if (isPre18) {
-                WoverWorldGenerator.C.log.info("World was create pre 1.18!");
+                LibWoverWorldGenerator.C.log.info("World was create pre 1.18!");
                 biomeSourceVersion = PresetRegistryImpl.BCL_WORLD_17;
             }
 
             if (WorldConfig.hasMod(IntegrationCore.BETTER_NETHER)) {
-                WoverWorldGenerator.C.log.info("Found Data from BetterNether, using for migration.");
+                LibWoverWorldGenerator.C.log.info("Found Data from BetterNether, using for migration.");
                 final CompoundTag bnRoot = WorldConfig.getRootTag(IntegrationCore.BETTER_NETHER);
-                biomeSourceVersion = "1.17".equals(bnRoot.getString(LEGACY_TAG_BN_GEN_VERSION))
+                biomeSourceVersion = "1.17" .equals(bnRoot.getString(LEGACY_TAG_BN_GEN_VERSION))
                         ? PresetRegistryImpl.BCL_WORLD_17
                         : PresetsRegistry.WOVER_WORLD;
             }
 
             Registry<LevelStem> dimensions = DimensionsWrapper.getDimensions(biomeSourceVersion);
             if (dimensions != null) {
-                WoverWorldGenerator.C.log.info("Set world to BiomeSource Version " + biomeSourceVersion);
+                LibWoverWorldGenerator.C.log.info("Set world to BiomeSource Version " + biomeSourceVersion);
                 writeWorldPresetSettings(new DimensionsWrapper(dimensions));
             } else {
-                WoverWorldGenerator.C.log.error("Failed to set world to BiomeSource Version " + biomeSourceVersion);
+                LibWoverWorldGenerator.C.log.error("Failed to set world to BiomeSource Version " + biomeSourceVersion);
             }
         }
     }
@@ -200,7 +200,7 @@ public class WorldGeneratorConfigImpl {
             }
         }
 
-        WoverWorldGenerator.C.log.verbose("Creating presets file for new world");
+        LibWoverWorldGenerator.C.log.verbose("Creating presets file for new world");
         writeWorldPresetSettingsDirect(DimensionsWrapper.build(dimensions.dimensions()));
     }
 
@@ -223,11 +223,11 @@ public class WorldGeneratorConfigImpl {
 
             Optional<DimensionsWrapper> oLevelStem = DimensionsWrapper.CODEC
                     .parse(new Dynamic<>(registryOps, presetNBT))
-                    .resultOrPartial(WoverWorldGenerator.C.log::error);
+                    .resultOrPartial(LibWoverWorldGenerator.C.log::error);
 
             return oLevelStem.orElse(DEFAULT_DIMENSIONS_WRAPPER).dimensions;
         } catch (Exception e) {
-            WoverWorldGenerator.C.log.error("Failed to load Dimensions", e);
+            LibWoverWorldGenerator.C.log.error("Failed to load Dimensions", e);
             return DEFAULT_DIMENSIONS_WRAPPER.dimensions;
         }
     }

@@ -1,6 +1,6 @@
 package org.betterx.wover.generator.impl.chunkgenerator;
 
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.state.api.WorldState;
 
 import com.mojang.serialization.Codec;
@@ -52,7 +52,7 @@ public class DimensionsWrapper {
     public static @Nullable Registry<LevelStem> getDimensions(ResourceKey<WorldPreset> key) {
         RegistryAccess access = WorldState.allStageRegistryAccess();
         if (access == null) {
-            WoverWorldGenerator.C.log.error("No valid registry found!");
+            LibWoverWorldGenerator.C.log.error("No valid registry found!");
             return null;
         }
         final Optional<Holder.Reference<WorldPreset>> preset = access.registryOrThrow(Registries.WORLD_PRESET)
@@ -67,7 +67,7 @@ public class DimensionsWrapper {
 
     public static @Nullable Registry<LevelStem> getDimensions(RegistryAccess access, ResourceKey<WorldPreset> key) {
         if (access == null) {
-            WoverWorldGenerator.C.log.error("No valid registry found!");
+            LibWoverWorldGenerator.C.log.error("No valid registry found!");
             return null;
         }
         var preset = access.registryOrThrow(Registries.WORLD_PRESET).getHolder(key);

@@ -2,7 +2,7 @@ package org.betterx.wover.surface.impl;
 
 import org.betterx.wover.common.surface.api.InjectableSurfaceRules;
 import org.betterx.wover.common.surface.api.SurfaceRuleProvider;
-import org.betterx.wover.entrypoint.WoverSurface;
+import org.betterx.wover.entrypoint.LibWoverSurface;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.surface.api.AssignedSurfaceRule;
 import org.betterx.wover.surface.api.SurfaceRuleRegistry;
@@ -100,7 +100,7 @@ public class SurfaceRuleUtil {
                 additionalRules.add(org);
         }
 
-        WoverSurface.C.LOG.verbose(
+        LibWoverSurface.C.LOG.verbose(
                 "Merged {} additional Surface Rules for Dimension {} => {} ({}) using {}",
                 count,
                 dimensionKey.location(),

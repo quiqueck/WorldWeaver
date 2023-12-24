@@ -4,7 +4,7 @@ import org.betterx.wover.biome.impl.modification.BiomeTagModificationWorker;
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
 import org.betterx.wover.common.generator.api.biomesource.ReloadableBiomeSource;
 import org.betterx.wover.common.generator.api.chunkgenerator.EnforceableChunkGenerator;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.impl.biomesource.end.TheEndBiomesHelper;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
@@ -148,7 +148,7 @@ class BiomeRepairHelper {
         biomeTagWorker.finished();
 
         if (biomesAdded > 0) {
-            WoverWorldGenerator.C.log.info("Added Tags for {} fabric biomes in {}", biomesAdded, sw);
+            LibWoverWorldGenerator.C.log.info("Added Tags for {} fabric biomes in {}", biomesAdded, sw);
         }
 
     }
@@ -185,7 +185,7 @@ class BiomeRepairHelper {
             biomeTagWorker.finished();
 
             if (biomesAdded > 0) {
-                WoverWorldGenerator.C.log.info("Added {} biomes to {} in {}", biomesAdded, tag.location(), sw);
+                LibWoverWorldGenerator.C.log.info("Added {} biomes to {} in {}", biomesAdded, tag.location(), sw);
             }
         }
     }

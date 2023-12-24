@@ -1,7 +1,7 @@
 package org.betterx.wover.surface.impl.conditions;
 
 import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
-import org.betterx.wover.entrypoint.WoverSurface;
+import org.betterx.wover.entrypoint.LibWoverSurface;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.surface.api.conditions.ConditionManager;
 
@@ -16,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class MaterialConditionRegistryImpl {
     public static final ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> THRESHOLD_CONDITION
-            = ConditionManager.createKey(WoverSurface.C.id("threshold_condition"));
+            = ConditionManager.createKey(LibWoverSurface.C.id("threshold_condition"));
     public static final ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> VOLUME_THRESHOLD_CONDITION
-            = ConditionManager.createKey(WoverSurface.C.id("volume_threshold_condition"));
+            = ConditionManager.createKey(LibWoverSurface.C.id("volume_threshold_condition"));
     public static final ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> ROUGH_NOISE_CONDITION
-            = ConditionManager.createKey(WoverSurface.C.id("rough_noise_condition"));
+            = ConditionManager.createKey(LibWoverSurface.C.id("rough_noise_condition"));
 
     public static ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> register(
             ResourceKey<Codec<? extends SurfaceRules.ConditionSource>> key,

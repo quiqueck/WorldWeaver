@@ -2,7 +2,7 @@ package org.betterx.wover.generator.api.biomesource;
 
 import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.api.data.BiomeDataRegistry;
-import org.betterx.wover.entrypoint.WoverBiome;
+import org.betterx.wover.entrypoint.LibWoverBiome;
 import org.betterx.wover.generator.impl.biomesource.WoverBiomeDataImpl;
 import org.betterx.wover.state.api.WorldState;
 
@@ -208,7 +208,7 @@ public class WoverBiomeData extends BiomeData {
                 throw new IllegalStateException("Accessing " + forWhat + " of " + ofBiome + " before any registry is ready!");
             }
             if (preFinalAccessWarning++ < 5)
-                WoverBiome.C.log.verboseWarning("Accessing " + forWhat + " of " + ofBiome + " before registry is ready!");
+                LibWoverBiome.C.log.verboseWarning("Accessing " + forWhat + " of " + ofBiome + " before registry is ready!");
             acc = WorldState.allStageRegistryAccess();
         }
         final Registry<BiomeData> reg = acc != null

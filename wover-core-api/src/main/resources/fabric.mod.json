@@ -17,7 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverCore"
+      "org.betterx.wover.entrypoint.LibWoverCore"
     ]
   },
   "mixins": [

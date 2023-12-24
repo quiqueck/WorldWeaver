@@ -8,7 +8,7 @@ import de.ambertation.wunderlib.ui.layout.values.Size;
 import de.ambertation.wunderlib.ui.layout.values.Value;
 import de.ambertation.wunderlib.ui.vanilla.LayoutScreen;
 import org.betterx.wover.config.api.Configs;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceConfigPanel;
 import org.betterx.wover.generator.api.client.biomesource.client.BiomeSourceWithConfigScreen;
 import org.betterx.wover.generator.impl.chunkgenerator.ChunkGeneratorManagerImpl;
@@ -207,7 +207,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
                                 generators.add(generator);
                                 options.add(dimensionValue, -1 * info.sortOrder());
                             } else {
-                                WoverWorldGenerator.C.log.debug(
+                                LibWoverWorldGenerator.C.log.debug(
                                         "Skipping duplicate generator for preset {}",
                                         presetKey
                                 );

@@ -4,7 +4,7 @@ import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.api.data.BiomeDataRegistry;
 import org.betterx.wover.common.registry.api.CustomRegistryData;
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
-import org.betterx.wover.entrypoint.WoverBiome;
+import org.betterx.wover.entrypoint.LibWoverBiome;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.state.api.WorldState;
@@ -31,7 +31,7 @@ public class BiomeDataRegistryImpl {
     }
 
     private static final CustomRegistryData.DataKey<Map<ResourceKey<BiomeData>, BiomeData>> TEMP_BIOME_DATA
-            = CustomRegistryData.createKey(WoverBiome.C.id("temp_biome_data"));
+            = CustomRegistryData.createKey(LibWoverBiome.C.id("temp_biome_data"));
 
     public static BiomeData getFromRegistryOrTemp(ResourceKey<Biome> key) {
         return getFromRegistryOrTemp(key, BiomeData::tempOf);

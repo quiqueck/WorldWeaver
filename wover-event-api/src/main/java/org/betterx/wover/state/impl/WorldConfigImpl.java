@@ -3,7 +3,7 @@ package org.betterx.wover.state.impl;
 import de.ambertation.wunderlib.utils.Version;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.core.impl.registry.ModCoreImpl;
-import org.betterx.wover.entrypoint.WoverEvents;
+import org.betterx.wover.entrypoint.LibWoverEvents;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnWorldConfig;
@@ -64,7 +64,7 @@ public class WorldConfigImpl {
                         TAGS.put(modCore, root);
                         eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.LOADED));
                     } catch (IOException e) {
-                        WoverEvents.C.log.error("World data loading failed", e);
+                        LibWoverEvents.C.log.error("World data loading failed", e);
                         eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.LOAD_FAILED));
                     }
                 } else {
@@ -143,7 +143,7 @@ public class WorldConfigImpl {
 
     public static void saveFile(ModCore modCore) {
         if (!hasMod(modCore)) {
-            WoverEvents.C.log.error("Mod " + modCore.modId + " is not registered for a worldconfig file");
+            LibWoverEvents.C.log.error("Mod " + modCore.modId + " is not registered for a worldconfig file");
             return;
         }
 
@@ -161,7 +161,7 @@ public class WorldConfigImpl {
             final File dataFile = new File(dataDir, modCore.modId + ".nbt");
             Util.safeReplaceFile(dataFile.toPath(), tempFile.toPath(), oldFile.toPath());
         } catch (IOException e) {
-            WoverEvents.C.log.error("World data saving failed", e);
+            LibWoverEvents.C.log.error("World data saving failed", e);
         }
     }
 

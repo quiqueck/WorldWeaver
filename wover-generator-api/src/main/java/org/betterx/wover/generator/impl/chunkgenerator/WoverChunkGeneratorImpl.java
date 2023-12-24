@@ -1,7 +1,7 @@
 package org.betterx.wover.generator.impl.chunkgenerator;
 
 import org.betterx.wover.common.generator.api.chunkgenerator.RestorableBiomeSource;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldState;
@@ -85,7 +85,7 @@ public class WoverChunkGeneratorImpl {
         final Registry<LevelStem> changedDimensions = biomeHelper.repairBiomeSourceInAllDimensions(access, dimensions);
 
         if (dimensions != changedDimensions) {
-            WoverWorldGenerator.C.log.verbose("Loading World with initially configured Dimensions.");
+            LibWoverWorldGenerator.C.log.verbose("Loading World with initially configured Dimensions.");
             registries = registries.replaceFrom(
                     RegistryLayer.DIMENSIONS,
                     new RegistryAccess.ImmutableRegistryAccess(List.of(changedDimensions)).freeze()

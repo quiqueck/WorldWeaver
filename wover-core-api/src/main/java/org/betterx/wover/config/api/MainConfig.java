@@ -1,12 +1,12 @@
 package org.betterx.wover.config.api;
 
 import de.ambertation.wunderlib.configs.ConfigFile;
-import org.betterx.wover.entrypoint.WoverCore;
+import org.betterx.wover.entrypoint.LibWoverCore;
 
 public class MainConfig extends ConfigFile {
-    public final static Group GENERAL_GROUP = new Group(WoverCore.C.namespace, "general", 0);
-    public final static Group WORLD_LOADING = new Group(WoverCore.C.namespace, "loading", 800);
-    public final static Group SERVER_GROUP = new Group(WoverCore.C.namespace, "server", 1000);
+    public final static Group GENERAL_GROUP = new Group(LibWoverCore.C.namespace, "general", 0);
+    public final static Group WORLD_LOADING = new Group(LibWoverCore.C.namespace, "loading", 800);
+    public final static Group SERVER_GROUP = new Group(LibWoverCore.C.namespace, "server", 1000);
     public final static String LOG_CATEGORY = "log";
     public final static String SERVER_CATEGORY = SERVER_GROUP.title();
 
@@ -23,6 +23,6 @@ public class MainConfig extends ConfigFile {
     ).setGroup(SERVER_GROUP);
 
     public MainConfig() {
-        super(WoverCore.C, "main");
+        super(LibWoverCore.C, "main");
     }
 }

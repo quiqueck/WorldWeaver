@@ -1,7 +1,7 @@
 package org.betterx.wover.generator.api.biomesource;
 
 import org.betterx.wover.biome.api.data.BiomeData;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.util.RandomizedWeightedList;
 
@@ -119,11 +119,11 @@ public class WoverBiomePicker {
             }
 
             if (registeredBiomes.size() != beforeSize) {
-                WoverWorldGenerator.C.log.verbose("Added " + (registeredBiomes.size() - beforeSize) + " Biomes");
+                LibWoverWorldGenerator.C.log.verbose("Added " + (registeredBiomes.size() - beforeSize) + " Biomes");
 
                 for (PickableBiome builtBiome : new ArrayList<>(registeredBiomes.values())) {
                     if (!beforeList.contains(builtBiome)) {
-                        WoverWorldGenerator.C.log.verbose(" - " + builtBiome.biomeData.biomeKey.location() + ", subbiomes=" + builtBiome.subbiomes.size());
+                        LibWoverWorldGenerator.C.log.verbose(" - " + builtBiome.biomeData.biomeKey.location() + ", subbiomes=" + builtBiome.subbiomes.size());
                     }
                 }
             }

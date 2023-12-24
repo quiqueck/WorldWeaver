@@ -42,13 +42,13 @@ function mksub(base, sub){
 
 export function create(options){
     const javaName = toCamelCase(options.title)
-    const mainClass = `Wover${javaName}`
+    const mainClass = `LibWover${javaName}`
     const clientClass = `${mainClass}Client`
     const datagenClass = `${mainClass}Datagen`
 
-    const mainTestClass = `Wover${javaName}TestMod`
-    const clientTestClass = `${mainClass}ClientTestMod`
-    const datagenTestClass = `${mainClass}DatagenTestMod`
+    const mainTestClass = `TestModWover${javaName}`
+    const clientTestClass = `${mainTestClass}Client`
+    const datagenTestClass = `${mainTestClass}Datagen`
 
     const loadAndReplaceTest = (path, subPackage) => {
         if (subPackage===undefined) subPackage = options.namespace

@@ -11,7 +11,7 @@ import org.betterx.wover.tag.impl.TagBootstrapContextImpl;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverTag implements ModInitializer {
+public class LibWoverTag implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-tag", "wover");
 
     @Override

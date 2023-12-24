@@ -1,7 +1,7 @@
 package org.betterx.wover.testmod.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.WoverWorldPreset;
+import org.betterx.wover.entrypoint.LibWoverWorldPreset;
 import org.betterx.wover.preset.api.WorldPresetManager;
 import org.betterx.wover.preset.api.WorldPresetTags;
 import org.betterx.wover.preset.api.flat.FlatLevelPresetManager;
@@ -26,9 +26,9 @@ public class TestModWoverWorldPreset implements ModInitializer {
     public static final ResourceKey<WorldPreset> END_START
             = WorldPresetManager.createKey(C.id("end_start"));
     public static final ResourceKey<WorldPreset> NETHER_START =
-            WorldPresetManager.createKey(WoverWorldPreset.C.id("nether_start"));
+            WorldPresetManager.createKey(LibWoverWorldPreset.C.id("nether_start"));
     public static final ResourceKey<FlatLevelGeneratorPreset> FLAT_NETHER =
-            FlatLevelPresetManager.createKey(WoverWorldPreset.C.id("nether"));
+            FlatLevelPresetManager.createKey(LibWoverWorldPreset.C.id("nether"));
 
     @Override
     public void onInitialize() {

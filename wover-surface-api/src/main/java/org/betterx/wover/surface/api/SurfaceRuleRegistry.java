@@ -1,7 +1,7 @@
 package org.betterx.wover.surface.api;
 
 import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
-import org.betterx.wover.entrypoint.WoverSurface;
+import org.betterx.wover.entrypoint.LibWoverSurface;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.surface.impl.SurfaceRuleRegistryImpl;
@@ -49,7 +49,7 @@ public class SurfaceRuleRegistry {
      * The Key of the Registry. ({@code wover/worldgen/surface_rules})
      */
     public static final ResourceKey<Registry<AssignedSurfaceRule>> SURFACE_RULES_REGISTRY =
-            DatapackRegistryBuilder.createRegistryKey(WoverSurface.C.id("wover/worldgen/surface_rules"));
+            DatapackRegistryBuilder.createRegistryKey(LibWoverSurface.C.id("wover/worldgen/surface_rules"));
 
     /**
      * Creates a ResourceKey for a SurfaceRule.

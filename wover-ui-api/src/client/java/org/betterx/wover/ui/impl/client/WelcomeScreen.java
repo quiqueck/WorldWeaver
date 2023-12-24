@@ -4,7 +4,7 @@ import de.ambertation.wunderlib.ui.ColorHelper;
 import de.ambertation.wunderlib.ui.layout.components.*;
 import de.ambertation.wunderlib.ui.layout.values.Size;
 import org.betterx.wover.config.api.client.ClientConfigs;
-import org.betterx.wover.entrypoint.WoverUi;
+import org.betterx.wover.entrypoint.LibWoverUi;
 import org.betterx.wover.events.impl.client.ClientWorldLifecycleImpl;
 
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,11 +15,11 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 public class WelcomeScreen extends WoverLayoutScreen {
-    public static final ResourceLocation BETTERX_LOCATION = WoverUi.C.id("betterx.png");
-    public static final ResourceLocation BACKGROUND = WoverUi.C.id("header.jpg");
-    public static final ResourceLocation ICON_BETTERNETHER = WoverUi.C.id("icon_betternether.png");
-    public static final ResourceLocation ICON_BETTEREND = WoverUi.C.id("icon_betterend.png");
-    public static final ResourceLocation ICON_BCLIB = WoverUi.C.id("icon_bclib.png");
+    public static final ResourceLocation BETTERX_LOCATION = LibWoverUi.C.id("betterx.png");
+    public static final ResourceLocation BACKGROUND = LibWoverUi.C.id("header.jpg");
+    public static final ResourceLocation ICON_BETTERNETHER = LibWoverUi.C.id("icon_betternether.png");
+    public static final ResourceLocation ICON_BETTEREND = LibWoverUi.C.id("icon_betterend.png");
+    public static final ResourceLocation ICON_BCLIB = LibWoverUi.C.id("icon_bclib.png");
 
     public WelcomeScreen(@NotNull Runnable onClose) {
         super(onClose, translatable("wover.welcome.title"));

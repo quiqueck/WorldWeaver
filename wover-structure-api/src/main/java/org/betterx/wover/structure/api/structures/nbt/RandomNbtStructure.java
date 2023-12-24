@@ -1,6 +1,6 @@
 package org.betterx.wover.structure.api.structures.nbt;
 
-import org.betterx.wover.entrypoint.WoverStructure;
+import org.betterx.wover.entrypoint.LibWoverStructure;
 import org.betterx.wover.structure.api.StructureNBT;
 import org.betterx.wover.structure.api.structures.StructurePlacement;
 import org.betterx.wover.structure.impl.StructureManagerImpl;
@@ -83,7 +83,7 @@ public class RandomNbtStructure extends Structure {
         final Optional<GenerationStub> result = placement.placementFunction.find(
                 ctx, rotation, mirror, element,
                 (pos, structurePiecesBuilder) -> {
-                    WoverStructure.C.log.debug("Generating RandomNbtStructure: " + pos + " (" + sw.getTime() + "ms)");
+                    LibWoverStructure.C.log.debug("Generating RandomNbtStructure: " + pos + " (" + sw.getTime() + "ms)");
                     this.generatePieces(
                             structurePiecesBuilder, ctx,
                             pos, rotation, mirror, element
@@ -91,9 +91,9 @@ public class RandomNbtStructure extends Structure {
                 }
         );
         if (result.isEmpty()) {
-            WoverStructure.C.log.debug("Rejected RandomNbtStructure " + element.nbtLocation() + " in " + sw.getTime() + "ms");
+            LibWoverStructure.C.log.debug("Rejected RandomNbtStructure " + element.nbtLocation() + " in " + sw.getTime() + "ms");
         } else {
-            WoverStructure.C.log.debug("Accepted RandomNbtStructure " + element.nbtLocation() + " in " + sw.getTime() + "ms");
+            LibWoverStructure.C.log.debug("Accepted RandomNbtStructure " + element.nbtLocation() + " in " + sw.getTime() + "ms");
         }
         return result;
     }

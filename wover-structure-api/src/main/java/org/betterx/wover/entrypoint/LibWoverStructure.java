@@ -8,7 +8,7 @@ import org.betterx.wover.structure.impl.sets.StructureSetManagerImpl;
 
 import net.fabricmc.api.ModInitializer;
 
-public class WoverStructure implements ModInitializer {
+public class LibWoverStructure implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-structure", "wover");
 
     @Override

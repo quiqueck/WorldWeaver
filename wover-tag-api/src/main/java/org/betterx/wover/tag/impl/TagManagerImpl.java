@@ -1,6 +1,6 @@
 package org.betterx.wover.tag.impl;
 
-import org.betterx.wover.entrypoint.WoverTag;
+import org.betterx.wover.entrypoint.LibWoverTag;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.tag.api.TagRegistry;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
@@ -107,7 +107,7 @@ public class TagManagerImpl {
                 );
 
                 entries.forEach(wrapper -> {
-                    builder.add(new TagLoader.EntryWithSource(wrapper.createTagEntry(), WoverTag.C.namespace));
+                    builder.add(new TagLoader.EntryWithSource(wrapper.createTagEntry(), LibWoverTag.C.namespace));
                 });
             });
         }

@@ -4,7 +4,7 @@ import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.api.data.BiomeDataRegistry;
 import org.betterx.wover.biome.impl.data.BiomeDataRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.WoverWorldGenerator;
+import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.generator.api.biomesource.WoverBiomeSource;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.util.Pair;
@@ -55,10 +55,10 @@ public class WoverBiomeSourceImpl {
         if (access == null) {
             access = WorldState.allStageRegistryAccess();
             if (access != null) {
-                WoverWorldGenerator.C.log.verbose("Registries were not finalized before populating BiomePickers!");
+                LibWoverWorldGenerator.C.log.verbose("Registries were not finalized before populating BiomePickers!");
             } else {
                 if (!ModCore.isDatagen()) {
-                    WoverWorldGenerator.C.log.verbose("Unable to build Biome List yet");
+                    LibWoverWorldGenerator.C.log.verbose("Unable to build Biome List yet");
                 }
                 return null;
             }

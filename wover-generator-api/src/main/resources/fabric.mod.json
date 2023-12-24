@@ -17,10 +17,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.entrypoint.WoverWorldGenerator"
+      "org.betterx.wover.entrypoint.LibWoverWorldGenerator"
     ],
     "client": [
-      "org.betterx.wover.entrypoint.client.WoverWorldGeneratorClient"
+      "org.betterx.wover.entrypoint.client.LibWoverWorldGeneratorClient"
     ],
     "fabric-datagen": [
       "org.betterx.wover.generator.datagen.WoverWorldGeneratorDatagen"

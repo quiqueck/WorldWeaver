@@ -1,6 +1,6 @@
 package org.betterx.wover.tag.impl;
 
-import org.betterx.wover.entrypoint.WoverTag;
+import org.betterx.wover.entrypoint.LibWoverTag;
 import org.betterx.wover.tag.api.TagRegistry;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 import org.betterx.wover.tag.api.event.context.TagElementWrapper;
@@ -36,7 +36,7 @@ public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implem
     protected static final ConcurrentHashMap<TagRegistry, TagBootstrapContextImpl> CACHE = new ConcurrentHashMap<>();
 
     public static void invalidateCaches() {
-        WoverTag.C.log.debug("Invalidating TagBootstrapContext Caches");
+        LibWoverTag.C.log.debug("Invalidating TagBootstrapContext Caches");
         CACHE.clear();
     }
 
@@ -66,7 +66,7 @@ public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implem
 
     public TagSet<T> getSetForTag(TagKey<T> tag) {
         if (tag == null) {
-            WoverTag.C.log.verboseWarning("Tag should not be null!");
+            LibWoverTag.C.log.verboseWarning("Tag should not be null!");
             return new TagSet<>();
         }
         return tags.computeIfAbsent(tag, k -> new TagSet<>());
