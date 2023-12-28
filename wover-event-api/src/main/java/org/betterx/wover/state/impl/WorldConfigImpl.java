@@ -32,10 +32,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Mod-specific data-storage for a world.
  * <p>
- * This class provides the ability for mod to store persistent data inside a world.
+ * This class provides the ability for a mod to store persistent data inside a world.
  */
 public class WorldConfigImpl {
-    private static final Map<ModCore, CompoundTag> TAGS = Maps.newHashMap();
+    private static final Map<ModCore, WorldConfigResource> TAGS = Maps.newHashMap();
     private static final List<ModCore> MODS = Lists.newArrayList();
     private static final Map<ModCore, EventImpl<OnWorldConfig>> EVENTS = Maps.newHashMap();
 
@@ -61,6 +61,7 @@ public class WorldConfigImpl {
                 if (file.exists()) {
                     try {
                         CompoundTag root = NbtIo.readCompressed(file.toPath(), NbtAccounter.create(0x200000L));
+                        WorldConfigResource config = new WorldConfigResource(modCore, root);
                         TAGS.put(modCore, root);
                         eventQueue.add(new Pair<>(modCore, OnWorldConfig.State.LOADED));
                     } catch (IOException e) {

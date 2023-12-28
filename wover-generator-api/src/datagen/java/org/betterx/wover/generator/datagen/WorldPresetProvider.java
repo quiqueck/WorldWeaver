@@ -4,7 +4,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.WoverWorldPresetProvider;
 import org.betterx.wover.generator.api.biomesource.end.WoverEndConfig;
 import org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig;
-import org.betterx.wover.generator.api.preset.PresetsRegistry;
+import org.betterx.wover.generator.api.preset.WorldPresets;
 import org.betterx.wover.generator.impl.chunkgenerator.WoverChunkGenerator;
 import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
@@ -35,18 +35,18 @@ public class WorldPresetProvider extends WoverWorldPresetProvider {
 
     @Override
     protected void bootstrap(WorldPresetBootstrapContext ctx) {
-        ctx.register(PresetsRegistry.WOVER_WORLD, createNormal(ctx));
-        ctx.register(PresetsRegistry.WOVER_WORLD_LARGE, createLarge(ctx));
-        ctx.register(PresetsRegistry.WOVER_WORLD_AMPLIFIED, createAmplified(ctx));
+        ctx.register(WorldPresets.WOVER_WORLD, createNormal(ctx));
+        ctx.register(WorldPresets.WOVER_WORLD_LARGE, createLarge(ctx));
+        ctx.register(WorldPresets.WOVER_WORLD_AMPLIFIED, createAmplified(ctx));
 
         //for compatibility with BCLib
         if (LegacyHelper.isLegacyEnabled()) {
             final ResourceKey<WorldPreset> BCL_WORLD
-                    = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(PresetsRegistry.WOVER_WORLD));
+                    = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(WorldPresets.WOVER_WORLD));
             final ResourceKey<WorldPreset> BCL_WORLD_LARGE
-                    = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(PresetsRegistry.WOVER_WORLD_LARGE));
+                    = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(WorldPresets.WOVER_WORLD_LARGE));
             final ResourceKey<WorldPreset> BCL_WORLD_AMPLIFIED
-                    = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(PresetsRegistry.WOVER_WORLD_AMPLIFIED));
+                    = WorldPresetManager.createKey(LegacyHelper.BCLIB_CORE.convertNamespace(WorldPresets.WOVER_WORLD_AMPLIFIED));
 
 
             ctx.register(PresetRegistryImpl.BCL_WORLD_17, createLegacy(ctx));
@@ -60,9 +60,9 @@ public class WorldPresetProvider extends WoverWorldPresetProvider {
     protected void prepareTags(TagBootstrapContext<WorldPreset> provider) {
         provider.add(
                 WorldPresetTags.NORMAL,
-                PresetsRegistry.WOVER_WORLD,
-                PresetsRegistry.WOVER_WORLD_AMPLIFIED,
-                PresetsRegistry.WOVER_WORLD_LARGE
+                WorldPresets.WOVER_WORLD,
+                WorldPresets.WOVER_WORLD_AMPLIFIED,
+                WorldPresets.WOVER_WORLD_LARGE
         );
     }
 
@@ -139,9 +139,9 @@ public class WorldPresetProvider extends WoverWorldPresetProvider {
                 LevelStem.OVERWORLD,
                 overworldStem,
                 LevelStem.NETHER,
-                PresetsRegistry.makeWoverNetherStem(netherContext, netherConfig),
+                WorldPresets.makeWoverNetherStem(netherContext, netherConfig),
                 LevelStem.END,
-                PresetsRegistry.makeWoverEndStem(endContext, endConfig)
+                WorldPresets.makeWoverEndStem(endContext, endConfig)
         );
     }
 }

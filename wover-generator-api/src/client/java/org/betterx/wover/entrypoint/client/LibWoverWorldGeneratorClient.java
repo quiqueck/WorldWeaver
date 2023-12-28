@@ -2,7 +2,7 @@ package org.betterx.wover.entrypoint.client;
 
 import org.betterx.wover.config.api.client.ClientConfigs;
 import org.betterx.wover.events.api.client.ClientWorldLifecycle;
-import org.betterx.wover.generator.api.preset.PresetsRegistry;
+import org.betterx.wover.generator.api.preset.WorldPresets;
 import org.betterx.wover.generator.impl.chunkgenerator.ConfiguredChunkGenerator;
 import org.betterx.wover.generator.impl.client.WorldSetupScreen;
 import org.betterx.wover.preset.api.WorldPresetManager;
@@ -17,7 +17,7 @@ public class LibWoverWorldGeneratorClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientWorldLifecycle.AFTER_WELCOME_SCREEN.subscribe(() -> {
             if (ClientConfigs.CLIENT.forceBetterXPreset.get()) {
-                WorldPresetManager.suggestDefault(PresetsRegistry.WOVER_WORLD, 2000);
+                WorldPresetManager.suggestDefault(WorldPresets.WOVER_WORLD, 2000);
             } else {
                 WorldPresetManager.suggestDefault(
                         net.minecraft.world.level.levelgen.presets.WorldPresets.NORMAL,
@@ -27,11 +27,11 @@ public class LibWoverWorldGeneratorClient implements ClientModInitializer {
         });
 
         if (ClientConfigs.CLIENT.forceBetterXPreset.get()) {
-            WorldPresetManager.suggestDefault(PresetsRegistry.WOVER_WORLD, 2000);
+            WorldPresetManager.suggestDefault(WorldPresets.WOVER_WORLD, 2000);
         }
 
         WorldPresetsUI.registerCustomUI(holder -> {
-            if (WorldPresetsUI.isKey(holder, PresetsRegistry.WOVER_WORLD)) {
+            if (WorldPresetsUI.isKey(holder, WorldPresets.WOVER_WORLD)) {
                 return WorldSetupScreen::new;
             }
 
@@ -46,7 +46,7 @@ public class LibWoverWorldGeneratorClient implements ClientModInitializer {
             return null;
         });
 
-        WorldPresetsUI.registerCustomUI(PresetsRegistry.WOVER_WORLD_AMPLIFIED, WorldSetupScreen::new);
-        WorldPresetsUI.registerCustomUI(PresetsRegistry.WOVER_WORLD_LARGE, WorldSetupScreen::new);
+        WorldPresetsUI.registerCustomUI(WorldPresets.WOVER_WORLD_AMPLIFIED, WorldSetupScreen::new);
+        WorldPresetsUI.registerCustomUI(WorldPresets.WOVER_WORLD_LARGE, WorldSetupScreen::new);
     }
 }

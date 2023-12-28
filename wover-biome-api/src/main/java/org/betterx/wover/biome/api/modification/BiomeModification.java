@@ -1,6 +1,6 @@
 package org.betterx.wover.biome.api.modification;
 
-import de.ambertation.wunderlib.configs.ConfigFile;
+import de.ambertation.wunderlib.configs.AbstractConfig;
 import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 import org.betterx.wover.biome.impl.modification.BiomeModificationImpl;
 import org.betterx.wover.biome.impl.modification.FeatureMap;
@@ -406,7 +406,7 @@ public interface BiomeModification {
         /**
          * Creates a predicate that tests if the given value from a config file matches the targetValue.
          * <p>
-         * The {@link ConfigFile} that provides the value has to be registered using
+         * The {@link AbstractConfig} that provides the value has to be registered using
          * {@link org.betterx.wover.config.api.Configs#register(Supplier)} or
          * {@link org.betterx.wover.config.api.Configs#register(ModCore, String, Configs.ConfigSupplier)}.
          * Otherwise it will not be found.
@@ -414,9 +414,12 @@ public interface BiomeModification {
          * @param value       the value from a config file
          * @param targetValue the target value to compare against
          * @return This builder.
-         * @see BiomePredicate#hasConfig(ConfigFile.Value, Object)
+         * @see BiomePredicate#hasConfig(AbstractConfig.Value, Object)
          */
-        public <T, R extends ConfigFile.Value<T, R>> Builder hasConfig(ConfigFile.Value<T, R> value, T targetValue) {
+        public <T, R extends AbstractConfig<?>.Value<T, R>> Builder hasConfig(
+                AbstractConfig<?>.Value<T, R> value,
+                T targetValue
+        ) {
             return predicate(BiomePredicate.hasConfig(value, targetValue));
         }
 

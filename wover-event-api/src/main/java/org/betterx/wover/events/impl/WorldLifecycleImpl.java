@@ -4,6 +4,7 @@ import org.betterx.wover.events.api.types.*;
 import org.betterx.wover.events.impl.types.ChainedEventImpl;
 import org.betterx.wover.events.impl.types.FolderReadyEventImpl;
 import org.betterx.wover.events.impl.types.RegistryReadyEventImpl;
+import org.betterx.wover.events.impl.types.ResourcesReadyEventImpl;
 
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.server.RegistryLayer;
@@ -32,6 +33,7 @@ public class WorldLifecycleImpl {
     public static final EventImpl<OnServerLevelReady> SERVER_LEVEL_READY =
             new EventImpl<>("SERVER_LEVEL_READY");
 
-    public static final EventImpl<OnResourceLoad> RESOURCES_LOADED =
-            new EventImpl<>("RESOURCES_LOADED");
+    //Internally uses BEFORE_LOADING_RESOURCES, so it needs to be initialized after that
+    public static final ResourcesReadyEventImpl RESOURCES_LOADED =
+            new ResourcesReadyEventImpl("RESOURCES_LOADED");
 }

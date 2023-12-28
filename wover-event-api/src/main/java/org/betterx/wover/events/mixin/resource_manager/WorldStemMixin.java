@@ -23,6 +23,6 @@ public class WorldStemMixin {
             WorldData worldData,
             CallbackInfo ci
     ) {
-        WorldLifecycleImpl.RESOURCES_LOADED.emit(c -> c.bootstrap(closeableResourceManager));
+        WorldLifecycleImpl.RESOURCES_LOADED.emit(closeableResourceManager);
     }
 }

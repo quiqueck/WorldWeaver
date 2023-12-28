@@ -1,15 +1,22 @@
 package org.betterx.wover.testmod.entrypoint;
 
+import de.ambertation.wunderlib.configs.ConfigResource;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.events.api.WorldLifecycle;
+import org.betterx.wover.state.api.WorldDatapackConfig;
 
 import net.fabricmc.api.ModInitializer;
 
 public class TestModWoverEvent implements ModInitializer {
-    public static final ModCore C = ModCore.create("event-test-mod");
+    public static final ModCore C = ModCore.create("wover-events-testmod");
 
     @Override
     public void onInitialize() {
+        ConfigResource config = ConfigResource.create(C, "test");
+        ConfigResource configB = ConfigResource.create(C, "test");
+        WorldDatapackConfig.registerConfig(config);
+        WorldDatapackConfig.registerConfig(configB);
+
         WorldLifecycle.WORLD_FOLDER_READY.subscribe((access) -> {
             C.LOG.info("World folder ready (prio 10): {}", access);
         }, 10);
@@ -55,5 +62,9 @@ public class TestModWoverEvent implements ModInitializer {
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe((storageSource, packRepository, worldStem) -> {
             C.LOG.info("Minecraft server ready: \n - {}\n - {}\n - {}", storageSource, packRepository, worldStem);
         });
+    }
+
+    private static void testMerge(String merge) {
+
     }
 }

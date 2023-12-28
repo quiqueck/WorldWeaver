@@ -47,9 +47,7 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.ApiStatus;
 
 public class BiomeSourceManagerImpl {
-
-
-    public static final ResourceLocation BIOME_CONFIGS = LibWoverWorldGenerator.C.id("biome_config.json");
+    public static final ResourceLocation BIOME_CONFIG_FILE = LibWoverWorldGenerator.C.id("biome_config.json");
     public static final ResourceLocation MINECRAFT_WILDCARD
             = new ResourceLocationSet.WildcardResourceLocation(IntegrationCore.MINECRAFT);
     public static final String BIOME_EXCLUSION_TAG = "exclude";
@@ -177,7 +175,7 @@ public class BiomeSourceManagerImpl {
 
         DatapackConfigs
                 .instance()
-                .runForResources(resourceManager, BIOME_CONFIGS, BiomeSourceManagerImpl::processBiomeConfigs);
+                .runForResources(resourceManager, BIOME_CONFIG_FILE, BiomeSourceManagerImpl::processBiomeConfigs);
 
         if (WorldState.registryAccess() != null && !EXCLUSIONS.isEmpty()) {
             WorldState.registryAccess()

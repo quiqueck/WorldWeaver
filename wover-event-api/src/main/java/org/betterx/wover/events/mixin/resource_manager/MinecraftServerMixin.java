@@ -27,7 +27,7 @@ public class MinecraftServerMixin {
         cir.getReturnValue().handleAsync((value, throwable) -> {
             if (throwable == null) {
                 final ResourceManager rm = resources.resourceManager();
-                WorldLifecycleImpl.RESOURCES_LOADED.emit(c -> c.bootstrap(rm));
+                WorldLifecycleImpl.RESOURCES_LOADED.emit(rm);
             }
             return value;
         }, (MinecraftServer) (Object) this);

@@ -1,6 +1,6 @@
 package org.betterx.wover.biome.api.modification.predicates;
 
-import de.ambertation.wunderlib.configs.ConfigFile;
+import de.ambertation.wunderlib.configs.AbstractConfig;
 import org.betterx.wover.biome.impl.modification.predicates.*;
 import org.betterx.wover.config.api.Configs;
 import org.betterx.wover.core.api.ModCore;
@@ -167,7 +167,7 @@ public interface BiomePredicate {
     /**
      * Creates a predicate that tests if a biome is in the nether.
      *
-     * @return
+     * @return the predicate
      */
     static BiomePredicate inNether() {
         return InDimension.NETHER;
@@ -275,7 +275,7 @@ public interface BiomePredicate {
     /**
      * Creates a predicate that tests if the given value from a config file matches the targetValue.
      * <p>
-     * The {@link ConfigFile} that provides the value has to be registered using
+     * The {@link AbstractConfig} that provides the value has to be registered using
      * {@link org.betterx.wover.config.api.Configs#register(Supplier)} or
      * {@link org.betterx.wover.config.api.Configs#register(ModCore, String, Configs.ConfigSupplier)}.
      * Otherwise it will not be found.
@@ -284,7 +284,10 @@ public interface BiomePredicate {
      * @param targetValue the target value to compare against
      * @return the predicate
      */
-    static <T, R extends ConfigFile.Value<T, R>> BiomePredicate hasConfig(ConfigFile.Value<T, R> value, T targetValue) {
+    static <T, R extends AbstractConfig<?>.Value<T, R>> BiomePredicate hasConfig(
+            AbstractConfig<?>.Value<T, R> value,
+            T targetValue
+    ) {
         return ConfigIs.of(value, targetValue);
     }
 

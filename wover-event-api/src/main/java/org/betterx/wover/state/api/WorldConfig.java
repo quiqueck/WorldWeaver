@@ -9,6 +9,9 @@ import net.minecraft.nbt.CompoundTag;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Manages config files that are located in the <b>data</b>-Folder of a world.
+ */
 public class WorldConfig {
     /**
      * Register mod cache, world cache is located in world data folder.

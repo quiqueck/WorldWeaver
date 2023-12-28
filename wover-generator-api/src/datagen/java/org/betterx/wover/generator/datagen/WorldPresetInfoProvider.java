@@ -2,13 +2,12 @@ package org.betterx.wover.generator.datagen;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverRegistryContentProvider;
-import org.betterx.wover.generator.api.preset.PresetsRegistry;
+import org.betterx.wover.generator.api.preset.WorldPresets;
 import org.betterx.wover.preset.api.WorldPresetInfo;
 import org.betterx.wover.preset.api.WorldPresetInfoBuilder;
 import org.betterx.wover.preset.api.WorldPresetInfoRegistry;
 
 import net.minecraft.data.worldgen.BootstapContext;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
 
 public class WorldPresetInfoProvider extends WoverRegistryContentProvider<WorldPresetInfo> {
     /**
@@ -26,18 +25,18 @@ public class WorldPresetInfoProvider extends WoverRegistryContentProvider<WorldP
     protected void bootstrap(BootstapContext<WorldPresetInfo> context) {
         WorldPresetInfoBuilder.start(context)
                               .order(1500)
-                              .overworldOverride(WorldPresets.NORMAL)
-                              .register(PresetsRegistry.WOVER_WORLD);
+                              .overworldOverride(net.minecraft.world.level.levelgen.presets.WorldPresets.NORMAL)
+                              .register(WorldPresets.WOVER_WORLD);
 
         WorldPresetInfoBuilder.start(context)
                               .order(2500)
-                              .overworldOverride(WorldPresets.AMPLIFIED)
-                              .endOverride(PresetsRegistry.WOVER_WORLD)
-                              .register(PresetsRegistry.WOVER_WORLD_AMPLIFIED);
+                              .overworldOverride(net.minecraft.world.level.levelgen.presets.WorldPresets.AMPLIFIED)
+                              .endOverride(WorldPresets.WOVER_WORLD)
+                              .register(WorldPresets.WOVER_WORLD_AMPLIFIED);
 
         WorldPresetInfoBuilder.start(context)
                               .order(3500)
-                              .overworldOverride(WorldPresets.LARGE_BIOMES)
-                              .register(PresetsRegistry.WOVER_WORLD_LARGE);
+                              .overworldOverride(net.minecraft.world.level.levelgen.presets.WorldPresets.LARGE_BIOMES)
+                              .register(WorldPresets.WOVER_WORLD_LARGE);
     }
 }

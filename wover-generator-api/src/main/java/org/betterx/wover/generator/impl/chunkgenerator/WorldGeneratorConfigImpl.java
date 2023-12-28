@@ -4,7 +4,7 @@ import de.ambertation.wunderlib.utils.Version;
 import org.betterx.wover.core.api.IntegrationCore;
 import org.betterx.wover.entrypoint.LibWoverEvents;
 import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
-import org.betterx.wover.generator.api.preset.PresetsRegistry;
+import org.betterx.wover.generator.api.preset.WorldPresets;
 import org.betterx.wover.generator.impl.preset.PresetRegistryImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.preset.api.WorldPresetInfo;
@@ -24,7 +24,6 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
@@ -117,7 +116,7 @@ public class WorldGeneratorConfigImpl {
             if (oldGen != null) {
                 if (oldGen.contains("type")) {
                     LibWoverWorldGenerator.C.log.info("Found World with beta generator Settings.");
-                    if ("bclib:bcl_world_preset_settings" .equals(oldGen.getString("type"))) {
+                    if ("bclib:bcl_world_preset_settings".equals(oldGen.getString("type"))) {
                         int netherVersion = 18;
                         int endVersion = 18;
                         if (oldGen.contains("minecraft:the_nether"))
@@ -134,9 +133,9 @@ public class WorldGeneratorConfigImpl {
                         else endVersion = 2;
 
                         var presets = List.of(
-                                DimensionsWrapper.getDimensionsMap(PresetsRegistry.WOVER_WORLD),
+                                DimensionsWrapper.getDimensionsMap(WorldPresets.WOVER_WORLD),
                                 DimensionsWrapper.getDimensionsMap(PresetRegistryImpl.BCL_WORLD_17),
-                                DimensionsWrapper.getDimensionsMap(WorldPresets.NORMAL)
+                                DimensionsWrapper.getDimensionsMap(net.minecraft.world.level.levelgen.presets.WorldPresets.NORMAL)
                         );
                         Map<ResourceKey<LevelStem>, ChunkGenerator> dimensions = new HashMap<>();
                         dimensions.put(LevelStem.OVERWORLD, presets.get(0).get(LevelStem.OVERWORLD));
@@ -150,7 +149,7 @@ public class WorldGeneratorConfigImpl {
             }
 
             LibWoverWorldGenerator.C.log.info("Found World without generator Settings. Setting up data...");
-            ResourceKey<WorldPreset> biomeSourceVersion = PresetsRegistry.WOVER_WORLD;
+            ResourceKey<WorldPreset> biomeSourceVersion = WorldPresets.WOVER_WORLD;
 
             // WorldConfig will set the version tag to 9.9.9 if the bclib file does not exist.
             // This is to prevent the world from being loaded as a legacy bclib world.
@@ -170,9 +169,9 @@ public class WorldGeneratorConfigImpl {
             if (WorldConfig.hasMod(IntegrationCore.BETTER_NETHER)) {
                 LibWoverWorldGenerator.C.log.info("Found Data from BetterNether, using for migration.");
                 final CompoundTag bnRoot = WorldConfig.getRootTag(IntegrationCore.BETTER_NETHER);
-                biomeSourceVersion = "1.17" .equals(bnRoot.getString(LEGACY_TAG_BN_GEN_VERSION))
+                biomeSourceVersion = "1.17".equals(bnRoot.getString(LEGACY_TAG_BN_GEN_VERSION))
                         ? PresetRegistryImpl.BCL_WORLD_17
-                        : PresetsRegistry.WOVER_WORLD;
+                        : WorldPresets.WOVER_WORLD;
             }
 
             Registry<LevelStem> dimensions = DimensionsWrapper.getDimensions(biomeSourceVersion);
