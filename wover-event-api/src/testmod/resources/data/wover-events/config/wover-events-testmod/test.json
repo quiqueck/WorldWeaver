@@ -1,0 +1,24 @@
+{
+  "both": "MAIN",
+  "mainonly": 23,
+  "array": [
+    1,
+    2,
+    3
+  ],
+  "btt": true,
+  "bff": false,
+  "cft": true,
+  "ctf": false,
+  "objectBoth": {
+    "a": [
+      {
+        "name": 3
+      },
+      {
+        "name": 4
+      }
+    ],
+    "b": 25
+  }
+}

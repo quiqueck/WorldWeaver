@@ -1,0 +1,25 @@
+{
+  "merge": "AND",
+  "both": "TEST",
+  "testonly": 42,
+  "array": [
+    3,
+    4,
+    5
+  ],
+  "btt": true,
+  "bff": false,
+  "cft": false,
+  "ctf": true,
+  "objectBoth": {
+    "a": [
+      {
+        "name": 1
+      },
+      {
+        "name": 2
+      }
+    ],
+    "b": 42
+  }
+}
