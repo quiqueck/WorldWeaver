@@ -62,6 +62,11 @@ public class TestModWoverEvent implements ModInitializer {
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe((storageSource, packRepository, worldStem) -> {
             C.LOG.info("Minecraft server ready: \n - {}\n - {}\n - {}", storageSource, packRepository, worldStem);
         });
+
+        WorldLifecycle.RESOURCES_LOADED.subscribe((resourceManager) -> {
+            C.LOG.info("Resources loaded: \n - {}", resourceManager);
+            C.LOG.info("Config: \n - {}", config);
+        });
     }
 
     private static void testMerge(String merge) {

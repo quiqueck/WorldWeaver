@@ -1,4 +1,5 @@
 {
+  "merge": "AND",
   "both": "MAIN",
   "mainonly": 23,
   "array": [

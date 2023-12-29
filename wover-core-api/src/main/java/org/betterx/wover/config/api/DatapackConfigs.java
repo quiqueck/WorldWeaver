@@ -32,12 +32,22 @@ public class DatapackConfigs {
     }
 
 
-    public void runForResources(
+    public void runForResource(
             ResourceManager manager,
             ResourceLocation fileLocation,
             DatapackConfigReloadHandler handler
     ) {
-        runForResources(manager, List.of(fileLocation.getPath()), handler, null);
+        final Map<ResourceLocation, List<Resource>> aSet = manager.listResourceStacks(
+                "config",
+                id -> {
+                    LibWoverCore.C.log.debug("Checking Resource from Datapack: '{}'", id);
+                    return fileLocation.getNamespace().equals(id.getNamespace()) && id
+                            .getPath()
+                            .equals("config/" + fileLocation.getPath());
+                }
+        );
+
+        runForSet(handler, null, aSet);
     }
 
     /**
@@ -52,7 +62,7 @@ public class DatapackConfigs {
      *                 mod or datapack that is providing the config file.
      * @param finished A function to call when all resources have been processed.
      */
-    public void runForResources(
+    public void runForConfigPaths(
             ResourceManager manager,
             List<String> paths,
             @Nullable DatapackConfigReloadHandler handler,
@@ -61,13 +71,21 @@ public class DatapackConfigs {
         final Map<ResourceLocation, List<Resource>> aSet = manager.listResourceStacks(
                 "config",
                 id -> {
-                    System.out.println(id);
+                    LibWoverCore.C.log.debug("Checking Resource from Datapack: '{}'", id);
                     return paths.contains(id.getPath());
                 }
         );
 
+        runForSet(handler, finished, aSet);
+    }
+
+    private static void runForSet(
+            @Nullable DatapackConfigReloadHandler handler,
+            @Nullable DatapackConfigFinished finished,
+            Map<ResourceLocation, List<Resource>> resources
+    ) {
         if (handler != null) {
-            for (Map.Entry<ResourceLocation, List<Resource>> entry : aSet.entrySet()) {
+            for (Map.Entry<ResourceLocation, List<Resource>> entry : resources.entrySet()) {
                 for (Resource item : entry.getValue()) {
                     try (Reader reader = item.openAsReader()) {
                         final JsonObject obj = JsonParser.parseReader(reader).getAsJsonObject();

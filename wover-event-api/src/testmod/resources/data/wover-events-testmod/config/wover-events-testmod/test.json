@@ -1,5 +1,4 @@
 {
-  "merge": "AND",
   "both": "TEST",
   "testonly": 42,
   "array": [

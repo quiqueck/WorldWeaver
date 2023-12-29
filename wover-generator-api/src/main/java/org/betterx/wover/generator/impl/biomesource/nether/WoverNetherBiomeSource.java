@@ -47,7 +47,7 @@ public class WoverNetherBiomeSource extends WoverBiomeSource implements
                     )
                     .apply(instance, instance.stable(WoverNetherBiomeSource::new))
             );
-    private static final List<TagKey<Biome>> TAGS = List.of(BiomeTags.IS_NETHER);
+    public static final List<TagKey<Biome>> TAGS = List.of(BiomeTags.IS_NETHER);
     private BiomeMap biomeMap;
     private WoverBiomePicker biomePicker;
     private WoverNetherConfig config;

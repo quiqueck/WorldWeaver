@@ -53,6 +53,7 @@ public class BiomeSourceManagerImpl {
     public static final String BIOME_EXCLUSION_TAG = "exclude";
     public static final String NO_FABRIC_REGISTER_TAG = "no_fabric_register";
     public static final String END_CATCH_ALL = "*:is_end";
+    public static final String NETHER_CATCH_ALL = "*:is_nether";
 
     public static void register(ResourceLocation location, Codec<? extends BiomeSource> codec) {
         BuiltInRegistryManager.register(BuiltInRegistries.BIOME_SOURCE, location, codec);
@@ -175,7 +176,7 @@ public class BiomeSourceManagerImpl {
 
         DatapackConfigs
                 .instance()
-                .runForResources(resourceManager, BIOME_CONFIG_FILE, BiomeSourceManagerImpl::processBiomeConfigs);
+                .runForResource(resourceManager, BIOME_CONFIG_FILE, BiomeSourceManagerImpl::processBiomeConfigs);
 
         if (WorldState.registryAccess() != null && !EXCLUSIONS.isEmpty()) {
             WorldState.registryAccess()
@@ -218,6 +219,9 @@ public class BiomeSourceManagerImpl {
                 if (key.equals(END_CATCH_ALL)) {
                     final List<TagKey<Biome>> endTags = WoverEndBiomeSource.TAGS;
                     addBiomesToExclusion(value, id -> addAllExclusions(endTags, id));
+                } else if (key.equals(NETHER_CATCH_ALL)) {
+                    final List<TagKey<Biome>> netherTags = WoverNetherBiomeSource.TAGS;
+                    addBiomesToExclusion(value, id -> addAllExclusions(netherTags, id));
                 } else {
                     final TagKey<Biome> tag = TagKey.create(Registries.BIOME, new ResourceLocation(key));
                     final Set<ResourceLocation> elements = EXCLUSIONS.computeIfAbsent(

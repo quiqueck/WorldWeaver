@@ -7,6 +7,7 @@ import org.betterx.wover.events.api.WorldLifecycle;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.flag.FeatureFlagSet;
 
 import com.google.gson.JsonObject;
 
@@ -31,7 +32,12 @@ public class WorldDatapackConfigImpl {
 
     @ApiStatus.Internal
     public static void initialize() {
+        WorldLifecycle.BEFORE_LOADING_RESOURCES.subscribe(WorldDatapackConfigImpl::onResourcesLoaded, Event.DEFAULT_PRIORITY * 100);
         WorldLifecycle.RESOURCES_LOADED.subscribe(WorldDatapackConfigImpl::onResourcesLoaded, Event.DEFAULT_PRIORITY * 100);
+    }
+
+    private static void onResourcesLoaded(ResourceManager resourceManager, FeatureFlagSet featureFlagSet) {
+        ConfigResource.invalidateCache();
     }
 
     private static void onResourcesLoaded(ResourceManager resourceManager) {
@@ -43,7 +49,7 @@ public class WorldDatapackConfigImpl {
         WorldDatapackConfigImpl obj = new WorldDatapackConfigImpl();
         DatapackConfigs
                 .instance()
-                .runForResources(resourceManager, paths, obj::processBiomeConfigs, obj::whenFinished);
+                .runForConfigPaths(resourceManager, paths, obj::processBiomeConfigs, obj::whenFinished);
     }
 
     final List<LoadedItem> resources = new LinkedList<>();
