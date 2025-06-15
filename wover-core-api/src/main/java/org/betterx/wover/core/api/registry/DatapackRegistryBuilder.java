@@ -189,7 +189,7 @@ public class DatapackRegistryBuilder {
                     //TODO: 1.21 creating a new instance of RegistrationInfo might be expensive...
                     return registry.register(resourceKey, object, new RegistrationInfo(Optional.empty(), lifecycle));
                 } else {
-                    return registry.getHolderOrThrow(resourceKey);
+                    return registry.getOrThrow(resourceKey);
                 }
             }
 
@@ -201,7 +201,7 @@ public class DatapackRegistryBuilder {
                 if (!registry.containsKey(resourceKey)) {
                     return registry.register(resourceKey, object, RegistrationInfo.BUILT_IN);
                 } else {
-                    return registry.getHolderOrThrow(resourceKey);
+                    return registry.getOrThrow(resourceKey);
                 }
             }
 
@@ -237,7 +237,7 @@ public class DatapackRegistryBuilder {
                     //TODO: 1.21 creating a new instance of RegistrationInfo might be expensive...
                     return registry.register(resourceKey, object, new RegistrationInfo(Optional.empty(), lifecycle));
                 } else {
-                    return registry.getHolderOrThrow(resourceKey);
+                    return registry.getOrThrow(resourceKey);
                 }
             }
 
@@ -250,7 +250,7 @@ public class DatapackRegistryBuilder {
                 if (!registry.containsKey(resourceKey)) {
                     return registry.register(resourceKey, object, RegistrationInfo.BUILT_IN);
                 } else {
-                    return registry.getHolderOrThrow(resourceKey);
+                    return registry.getOrThrow(resourceKey);
                 }
             }
 
