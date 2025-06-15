@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class WelcomeScreen extends WoverLayoutScreen {
     public static final ResourceLocation BETTERX_LOCATION = LibWoverUi.C.id("betterx.png");
-    public static final ResourceLocation BACKGROUND = LibWoverUi.C.id("header.png");
+    public static final ResourceLocation HEADER = LibWoverUi.C.id("header.png");
     public static final ResourceLocation ICON_BETTERNETHER = LibWoverUi.C.id("icon_betternether.png");
     public static final ResourceLocation ICON_BETTEREND = LibWoverUi.C.id("icon_betterend.png");
     public static final ResourceLocation ICON_BCLIB = LibWoverUi.C.id("icon_bclib.png");
@@ -30,12 +30,10 @@ public class WelcomeScreen extends WoverLayoutScreen {
     protected LayoutComponent<?, ?> initContent() {
         VerticalStack content = new VerticalStack(fill(), fit()).setDebugName("content");
 
-        content.addImage(fill(), fit(), BACKGROUND, new Size(854 / 2, 286 / 2));
-        //content.addHorizontalLine(1).setColor(ColorHelper.BLACK);
+        content.addImage(fill(), fit(), HEADER, new Size(854 / 2, 286 / 2));
         content.addSpacer(16);
         HorizontalStack headerRow = content.addRow(fit(), fit()).setDebugName("title bar").centerHorizontal();
-//        headerRow.addIcon(icon, Size.of(512)).setDebugName("icon");
-        //headerRow.addSpacer(4);
+
         headerRow.addText(fit(), fit(), title).centerHorizontal().setColor(ColorHelper.WHITE).setDebugName("title");
         headerRow.addImage(fixed(178 / 2), fixed(40 / 2), BETTERX_LOCATION, Size.of(178, 40)).setDebugName("betterx");
         content.addSpacer(16);
@@ -60,7 +58,11 @@ public class WelcomeScreen extends WoverLayoutScreen {
         innerContent.addSpacer(2);
         HorizontalStack dscBox = innerContent.indent(24);
         dscBox
-                .addMultilineText(fill(), fit(), translatable("description.config.wover.client.general.check_for_new_versions"))
+                .addMultilineText(
+                        fill(),
+                        fit(),
+                        translatable("description.config.wover.client.general.check_for_new_versions")
+                )
                 .setColor(ColorHelper.GRAY);
         dscBox.addSpacer(8);
 
@@ -124,7 +126,6 @@ public class WelcomeScreen extends WoverLayoutScreen {
             VersionChecker.startCheck(true);
             onClose();
         }).alignRight();
-
         return VerticalScroll.create(fill(), fill(), content).setScrollerPadding(0);
     }
 

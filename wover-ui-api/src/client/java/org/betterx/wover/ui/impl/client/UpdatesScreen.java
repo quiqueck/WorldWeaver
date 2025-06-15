@@ -11,7 +11,6 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverUi;
 import org.betterx.wover.ui.api.VersionChecker;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -39,12 +38,8 @@ public class UpdatesScreen extends WoverLayoutScreen {
     }
 
     public static void showUpdateUI() {
-        if (!RenderSystem.isOnRenderThread()) {
-            RenderSystem.recordRenderCall(() -> Minecraft.getInstance()
-                                                         .setScreen(new UpdatesScreen(Minecraft.getInstance().screen)));
-        } else {
-            Minecraft.getInstance().setScreen(new UpdatesScreen(Minecraft.getInstance().screen));
-        }
+        //No more java side render thread calls?
+        Minecraft.getInstance().setScreen(new UpdatesScreen(Minecraft.getInstance().screen));
     }
 
     public ResourceLocation getUpdaterIcon(ModCore core) {
