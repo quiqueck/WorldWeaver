@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover-testmod",
-  "version": "21.0.0",
+  "version": "21.6.0",
   "name": "WorldWeaver - TestMod",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
@@ -28,7 +28,9 @@
   },
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6-rc.1"],
+    "minecraft": [
+      "1.21.6-rc.1"
+    ],
     "java": ">=17",
     "fabric-api": "*"
   }

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover-surface-testmod",
-  "version": "21.0.0",
+  "version": "21.6.0",
   "name": "WorldWeaver - Surface (TestMod)",
   "description": "",
   "authors": [
@@ -28,7 +28,9 @@
   },
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6-rc.1"],
+    "minecraft": [
+      "1.21.6-rc.1"
+    ],
     "java": ">=17",
     "fabric-api": ">=0.100.1"
   }
