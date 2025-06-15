@@ -24,8 +24,8 @@ public abstract class CreateWorldScreenMixin {
     @Shadow
     public abstract WorldCreationUiState getUiState();
 
-    @Inject(method = "createNewWorldDirectory", at = @At("RETURN"))
-    void wover_captureRegistry(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+    @Inject(method = "createNewWorld", at = @At("RETURN"))
+    private void wover_captureRegistry(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
         WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(
                 this.getUiState()
                     .getSettings()
