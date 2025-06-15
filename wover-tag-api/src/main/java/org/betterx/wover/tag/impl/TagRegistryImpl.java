@@ -117,11 +117,8 @@ public abstract class TagRegistryImpl<T, P extends TagBootstrapContext<T>> imple
 
         @Override
         public TagKey<T> makeTag(ResourceLocation id) {
-            final TagKey<T> tag = registry
-                    .getTagNames()
-                    .filter(tagKey -> tagKey.location().equals(id))
-                    .findAny()
-                    .orElse(TagKey.create(registry.key(), id));
+            TagKey<T> tag = TagKey.create(registry.key(), id);
+
             initializeTag(tag);
             return tag;
         }

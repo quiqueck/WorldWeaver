@@ -10,6 +10,8 @@ import org.betterx.wover.tag.api.event.context.TagElementWrapper;
 import org.betterx.wover.tag.impl.TagManagerImpl;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -232,6 +234,7 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
              */
             protected final void addTags(HolderLookup.Provider arg) {
                 P provider = tagRegistry.createBootstrapContext(initAll());
+
                 //make sure that force written Tags are added to the provider
                 forceWrite.forEach(provider::asPlaceholder);
                 prepareTags(provider);
@@ -252,15 +255,22 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
                     if (!force && elements.isEmpty()) {
                         return;
                     }
-                    final FabricTagProvider<T>.FabricTagBuilder builder = getOrCreateTagBuilder(tag).setReplace(replaceOriginalTags());
+
+                    TagAppender<ResourceKey<T>, T> builder = this.builder(tag);
+                    builder.setReplace(replaceOriginalTags());
+
+                    ResourceKey<T> key;
+                    TagKey<T> tagKey;
                     //write all elements that passed the above filtering...
                     for (var element : elements) {
                         if (element.tag()) {
-                            if (element.required()) builder.forceAddTag(TagKey.create(registryKey, element.id()));
-                            else builder.addOptionalTag(element.id());
+                            tagKey = TagKey.create(tagRegistry.registryKey(), element.id());
+                            if (element.required()) builder.forceAddTag(tagKey);
+                            else builder.addOptionalTag(tagKey);
                         } else {
-                            if (element.required()) builder.add(element.id());
-                            else builder.addOptional(element.id());
+                            key = ResourceKey.create(registryKey, element.id());
+                            if (element.required()) builder.add(key);
+                            else builder.addOptional(key);
                         }
                     }
                 });

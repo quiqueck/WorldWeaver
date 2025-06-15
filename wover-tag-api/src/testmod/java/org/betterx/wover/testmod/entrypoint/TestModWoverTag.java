@@ -26,7 +26,7 @@ public class TestModWoverTag implements ModInitializer {
             ctx.add(aa, Blocks.ACACIA_DOOR);
 
             ctx.add(aa, Blocks.ACACIA_BUTTON);
-            ctx.addOptional(aa, Blocks.ACACIA_FENCE);
+            ctx.addOptional(aaa, Blocks.ACACIA_FENCE);
 
             ctx.add(bb, Blocks.ACACIA_BUTTON);
             ctx.addOptional(bb, Blocks.ACACIA_BUTTON);

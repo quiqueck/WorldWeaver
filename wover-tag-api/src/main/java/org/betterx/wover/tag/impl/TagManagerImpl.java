@@ -34,7 +34,8 @@ public class TagManagerImpl {
     public static TagRegistryImpl<Block, TagBootstrapContext<Block>> BLOCKS = registerType(BuiltInRegistries.BLOCK);
     public static TagRegistryImpl<Item, ItemTagBootstrapContext> ITEMS = registerItem();
     public static TagRegistryImpl<Enchantment, TagBootstrapContext<Enchantment>> ENCHANTMENTS = registerType(Registries.ENCHANTMENT);
-    public static TagRegistryImpl<EntityType<?>, TagBootstrapContext<EntityType<?>>> ENTITY_TYPES = registerType(Registries.ENTITY_TYPE);
+    public static TagRegistryImpl<EntityType<?>, TagBootstrapContext<EntityType<?>>> ENTITY_TYPES = registerType(
+            Registries.ENTITY_TYPE);
     public static BiomeTagRegistryImpl BIOMES = registerBiome();
 
     public static <T, P extends TagBootstrapContext<T>> TagRegistryImpl<T, P> registerType(DefaultedRegistry<T> registry) {
@@ -77,7 +78,7 @@ public class TagManagerImpl {
                 Registries.tagsDirPath(registryKey),
                 (preset) -> WorldState.registryAccess() != null
                         ? WorldState.registryAccess()
-                                    .registryOrThrow(registryKey)
+                                    .lookupOrThrow(registryKey)
                                     .getKey(preset)
                         : null
         );
