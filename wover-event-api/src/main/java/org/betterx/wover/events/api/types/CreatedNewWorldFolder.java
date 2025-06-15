@@ -3,7 +3,7 @@ package org.betterx.wover.events.api.types;
 import org.betterx.wover.events.api.Subscriber;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -28,7 +28,7 @@ public interface CreatedNewWorldFolder extends Subscriber {
      */
     void init(
             LevelStorageSource.LevelStorageAccess storageAccess,
-            RegistryAccess registryAccess,
+            HolderLookup.Provider registryAccess,
             Holder<WorldPreset> preset,
             WorldDimensions selectedDimensions,
             boolean recreated

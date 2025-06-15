@@ -16,8 +16,8 @@ import com.mojang.datafixers.types.templates.TypeTemplate;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -72,12 +72,15 @@ public class ChunkGeneratorManagerImpl {
         }
         WorldConfig.registerMod(LibWoverWorldGenerator.C);
 
-        WorldLifecycle.CREATED_NEW_WORLD_FOLDER.subscribe(ChunkGeneratorManagerImpl::onWorldCreation, ChunkGeneratorManager.CREATE_DIMENSION_CONFIG_PRIORITY);
+        WorldLifecycle.CREATED_NEW_WORLD_FOLDER.subscribe(
+                ChunkGeneratorManagerImpl::onWorldCreation,
+                ChunkGeneratorManager.CREATE_DIMENSION_CONFIG_PRIORITY
+        );
     }
 
     private static void onWorldCreation(
             LevelStorageSource.LevelStorageAccess storage,
-            RegistryAccess access,
+            HolderLookup.Provider access,
             Holder<WorldPreset> currentPreset,
             WorldDimensions dimensions,
             boolean recreated
@@ -130,7 +133,7 @@ public class ChunkGeneratorManagerImpl {
                                         String namespace = null;
                                         if (WorldState.registryAccess() != null) {
                                             final ResourceLocation location = WorldState.registryAccess()
-                                                                                        .registryOrThrow(Registries.PLACED_FEATURE)
+                                                                                        .lookupOrThrow(Registries.PLACED_FEATURE)
                                                                                         .getKey(feature);
                                             if (location != null) {
                                                 namespace = location.getNamespace();

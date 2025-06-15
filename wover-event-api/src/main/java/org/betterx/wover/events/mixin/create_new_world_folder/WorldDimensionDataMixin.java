@@ -5,8 +5,7 @@ import org.betterx.wover.events.impl.WorldLifecycleImpl;
 import org.betterx.wover.state.api.WorldState;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +38,7 @@ public class WorldDimensionDataMixin {
 
     //this is called when a new world is first created on the server
     @Inject(method = "create", at = @At("RETURN"))
-    void wover_onCreateWorld(RegistryAccess registryAccess, CallbackInfoReturnable<WorldDimensions> cir) {
+    void wover_onCreateWorld(HolderLookup.Provider registryAccess, CallbackInfoReturnable<WorldDimensions> cir) {
         Holder<WorldPreset> holder = wover_getWorldPreset(registryAccess);
         WorldDimensions dimensions = cir.getReturnValue();
 
@@ -54,10 +53,11 @@ public class WorldDimensionDataMixin {
     }
 
     @NotNull
-    private Holder<WorldPreset> wover_getWorldPreset(RegistryAccess registryAccess) {
-        Registry<WorldPreset> worldPresetRegistry = registryAccess.registryOrThrow(Registries.WORLD_PRESET);
-        Holder.Reference<WorldPreset> reference = worldPresetRegistry.getHolder(WorldPresets.NORMAL)
-                                                                     .or(() -> worldPresetRegistry.holders().findAny())
+    private Holder<WorldPreset> wover_getWorldPreset(HolderLookup.Provider registryAccess) {
+        HolderLookup.RegistryLookup<WorldPreset> worldPresetRegistry = registryAccess.lookupOrThrow(Registries.WORLD_PRESET);
+        Holder.Reference<WorldPreset> reference = worldPresetRegistry.get(WorldPresets.NORMAL)
+                                                                     .or(() -> worldPresetRegistry.listElements()
+                                                                                                  .findAny())
                                                                      .orElseThrow();
 
         Optional<ResourceKey<WorldPreset>> presetKey = Optional
@@ -69,7 +69,7 @@ public class WorldDimensionDataMixin {
                 .or(() -> Optional.ofNullable(LEGACY_PRESET_NAMES.get(this.levelType)));
         Objects.requireNonNull(worldPresetRegistry);
         Holder<WorldPreset> holder = presetKey
-                .flatMap(worldPresetRegistry::getHolder)
+                .flatMap(worldPresetRegistry::get)
                 .orElse(reference);
         return holder;
     }

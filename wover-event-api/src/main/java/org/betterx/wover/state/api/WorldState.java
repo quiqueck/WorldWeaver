@@ -67,7 +67,7 @@ public class WorldState {
         final RegistryAccess access = allStageRegistryAccess();
         final ResourceLocation id = access == null || biome == null
                 ? null
-                : access.registryOrThrow(Registries.BIOME).getKey(biome);
+                : access.lookupOrThrow(Registries.BIOME).getKey(biome);
 
         if (id == null) {
             LibWoverEvents.C.log.error("Unable to get ResourceLocation for " + biome + ".");

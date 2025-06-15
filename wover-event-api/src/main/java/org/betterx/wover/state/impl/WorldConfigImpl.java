@@ -7,6 +7,7 @@ import org.betterx.wover.entrypoint.LibWoverEvents;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnWorldConfig;
+import static org.betterx.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.util.Pair;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import static org.betterx.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,10 +79,12 @@ public class WorldConfigImpl {
             });
 
         eventQueue.forEach(pair -> {
-            EVENTS.computeIfPresent(pair.first, (key, event) -> {
-                event.emit(subscriber -> subscriber.config(key, TAGS.get(key), pair.second));
-                return event;
-            });
+            EVENTS.computeIfPresent(
+                    pair.first, (key, event) -> {
+                        event.emit(subscriber -> subscriber.config(key, TAGS.get(key), pair.second));
+                        return event;
+                    }
+            );
         });
     }
 
@@ -94,10 +96,12 @@ public class WorldConfigImpl {
         root.putString(TAG_MODIFIED, modCore.getModVersion().toString());
 
         if (emit) {
-            EVENTS.computeIfPresent(modCore, (key, event) -> {
-                event.emit(subscriber -> subscriber.config(modCore, root, OnWorldConfig.State.CREATED));
-                return event;
-            });
+            EVENTS.computeIfPresent(
+                    modCore, (key, event) -> {
+                        event.emit(subscriber -> subscriber.config(modCore, root, OnWorldConfig.State.CREATED));
+                        return event;
+                    }
+            );
         }
 
         return root;
@@ -132,7 +136,7 @@ public class WorldConfigImpl {
         CompoundTag tag = getRootTag(modCore);
         for (String part : parts) {
             if (tag.contains(part)) {
-                tag = tag.getCompound(part);
+                tag = tag.getCompound(part).orElseThrow();
             } else {
                 CompoundTag t = new CompoundTag();
                 tag.put(part, t);
@@ -173,17 +177,17 @@ public class WorldConfigImpl {
      * @return The Version object
      */
     public static Version getModifiedVersion(ModCore modCore) {
-        return new Version(getRootTag(modCore).getString(TAG_MODIFIED));
+        return new Version(getRootTag(modCore).getStringOr(TAG_MODIFIED, "0.0.0"));
     }
 
     /**
-     * Get the version of the original version that create dthis file
+     * Get the version of the original version that create this file
      *
      * @param modCore The Mod
      * @return The Version object
      */
     public static Version getCreatedVersion(ModCore modCore) {
-        return new Version(getRootTag(modCore).getString(TAG_CREATED));
+        return new Version(getRootTag(modCore).getStringOr(TAG_CREATED, "0.0.0"));
     }
 }
 
