@@ -24,12 +24,10 @@
     "wover.{namespace}.mixins.common.json"
   ],
   "depends": {
-    "fabricloader": ">=0.15.3",
-    "minecraft": [
-      "1.21-beta.3"
-    ],
+    "fabricloader": ">=0.16.0",
+    "minecraft": ["1.21.6-rc.1"],
     "java": ">=17",
-    "fabric-api": ">=0.91.0"
+    "fabric-api": ">=0.100.1"
   },
   "custom": {
     "modmenu": {
