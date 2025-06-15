@@ -249,6 +249,11 @@ public class WoverBiomeData extends BiomeData {
         return parent == null && findEdgeParent() == null;
     }
 
+    @Override
+    public float genChance(){
+        return this.genChance;
+    }
+
     public BiomeData getEdgeData() {
         if (edgeData == null) return null;
         final Registry<BiomeData> reg = getDataRegistry("edge biome", biomeKey);
