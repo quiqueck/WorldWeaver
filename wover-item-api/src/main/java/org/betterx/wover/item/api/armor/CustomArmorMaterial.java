@@ -1,14 +1,16 @@
 package org.betterx.wover.item.api.armor;
 
-import org.betterx.wover.core.api.registry.BuiltInRegistryManager;
-
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -21,30 +23,36 @@ public class CustomArmorMaterial {
 
     public static class Builder {
         private final ResourceLocation location;
-        private final EnumMap<ArmorItem.Type, Integer> defense;
+        private final EnumMap<ArmorType, Integer> defense;
         private int enchantmentValue;
         private Holder<SoundEvent> equipSound;
         private float toughness;
+        private int durability;
         private float knockbackResistance;
-        private Supplier<Ingredient> repairIngredientSupplier;
-        List<ArmorMaterial.Layer> layers;
+        private TagKey<Item> repairIngredient;
+        private ResourceKey<EquipmentAsset> assetId;
 
         private Builder(ResourceLocation location) {
             this.location = location;
-            this.defense = new EnumMap<>(ArmorItem.Type.class);
+            this.defense = new EnumMap<>(ArmorType.class);
         }
 
         public Builder defense(int boots, int leggings, int chestplate, int helmet, int body) {
-            defense(ArmorItem.Type.BOOTS, boots);
-            defense(ArmorItem.Type.LEGGINGS, leggings);
-            defense(ArmorItem.Type.CHESTPLATE, chestplate);
-            defense(ArmorItem.Type.HELMET, helmet);
-            defense(ArmorItem.Type.BODY, body);
+            defense(ArmorType.BOOTS, boots);
+            defense(ArmorType.LEGGINGS, leggings);
+            defense(ArmorType.CHESTPLATE, chestplate);
+            defense(ArmorType.HELMET, helmet);
+            defense(ArmorType.BODY, body);
             return this;
         }
 
-        public Builder defense(ArmorItem.Type type, int defense) {
+        public Builder defense(ArmorType type, int defense) {
             this.defense.put(type, defense);
+            return this;
+        }
+
+        public Builder durability(int durability) {
+            this.durability = durability;
             return this;
         }
 
@@ -68,19 +76,33 @@ public class CustomArmorMaterial {
             return this;
         }
 
-        public Builder repairIngredientSupplier(Supplier<Ingredient> repairIngredientSupplier) {
-            this.repairIngredientSupplier = repairIngredientSupplier;
+        public Builder repairIngredient(TagKey<Item> repairIngredient) {
+            this.repairIngredient = repairIngredient;
             return this;
         }
 
-        public Builder layers(List<ArmorMaterial.Layer> layers) {
-            this.layers = layers;
+        @Deprecated(forRemoval = true)
+        public Builder repairIngredientSupplier(Supplier<Ingredient> repairIngredientSupplier) {
+            return this;
+        }
+
+        public Builder assetId(ResourceKey<EquipmentAsset> assetId) {
+            this.assetId = assetId;
+            return this;
+        }
+
+        @Deprecated(forRemoval = true)
+        public Builder layers(List<Object> layers) {
             return this;
         }
 
         protected void validate() throws IllegalStateException {
-            if (defense.size() != ArmorItem.Type.values().length) {
+            if (defense.size() != ArmorType.values().length) {
                 throw new IllegalStateException("Defense values must be set for all armor types");
+            }
+
+            if (durability <= 0) {
+                throw new IllegalStateException("Durability must be positive");
             }
 
             if (enchantmentValue < 0) {
@@ -99,29 +121,31 @@ public class CustomArmorMaterial {
                 throw new IllegalStateException("Knockback resistance must be non-negative");
             }
 
-            if (repairIngredientSupplier == null) {
-                throw new IllegalStateException("Repair ingredient supplier must be set");
+            if (repairIngredient == null) {
+                throw new IllegalStateException("Repair ingredient must be set");
+            }
+
+            if (assetId == null) {
+                throw new IllegalStateException("Asset ID must be set");
             }
         }
 
         public ArmorMaterial build() {
-            if (layers == null) {
-                layers = List.of(new ArmorMaterial.Layer(location));
+            if (assetId == null) {
+                assetId = ResourceKey.create(EquipmentAssets.ROOT_ID, location);
             }
             validate();
             return new ArmorMaterial(
+                    durability,
                     defense, enchantmentValue, equipSound,
-                    repairIngredientSupplier, layers, toughness,
-                    knockbackResistance
+                    toughness,
+                    knockbackResistance,
+                    repairIngredient, assetId
             );
         }
 
         public Holder<ArmorMaterial> buildAndRegister() {
-            return BuiltInRegistryManager.registerForHolder(
-                    BuiltInRegistries.ARMOR_MATERIAL,
-                    location,
-                    this.build()
-            );
+            return Holder.direct(build());
         }
     }
 }

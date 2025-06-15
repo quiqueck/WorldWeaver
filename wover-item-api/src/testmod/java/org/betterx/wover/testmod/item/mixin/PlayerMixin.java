@@ -5,8 +5,8 @@ import org.betterx.wover.testmod.entrypoint.TestModWoverItem;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -21,8 +21,8 @@ public class PlayerMixin {
         return original.call().add(TestModWoverItem.OBSIDIAN_BLOCK_BREAK_SPEED);
     }
 
-    @WrapOperation(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;)F"))
-    float wover_test_getDestroySpeed(Inventory instance, BlockState blockState, Operation<Float> original) {
+    @WrapOperation(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;)F"))
+    float wover_test_getDestroySpeed(ItemStack instance, BlockState blockState, Operation<Float> original) {
         final LivingEntity entity = (LivingEntity) (Object) this;
         float speed = original.call(instance, blockState);
         if (blockState.is(CommonBlockTags.IS_OBSIDIAN)) {

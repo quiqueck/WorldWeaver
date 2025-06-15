@@ -20,7 +20,7 @@ public class TestItemRegistry {
     }
 
     public static Item ENCHANTED_AXE = R.register(
-            "enchanted_axe", new EnchantedAxe(),
+            "enchanted_axe", new EnchantedAxe(R.C.mk("enchanted_axe")),
             ItemTags.AXES, ItemTags.MINING_ENCHANTABLE, ItemTags.MINING_LOOT_ENCHANTABLE
     );
 }

@@ -11,8 +11,8 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
@@ -34,11 +34,11 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
      */
     protected final ModCore modCore;
 
-    protected final LootContextParamSet lootContextType;
+    protected final ContextKeySet lootContextType;
 
     public WoverLootTableProvider(
             ModCore modCore,
-            LootContextParamSet lootContextType
+            ContextKeySet lootContextType
     ) {
         this(modCore, modCore.namespace, lootContextType);
     }
@@ -46,7 +46,7 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
     public WoverLootTableProvider(
             ModCore modCore,
             String title,
-            LootContextParamSet lootContextType
+            ContextKeySet lootContextType
     ) {
         this.modCore = modCore;
         this.title = title;
@@ -85,12 +85,14 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
             final HashMap<ResourceLocation, LootTable> builders = new HashMap<>();
 
             return registryLookup.thenCompose(lookup -> {
-                boostrap(lookup, (registryKey, builder) -> {
-                    if (builders.containsKey(registryKey.location()))
-                        throw new IllegalStateException("Duplicate loot table for " + registryKey.location());
+                boostrap(
+                        lookup, (registryKey, builder) -> {
+                            if (builders.containsKey(registryKey.location()))
+                                throw new IllegalStateException("Duplicate loot table for " + registryKey.location());
 
-                    builders.put(registryKey.location(), builder.setParamSet(lootContextType).build());
-                });
+                            builders.put(registryKey.location(), builder.setParamSet(lootContextType).build());
+                        }
+                );
 
                 final RegistryOps<JsonElement> ops = lookup.createSerializationContext(JsonOps.INSTANCE);
                 return CompletableFuture.allOf(

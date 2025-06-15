@@ -12,17 +12,22 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.gameevent.GameEvent;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 
 public class ItemRegistry {
     private static final Map<ModCore, ItemRegistry> REGISTRIES = new HashMap<>();
@@ -63,17 +68,16 @@ public class ItemRegistry {
     }
 
     public <T extends Item> T registerAsTool(String path, T item, TagKey<Item>... tags) {
-        register(path, item, tags);
-
-        return item;
+        return register(path, item, tags);
     }
 
+    @Deprecated(forRemoval = true)
     public FoodProperties.Builder foodPropertiesOf(int hunger, float saturation, MobEffectInstance... effects) {
-        FoodProperties.Builder builder = new FoodProperties.Builder().nutrition(hunger).saturationModifier(saturation);
-        for (MobEffectInstance effect : effects) {
-            builder.effect(effect, 1F);
-        }
-        return builder;
+        return this.foodPropertiesOf(hunger, saturation);
+    }
+
+    public FoodProperties.Builder foodPropertiesOf(int hunger, float saturation) {
+        return new FoodProperties.Builder().nutrition(hunger).saturationModifier(saturation);
     }
 
     public FoodProperties.Builder drinkPropertiesOf(int hunger, float saturation) {
@@ -94,11 +98,20 @@ public class ItemRegistry {
             int hunger, float saturation,
             MobEffectInstance... effects
     ) {
-        return this.register(name, factory.apply(properties.food(this
-                .foodPropertiesOf(hunger, saturation, effects)
-                .build())));
+        final Consumable.Builder consumable = Consumables.defaultFood();
+        for (MobEffectInstance effect : effects) {
+            consumable.onConsume(new ApplyStatusEffectsConsumeEffect(
+                    effect,
+                    1F
+            ));
+        }
+        final FoodProperties.Builder foodProps = this.foodPropertiesOf(hunger, saturation);
+
+        return this.register(
+                name, factory.apply(properties.food(foodProps.build(), consumable.build()))
+        );
     }
-    
+
     public <T extends Item> T registerDrink(
             String name, Function<Item.Properties, T> factory,
             int hunger, float saturation,
@@ -113,31 +126,47 @@ public class ItemRegistry {
             int hunger, float saturation,
             MobEffectInstance... effects
     ) {
-        return this.register(name, factory.apply(properties.food(this
-                .drinkPropertiesOf(hunger, saturation)
-                .build())));
+        return this.register(
+                name, factory.apply(properties.food(this
+                        .drinkPropertiesOf(hunger, saturation)
+                        .build()))
+        );
     }
 
+    public static final DefaultDispenseItemBehavior DISPENSE_SPAWN_EGG_BEHAVIOUR = new DefaultDispenseItemBehavior() {
+        @Override
+        public @NotNull ItemStack execute(BlockSource blockSource, ItemStack stack) {
+            Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
+            EntityType<?> entityType = ((SpawnEggItem) stack.getItem()).getType(
+                    blockSource.level().registryAccess(),
+                    stack
+            );
 
-    public <T extends SpawnEggItem> T registerEgg(String path, T item, TagKey<Item>... tags) {
-        DefaultDispenseItemBehavior behavior = new DefaultDispenseItemBehavior() {
-            public ItemStack execute(BlockSource pointer, ItemStack stack) {
-                Direction direction = pointer.state().getValue(DispenserBlock.FACING);
-                EntityType<?> entityType = ((SpawnEggItem) stack.getItem()).getType(stack);
+            try {
                 entityType.spawn(
-                        pointer.level(),
+                        blockSource.level(),
                         stack,
                         null,
-                        pointer.pos().relative(direction),
-                        MobSpawnType.DISPENSER,
+                        blockSource.pos().relative(direction),
+                        EntitySpawnReason.DISPENSER,
                         direction != Direction.UP,
                         false
                 );
-                stack.shrink(1);
-                return stack;
+            } catch (Exception var6) {
+                LOGGER.error("Error while dispensing spawn egg from dispenser at {}", blockSource.pos(), var6);
+                return ItemStack.EMPTY;
             }
-        };
-        DispenserBlock.registerBehavior(item, behavior);
+
+            stack.shrink(1);
+            blockSource.level().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource.pos());
+            return stack;
+        }
+    };
+
+
+    @SafeVarargs
+    public final <T extends SpawnEggItem> T registerEgg(String path, T item, TagKey<Item>... tags) {
+        DispenserBlock.registerBehavior(item, DISPENSE_SPAWN_EGG_BEHAVIOUR);
         return register(path, item, tags);
     }
 
