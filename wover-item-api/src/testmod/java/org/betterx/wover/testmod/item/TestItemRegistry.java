@@ -4,7 +4,6 @@ import org.betterx.wover.item.api.ItemRegistry;
 import org.betterx.wover.testmod.entrypoint.TestModWoverItem;
 
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.item.Item;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -19,8 +18,8 @@ public class TestItemRegistry {
         // NO-OP
     }
 
-    public static Item ENCHANTED_AXE = R.register(
-            "enchanted_axe", new EnchantedAxe(R.C.mk("enchanted_axe")),
-            ItemTags.AXES, ItemTags.MINING_ENCHANTABLE, ItemTags.MINING_LOOT_ENCHANTABLE
-    );
+    public static EnchantedAxe ENCHANTED_AXE = R
+            .defineDefaultItem("enchanted_axe", EnchantedAxe::new)
+            .setTags(ItemTags.AXES, ItemTags.MINING_ENCHANTABLE, ItemTags.MINING_LOOT_ENCHANTABLE)
+            .buildAndRegister();
 }
