@@ -21,14 +21,14 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
  * @author Quiqueck
  * @since 21.6.0
  */
-public abstract class ItemConfig<I extends Item, C extends ItemConfig<I, C>> {
+public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I, C>> {
     /**
      * Factory interface for creating items from configuration objects.
      *
      * @param <I> The type of item to create
      * @param <C> The configuration type used to create the item
      */
-    public interface ItemFactory<I extends Item, C extends ItemConfig<I, C>> {
+    public interface ItemFactory<I extends Item, C extends ItemDefinition<I, C>> {
         /**
          * Creates an item instance from the given configuration.
          *
@@ -61,7 +61,7 @@ public abstract class ItemConfig<I extends Item, C extends ItemConfig<I, C>> {
     /**
      * Factory instance used to create the item
      */
-    protected final ItemConfig.ItemFactory<I, C> itemFactory;
+    protected final ItemDefinition.ItemFactory<I, C> itemFactory;
 
     /**
      * Creates a new item configuration.
@@ -70,7 +70,7 @@ public abstract class ItemConfig<I extends Item, C extends ItemConfig<I, C>> {
      * @param itemName    The name identifier for the item
      * @param itemFactory The factory used to create the item instance
      */
-    protected ItemConfig(ItemRegistry registry, String itemName, ItemConfig.ItemFactory<I, C> itemFactory) {
+    protected ItemDefinition(ItemRegistry registry, String itemName, ItemDefinition.ItemFactory<I, C> itemFactory) {
         this.itemKey = registry.key(itemName);
         this.properties = new Item.Properties().setId(this.itemKey);
         this.itemFactory = itemFactory;
@@ -89,7 +89,7 @@ public abstract class ItemConfig<I extends Item, C extends ItemConfig<I, C>> {
      * This method is called automatically by {@link #buildAndRegister()} after the item is built
      * but before it is registered with the registry. Subclasses can use this to perform any
      * post-creation setup or modifications that need to happen before registration.
-     * 
+     *
      * @param item The built item instance that will be registered
      * @return The item instance (potentially modified) that should be registered
      */
@@ -102,19 +102,19 @@ public abstract class ItemConfig<I extends Item, C extends ItemConfig<I, C>> {
      * @return The created item instance
      */
     @SuppressWarnings("unchecked")
-    public I build() {
+    public final I build() {
         this.beforeBuild();
         return itemFactory.createItem((C) this);
     }
 
     /**
      * Builds the item and automatically registers it with the item registry.
-     * This is a convenience method that combines {@link #build()}, {@link #beforeRegister(I)}, 
+     * This is a convenience method that combines {@link #build()}, {@link #beforeRegister(I)},
      * and registration. The process is: build item → call beforeRegister → register with registry.
      *
      * @return The created and registered item instance
      */
-    public I buildAndRegister() {
+    public final I buildAndRegister() {
         I item = this.beforeRegister(this.build());
         this.registry.register(this.itemKey, item, tags);
         return item;

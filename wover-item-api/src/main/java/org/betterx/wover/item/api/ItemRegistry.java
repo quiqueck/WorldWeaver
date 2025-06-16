@@ -54,7 +54,7 @@ import java.util.stream.Stream;
  * </pre>
  *
  * @author Quiqueck
- * @see ItemConfig
+ * @see ItemDefinition
  * @see ModCore
  * @since 21.6.0
  */
@@ -143,10 +143,10 @@ public class ItemRegistry {
      * vanilla Minecraft items without any custom behavior.
      *
      * @param itemName The name identifier for the vanilla item
-     * @return A new VanillaItemConfig instance for method chaining
+     * @return A new VanillaItemDefinition instance for method chaining
      */
-    public VanillaItemConfig defineDefaultItem(String itemName) {
-        return new VanillaItemConfig(this, itemName);
+    public VanillaItemDefinition defineDefaultItem(String itemName) {
+        return new VanillaItemDefinition(this, itemName);
     }
 
     /**
@@ -157,13 +157,13 @@ public class ItemRegistry {
      * @param itemName    The name identifier for the item
      * @param itemFactory The factory used to create the item instance
      * @param <I>         The type of item to create
-     * @return A new DefaultItemConfig instance for method chaining
+     * @return A new DefaultItemDefinition instance for method chaining
      */
-    public <I extends Item> DefaultItemConfig<I> defineDefaultItem(
+    public <I extends Item> DefaultItemDefinition<I> defineDefaultItem(
             String itemName,
-            DefaultItemConfig.ItemFactory<I> itemFactory
+            DefaultItemDefinition.ItemFactory<I> itemFactory
     ) {
-        return new DefaultItemConfig<>(this, itemName, itemFactory);
+        return new DefaultItemDefinition<>(this, itemName, itemFactory);
     }
 
     /**
@@ -174,13 +174,13 @@ public class ItemRegistry {
      * @param toolName    The name identifier for the tool item
      * @param itemFactory The factory used to create the tool item instance
      * @param <I>         The type of tool item to create
-     * @return A new ToolItemConfig instance for method chaining
+     * @return A new ToolItemDefinition instance for method chaining
      */
-    public <I extends Item> ToolItemConfig<I> defineToolItem(
+    public <I extends Item> ToolItemDefinition<I> defineToolItem(
             String toolName,
-            ToolItemConfig.ItemFactory<I> itemFactory
+            ToolItemDefinition.ItemFactory<I> itemFactory
     ) {
-        return new ToolItemConfig<>(this, toolName, itemFactory);
+        return new ToolItemDefinition<>(this, toolName, itemFactory);
     }
 
     /**
@@ -191,13 +191,13 @@ public class ItemRegistry {
      * @param armorName   The name identifier for the armor item
      * @param itemFactory The factory used to create the armor item instance
      * @param <I>         The type of armor item to create
-     * @return A new ArmorItemConfig instance for method chaining
+     * @return A new ArmorItemDefinition instance for method chaining
      */
-    public <I extends Item> ArmorItemConfig<I> defineArmorItem(
+    public <I extends Item> ArmorItemDefinition<I> defineArmorItem(
             String armorName,
-            ArmorItemConfig.ItemFactory<I> itemFactory
+            ArmorItemDefinition.ItemFactory<I> itemFactory
     ) {
-        return new ArmorItemConfig<>(this, armorName, itemFactory);
+        return new ArmorItemDefinition<>(this, armorName, itemFactory);
     }
 
     /**
@@ -208,13 +208,13 @@ public class ItemRegistry {
      * @param foodName    The name identifier for the food item
      * @param itemFactory The factory used to create the food item instance
      * @param <I>         The type of food item to create
-     * @return A new FoodItemConfig instance for method chaining
+     * @return A new FoodItemDefinition instance for method chaining
      */
-    public <I extends Item> FoodItemConfig<I> defineFoodItem(
+    public <I extends Item> FoodItemDefinition<I> defineFoodItem(
             String foodName,
-            FoodItemConfig.ItemFactory<I> itemFactory
+            FoodItemDefinition.ItemFactory<I> itemFactory
     ) {
-        return new FoodItemConfig<>(this, foodName, itemFactory);
+        return new FoodItemDefinition<>(this, foodName, itemFactory);
     }
 
     /**
@@ -225,13 +225,13 @@ public class ItemRegistry {
      * @param drinkName   The name identifier for the drink item
      * @param itemFactory The factory used to create the drink item instance
      * @param <I>         The type of drink item to create
-     * @return A new DrinkItemConfig instance for method chaining
+     * @return A new DrinkItemDefinition instance for method chaining
      */
-    public <I extends Item> DrinkItemConfig<I> defineDrinkItem(
+    public <I extends Item> DrinkItemDefinition<I> defineDrinkItem(
             String drinkName,
-            FoodItemConfig.ItemFactory<I> itemFactory
+            FoodItemDefinition.ItemFactory<I> itemFactory
     ) {
-        return new DrinkItemConfig<>(this, drinkName, itemFactory);
+        return new DrinkItemDefinition<>(this, drinkName, itemFactory);
     }
 
     /**
@@ -242,13 +242,13 @@ public class ItemRegistry {
      * @param eggName     The name identifier for the spawn egg
      * @param itemFactory The factory used to create the spawn egg item instance
      * @param <I>         The type of spawn egg item to create
-     * @return A new SpawnEggConfig instance for method chaining
+     * @return A new SpawnEggDefinition instance for method chaining
      */
-    public <I extends SpawnEggItem> SpawnEggConfig<I> defineSpawnEgg(
+    public <I extends SpawnEggItem> SpawnEggDefinition<I> defineSpawnEgg(
             String eggName,
-            SpawnEggConfig.ItemFactory<I> itemFactory
+            SpawnEggDefinition.ItemFactory<I> itemFactory
     ) {
-        return new SpawnEggConfig<>(this, eggName, itemFactory);
+        return new SpawnEggDefinition<>(this, eggName, itemFactory);
     }
 
     /**
@@ -259,13 +259,13 @@ public class ItemRegistry {
      * @param templateName The name identifier for the smithing template
      * @param itemFactory  The factory used to create the smithing template item instance
      * @param <I>          The type of smithing template item to create
-     * @return A new SmithingTemplateConfig instance for method chaining
+     * @return A new SmithingTemplateDefinition instance for method chaining
      */
-    public <I extends SmithingTemplateItem> SmithingTemplateConfig<I> defineSmithingTemplate(
+    public <I extends SmithingTemplateItem> SmithingTemplateDefinition<I> defineSmithingTemplate(
             String templateName,
-            SmithingTemplateConfig.ItemFactory<I> itemFactory
+            SmithingTemplateDefinition.ItemFactory<I> itemFactory
     ) {
-        return new SmithingTemplateConfig<>(this, templateName, itemFactory);
+        return new SmithingTemplateDefinition<>(this, templateName, itemFactory);
     }
 
     /**
@@ -326,13 +326,13 @@ public class ItemRegistry {
      * @param tags Optional tags to apply to the spawn egg
      * @param <T>  The type of spawn egg item
      * @return The registered spawn egg item
-     * @deprecated Use {@link #defineSpawnEgg(String, SpawnEggConfig.ItemFactory)} with
-     * {@link SpawnEggConfig#buildAndRegister()} instead for better configuration options
+     * @deprecated Use {@link #defineSpawnEgg(String, SpawnEggDefinition.ItemFactory)} with
+     * {@link SpawnEggDefinition#buildAndRegister()} instead for better configuration options
      */
     @Deprecated(forRemoval = true)
     @SafeVarargs
     public final <T extends SpawnEggItem> T registerEgg(String path, T item, TagKey<Item>... tags) {
-        DispenserBlock.registerBehavior(item, SpawnEggConfig.DISPENSE_SPAWN_EGG_BEHAVIOUR);
+        DispenserBlock.registerBehavior(item, SpawnEggDefinition.DISPENSE_SPAWN_EGG_BEHAVIOUR);
         return register(path, item, tags);
     }
 
@@ -343,8 +343,8 @@ public class ItemRegistry {
      * @param baseSlotEmptyIcons       Icons for base slot when empty
      * @param additionalSlotEmptyIcons Icons for additional slot when empty
      * @return The registered smithing template item
-     * @deprecated Use {@link #defineSmithingTemplate(String, SmithingTemplateConfig.ItemFactory)} with
-     * {@link SmithingTemplateConfig#buildAndRegister()} instead for better configuration options
+     * @deprecated Use {@link #defineSmithingTemplate(String, SmithingTemplateDefinition.ItemFactory)} with
+     * {@link SmithingTemplateDefinition#buildAndRegister()} instead for better configuration options
      */
     @Deprecated(forRemoval = true)
     public SmithingTemplateItem registerSmithingTemplateItem(
@@ -368,8 +368,8 @@ public class ItemRegistry {
      * @param item The smithing template item to register
      * @param <T>  The type of smithing template item
      * @return The registered smithing template item
-     * @deprecated Use {@link #defineSmithingTemplate(String, SmithingTemplateConfig.ItemFactory)} with
-     * {@link SmithingTemplateConfig#buildAndRegister()} instead for better configuration options
+     * @deprecated Use {@link #defineSmithingTemplate(String, SmithingTemplateDefinition.ItemFactory)} with
+     * {@link SmithingTemplateDefinition#buildAndRegister()} instead for better configuration options
      */
     @Deprecated(forRemoval = true)
     public <T extends SmithingTemplateItem> T registerSmithingTemplateItem(

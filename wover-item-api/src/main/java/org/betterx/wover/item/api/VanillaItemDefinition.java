@@ -4,10 +4,10 @@ import net.minecraft.world.item.Item;
 
 /**
  * Configuration class specifically for creating vanilla Minecraft {@link Item} instances.
- * This class is a specialized version of {@link ItemConfig} that creates standard Minecraft
+ * This class is a specialized version of {@link ItemDefinition} that creates standard Minecraft
  * items without any custom behavior or additional functionality.
  *
- * <p>This class differs from {@link DefaultItemConfig} in that it:</p>
+ * <p>This class differs from {@link DefaultItemDefinition} in that it:</p>
  * <ul>
  *   <li>Uses a concrete {@link Item} type rather than a generic type parameter</li>
  *   <li>Provides a built-in factory for creating vanilla items</li>
@@ -21,13 +21,13 @@ import net.minecraft.world.item.Item;
  * @author Quiqueck
  * @since 21.6.0
  */
-public final class VanillaItemConfig extends ItemConfig<Item, VanillaItemConfig> {
+public final class VanillaItemDefinition extends ItemDefinition<Item, VanillaItemDefinition> {
     /**
      * Default factory for creating vanilla Minecraft items.
      * This factory simply creates a new {@link Item} instance with the configured properties,
      * resulting in an item that behaves identically to vanilla Minecraft items.
      */
-    public static final ItemFactory<Item, VanillaItemConfig> DEFAULT_FACTORY = config -> new Item(
+    public static final ItemFactory<Item, VanillaItemDefinition> DEFAULT_FACTORY = config -> new Item(
             config.properties);
 
     /**
@@ -38,7 +38,7 @@ public final class VanillaItemConfig extends ItemConfig<Item, VanillaItemConfig>
      * @param registry The item registry to use for registration
      * @param itemName The name identifier for the vanilla item
      */
-    VanillaItemConfig(ItemRegistry registry, String itemName) {
+    VanillaItemDefinition(ItemRegistry registry, String itemName) {
         super(registry, itemName, DEFAULT_FACTORY);
     }
 
@@ -57,7 +57,7 @@ public final class VanillaItemConfig extends ItemConfig<Item, VanillaItemConfig>
      * Called before the vanilla item is registered to allow for any final modifications.
      * This default implementation returns the item unchanged to maintain vanilla behavior.
      * The simplicity is intentional to match vanilla Minecraft item registration.
-     * 
+     *
      * @param item The built vanilla item instance
      * @return The vanilla item instance (unchanged) that should be registered
      */

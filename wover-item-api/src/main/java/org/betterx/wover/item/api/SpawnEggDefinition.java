@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Specialized configuration class for creating spawn egg items.
- * This class extends {@link ItemConfig} to provide specific functionality for spawn eggs,
+ * This class extends {@link ItemDefinition} to provide specific functionality for spawn eggs,
  * including automatic dispenser behavior registration and entity type configuration.
  *
  * <p>Spawn eggs in Minecraft have specialized behavior including:</p>
@@ -36,22 +36,22 @@ import org.jetbrains.annotations.NotNull;
  * @author WorldWeaver
  * @since 1.21.6
  */
-public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnEggConfig<I>> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpawnEggConfig.class);
+public class SpawnEggDefinition<I extends SpawnEggItem> extends ItemDefinition<I, SpawnEggDefinition<I>> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpawnEggDefinition.class);
 
     /**
      * Factory interface for creating spawn egg items from configuration objects.
-     * Extends the base ItemFactory to work specifically with SpawnEggConfig.
+     * Extends the base ItemFactory to work specifically with SpawnEggDefinition.
      *
      * @param <I> The type of spawn egg item to create
      */
-    public interface ItemFactory<I extends SpawnEggItem> extends ItemConfig.ItemFactory<I, SpawnEggConfig<I>> {
+    public interface ItemFactory<I extends SpawnEggItem> extends ItemDefinition.ItemFactory<I, SpawnEggDefinition<I>> {
     }
 
     /**
      * Default dispenser behavior for spawn eggs that enables automatic entity spawning.
      *
-     * <p>This behavior is automatically registered for spawn eggs created through SpawnEggConfig
+     * <p>This behavior is automatically registered for spawn eggs created through SpawnEggDefinition
      * and handles the following when a spawn egg is dispensed:</p>
      * <ul>
      *   <li>Determines the spawn direction based on the dispenser's facing direction</li>
@@ -122,10 +122,10 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * @param eggName     The name identifier for the spawn egg item
      * @param itemFactory The factory used to create the spawn egg item instance
      */
-    protected SpawnEggConfig(
+    protected SpawnEggDefinition(
             ItemRegistry registry,
             String eggName,
-            ItemConfig.ItemFactory<I, SpawnEggConfig<I>> itemFactory
+            ItemDefinition.ItemFactory<I, SpawnEggDefinition<I>> itemFactory
     ) {
         super(registry, eggName, itemFactory);
     }
@@ -164,7 +164,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * @param entityType The entity type to spawn when this egg is used
      * @return This configuration instance for method chaining
      */
-    public SpawnEggConfig<I> entityType(EntityType<? extends Mob> entityType) {
+    public SpawnEggDefinition<I> entityType(EntityType<? extends Mob> entityType) {
         this.entityType = entityType;
         return this;
     }
@@ -176,7 +176,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * @param color The primary color as an RGB integer (0xRRGGBB format)
      * @return This configuration instance for method chaining
      */
-    public SpawnEggConfig<I> primaryColor(int color) {
+    public SpawnEggDefinition<I> primaryColor(int color) {
         this.primaryColor = color;
         return this;
     }
@@ -188,7 +188,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * @param color The secondary color as an RGB integer (0xRRGGBB format)
      * @return This configuration instance for method chaining
      */
-    public SpawnEggConfig<I> secondaryColor(int color) {
+    public SpawnEggDefinition<I> secondaryColor(int color) {
         this.secondaryColor = color;
         return this;
     }
@@ -201,7 +201,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * @param secondaryColor The secondary color as an RGB integer (0xRRGGBB format)
      * @return This configuration instance for method chaining
      */
-    public SpawnEggConfig<I> colors(int primaryColor, int secondaryColor) {
+    public SpawnEggDefinition<I> colors(int primaryColor, int secondaryColor) {
         this.primaryColor = primaryColor;
         this.secondaryColor = secondaryColor;
         return this;
@@ -241,7 +241,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      *
      * <p>Usage example:</p>
      * <pre class="java">
-     * SpawnEggItem egg = registry.defineSpawnEgg("my_mob", SpawnEggConfig::createSpawnEgg)
+     * SpawnEggItem egg = registry.defineSpawnEgg("my_mob", SpawnEggDefinition::createSpawnEgg)
      *     .entityType(MyEntityTypes.MY_MOB)
      *     .colors(0xFF0000, 0x00FF00)
      *     .buildAndRegister();
@@ -250,7 +250,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * @param config The spawn egg configuration containing entity type, colors, and properties
      * @return A new SpawnEggItem instance configured with the provided settings
      */
-    public static SpawnEggItem createSpawnEgg(SpawnEggConfig<SpawnEggItem> config) {
+    public static SpawnEggItem createSpawnEgg(SpawnEggDefinition<SpawnEggItem> config) {
         return new SpawnEggItem(
                 config.entityType,
                 config.getProperties()

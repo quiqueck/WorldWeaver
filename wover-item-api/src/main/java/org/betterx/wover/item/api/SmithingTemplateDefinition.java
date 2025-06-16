@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Specialized configuration class for creating smithing template items.
- * This class extends {@link ItemConfig} to provide specific functionality for smithing templates,
+ * This class extends {@link ItemDefinition} to provide specific functionality for smithing templates,
  * including configuration of base slot icons, additional slot icons, and template descriptions.
  *
  * <p>Smithing templates in Minecraft are used to customize armor and tools at smithing tables.
@@ -28,14 +28,14 @@ import java.util.List;
  * @author Quiqueck
  * @since 21.6.0
  */
-public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends ItemConfig<I, SmithingTemplateConfig<I>> {
+public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends ItemDefinition<I, SmithingTemplateDefinition<I>> {
     /**
      * Factory interface for creating smithing template items from configuration objects.
-     * Extends the base ItemFactory to work specifically with SmithingTemplateConfig.
+     * Extends the base ItemFactory to work specifically with SmithingTemplateDefinition.
      *
      * @param <I> The type of smithing template item to create
      */
-    public interface ItemFactory<I extends SmithingTemplateItem> extends ItemConfig.ItemFactory<I, SmithingTemplateConfig<I>> {
+    public interface ItemFactory<I extends SmithingTemplateItem> extends ItemDefinition.ItemFactory<I, SmithingTemplateDefinition<I>> {
     }
 
     /**
@@ -60,10 +60,10 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * @param templateName The name identifier for the smithing template item
      * @param itemFactory  The factory used to create the smithing template item instance
      */
-    protected SmithingTemplateConfig(
+    protected SmithingTemplateDefinition(
             ItemRegistry registry,
             String templateName,
-            ItemConfig.ItemFactory<I, SmithingTemplateConfig<I>> itemFactory
+            ItemDefinition.ItemFactory<I, SmithingTemplateDefinition<I>> itemFactory
     ) {
         super(registry, templateName, itemFactory);
         this.templatePath = templateName;
@@ -107,7 +107,7 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * @param icons List of resource locations pointing to the base slot empty icon textures
      * @return This configuration instance for method chaining
      */
-    public SmithingTemplateConfig<I> baseSlotEmptyIcons(List<ResourceLocation> icons) {
+    public SmithingTemplateDefinition<I> baseSlotEmptyIcons(List<ResourceLocation> icons) {
         this.baseSlotEmptyIcons = icons;
         return this;
     }
@@ -119,7 +119,7 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * @param icons List of resource locations pointing to the additional slot empty icon textures
      * @return This configuration instance for method chaining
      */
-    public SmithingTemplateConfig<I> additionalSlotEmptyIcons(List<ResourceLocation> icons) {
+    public SmithingTemplateDefinition<I> additionalSlotEmptyIcons(List<ResourceLocation> icons) {
         this.additionalSlotEmptyIcons = icons;
         return this;
     }
@@ -132,7 +132,7 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * @param additionalIcons List of resource locations for additional slot empty icons
      * @return This configuration instance for method chaining
      */
-    public SmithingTemplateConfig<I> slotIcons(
+    public SmithingTemplateDefinition<I> slotIcons(
             List<ResourceLocation> baseIcons,
             List<ResourceLocation> additionalIcons
     ) {
@@ -148,7 +148,7 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * @param path The template path for description generation
      * @return This configuration instance for method chaining
      */
-    public SmithingTemplateConfig<I> templatePath(String path) {
+    public SmithingTemplateDefinition<I> templatePath(String path) {
         this.templatePath = path;
         return this;
     }
@@ -187,7 +187,7 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      *
      * <p>Usage example:</p>
      * <pre class="java">
-     * SmithingTemplateItem template = registry.defineSmithingTemplate("my_upgrade", SmithingTemplateConfig::createSmithingTemplate)
+     * SmithingTemplateItem template = registry.defineSmithingTemplate("my_upgrade", SmithingTemplateDefinition::createSmithingTemplate)
      *     .baseSlotEmptyIcons(List.of(baseIcon1, baseIcon2))
      *     .additionalSlotEmptyIcons(List.of(addIcon1, addIcon2))
      *     .buildAndRegister();
@@ -196,7 +196,7 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * @param config The smithing template configuration containing icons and properties
      * @return A new SmithingTemplateItem instance configured with the provided settings
      */
-    public static SmithingTemplateItem createSmithingTemplate(SmithingTemplateConfig<SmithingTemplateItem> config) {
+    public static SmithingTemplateItem createSmithingTemplate(SmithingTemplateDefinition<SmithingTemplateItem> config) {
         return SmithingTemplates
                 .create(config.registry.C, config.templatePath)
                 .setBaseSlotEmptyIcons(config.baseSlotEmptyIcons)

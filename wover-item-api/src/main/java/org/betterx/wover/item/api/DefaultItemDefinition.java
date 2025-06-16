@@ -3,26 +3,26 @@ package org.betterx.wover.item.api;
 import net.minecraft.world.item.Item;
 
 /**
- * Default implementation of {@link ItemConfig} for creating standard items.
- * This class provides a concrete implementation of the abstract ItemConfig base class
+ * Default implementation of {@link ItemDefinition} for creating standard items.
+ * This class provides a concrete implementation of the abstract ItemDefinition base class
  * without any specialized behavior, making it suitable for basic item creation.
  *
  * <p>This is the most commonly used configuration class for simple items that don't
  * require specialized functionality like armor or tools. It inherits all the standard
- * item configuration methods from the base ItemConfig class.</p>
+ * item configuration methods from the base ItemDefinition class.</p>
  *
  * @param <I> The type of item being created, must extend {@link Item}
  * @author Quiqueck
  * @since 21.6.0
  */
-public final class DefaultItemConfig<I extends Item> extends ItemConfig<I, DefaultItemConfig<I>> {
+public final class DefaultItemDefinition<I extends Item> extends ItemDefinition<I, DefaultItemDefinition<I>> {
     /**
      * Factory interface for creating default items from configuration objects.
-     * Extends the base ItemFactory to work specifically with DefaultItemConfig.
+     * Extends the base ItemFactory to work specifically with DefaultItemDefinition.
      *
      * @param <I> The type of item to create
      */
-    public interface ItemFactory<I extends Item> extends ItemConfig.ItemFactory<I, DefaultItemConfig<I>> {
+    public interface ItemFactory<I extends Item> extends ItemDefinition.ItemFactory<I, DefaultItemDefinition<I>> {
     }
 
     /**
@@ -33,10 +33,10 @@ public final class DefaultItemConfig<I extends Item> extends ItemConfig<I, Defau
      * @param itemName    The name identifier for the item
      * @param itemFactory The factory used to create the item instance
      */
-    DefaultItemConfig(
+    DefaultItemDefinition(
             ItemRegistry registry,
             String itemName,
-            ItemConfig.ItemFactory<I, DefaultItemConfig<I>> itemFactory
+            ItemDefinition.ItemFactory<I, DefaultItemDefinition<I>> itemFactory
     ) {
         super(registry, itemName, itemFactory);
     }
@@ -57,7 +57,7 @@ public final class DefaultItemConfig<I extends Item> extends ItemConfig<I, Defau
      * This default implementation returns the item unchanged since standard items
      * typically don't require post-creation modifications. Subclasses can override
      * this method if custom setup is needed before registration.
-     * 
+     *
      * @param item The built item instance
      * @return The item instance (potentially modified) that should be registered
      */

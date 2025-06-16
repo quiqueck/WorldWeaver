@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.Block;
 
 /**
  * Specialized configuration class for creating tool items with tool-specific properties.
- * This class extends {@link ItemConfig} to provide additional methods for configuring
+ * This class extends {@link ItemDefinition} to provide additional methods for configuring
  * tool materials, attack damage, attack speed, and tool-specific behaviors.
  *
  * <p>Tool items in Minecraft have specialized functionality including:</p>
@@ -26,14 +26,14 @@ import net.minecraft.world.level.block.Block;
  * @author Quiqueck
  * @since 21.6.0
  */
-public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig<I>> {
+public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolItemDefinition<I>> {
     /**
      * Factory interface for creating tool items from configuration objects.
-     * Extends the base ItemFactory to work specifically with ToolItemConfig.
+     * Extends the base ItemFactory to work specifically with ToolItemDefinition.
      *
      * @param <I> The type of tool item to create
      */
-    public interface ItemFactory<I extends Item> extends ItemConfig.ItemFactory<I, ToolItemConfig<I>> {
+    public interface ItemFactory<I extends Item> extends ItemDefinition.ItemFactory<I, ToolItemDefinition<I>> {
     }
 
     /**
@@ -43,10 +43,10 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param toolName    The name identifier for the tool item
      * @param itemFactory The factory used to create the tool item instance
      */
-    protected ToolItemConfig(
+    protected ToolItemDefinition(
             ItemRegistry registry,
             String toolName,
-            ItemConfig.ItemFactory<I, ToolItemConfig<I>> itemFactory
+            ItemDefinition.ItemFactory<I, ToolItemDefinition<I>> itemFactory
     ) {
         super(registry, toolName, itemFactory);
     }
@@ -64,7 +64,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * Called before the tool item is registered to allow for any final modifications.
      * This default implementation returns the item unchanged, but subclasses can override
      * this method to perform custom post-creation setup before registration.
-     * 
+     *
      * @param item The built tool item instance
      * @return The tool item instance (potentially modified) that should be registered
      */
@@ -85,7 +85,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param blockingDisableTime Time in seconds that blocking is disabled after attacking
      * @return This configuration instance for method chaining
      */
-    public ToolItemConfig<I> tool(
+    public ToolItemDefinition<I> tool(
             ToolMaterial material,
             TagKey<Block> effectiveBlocks,
             float baseDamage,
@@ -105,7 +105,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
-    public ToolItemConfig<I> pickaxe(ToolMaterial material, float baseDamage, float attackSpeed) {
+    public ToolItemDefinition<I> pickaxe(ToolMaterial material, float baseDamage, float attackSpeed) {
         this.properties.pickaxe(material, baseDamage, attackSpeed);
         return this;
     }
@@ -119,7 +119,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
-    public ToolItemConfig<I> axe(ToolMaterial material, float baseDamage, float attackSpeed) {
+    public ToolItemDefinition<I> axe(ToolMaterial material, float baseDamage, float attackSpeed) {
         this.properties.axe(material, baseDamage, attackSpeed);
         return this;
     }
@@ -133,7 +133,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
-    public ToolItemConfig<I> hoe(ToolMaterial material, float baseDamage, float attackSpeed) {
+    public ToolItemDefinition<I> hoe(ToolMaterial material, float baseDamage, float attackSpeed) {
         this.properties.hoe(material, baseDamage, attackSpeed);
         return this;
     }
@@ -147,7 +147,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
-    public ToolItemConfig<I> shovel(ToolMaterial material, float baseDamage, float attackSpeed) {
+    public ToolItemDefinition<I> shovel(ToolMaterial material, float baseDamage, float attackSpeed) {
         this.properties.shovel(material, baseDamage, attackSpeed);
         return this;
     }
@@ -161,7 +161,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
-    public ToolItemConfig<I> sword(ToolMaterial material, float baseDamage, float attackSpeed) {
+    public ToolItemDefinition<I> sword(ToolMaterial material, float baseDamage, float attackSpeed) {
         this.properties.sword(material, baseDamage, attackSpeed);
         return this;
     }

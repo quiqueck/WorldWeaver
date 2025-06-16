@@ -8,21 +8,21 @@ import net.minecraft.world.item.equipment.trim.TrimMaterial;
 
 /**
  * Specialized configuration class for creating armor items with armor-specific properties.
- * This class extends {@link ItemConfig} to provide additional methods for configuring
+ * This class extends {@link ItemDefinition} to provide additional methods for configuring
  * armor materials, armor types, and trim materials.
  *
  * @param <I> The type of armor item being created, must extend {@link Item}
  * @author Quiqueck
  * @since 21.6.0
  */
-public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConfig<I>> {
+public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, ArmorItemDefinition<I>> {
     /**
      * Factory interface for creating armor items from configuration objects.
-     * Extends the base ItemFactory to work specifically with ArmorItemConfig.
+     * Extends the base ItemFactory to work specifically with ArmorItemDefinition.
      *
      * @param <I> The type of armor item to create
      */
-    public interface ItemFactory<I extends Item> extends ItemConfig.ItemFactory<I, ArmorItemConfig<I>> {
+    public interface ItemFactory<I extends Item> extends ItemDefinition.ItemFactory<I, ArmorItemDefinition<I>> {
     }
 
     /**
@@ -32,10 +32,10 @@ public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConf
      * @param armorName   The name identifier for the armor item
      * @param itemFactory The factory used to create the armor item instance
      */
-    protected ArmorItemConfig(
+    protected ArmorItemDefinition(
             ItemRegistry registry,
             String armorName,
-            ItemConfig.ItemFactory<I, ArmorItemConfig<I>> itemFactory
+            ItemDefinition.ItemFactory<I, ArmorItemDefinition<I>> itemFactory
     ) {
         super(registry, armorName, itemFactory);
     }
@@ -53,7 +53,7 @@ public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConf
      * Called before the armor item is registered to allow for any final modifications.
      * This default implementation returns the item unchanged, but subclasses can override
      * this method to perform custom post-creation setup before registration.
-     * 
+     *
      * @param item The built armor item instance
      * @return The armor item instance (potentially modified) that should be registered
      */
@@ -70,7 +70,7 @@ public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConf
      * @param type     The armor type (HELMET, CHESTPLATE, LEGGINGS, BOOTS) defining which slot this armor occupies
      * @return This configuration instance for method chaining
      */
-    public ArmorItemConfig<I> humanoidArmor(ArmorMaterial material, ArmorType type) {
+    public ArmorItemDefinition<I> humanoidArmor(ArmorMaterial material, ArmorType type) {
         this.properties.humanoidArmor(material, type);
         return this;
     }
@@ -82,7 +82,7 @@ public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConf
      * @param material The armor material defining protection values and durability for wolf armor
      * @return This configuration instance for method chaining
      */
-    public ArmorItemConfig<I> wolfArmor(ArmorMaterial material) {
+    public ArmorItemDefinition<I> wolfArmor(ArmorMaterial material) {
         this.properties.wolfArmor(material);
         return this;
     }
@@ -94,7 +94,7 @@ public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConf
      * @param material The armor material defining protection values and durability for horse armor
      * @return This configuration instance for method chaining
      */
-    public ArmorItemConfig<I> horseArmor(ArmorMaterial material) {
+    public ArmorItemDefinition<I> horseArmor(ArmorMaterial material) {
         this.properties.horseArmor(material);
         return this;
     }
@@ -106,7 +106,7 @@ public class ArmorItemConfig<I extends Item> extends ItemConfig<I, ArmorItemConf
      * @param trimMaterialKey The resource key for the trim material
      * @return This configuration instance for method chaining
      */
-    public ArmorItemConfig<I> trimMaterial(ResourceKey<TrimMaterial> trimMaterialKey) {
+    public ArmorItemDefinition<I> trimMaterial(ResourceKey<TrimMaterial> trimMaterialKey) {
         this.properties.trimMaterial(trimMaterialKey);
         return this;
     }

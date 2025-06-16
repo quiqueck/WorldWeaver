@@ -13,7 +13,7 @@ import net.minecraft.world.item.consume_effects.ConsumeEffect;
 
 /**
  * Specialized configuration class for creating food items with food-specific properties.
- * This class extends {@link ItemConfig} to provide additional methods for configuring
+ * This class extends {@link ItemDefinition} to provide additional methods for configuring
  * nutrition values, saturation, consumption effects, animations, and sounds.
  *
  * <p>Food items in Minecraft have complex behavior including:</p>
@@ -28,14 +28,14 @@ import net.minecraft.world.item.consume_effects.ConsumeEffect;
  * @author Quiqueck
  * @since 21.6.0
  */
-public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig<I>> {
+public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodItemDefinition<I>> {
     /**
      * Factory interface for creating food items from configuration objects.
-     * Extends the base ItemFactory to work specifically with FoodItemConfig.
+     * Extends the base ItemFactory to work specifically with FoodItemDefinition.
      *
      * @param <I> The type of food item to create
      */
-    public interface ItemFactory<I extends Item> extends ItemConfig.ItemFactory<I, FoodItemConfig<I>> {
+    public interface ItemFactory<I extends Item> extends ItemDefinition.ItemFactory<I, FoodItemDefinition<I>> {
     }
 
     /**
@@ -55,10 +55,10 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param foodName    The name identifier for the food item
      * @param itemFactory The factory used to create the food item instance
      */
-    protected FoodItemConfig(
+    protected FoodItemDefinition(
             ItemRegistry registry,
             String foodName,
-            ItemConfig.ItemFactory<I, FoodItemConfig<I>> itemFactory
+            ItemDefinition.ItemFactory<I, FoodItemDefinition<I>> itemFactory
     ) {
         this(registry, foodName, itemFactory, Consumables.defaultFood());
     }
@@ -71,10 +71,10 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param itemFactory    The factory used to create the food item instance
      * @param baseConsumable The base consumable configuration to build upon
      */
-    protected FoodItemConfig(
+    protected FoodItemDefinition(
             ItemRegistry registry,
             String foodName,
-            ItemConfig.ItemFactory<I, FoodItemConfig<I>> itemFactory,
+            ItemDefinition.ItemFactory<I, FoodItemDefinition<I>> itemFactory,
             Consumable.Builder baseConsumable
     ) {
         super(registry, foodName, itemFactory);
@@ -96,7 +96,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * Called before the food item is registered to allow for any final modifications.
      * This default implementation returns the item unchanged, but subclasses can override
      * this method to perform custom post-creation setup before registration.
-     * 
+     *
      * @param item The built food item instance
      * @return The food item instance (potentially modified) that should be registered
      */
@@ -112,7 +112,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param statusEffects The mob effect instances to apply when consumed
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> setEffects(MobEffectInstance... statusEffects) {
+    public FoodItemDefinition<I> setEffects(MobEffectInstance... statusEffects) {
         for (MobEffectInstance effect : statusEffects) {
             this.consumable.onConsume(new ApplyStatusEffectsConsumeEffect(
                     effect,
@@ -129,7 +129,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param consumeDuration The consumption duration in seconds
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> consumeSeconds(float consumeDuration) {
+    public FoodItemDefinition<I> consumeSeconds(float consumeDuration) {
         this.consumable.consumeSeconds(consumeDuration);
         return this;
     }
@@ -140,7 +140,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param useAnimation The animation to play during consumption (EAT, DRINK, etc.)
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> animation(ItemUseAnimation useAnimation) {
+    public FoodItemDefinition<I> animation(ItemUseAnimation useAnimation) {
         this.consumable.animation(useAnimation);
         return this;
     }
@@ -151,7 +151,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param soundEvent The sound event to play during consumption
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> sound(Holder<SoundEvent> soundEvent) {
+    public FoodItemDefinition<I> sound(Holder<SoundEvent> soundEvent) {
         this.consumable.sound(soundEvent);
         return this;
     }
@@ -162,7 +162,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param soundEvent The sound event to play after consumption completes
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> soundAfterConsume(Holder<SoundEvent> soundEvent) {
+    public FoodItemDefinition<I> soundAfterConsume(Holder<SoundEvent> soundEvent) {
         this.consumable.soundAfterConsume(soundEvent);
         return this;
     }
@@ -173,7 +173,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param showParticles Whether to show consumption particles
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> hasConsumeParticles(boolean showParticles) {
+    public FoodItemDefinition<I> hasConsumeParticles(boolean showParticles) {
         this.consumable.hasConsumeParticles(showParticles);
         return this;
     }
@@ -184,7 +184,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param effect The consume effect to add
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> onConsume(ConsumeEffect effect) {
+    public FoodItemDefinition<I> onConsume(ConsumeEffect effect) {
         this.consumable.onConsume(effect);
         return this;
     }
@@ -197,7 +197,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param hungerPoints The number of hunger points to restore (typically 1-20)
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> nutrition(int hungerPoints) {
+    public FoodItemDefinition<I> nutrition(int hungerPoints) {
         this.foodProperties.nutrition(hungerPoints);
         return this;
     }
@@ -210,7 +210,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param saturationValue The saturation modifier (typically 0.1 to 2.0)
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> saturationModifier(float saturationValue) {
+    public FoodItemDefinition<I> saturationModifier(float saturationValue) {
         this.foodProperties.saturationModifier(saturationValue);
         return this;
     }
@@ -221,7 +221,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      *
      * @return This configuration instance for method chaining
      */
-    public FoodItemConfig<I> alwaysEdible() {
+    public FoodItemDefinition<I> alwaysEdible() {
         this.foodProperties.alwaysEdible();
         return this;
     }
@@ -235,7 +235,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param foodProps The built food properties
      * @return This configuration instance for method chaining
      */
-    protected FoodItemConfig<I> food(FoodProperties foodProps) {
+    protected FoodItemDefinition<I> food(FoodProperties foodProps) {
         this.properties.food(foodProps);
         return this;
     }
@@ -248,7 +248,7 @@ public class FoodItemConfig<I extends Item> extends ItemConfig<I, FoodItemConfig
      * @param consumableBehavior The built consumable behavior
      * @return This configuration instance for method chaining
      */
-    protected FoodItemConfig<I> food(FoodProperties foodProps, Consumable consumableBehavior) {
+    protected FoodItemDefinition<I> food(FoodProperties foodProps, Consumable consumableBehavior) {
         this.properties.food(foodProps, consumableBehavior);
         return this;
     }
