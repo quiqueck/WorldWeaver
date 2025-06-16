@@ -186,12 +186,12 @@ public class SmithingTemplateConfig<I extends SmithingTemplateItem> extends Item
      * need a custom smithing template subclass.
      *
      * <p>Usage example:</p>
-     * <pre>{@code
+     * <pre class="java">
      * SmithingTemplateItem template = registry.defineSmithingTemplate("my_upgrade", SmithingTemplateConfig::createSmithingTemplate)
      *     .baseSlotEmptyIcons(List.of(baseIcon1, baseIcon2))
      *     .additionalSlotEmptyIcons(List.of(addIcon1, addIcon2))
      *     .buildAndRegister();
-     * }</pre>
+     * </pre>
      *
      * @param config The smithing template configuration containing icons and properties
      * @return A new SmithingTemplateItem instance configured with the provided settings

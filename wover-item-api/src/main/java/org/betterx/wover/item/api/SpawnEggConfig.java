@@ -11,9 +11,10 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Specialized configuration class for creating spawn egg items.
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnEggConfig<I>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpawnEggConfig.class);
-    
+
     /**
      * Factory interface for creating spawn egg items from configuration objects.
      * Extends the base ItemFactory to work specifically with SpawnEggConfig.
@@ -49,7 +50,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
 
     /**
      * Default dispenser behavior for spawn eggs that enables automatic entity spawning.
-     * 
+     *
      * <p>This behavior is automatically registered for spawn eggs created through SpawnEggConfig
      * and handles the following when a spawn egg is dispensed:</p>
      * <ul>
@@ -61,11 +62,11 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      *   <li>Triggers the ENTITY_PLACE game event</li>
      *   <li>Provides error handling and logging for failed spawning attempts</li>
      * </ul>
-     * 
+     *
      * <p>The spawned entity will appear one block away from the dispenser in the direction
      * the dispenser is facing. If spawning fails for any reason, the error is logged and
      * an empty ItemStack is returned to prevent item duplication.</p>
-     * 
+     *
      * @see DispenserBlock#registerBehavior(net.minecraft.world.item.Item, net.minecraft.core.dispenser.DispenseItemBehavior)
      * @see EntitySpawnReason#DISPENSER
      */
@@ -147,7 +148,7 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * Called before the spawn egg is registered to set up dispenser behavior and perform modifications.
      * This implementation automatically registers the spawn egg with the dispenser system so that
      * dispensers can spawn entities when the egg is dispensed.
-     * 
+     *
      * @param item The built spawn egg item instance
      * @return The spawn egg item instance with dispenser behavior registered
      */
@@ -239,12 +240,12 @@ public class SpawnEggConfig<I extends SpawnEggItem> extends ItemConfig<I, SpawnE
      * need a custom spawn egg subclass.
      *
      * <p>Usage example:</p>
-     * <pre>{@code
+     * <pre class="java">
      * SpawnEggItem egg = registry.defineSpawnEgg("my_mob", SpawnEggConfig::createSpawnEgg)
      *     .entityType(MyEntityTypes.MY_MOB)
      *     .colors(0xFF0000, 0x00FF00)
      *     .buildAndRegister();
-     * }</pre>
+     * </pre>
      *
      * @param config The spawn egg configuration containing entity type, colors, and properties
      * @return A new SpawnEggItem instance configured with the provided settings

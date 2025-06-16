@@ -15,33 +15,117 @@ import org.spongepowered.include.com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+/**
+ * Utility class for creating custom smithing templates with predefined slot configurations.
+ *
+ * <p>This class provides a comprehensive system for creating smithing table templates with
+ * common slot layouts, automatic localization support, and consistent formatting. It includes
+ * predefined empty slot icons for various item types and a fluent builder API for easy template creation.
+ *
+ * <h2>Key Features</h2>
+ * <ul>
+ *   <li>Predefined empty slot icons for tools, armor, and materials</li>
+ *   <li>Builder pattern for easy template configuration</li>
+ *   <li>Automatic localization key generation</li>
+ *   <li>Consistent formatting with predefined chat colors</li>
+ *   <li>Slot icon combination utilities</li>
+ * </ul>
+ *
+ * <h2>Predefined Slot Collections</h2>
+ * <ul>
+ *   <li>{@link #TOOLS} - All tool slots (sword, pickaxe, axe, hoe, shovel)</li>
+ *   <li>{@link #ARMOR} - All armor slots (helmet, chestplate, leggings, boots)</li>
+ *   <li>{@link #ARMOR_AND_TOOLS} - Combined collection of equipment slots</li>
+ * </ul>
+ *
+ * <h2>Usage Example</h2>
+ * <pre class="java">
+ * SmithingTemplateItem template = SmithingTemplates.create(modCore, "upgrade_template")
+ *     .setBaseSlotEmptyIcons(SmithingTemplates.ARMOR_AND_TOOLS)
+ *     .setAdditionalSlotEmptyIcons(List.of(SmithingTemplates.EMPTY_SLOT_INGOT))
+ *     .build();
+ * </pre>
+ *
+ * @see SmithingTemplateItem
+ * @see ModCore
+ */
 public class SmithingTemplates {
+    /**
+     * Chat formatting used for template titles
+     */
     public static final ChatFormatting TITLE_FORMAT = ChatFormatting.GRAY;
+    /**
+     * Chat formatting used for template descriptions
+     */
     public static final ChatFormatting DESCRIPTION_FORMAT = ChatFormatting.BLUE;
 
+    // Armor slot empty icons
+    /**
+     * Empty slot icon for helmet armor pieces
+     */
     public static final ResourceLocation EMPTY_SLOT_HELMET = ResourceLocation.withDefaultNamespace(
             "item/empty_armor_slot_helmet");
+    /**
+     * Empty slot icon for chestplate armor pieces
+     */
     public static final ResourceLocation EMPTY_SLOT_CHESTPLATE = ResourceLocation.withDefaultNamespace(
             "item/empty_armor_slot_chestplate");
+    /**
+     * Empty slot icon for leggings armor pieces
+     */
     public static final ResourceLocation EMPTY_SLOT_LEGGINGS = ResourceLocation.withDefaultNamespace(
             "item/empty_armor_slot_leggings");
+    /**
+     * Empty slot icon for boots armor pieces
+     */
     public static final ResourceLocation EMPTY_SLOT_BOOTS = ResourceLocation.withDefaultNamespace(
             "item/empty_armor_slot_boots");
+
+    // Tool slot empty icons
+    /**
+     * Empty slot icon for hoe tools
+     */
     public static final ResourceLocation EMPTY_SLOT_HOE = ResourceLocation.withDefaultNamespace("item/empty_slot_hoe");
+    /**
+     * Empty slot icon for axe tools
+     */
     public static final ResourceLocation EMPTY_SLOT_AXE = ResourceLocation.withDefaultNamespace("item/empty_slot_axe");
+    /**
+     * Empty slot icon for sword weapons
+     */
     public static final ResourceLocation EMPTY_SLOT_SWORD = ResourceLocation.withDefaultNamespace(
             "item/empty_slot_sword");
+    /**
+     * Empty slot icon for shovel tools
+     */
     public static final ResourceLocation EMPTY_SLOT_SHOVEL = ResourceLocation.withDefaultNamespace(
             "item/empty_slot_shovel");
+    /**
+     * Empty slot icon for pickaxe tools
+     */
     public static final ResourceLocation EMPTY_SLOT_PICKAXE = ResourceLocation.withDefaultNamespace(
             "item/empty_slot_pickaxe");
+
+    // Material slot empty icons
+    /**
+     * Empty slot icon for ingot materials
+     */
     public static final ResourceLocation EMPTY_SLOT_INGOT = ResourceLocation.withDefaultNamespace(
             "item/empty_slot_ingot");
+    /**
+     * Empty slot icon for redstone dust materials
+     */
     public static final ResourceLocation EMPTY_SLOT_REDSTONE_DUST = ResourceLocation.withDefaultNamespace(
             "item/empty_slot_redstone_dust");
+    /**
+     * Empty slot icon for diamond materials
+     */
     public static final ResourceLocation EMPTY_SLOT_DIAMOND = ResourceLocation.withDefaultNamespace(
             "item/empty_slot_diamond");
 
+    /**
+     * Predefined collection of all tool slot icons
+     */
     public static final List<ResourceLocation> TOOLS = List.of(
             EMPTY_SLOT_SWORD,
             EMPTY_SLOT_PICKAXE,
@@ -50,26 +134,52 @@ public class SmithingTemplates {
             EMPTY_SLOT_SHOVEL
     );
 
+    /**
+     * Predefined collection of all armor slot icons
+     */
     public static final List<ResourceLocation> ARMOR = List.of(
             EMPTY_SLOT_HELMET,
             EMPTY_SLOT_CHESTPLATE,
             EMPTY_SLOT_LEGGINGS,
             EMPTY_SLOT_BOOTS
     );
+
+    /**
+     * Predefined collection combining armor and tool slot icons
+     */
     public static final List<ResourceLocation> ARMOR_AND_TOOLS = combine(ARMOR, TOOLS);
 
-    public static List<ResourceLocation> combine(List<ResourceLocation>... sources) {
+    /**
+     * Combines multiple resource location lists into a single immutable list.
+     *
+     * @param sourceLists The lists to combine
+     * @return A new immutable list containing all elements from the source lists
+     */
+    public static List<ResourceLocation> combine(List<ResourceLocation>... sourceLists) {
         final ImmutableList.Builder<ResourceLocation> builder = ImmutableList.builder();
-        for (var s : sources) {
-            builder.addAll(s);
+        for (var sourceList : sourceLists) {
+            builder.addAll(sourceList);
         }
         return builder.build();
     }
 
-    public static Builder create(ModCore modCore, String path) {
-        return new Builder(modCore, path);
+    /**
+     * Creates a new builder for a smithing template.
+     *
+     * @param modCore      The mod core instance for resource location generation
+     * @param templatePath The path identifier for this template
+     * @return A new builder instance
+     */
+    public static Builder create(ModCore modCore, String templatePath) {
+        return new Builder(modCore, templatePath);
     }
 
+    /**
+     * Builder class for creating smithing templates with fluent API.
+     *
+     * <p>This builder handles the creation of smithing templates with automatic localization
+     * key generation and validation of required properties.
+     */
     public static class Builder {
         private final ModCore C;
         private final String path;
@@ -77,27 +187,72 @@ public class SmithingTemplates {
         private List<ResourceLocation> additionalSlotEmptyIcons;
         private Item.Properties properties;
 
-        private Builder(ModCore modCore, String path) {
+        private Builder(ModCore modCore, String templatePath) {
             this.C = modCore;
-            this.path = path;
+            this.path = templatePath;
             this.properties = new Item.Properties();
         }
 
-        public Builder setBaseSlotEmptyIcons(List<ResourceLocation> baseSlotEmptyIcons) {
-            this.baseSlotEmptyIcons = baseSlotEmptyIcons;
+        /**
+         * Sets the empty slot icons for the base (equipment) slot.
+         *
+         * <p>These icons are displayed in the smithing table's first slot to indicate
+         * what types of items can be upgraded (e.g., tools, armor pieces).
+         *
+         * @param baseSlotIcons List of resource locations for base slot empty icons
+         * @return This builder instance for chaining
+         */
+        public Builder setBaseSlotEmptyIcons(List<ResourceLocation> baseSlotIcons) {
+            this.baseSlotEmptyIcons = baseSlotIcons;
             return this;
         }
 
-        public Builder setAdditionalSlotEmptyIcons(List<ResourceLocation> additionalSlotEmptyIcons) {
-            this.additionalSlotEmptyIcons = additionalSlotEmptyIcons;
+        /**
+         * Sets the empty slot icons for the additional (material) slot.
+         *
+         * <p>These icons are displayed in the smithing table's second slot to indicate
+         * what types of materials can be used for the upgrade (e.g., ingots, gems).
+         *
+         * @param additionalSlotIcons List of resource locations for additional slot empty icons
+         * @return This builder instance for chaining
+         */
+        public Builder setAdditionalSlotEmptyIcons(List<ResourceLocation> additionalSlotIcons) {
+            this.additionalSlotEmptyIcons = additionalSlotIcons;
             return this;
         }
 
-        public Builder setProperties(Item.Properties properties) {
-            this.properties = properties;
+        /**
+         * Sets custom item properties for the smithing template.
+         *
+         * <p>If not set, default properties will be used. The resource ID will be
+         * automatically set based on the template path.
+         *
+         * @param itemProperties The item properties to use
+         * @return This builder instance for chaining
+         */
+        public Builder setProperties(Item.Properties itemProperties) {
+            this.properties = itemProperties;
             return this;
         }
 
+        /**
+         * Builds the smithing template item with the configured properties.
+         *
+         * <p>This method validates that all required properties are set and creates
+         * the final {@link SmithingTemplateItem} with automatically generated
+         * localization keys and proper formatting.
+         *
+         * <h3>Generated Localization Keys</h3>
+         * <ul>
+         *   <li>{@code item.modid.smithing_template.template_name.applies_to}</li>
+         *   <li>{@code item.modid.smithing_template.template_name.ingredients}</li>
+         *   <li>{@code item.modid.smithing_template.template_name.base_slot_description}</li>
+         *   <li>{@code item.modid.smithing_template.template_name.additions_slot_description}</li>
+         * </ul>
+         *
+         * @return The configured smithing template item
+         * @throws IllegalStateException if required properties are missing
+         */
         public SmithingTemplateItem build() {
             if (baseSlotEmptyIcons == null || baseSlotEmptyIcons.isEmpty()) {
                 throw new IllegalStateException("Base slot empty icons must contain at least one icon");
