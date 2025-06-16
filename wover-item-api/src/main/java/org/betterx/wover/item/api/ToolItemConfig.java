@@ -5,56 +5,152 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.block.Block;
 
+/**
+ * Specialized configuration class for creating tool items with tool-specific properties.
+ * This class extends {@link ItemConfig} to provide additional methods for configuring
+ * tool materials, attack damage, attack speed, and tool-specific behaviors.
+ * 
+ * <p>Tool items in Minecraft have specialized functionality including:</p>
+ * <ul>
+ *   <li>Specific tool materials that determine durability and mining speed</li>
+ *   <li>Attack damage and speed values for combat</li>
+ *   <li>Block breaking effectiveness based on tool type</li>
+ *   <li>Enchantability and repair material compatibility</li>
+ * </ul>
+ * 
+ * <p>This class provides convenience methods for creating common tool types like
+ * pickaxes, axes, hoes, shovels, and swords, as well as a generic tool method
+ * for custom tool behaviors.</p>
+ * 
+ * @param <I> The type of tool item being created, must extend {@link Item}
+ * 
+ * @author Quiqueck
+ * @since 21.6.0
+ */
 public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig<I>> {
+    /**
+     * Factory interface for creating tool items from configuration objects.
+     * Extends the base ItemFactory to work specifically with ToolItemConfig.
+     * 
+     * @param <I> The type of tool item to create
+     */
     public interface ItemFactory<I extends Item> extends ItemConfig.ItemFactory<I, ToolItemConfig<I>> {
     }
 
+    /**
+     * Creates a new tool item configuration.
+     * 
+     * @param registry The item registry to use for registration
+     * @param toolName The name identifier for the tool item
+     * @param itemFactory The factory used to create the tool item instance
+     */
     protected ToolItemConfig(
             ItemRegistry registry,
-            String name,
+            String toolName,
             ItemConfig.ItemFactory<I, ToolItemConfig<I>> itemFactory
     ) {
-        super(registry, name, itemFactory);
+        super(registry, toolName, itemFactory);
     }
 
+    /**
+     * Called before the tool item is built to allow for any final configuration.
+     * Currently empty but can be overridden by subclasses for custom setup logic.
+     */
     @Override
     protected void beforeBuild() {
 
     }
 
+    /**
+     * Configures this item as a custom tool with specific material and block effectiveness.
+     * This is the most flexible tool configuration method, allowing you to specify exactly
+     * which blocks this tool can effectively break.
+     * 
+     * @param material The tool material defining durability, speed, and enchantability
+     * @param effectiveBlocks Tag containing blocks this tool can effectively break
+     * @param baseDamage The base attack damage when used as a weapon
+     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     * @param blockingDisableTime Time in seconds that blocking is disabled after attacking
+     * @return This configuration instance for method chaining
+     */
     public ToolItemConfig<I> tool(
-            ToolMaterial toolMaterial,
-            TagKey<Block> tagKey,
-            float attackDamage,
+            ToolMaterial material,
+            TagKey<Block> effectiveBlocks,
+            float baseDamage,
             float attackSpeed,
-            float disableBlockingForSeconds
+            float blockingDisableTime
     ) {
-        this.properties.tool(toolMaterial, tagKey, attackDamage, attackSpeed, disableBlockingForSeconds);
+        this.properties.tool(material, effectiveBlocks, baseDamage, attackSpeed, blockingDisableTime);
         return this;
     }
 
-    public ToolItemConfig<I> pickaxe(ToolMaterial toolMaterial, float attackDamage, float attackSpeed) {
-        this.properties.pickaxe(toolMaterial, attackDamage, attackSpeed);
+    /**
+     * Configures this item as a pickaxe with the specified material and combat stats.
+     * Pickaxes are effective against stone, ores, and other hard materials.
+     * 
+     * @param material The tool material defining durability, mining speed, and enchantability
+     * @param baseDamage The base attack damage when used as a weapon
+     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     * @return This configuration instance for method chaining
+     */
+    public ToolItemConfig<I> pickaxe(ToolMaterial material, float baseDamage, float attackSpeed) {
+        this.properties.pickaxe(material, baseDamage, attackSpeed);
         return this;
     }
 
-    public ToolItemConfig<I> axe(ToolMaterial toolMaterial, float attackDamage, float attackSpeed) {
-        this.properties.axe(toolMaterial, attackDamage, attackSpeed);
+    /**
+     * Configures this item as an axe with the specified material and combat stats.
+     * Axes are effective against wood-based blocks and have special interactions with logs.
+     * 
+     * @param material The tool material defining durability, chopping speed, and enchantability
+     * @param baseDamage The base attack damage when used as a weapon
+     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     * @return This configuration instance for method chaining
+     */
+    public ToolItemConfig<I> axe(ToolMaterial material, float baseDamage, float attackSpeed) {
+        this.properties.axe(material, baseDamage, attackSpeed);
         return this;
     }
 
-    public ToolItemConfig<I> hoe(ToolMaterial toolMaterial, float attackDamage, float attackSpeed) {
-        this.properties.hoe(toolMaterial, attackDamage, attackSpeed);
+    /**
+     * Configures this item as a hoe with the specified material and combat stats.
+     * Hoes are used for tilling dirt and farmland, and have special crop-related interactions.
+     * 
+     * @param material The tool material defining durability, tilling effectiveness, and enchantability
+     * @param baseDamage The base attack damage when used as a weapon
+     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     * @return This configuration instance for method chaining
+     */
+    public ToolItemConfig<I> hoe(ToolMaterial material, float baseDamage, float attackSpeed) {
+        this.properties.hoe(material, baseDamage, attackSpeed);
         return this;
     }
 
-    public ToolItemConfig<I> shovel(ToolMaterial toolMaterial, float attackDamage, float attackSpeed) {
-        this.properties.shovel(toolMaterial, attackDamage, attackSpeed);
+    /**
+     * Configures this item as a shovel with the specified material and combat stats.
+     * Shovels are effective against soft materials like dirt, sand, gravel, and snow.
+     * 
+     * @param material The tool material defining durability, digging speed, and enchantability
+     * @param baseDamage The base attack damage when used as a weapon
+     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     * @return This configuration instance for method chaining
+     */
+    public ToolItemConfig<I> shovel(ToolMaterial material, float baseDamage, float attackSpeed) {
+        this.properties.shovel(material, baseDamage, attackSpeed);
         return this;
     }
 
-    public ToolItemConfig<I> sword(ToolMaterial toolMaterial, float attackDamage, float attackSpeed) {
-        this.properties.sword(toolMaterial, attackDamage, attackSpeed);
+    /**
+     * Configures this item as a sword with the specified material and combat stats.
+     * Swords are primarily weapons with high attack damage and can cut through certain blocks.
+     * 
+     * @param material The tool material defining durability, attack effectiveness, and enchantability
+     * @param baseDamage The base attack damage when used as a weapon
+     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     * @return This configuration instance for method chaining
+     */
+    public ToolItemConfig<I> sword(ToolMaterial material, float baseDamage, float attackSpeed) {
+        this.properties.sword(material, baseDamage, attackSpeed);
         return this;
     }
 }
