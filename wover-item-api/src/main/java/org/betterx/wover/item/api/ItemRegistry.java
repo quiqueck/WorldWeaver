@@ -4,25 +4,21 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.smithing.SmithingTemplates;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
-import net.minecraft.core.dispenser.BlockSource;
-import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SmithingTemplateItem;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.gameevent.GameEvent;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 public class ItemRegistry {
     private static final Map<ModCore, ItemRegistry> REGISTRIES = new HashMap<>();
@@ -73,7 +69,15 @@ public class ItemRegistry {
         return new ToolItemConfig<>(this, name, itemFactory);
     }
 
-    public <I extends Item> ArmorItemConfig<I> defineToolItem(
+    /**
+     * Creates a configuration for an armor item.
+     *
+     * @param name        The name identifier for the armor item
+     * @param itemFactory The factory used to create the armor item instance
+     * @param <I>         The type of armor item to create
+     * @return A new ArmorItemConfig instance for method chaining
+     */
+    public <I extends Item> ArmorItemConfig<I> defineArmorItem(
             String name,
             ArmorItemConfig.ItemFactory<I> itemFactory
     ) {
@@ -92,6 +96,21 @@ public class ItemRegistry {
             FoodItemConfig.ItemFactory<I> itemFactory
     ) {
         return new DrinkItemConfig<>(this, name, itemFactory);
+    }
+
+    /**
+     * Creates a configuration for a spawn egg item.
+     *
+     * @param name        The name identifier for the spawn egg
+     * @param itemFactory The factory used to create the spawn egg item instance
+     * @param <I>         The type of spawn egg item to create
+     * @return A new SpawnEggConfig instance for method chaining
+     */
+    public <I extends SpawnEggItem> SpawnEggConfig<I> defineSpawnEgg(
+            String name,
+            SpawnEggConfig.ItemFactory<I> itemFactory
+    ) {
+        return new SpawnEggConfig<>(this, name, itemFactory);
     }
 
 
@@ -114,37 +133,19 @@ public class ItemRegistry {
         return register(path, item, tags);
     }
 
-    public static final DefaultDispenseItemBehavior DISPENSE_SPAWN_EGG_BEHAVIOUR = new DefaultDispenseItemBehavior() {
-        @Override
-        public @NotNull ItemStack execute(BlockSource blockSource, ItemStack stack) {
-            Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-            EntityType<?> entityType = ((SpawnEggItem) stack.getItem()).getType(
-                    blockSource.level().registryAccess(),
-                    stack
-            );
 
-            try {
-                entityType.spawn(
-                        blockSource.level(),
-                        stack,
-                        null,
-                        blockSource.pos().relative(direction),
-                        EntitySpawnReason.DISPENSER,
-                        direction != Direction.UP,
-                        false
-                );
-            } catch (Exception var6) {
-                LOGGER.error("Error while dispensing spawn egg from dispenser at {}", blockSource.pos(), var6);
-                return ItemStack.EMPTY;
-            }
-
-            stack.shrink(1);
-            blockSource.level().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource.pos());
-            return stack;
-        }
-    };
-
-
+    /**
+     * Registers a spawn egg item with automatic dispenser behavior.
+     *
+     * @param path The registry path for the spawn egg
+     * @param item The spawn egg item to register
+     * @param tags Optional tags to apply to the spawn egg
+     * @param <T>  The type of spawn egg item
+     * @return The registered spawn egg item
+     * @deprecated Use {@link #defineSpawnEgg(String, SpawnEggConfig.ItemFactory)} with
+     * {@link SpawnEggConfig#buildAndRegister()} instead for better configuration options
+     */
+    @Deprecated(forRemoval = true)
     @SafeVarargs
     public final <T extends SpawnEggItem> T registerEgg(String path, T item, TagKey<Item>... tags) {
         DispenserBlock.registerBehavior(item, DISPENSE_SPAWN_EGG_BEHAVIOUR);
@@ -173,6 +174,7 @@ public class ItemRegistry {
         return item;
     }
 
+    @Deprecated(forRemoval = true)
     public Item.Properties createDefaultItemSettings() {
         return new Item.Properties();
     }

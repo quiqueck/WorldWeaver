@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
  * Specialized configuration class for creating tool items with tool-specific properties.
  * This class extends {@link ItemConfig} to provide additional methods for configuring
  * tool materials, attack damage, attack speed, and tool-specific behaviors.
- * 
+ *
  * <p>Tool items in Minecraft have specialized functionality including:</p>
  * <ul>
  *   <li>Specific tool materials that determine durability and mining speed</li>
@@ -17,13 +17,12 @@ import net.minecraft.world.level.block.Block;
  *   <li>Block breaking effectiveness based on tool type</li>
  *   <li>Enchantability and repair material compatibility</li>
  * </ul>
- * 
+ *
  * <p>This class provides convenience methods for creating common tool types like
  * pickaxes, axes, hoes, shovels, and swords, as well as a generic tool method
  * for custom tool behaviors.</p>
- * 
+ *
  * @param <I> The type of tool item being created, must extend {@link Item}
- * 
  * @author Quiqueck
  * @since 21.6.0
  */
@@ -31,7 +30,7 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     /**
      * Factory interface for creating tool items from configuration objects.
      * Extends the base ItemFactory to work specifically with ToolItemConfig.
-     * 
+     *
      * @param <I> The type of tool item to create
      */
     public interface ItemFactory<I extends Item> extends ItemConfig.ItemFactory<I, ToolItemConfig<I>> {
@@ -39,9 +38,9 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
 
     /**
      * Creates a new tool item configuration.
-     * 
-     * @param registry The item registry to use for registration
-     * @param toolName The name identifier for the tool item
+     *
+     * @param registry    The item registry to use for registration
+     * @param toolName    The name identifier for the tool item
      * @param itemFactory The factory used to create the tool item instance
      */
     protected ToolItemConfig(
@@ -62,14 +61,27 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     }
 
     /**
+     * Called before the tool item is registered to allow for any final modifications.
+     * This default implementation returns the item unchanged, but subclasses can override
+     * this method to perform custom post-creation setup before registration.
+     * 
+     * @param item The built tool item instance
+     * @return The tool item instance (potentially modified) that should be registered
+     */
+    @Override
+    protected I beforeRegister(I item) {
+        return item;
+    }
+
+    /**
      * Configures this item as a custom tool with specific material and block effectiveness.
      * This is the most flexible tool configuration method, allowing you to specify exactly
      * which blocks this tool can effectively break.
-     * 
-     * @param material The tool material defining durability, speed, and enchantability
-     * @param effectiveBlocks Tag containing blocks this tool can effectively break
-     * @param baseDamage The base attack damage when used as a weapon
-     * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
+     *
+     * @param material            The tool material defining durability, speed, and enchantability
+     * @param effectiveBlocks     Tag containing blocks this tool can effectively break
+     * @param baseDamage          The base attack damage when used as a weapon
+     * @param attackSpeed         The attack speed modifier (4.0 is baseline, higher is faster)
      * @param blockingDisableTime Time in seconds that blocking is disabled after attacking
      * @return This configuration instance for method chaining
      */
@@ -87,9 +99,9 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     /**
      * Configures this item as a pickaxe with the specified material and combat stats.
      * Pickaxes are effective against stone, ores, and other hard materials.
-     * 
-     * @param material The tool material defining durability, mining speed, and enchantability
-     * @param baseDamage The base attack damage when used as a weapon
+     *
+     * @param material    The tool material defining durability, mining speed, and enchantability
+     * @param baseDamage  The base attack damage when used as a weapon
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
@@ -101,9 +113,9 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     /**
      * Configures this item as an axe with the specified material and combat stats.
      * Axes are effective against wood-based blocks and have special interactions with logs.
-     * 
-     * @param material The tool material defining durability, chopping speed, and enchantability
-     * @param baseDamage The base attack damage when used as a weapon
+     *
+     * @param material    The tool material defining durability, chopping speed, and enchantability
+     * @param baseDamage  The base attack damage when used as a weapon
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
@@ -115,9 +127,9 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     /**
      * Configures this item as a hoe with the specified material and combat stats.
      * Hoes are used for tilling dirt and farmland, and have special crop-related interactions.
-     * 
-     * @param material The tool material defining durability, tilling effectiveness, and enchantability
-     * @param baseDamage The base attack damage when used as a weapon
+     *
+     * @param material    The tool material defining durability, tilling effectiveness, and enchantability
+     * @param baseDamage  The base attack damage when used as a weapon
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
@@ -129,9 +141,9 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     /**
      * Configures this item as a shovel with the specified material and combat stats.
      * Shovels are effective against soft materials like dirt, sand, gravel, and snow.
-     * 
-     * @param material The tool material defining durability, digging speed, and enchantability
-     * @param baseDamage The base attack damage when used as a weapon
+     *
+     * @param material    The tool material defining durability, digging speed, and enchantability
+     * @param baseDamage  The base attack damage when used as a weapon
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
@@ -143,9 +155,9 @@ public class ToolItemConfig<I extends Item> extends ItemConfig<I, ToolItemConfig
     /**
      * Configures this item as a sword with the specified material and combat stats.
      * Swords are primarily weapons with high attack damage and can cut through certain blocks.
-     * 
-     * @param material The tool material defining durability, attack effectiveness, and enchantability
-     * @param baseDamage The base attack damage when used as a weapon
+     *
+     * @param material    The tool material defining durability, attack effectiveness, and enchantability
+     * @param baseDamage  The base attack damage when used as a weapon
      * @param attackSpeed The attack speed modifier (4.0 is baseline, higher is faster)
      * @return This configuration instance for method chaining
      */
