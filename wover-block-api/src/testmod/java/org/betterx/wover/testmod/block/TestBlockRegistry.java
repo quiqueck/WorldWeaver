@@ -1,11 +1,13 @@
 package org.betterx.wover.testmod.block;
 
 import org.betterx.wover.block.api.BlockRegistry;
+import org.betterx.wover.block.api.trait.BlockTraits;
+import org.betterx.wover.block.api.trait.FlammableBlockTrait;
 import org.betterx.wover.tag.api.predefined.CommonPoiTags;
 import org.betterx.wover.testmod.entrypoint.TestModWoverBlock;
 
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.PushReaction;
 
@@ -17,32 +19,39 @@ public class TestBlockRegistry {
     private TestBlockRegistry() {
     }
 
-    public static final TestBlock TEST_BLOCK = R.register(
-            "test_block",
-            new TestBlock(Block.Properties.of().ignitedByLava().instabreak().setId(R.key("test_block"))),
-            CommonPoiTags.MASON_WORKSTATION
-    );
+    public static final TestBlock TEST_BLOCK = R
+            .defineDefaultBlockWithProps("test_block", TestBlock::new)
+            .addTrait(BlockTraits.FLAMMABLE)
+            .tags(CommonPoiTags.MASON_WORKSTATION)
+            .instabreak()
+            .buildAndRegister();
 
-    public static final TestDoorBlock TEST_DOOR = R.register(
-            "test_door",
-            new TestDoorBlock(
-                    BlockSetType.COPPER, Block.Properties
-                    .of()
-                    .ignitedByLava()
-                    .pushReaction(PushReaction.DESTROY)
-                    .setId(R.key("test_door"))
+    public static final TestDoorBlock TEST_DOOR = R
+            .defineDefaultBlockWithProps(
+                    "test_door", (props) -> new TestDoorBlock(
+                            BlockSetType.COPPER,
+                            props
+                    )
             )
-    );
+            .addTrait(BlockTraits.FLAMMABLE)
+            .tags(BlockTags.DOORS)
+            .itemTags(ItemTags.DOORS)
+            .pushReaction(PushReaction.DESTROY)
+            .buildAndRegister();
 
-    public static final TestWall TEST_WALL = R.register(
-            "test_wall",
-            new TestWall(Block.Properties.of().ignitedByLava().forceSolidOn()
-                                         .setId(R.key("test_wall"))),
-            BlockTags.WALLS
-    );
+    public static final TestWall TEST_WALL = R
+            .defineDefaultBlockWithProps("test_wall", TestWall::new)
+            .addTrait(BlockTraits.FLAMMABLE)
+            .tags(BlockTags.WALLS)
+            .itemTags(ItemTags.WALLS)
+            .forceSolidOn()
+            .buildAndRegister();
 
     @ApiStatus.Internal
     public static void ensureStaticallyLoaded() {
         // NO-OP
+
+        FlammableBlockTrait.RuntimeTrait trait = BlockTraits.FLAMMABLE.getRuntimeTrait(TEST_BLOCK);
+        TestModWoverBlock.C.LOG.info("Trait: " + trait);
     }
 }

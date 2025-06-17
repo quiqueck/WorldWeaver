@@ -2,6 +2,7 @@ package org.betterx.wover.item.api;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.smithing.SmithingTemplates;
+import org.betterx.wover.item.impl.api.ItemRegistryImpl;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
 import net.minecraft.core.Registry;
@@ -18,7 +19,10 @@ import net.minecraft.world.level.block.DispenserBlock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Central registry for managing item registration and configuration within a mod.
@@ -58,12 +62,7 @@ import java.util.stream.Stream;
  * @see ModCore
  * @since 21.6.0
  */
-public class ItemRegistry {
-    /**
-     * Global registry mapping mod cores to their respective item registries
-     */
-    private static final Map<ModCore, ItemRegistry> REGISTRIES = new HashMap<>();
-
+public abstract class ItemRegistry {
     /**
      * The mod core this registry belongs to
      */
@@ -85,7 +84,7 @@ public class ItemRegistry {
      *
      * @param modCore The mod core this registry will belong to
      */
-    private ItemRegistry(ModCore modCore) {
+    protected ItemRegistry(ModCore modCore) {
         this.C = modCore;
 
         if (ModCore.isDatagen()) {
@@ -100,7 +99,7 @@ public class ItemRegistry {
      * @return Stream of all ItemRegistry instances
      */
     public static Stream<ItemRegistry> streamAll() {
-        return REGISTRIES.values().stream();
+        return ItemRegistryImpl.streamAll();
     }
 
     /**
@@ -112,7 +111,7 @@ public class ItemRegistry {
      * @return The ItemRegistry instance for the specified mod core
      */
     public static ItemRegistry forMod(ModCore modCore) {
-        return REGISTRIES.computeIfAbsent(modCore, c -> new ItemRegistry(modCore));
+        return ItemRegistryImpl.forMod(modCore);
     }
 
     /**
@@ -133,7 +132,7 @@ public class ItemRegistry {
      * @param itemName The name identifier for the item
      * @return A ResourceKey for the item in this mod's namespace
      */
-    public ResourceKey<Item> key(String itemName) {
+    public @NotNull ResourceKey<Item> key(@NotNull String itemName) {
         return ResourceKey.create(BuiltInRegistries.ITEM.key(), C.mk(itemName));
     }
 
@@ -164,6 +163,23 @@ public class ItemRegistry {
             DefaultItemDefinition.ItemFactory<I> itemFactory
     ) {
         return new DefaultItemDefinition<>(this, itemName, itemFactory);
+    }
+
+    /**
+     * Creates a configuration for a default item with a custom factory.
+     * This allows for creating custom item types while still using the default
+     * configuration pattern.
+     *
+     * @param itemName    The name identifier for the item
+     * @param itemFactory The factory used to create the item instance
+     * @param <I>         The type of item to create
+     * @return A new DefaultItemDefinition instance for method chaining
+     */
+    public <I extends Item> DefaultItemDefinition<I> defineDefaultItem(
+            String itemName,
+            Function<Item.Properties, I> itemFactory
+    ) {
+        return new DefaultItemDefinition<>(this, itemName, (def) -> itemFactory.apply(def.getProperties()));
     }
 
     /**
@@ -278,7 +294,7 @@ public class ItemRegistry {
      * @param tags Optional tags to apply to the item during data generation
      * @param <T>  The type of item being registered
      */
-    <T extends Item> void register(ResourceKey<Item> key, T item, TagKey<Item>[] tags) {
+    protected <T extends Item> void register(@NotNull ResourceKey<Item> key, T item, @Nullable TagKey<Item>[] tags) {
         if (item != null && item != Items.AIR) {
             Registry.register(BuiltInRegistries.ITEM, key, item);
             items.put(key.location(), item);

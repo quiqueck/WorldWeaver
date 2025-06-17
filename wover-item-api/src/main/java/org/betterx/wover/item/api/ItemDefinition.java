@@ -17,25 +17,25 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
  * and automatic registration.
  *
  * @param <I> The type of item being created, must extend {@link Item}
- * @param <C> The concrete configuration class type for method chaining
+ * @param <D> The concrete configuration class type for method chaining
  * @author Quiqueck
  * @since 21.6.0
  */
-public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I, C>> {
+public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I, D>> {
     /**
      * Factory interface for creating items from configuration objects.
      *
      * @param <I> The type of item to create
-     * @param <C> The configuration type used to create the item
+     * @param <D> The configuration type used to create the item
      */
-    public interface ItemFactory<I extends Item, C extends ItemDefinition<I, C>> {
+    public interface ItemFactory<I extends Item, D extends ItemDefinition<I, D>> {
         /**
          * Creates an item instance from the given configuration.
          *
-         * @param config The configuration object containing all item settings
+         * @param definition The configuration object containing all item settings
          * @return The created item instance
          */
-        I createItem(C config);
+        I createItem(D definition);
     }
 
     /**
@@ -61,7 +61,7 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
     /**
      * Factory instance used to create the item
      */
-    protected final ItemDefinition.ItemFactory<I, C> itemFactory;
+    protected final ItemDefinition.ItemFactory<I, D> itemFactory;
 
     /**
      * Creates a new item configuration.
@@ -70,7 +70,7 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @param itemName    The name identifier for the item
      * @param itemFactory The factory used to create the item instance
      */
-    protected ItemDefinition(ItemRegistry registry, String itemName, ItemDefinition.ItemFactory<I, C> itemFactory) {
+    protected ItemDefinition(ItemRegistry registry, String itemName, ItemDefinition.ItemFactory<I, D> itemFactory) {
         this.itemKey = registry.key(itemName);
         this.properties = new Item.Properties().setId(this.itemKey);
         this.itemFactory = itemFactory;
@@ -104,7 +104,7 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
     @SuppressWarnings("unchecked")
     public final I build() {
         this.beforeBuild();
-        return itemFactory.createItem((C) this);
+        return itemFactory.createItem((D) this);
     }
 
     /**
@@ -131,9 +131,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      */
     @SafeVarargs
     @SuppressWarnings("unchecked")
-    public final C setTags(TagKey<Item>... itemTags) {
+    public final D tags(TagKey<Item>... itemTags) {
         this.tags = itemTags;
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -141,7 +141,7 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      *
      * @return Array of tags applied to this item, may be null
      */
-    public TagKey<Item>[] getTags() {
+    public TagKey<Item>[] tags() {
         return this.tags;
     }
 
@@ -156,9 +156,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C usingConvertsTo(Item convertToItem) {
+    public D usingConvertsTo(Item convertToItem) {
         this.properties.usingConvertsTo(convertToItem);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -168,9 +168,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C useCooldown(float cooldownSeconds) {
+    public D useCooldown(float cooldownSeconds) {
         this.properties.useCooldown(cooldownSeconds);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -180,9 +180,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C stacksTo(int maxStackSize) {
+    public D stacksTo(int maxStackSize) {
         this.properties.stacksTo(maxStackSize);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -193,9 +193,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C durability(int maxDurability) {
+    public D durability(int maxDurability) {
         this.properties.durability(maxDurability);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -205,9 +205,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C craftRemainder(Item remainderItem) {
+    public D craftRemainder(Item remainderItem) {
         this.properties.craftRemainder(remainderItem);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -217,9 +217,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C rarity(Rarity itemRarity) {
+    public D rarity(Rarity itemRarity) {
         this.properties.rarity(itemRarity);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -228,9 +228,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C fireResistant() {
+    public D fireResistant() {
         this.properties.fireResistant();
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -240,9 +240,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C jukeboxPlayable(ResourceKey<JukeboxSong> songKey) {
+    public D jukeboxPlayable(ResourceKey<JukeboxSong> songKey) {
         this.properties.jukeboxPlayable(songKey);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -253,9 +253,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C enchantable(int enchantability) {
+    public D enchantable(int enchantability) {
         this.properties.enchantable(enchantability);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -265,9 +265,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C repairable(Item repairItem) {
+    public D repairable(Item repairItem) {
         this.properties.repairable(repairItem);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -277,9 +277,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C repairable(TagKey<Item> repairTag) {
+    public D repairable(TagKey<Item> repairTag) {
         this.properties.repairable(repairTag);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -289,9 +289,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C equippable(EquipmentSlot slot) {
+    public D equippable(EquipmentSlot slot) {
         this.properties.equippable(slot);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -301,9 +301,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C equippableUnswappable(EquipmentSlot slot) {
+    public D equippableUnswappable(EquipmentSlot slot) {
         this.properties.equippableUnswappable(slot);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -313,9 +313,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C requiredFeatures(FeatureFlag... requiredFlags) {
+    public D requiredFeatures(FeatureFlag... requiredFlags) {
         this.properties.requiredFeatures(requiredFlags);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -325,9 +325,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C overrideDescription(String descriptionKey) {
+    public D overrideDescription(String descriptionKey) {
         this.properties.overrideDescription(descriptionKey);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -336,9 +336,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C useBlockDescriptionPrefix() {
+    public D useBlockDescriptionPrefix() {
         this.properties.useBlockDescriptionPrefix();
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -347,9 +347,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C useItemDescriptionPrefix() {
+    public D useItemDescriptionPrefix() {
         this.properties.useItemDescriptionPrefix();
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -370,9 +370,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public <T> C component(DataComponentType<T> componentType, T componentData) {
+    public <T> D component(DataComponentType<T> componentType, T componentData) {
         this.properties.component(componentType, componentData);
-        return (C) this;
+        return (D) this;
     }
 
     /**
@@ -382,9 +382,9 @@ public abstract class ItemDefinition<I extends Item, C extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public C attributes(ItemAttributeModifiers attributeModifiers) {
+    public D attributes(ItemAttributeModifiers attributeModifiers) {
         this.properties.attributes(attributeModifiers);
-        return (C) this;
+        return (D) this;
     }
 
     /**

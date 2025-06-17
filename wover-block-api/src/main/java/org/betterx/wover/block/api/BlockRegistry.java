@@ -1,6 +1,8 @@
 package org.betterx.wover.block.api;
 
+import org.betterx.wover.block.api.trait.FlammableBlockTrait;
 import org.betterx.wover.block.impl.WoverBlockItemImpl;
+import org.betterx.wover.block.impl.api.BlockRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ItemRegistry;
 import org.betterx.wover.loot.api.BlockLootProvider;
@@ -12,32 +14,30 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.storage.loot.LootTable;
-
-import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class BlockRegistry {
-    private static final Map<ModCore, BlockRegistry> REGISTRIES = new HashMap<>();
+public abstract class BlockRegistry {
     public final ModCore C;
-    private final Map<ResourceLocation, Block> blocks = new HashMap<>();
+    private final Map<ResourceKey<Block>, Block> blocks = new HashMap<>();
     private Map<Block, TagKey<Block>[]> datagenTags;
-    private final ItemRegistry itemRegistry;
 
-    private BlockRegistry(ModCore modeCore) {
+
+    protected BlockRegistry(ModCore modeCore) {
         this.C = modeCore;
-        this.itemRegistry = ItemRegistry.forMod(modeCore);
 
         if (ModCore.isDatagen()) {
             datagenTags = new HashMap<>();
@@ -45,12 +45,14 @@ public class BlockRegistry {
     }
 
     public static Stream<BlockRegistry> streamAll() {
-        return REGISTRIES.values().stream();
+        return BlockRegistryImpl.streamAll();
     }
 
     public static BlockRegistry forMod(ModCore modCore) {
-        return REGISTRIES.computeIfAbsent(modCore, c -> new BlockRegistry(modCore));
+        return BlockRegistryImpl.forMod(modCore);
     }
+
+    public abstract ItemRegistry itemRegistry();
 
     public Stream<Block> allBlocks() {
         return blocks.values().stream();
@@ -71,8 +73,60 @@ public class BlockRegistry {
      * @param blockName The name identifier for the block
      * @return A ResourceKey for the block in this mod's namespace
      */
-    public ResourceKey<Block> key(String blockName) {
+    public @NotNull ResourceKey<Block> key(@NotNull String blockName) {
         return ResourceKey.create(BuiltInRegistries.BLOCK.key(), C.mk(blockName));
+    }
+
+    public @NotNull ResourceKey<Item> blockItemKey(@NotNull ResourceKey<Block> blockKey) {
+        return ResourceKey.create(BuiltInRegistries.ITEM.key(), blockKey.location());
+    }
+
+    public VanillaBlockDefinition defineDefaultBlock(String blockName) {
+        return new VanillaBlockDefinition(this, blockName);
+    }
+
+    public <B extends Block> DefaultBlockDefinition<B> defineDefaultBlock(
+            String blockName,
+            DefaultBlockDefinition.BlockFactory<B> blockFactory
+    ) {
+        return new DefaultBlockDefinition<>(this, blockName, blockFactory);
+    }
+
+    public <B extends Block> DefaultBlockDefinition<B> defineDefaultBlockWithProps(
+            String blockName,
+            Function<BlockBehaviour.Properties, B> blockFactory
+    ) {
+        return new DefaultBlockDefinition<>(this, blockName, (def) -> blockFactory.apply(def.properties));
+    }
+
+    <T extends Block> void register(
+            @NotNull ResourceKey<Block> key,
+            T block,
+            @Nullable TagKey<Block>[] tags,
+            @NotNull ResourceKey<Item> itemKey,
+            @Nullable TagKey<Item>[] itemTags
+    ) {
+        if (block != null && block != Blocks.AIR) {
+            _registerBlockOnly(key, block, tags);
+
+            final BlockItem item;
+
+            if (block instanceof CustomBlockItemProvider provider) {
+                item = provider.getCustomBlockItem(
+                        itemKey.location(),
+                        defaultBlockItemSettings().setId(ResourceKey.create(
+                                BuiltInRegistries.ITEM.key(),
+                                itemKey.location()
+                        ))
+                );
+            } else {
+                item = WoverBlockItemImpl.create(block, defaultBlockItemSettings().setId(itemKey));
+            }
+            if (itemTags == null)
+                registerBlockItem(itemKey, item);
+            else
+                registerBlockItem(itemKey, item, itemTags);
+        }
     }
 
     @SafeVarargs
@@ -80,56 +134,42 @@ public class BlockRegistry {
         return register(path, block, tags, null);
     }
 
+
     public <T extends Block> T register(String path, T block, TagKey<Block>[] tags, TagKey<Item>[] itemTags) {
-        if (block != null && block != Blocks.AIR) {
-            final ResourceLocation id = tags == null
-                    ? _registerBlockOnly(path, block)
-                    : _registerBlockOnly(path, block, tags);
+        var blockKey = key(path);
+        var itemKey = blockItemKey(blockKey);
+        register(blockKey, block, tags, itemKey, itemTags);
 
-            final BlockItem item;
-            if (block instanceof CustomBlockItemProvider provider) {
-                item = provider.getCustomBlockItem(id, defaultBlockItemSettings());
-            } else {
-                item = WoverBlockItemImpl.create(block, defaultBlockItemSettings());
-            }
-            if (itemTags == null)
-                registerBlockItem(path, item);
-            else
-                registerBlockItem(path, item, itemTags);
-
-            if (block.defaultBlockState().ignitedByLava()
-                    && FlammableBlockRegistry.getDefaultInstance()
-                                             .get(block)
-                                             .getBurnChance() == 0) {
-                FlammableBlockRegistry.getDefaultInstance().add(block, 5, 5);
-            }
-        }
+        FlammableBlockTrait.registerAsFlammable(block);
         return block;
     }
 
     @SafeVarargs
-    private ResourceLocation _registerBlockOnly(String path, Block block, TagKey<Block>... tags) {
-        ResourceLocation id = C.mk(path);
-        Registry.register(BuiltInRegistries.BLOCK, id, block);
-        blocks.put(id, block);
+    private void _registerBlockOnly(
+            @NotNull ResourceKey<Block> key,
+            @NotNull Block block,
+            @Nullable TagKey<Block>... tags
+    ) {
+        Registry.register(BuiltInRegistries.BLOCK, key, block);
+        blocks.put(key, block);
 
         if (datagenTags != null && tags != null && tags.length > 0) datagenTags.put(block, tags);
-        return id;
     }
 
     @SafeVarargs
     public final <T extends Block> T registerBlockOnly(String path, T block, TagKey<Block>... tags) {
         if (block != null && block != Blocks.AIR) {
-            _registerBlockOnly(path, block, tags);
+            _registerBlockOnly(key(path), block, tags);
         }
 
         return block;
     }
 
-    @SafeVarargs
-    private BlockItem registerBlockItem(String path, BlockItem item, TagKey<Item>... tags) {
-        return this.itemRegistry.register(path, item, tags);
-    }
+    protected abstract void registerBlockItem(
+            @NotNull ResourceKey<Item> itemKey,
+            @NotNull BlockItem item,
+            @Nullable TagKey<Item>... tags
+    );
 
     protected Item.Properties defaultBlockItemSettings() {
         return new Item.Properties();
@@ -144,7 +184,7 @@ public class BlockRegistry {
                 .entrySet()
                 .stream()
                 .filter(b -> b.getValue() instanceof BlockTagProvider)
-                .forEach(b -> ((BlockTagProvider) b.getValue()).registerBlockTags(b.getKey(), ctx));
+                .forEach(b -> ((BlockTagProvider) b.getValue()).registerBlockTags(b.getKey().location(), ctx));
     }
 
     public void bootstrapBlockLoot(
@@ -157,8 +197,12 @@ public class BlockRegistry {
                 .stream()
                 .filter(b -> b.getValue() instanceof BlockLootProvider)
                 .forEach(b -> {
-                    var key = LootTableManager.getBlockLootTableKey(C, b.getKey());
-                    var builder = ((BlockLootProvider) b.getValue()).registerBlockLoot(b.getKey(), provider, key);
+                    var key = LootTableManager.getBlockLootTableKey(C, b.getKey().location());
+                    var builder = ((BlockLootProvider) b.getValue()).registerBlockLoot(
+                            b.getKey().location(),
+                            provider,
+                            key
+                    );
 
                     if (builder != null)
                         biConsumer.accept(key, builder);

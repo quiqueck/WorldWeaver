@@ -20,6 +20,6 @@ public class TestItemRegistry {
 
     public static EnchantedAxe ENCHANTED_AXE = R
             .defineDefaultItem("enchanted_axe", EnchantedAxe::new)
-            .setTags(ItemTags.AXES, ItemTags.MINING_ENCHANTABLE, ItemTags.MINING_LOOT_ENCHANTABLE)
+            .tags(ItemTags.AXES, ItemTags.MINING_ENCHANTABLE, ItemTags.MINING_LOOT_ENCHANTABLE)
             .buildAndRegister();
 }
