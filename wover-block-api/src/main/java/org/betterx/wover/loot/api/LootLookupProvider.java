@@ -5,6 +5,8 @@ import org.betterx.wover.tag.api.predefined.CommonItemTags;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.predicates.DataComponentPredicates;
+import net.minecraft.core.component.predicates.EnchantmentsPredicate;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.resources.ResourceKey;
@@ -64,6 +66,10 @@ public class LootLookupProvider {
         this.enchantmentLookup = provider.lookupOrThrow(Registries.ENCHANTMENT);
     }
 
+    public HolderLookup.RegistryLookup<Item> itemLookup() {
+        return provider.lookupOrThrow(Registries.ITEM);
+    }
+
     public Holder<Enchantment> enchantment(ResourceKey<Enchantment> key) {
         return this.enchantmentLookup.getOrThrow(key);
     }
@@ -83,15 +89,28 @@ public class LootLookupProvider {
     public LootItemCondition.Builder silkTouchCondition() {
         return MatchTool.toolMatches(ItemPredicate.Builder
                 .item()
-                .withSubPredicate(ItemSubPredicates.ENCHANTMENTS, ItemEnchantmentsPredicate.enchantments(List.of(new EnchantmentPredicate(silkTouch(), MinMaxBounds.Ints.atLeast(1))))));
+                .withComponents(
+                        DataComponentMatchers.Builder
+                                .components()
+                                .partial(
+                                        DataComponentPredicates.ENCHANTMENTS,
+                                        EnchantmentsPredicate.enchantments(List.of(
+                                                new EnchantmentPredicate(
+                                                        silkTouch(),
+                                                        MinMaxBounds.Ints.atLeast(1)
+                                                )
+                                        ))
+                                )
+                                .build()
+                ));
     }
 
     public LootItemCondition.Builder shearsCondition() {
-        return MatchTool.toolMatches(ItemPredicate.Builder.item().of(CommonItemTags.SHEARS));
+        return MatchTool.toolMatches(ItemPredicate.Builder.item().of(itemLookup(), CommonItemTags.SHEARS));
     }
 
     public LootItemCondition.Builder hoeCondition() {
-        return MatchTool.toolMatches(ItemPredicate.Builder.item().of(ItemTags.HOES));
+        return MatchTool.toolMatches(ItemPredicate.Builder.item().of(itemLookup(), ItemTags.HOES));
     }
 
     public LootItemCondition.Builder shearsOrHoeSilkTouchCondition() {
@@ -170,7 +189,12 @@ public class LootLookupProvider {
             LootPoolSingletonContainer.Builder<? extends LootPoolSingletonContainer.Builder<?>> item = LootItem
                     .lootTableItem(dropInfo.item)
                     .apply(SetItemCountFunction.setCount(dropInfo.numberProvider));
-            createSelfDropDispatchTable(mainBuilder, withSilkTouch, vanillaBlockLoot.hasSilkTouch(), vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item));
+            createSelfDropDispatchTable(
+                    mainBuilder,
+                    withSilkTouch,
+                    vanillaBlockLoot.hasSilkTouch(),
+                    vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)
+            );
         }
 
         return mainBuilder;
@@ -285,11 +309,18 @@ public class LootLookupProvider {
             NumberProvider saplingCount,
             int fortuneBonus
     ) {
-        return vanillaBlockLoot.createShearsDispatchTable(plantBlock, vanillaBlockLoot.applyExplosionDecay(plantBlock, (LootItem
-                .lootTableItem(sapling)
-                .when(LootItemRandomChanceCondition.randomChance(saplingChance)))
-                .apply(SetItemCountFunction.setCount(saplingCount))
-                .apply(ApplyBonusCount.addUniformBonusCount(enchantmentLookup.getOrThrow(Enchantments.FORTUNE), fortuneBonus))));
+        return vanillaBlockLoot.createShearsDispatchTable(
+                plantBlock, vanillaBlockLoot.applyExplosionDecay(
+                        plantBlock, (LootItem
+                                .lootTableItem(sapling)
+                                .when(LootItemRandomChanceCondition.randomChance(saplingChance)))
+                                .apply(SetItemCountFunction.setCount(saplingCount))
+                                .apply(ApplyBonusCount.addUniformBonusCount(
+                                        enchantmentLookup.getOrThrow(Enchantments.FORTUNE),
+                                        fortuneBonus
+                                ))
+                )
+        );
     }
 
     public <T extends Comparable<T> & StringRepresentable> LootTable.Builder dropPlant(
@@ -299,7 +330,17 @@ public class LootLookupProvider {
             Property<T> property,
             T comparable
     ) {
-        return this.dropPlant(plantBlock, fruit, ConstantValue.exactly(1), seed, ConstantValue.exactly(1), 0.571f, 3, property, comparable);
+        return this.dropPlant(
+                plantBlock,
+                fruit,
+                ConstantValue.exactly(1),
+                seed,
+                ConstantValue.exactly(1),
+                0.571f,
+                3,
+                property,
+                comparable
+        );
     }
 
     public LootTable.Builder dropPlant(
@@ -309,7 +350,17 @@ public class LootLookupProvider {
             IntegerProperty property,
             int comparable
     ) {
-        return this.dropPlant(plantBlock, fruit, ConstantValue.exactly(1), seed, ConstantValue.exactly(1), 0.571f, 3, property, comparable);
+        return this.dropPlant(
+                plantBlock,
+                fruit,
+                ConstantValue.exactly(1),
+                seed,
+                ConstantValue.exactly(1),
+                0.571f,
+                3,
+                property,
+                comparable
+        );
     }
 
     public <T extends Comparable<T> & StringRepresentable> LootTable.Builder dropPlant(
@@ -374,7 +425,11 @@ public class LootLookupProvider {
                                 .add(LootItem
                                         .lootTableItem(seed)
                                         .apply(SetItemCountFunction.setCount(seedCount))
-                                        .apply(ApplyBonusCount.addBonusBinomialDistributionCount(enchantmentLookup.getOrThrow(Enchantments.FORTUNE), probability, extraRounds))
+                                        .apply(ApplyBonusCount.addBonusBinomialDistributionCount(
+                                                enchantmentLookup.getOrThrow(Enchantments.FORTUNE),
+                                                probability,
+                                                extraRounds
+                                        ))
                                 )
                 )
 
@@ -422,7 +477,8 @@ public class LootLookupProvider {
                                         leaveBlock,
                                         LootItem.lootTableItem(saplingBlock)
                                 )
-                                .when(BonusLevelTableCondition.bonusLevelFlatChance(enchantmentLookup.getOrThrow(Enchantments.FORTUNE), fortuneSaplingChances))
+                                .when(BonusLevelTableCondition.bonusLevelFlatChance(
+                                        enchantmentLookup.getOrThrow(Enchantments.FORTUNE), fortuneSaplingChances))
                 );
         if (stickBlock != null) {
             if (stickCount == null) {
@@ -438,7 +494,10 @@ public class LootLookupProvider {
                                             LootItem.lootTableItem(Items.STICK)
                                                     .apply(SetItemCountFunction.setCount(stickCount))
                                     )
-                                    .when(BonusLevelTableCondition.bonusLevelFlatChance(enchantmentLookup.getOrThrow(Enchantments.FORTUNE), VANILLA_LEAVES_STICK_CHANCES)))
+                                    .when(BonusLevelTableCondition.bonusLevelFlatChance(
+                                            enchantmentLookup.getOrThrow(Enchantments.FORTUNE),
+                                            VANILLA_LEAVES_STICK_CHANCES
+                                    )))
             );
         }
         return baseBuilder;

@@ -19,21 +19,25 @@ public class TestBlockRegistry {
 
     public static final TestBlock TEST_BLOCK = R.register(
             "test_block",
-            new TestBlock(Block.Properties.of().ignitedByLava().instabreak()),
+            new TestBlock(Block.Properties.of().ignitedByLava().instabreak().setId(R.key("test_block"))),
             CommonPoiTags.MASON_WORKSTATION
     );
 
     public static final TestDoorBlock TEST_DOOR = R.register(
             "test_door",
-            new TestDoorBlock(BlockSetType.COPPER, Block.Properties
+            new TestDoorBlock(
+                    BlockSetType.COPPER, Block.Properties
                     .of()
                     .ignitedByLava()
-                    .pushReaction(PushReaction.DESTROY))
+                    .pushReaction(PushReaction.DESTROY)
+                    .setId(R.key("test_door"))
+            )
     );
 
     public static final TestWall TEST_WALL = R.register(
             "test_wall",
-            new TestWall(Block.Properties.of().ignitedByLava().forceSolidOn()),
+            new TestWall(Block.Properties.of().ignitedByLava().forceSolidOn()
+                                         .setId(R.key("test_wall"))),
             BlockTags.WALLS
     );
 

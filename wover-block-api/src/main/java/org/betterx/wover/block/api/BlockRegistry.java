@@ -64,6 +64,17 @@ public class BlockRegistry {
                 .map(block -> (BlockItem) block.asItem());
     }
 
+    /**
+     * Creates a resource key for a block with the given name.
+     * The resource key uses this registry's mod namespace.
+     *
+     * @param blockName The name identifier for the block
+     * @return A ResourceKey for the block in this mod's namespace
+     */
+    public ResourceKey<Block> key(String blockName) {
+        return ResourceKey.create(BuiltInRegistries.BLOCK.key(), C.mk(blockName));
+    }
+
     @SafeVarargs
     public final <T extends Block> T register(String path, T block, TagKey<Block>... tags) {
         return register(path, block, tags, null);

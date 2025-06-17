@@ -49,7 +49,7 @@ public class PoiManagerImpl {
     }
 
     public static void setTag(ResourceKey<PoiType> type, TagKey<Block> tag) {
-        var oHolder = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolder(type);
+        var oHolder = BuiltInRegistries.POINT_OF_INTEREST_TYPE.get(type);
         if (oHolder.isPresent()) {
             setTag(oHolder.get().value(), tag);
             didAddTagFor(oHolder.get(), tag);
@@ -86,7 +86,10 @@ public class PoiManagerImpl {
         PoiManagerImpl.setTag(PoiTypes.LODESTONE, CommonPoiTags.LODESTONE);
         PoiManagerImpl.setTag(PoiTypes.LIGHTNING_ROD, CommonPoiTags.LIGHTNING_ROD);
 
-        WorldLifecycle.BEFORE_CREATING_LEVELS.subscribe(PoiManagerImpl::finalizedWorldLoad, EventImpl.SYSTEM_PRIORITY - 1);
+        WorldLifecycle.BEFORE_CREATING_LEVELS.subscribe(
+                PoiManagerImpl::finalizedWorldLoad,
+                EventImpl.SYSTEM_PRIORITY - 1
+        );
     }
 
     private static void finalizedWorldLoad(
@@ -123,7 +126,7 @@ public class PoiManagerImpl {
             if ((Object) type.value() instanceof PoiTypeExtension ex) {
                 TagKey<Block> tag = ex.wover_getTag();
                 if (tag != null) {
-                    var registry = WorldState.registryAccess().registryOrThrow(tag.registry());
+                    var registry = WorldState.registryAccess().lookupOrThrow(tag.registry());
                     for (var block : registry.getTagOrEmpty(tag)) {
                         for (var state : block.value().getStateDefinition().getPossibleStates()) {
                             PoiTypes.TYPE_BY_STATE.put(state, type);

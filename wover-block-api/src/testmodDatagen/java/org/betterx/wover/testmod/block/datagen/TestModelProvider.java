@@ -5,7 +5,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.WoverModelProvider;
 import org.betterx.wover.testmod.block.TestBlockRegistry;
 
-import net.minecraft.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.world.level.block.Blocks;
 
 public class TestModelProvider extends WoverModelProvider {
