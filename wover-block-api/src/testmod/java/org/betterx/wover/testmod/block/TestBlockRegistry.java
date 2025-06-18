@@ -22,7 +22,7 @@ public class TestBlockRegistry {
     public static final TestBlock TEST_BLOCK = R
             .defineDefaultBlockWithProps("test_block", TestBlock::new)
             .addTrait(BlockTraits.FLAMMABLE)
-            .tags(CommonPoiTags.MASON_WORKSTATION)
+            .addTags(CommonPoiTags.MASON_WORKSTATION)
             .instabreak()
             .buildAndRegister();
 
@@ -34,16 +34,16 @@ public class TestBlockRegistry {
                     )
             )
             .addTrait(BlockTraits.FLAMMABLE)
-            .tags(BlockTags.DOORS)
-            .itemTags(ItemTags.DOORS)
+            .addTags(BlockTags.DOORS)
+            .addItemTags(ItemTags.DOORS)
             .pushReaction(PushReaction.DESTROY)
             .buildAndRegister();
 
     public static final TestWall TEST_WALL = R
             .defineDefaultBlockWithProps("test_wall", TestWall::new)
             .addTrait(BlockTraits.FLAMMABLE)
-            .tags(BlockTags.WALLS)
-            .itemTags(ItemTags.WALLS)
+            .addTags(BlockTags.WALLS)
+            .addItemTags(ItemTags.WALLS)
             .forceSolidOn()
             .buildAndRegister();
 

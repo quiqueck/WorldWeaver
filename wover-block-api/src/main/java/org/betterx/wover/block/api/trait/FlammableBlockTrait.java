@@ -3,7 +3,6 @@ package org.betterx.wover.block.api.trait;
 import org.betterx.wover.block.api.BlockDefinition;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
@@ -49,8 +48,8 @@ public class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.C
     }
 
     @Override
-    public void configureProperties(BlockBehaviour.Properties properties, FlammableBlockTrait.Config config) {
-        properties.ignitedByLava();
+    public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition, Config config) {
+        definition.getProperties().ignitedByLava();
     }
 
     @Override

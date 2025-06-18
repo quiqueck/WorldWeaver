@@ -1,5 +1,7 @@
 package org.betterx.wover.item.api;
 
+import org.betterx.wover.util.GrowableArray;
+
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -56,7 +58,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     /**
      * Optional tags to be applied to the item
      */
-    protected TagKey<Item>[] tags;
+    protected GrowableArray<TagKey<Item>> tags;
 
     /**
      * Factory instance used to create the item
@@ -116,7 +118,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     public final I buildAndRegister() {
         I item = this.beforeRegister(this.build());
-        this.registry.register(this.itemKey, item, tags);
+        this.registry.register(this.itemKey, item, tags == null ? null : tags.elements());
         return item;
     }
 
@@ -131,8 +133,12 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SafeVarargs
     @SuppressWarnings("unchecked")
-    public final D tags(TagKey<Item>... itemTags) {
-        this.tags = itemTags;
+    public final D addTags(TagKey<Item>... itemTags) {
+        if (this.tags == null) {
+            this.tags = new GrowableArray<>(itemTags);
+        } else {
+            this.tags.add(itemTags);
+        }
         return (D) this;
     }
 
@@ -142,7 +148,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      * @return Array of tags applied to this item, may be null
      */
     public TagKey<Item>[] tags() {
-        return this.tags;
+        return this.tags.elements();
     }
 
 

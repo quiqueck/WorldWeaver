@@ -3,7 +3,6 @@ package org.betterx.wover.block.api.trait;
 import org.betterx.wover.block.api.BlockDefinition;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
@@ -161,7 +160,7 @@ public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R
 
     public abstract C getDefaultConfig();
 
-    public void configureProperties(BlockBehaviour.Properties properties, C config) {
+    public void configure(BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition, C config) {
         // Default implementation does nothing
     }
 

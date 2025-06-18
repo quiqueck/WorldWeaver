@@ -3,6 +3,7 @@ package org.betterx.wover.block.api;
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockWithTraits;
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.util.GrowableArray;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
@@ -49,8 +50,8 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     protected final BlockBehaviour.Properties properties;
 
-    protected TagKey<Block>[] tags;
-    protected TagKey<Item>[] itemTags;
+    protected GrowableArray<TagKey<Block>> tags;
+    protected GrowableArray<TagKey<Item>> itemTags;
 
     protected List<ConfiguredTrait<? extends BlockTrait.Config, ? extends BlockTrait<? super B, ?, ?>>> traits;
 
@@ -102,7 +103,13 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     public final B buildAndRegister() {
         B block = this.beforeRegister(this.build());
-        this.registry.register(this.blockKey, block, tags, this.itemKey, itemTags);
+        this.registry.register(
+                this.blockKey,
+                block,
+                tags == null ? null : tags.elements(),
+                this.itemKey,
+                itemTags == null ? null : itemTags.elements()
+        );
 
         // If traits are defined, call afterBlockRegistration for each trait
         if (this.traits != null) {
@@ -157,8 +164,12 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SafeVarargs
     @SuppressWarnings("unchecked")
-    public final D tags(TagKey<Block>... blockTags) {
-        this.tags = blockTags;
+    public final D addTags(TagKey<Block>... blockTags) {
+        if (this.tags == null) {
+            this.tags = new GrowableArray<>(blockTags);
+        } else {
+            this.tags.add(blockTags);
+        }
         return (D) this;
     }
 
@@ -168,7 +179,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return Array of tags applied to this block, may be null
      */
     public TagKey<Block>[] tags() {
-        return this.tags;
+        return this.tags.elements();
     }
 
     /**
@@ -179,8 +190,12 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SafeVarargs
     @SuppressWarnings("unchecked")
-    public final D itemTags(TagKey<Item>... itemTags) {
-        this.itemTags = itemTags;
+    public final D addItemTags(TagKey<Item>... itemTags) {
+        if (this.itemTags == null) {
+            this.itemTags = new GrowableArray<>(itemTags);
+        } else {
+            this.itemTags.add(itemTags);
+        }
         return (D) this;
     }
 
@@ -190,7 +205,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return Array of tags applied to this blockItem, may be null
      */
     public TagKey<Item>[] itemTags() {
-        return this.itemTags;
+        return this.itemTags.elements();
     }
 
     // **********************************************************************
@@ -660,7 +675,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     private <C extends BlockTrait.Config> void configurePropertiesUnchecked(
             ConfiguredTrait<C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
     ) {
-        configuredTrait.trait.configureProperties(this.properties, configuredTrait.config);
+        ((BlockTrait<B, C, ?>) configuredTrait.trait).configure((D) this, configuredTrait.config);
     }
 
     @SuppressWarnings("unchecked")
