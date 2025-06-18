@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 public abstract class BlockDefinition<B extends Block, D extends BlockDefinition<B, D>> {
-    public class ConfiguredTrait<C extends BlockTrait.Config, T extends BlockTrait<? super B, C, ?>> {
+    public static class ConfiguredTrait<B extends Block, C extends BlockTrait.Config, T extends BlockTrait<? super B, C, ?>> {
         public final T trait;
         public final C config;
 
@@ -53,7 +53,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     protected GrowableArray<TagKey<Block>> tags;
     protected GrowableArray<TagKey<Item>> itemTags;
 
-    protected List<ConfiguredTrait<? extends BlockTrait.Config, ? extends BlockTrait<? super B, ?, ?>>> traits;
+    protected List<ConfiguredTrait<? super B, ? extends BlockTrait.Config, ? extends BlockTrait<? super B, ?, ?>>> traits;
 
     protected final BlockDefinition.BlockFactory<B, D> blockFactory;
 
@@ -146,14 +146,28 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
             return (D) this;
         }
 
+
         if (this.traits == null) this.traits = new LinkedList<>();
 
         this.traits.add(new ConfiguredTrait<>(trait, config));
         return (D) this;
     }
 
+    @SuppressWarnings("unchecked")
     public <C extends BlockTrait.Config, T extends BlockTrait<? super B, C, ?>> D addTrait(@NotNull T trait) {
-        return addTrait(trait, trait.getDefaultConfig());
+        if (trait.clientOnly() && !ModCore.isClient()) {
+            // Skip traits that are only for the client side
+            return (D) this;
+        }
+        if (trait.datagenOnly() && !ModCore.isDatagen()) {
+            // Skip traits that are only for data generation
+            return (D) this;
+        }
+
+        if (this.traits == null) this.traits = new LinkedList<>();
+
+        this.traits.add(trait.getDefaultConfig());
+        return (D) this;
     }
 
     /**
@@ -673,14 +687,14 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     // Helper methods to handle generic type casting
     @SuppressWarnings("unchecked")
     private <C extends BlockTrait.Config> void configurePropertiesUnchecked(
-            ConfiguredTrait<C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
+            ConfiguredTrait<? super B, C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
     ) {
         ((BlockTrait<B, C, ?>) configuredTrait.trait).configure((D) this, configuredTrait.config);
     }
 
     @SuppressWarnings("unchecked")
     private <C extends BlockTrait.Config> BlockTrait.RuntimeTrait<B, ?> forRuntimeUnchecked(
-            ConfiguredTrait<C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
+            ConfiguredTrait<? super B, C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
     ) {
         // Cast is safe because the trait can work with B (since B extends the super type)
         return (BlockTrait.RuntimeTrait<B, ?>) configuredTrait.trait.forRuntime(configuredTrait.config);
@@ -689,7 +703,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @SuppressWarnings("unchecked")
     private <C extends BlockTrait.Config> void afterBlockRegistrationUnchecked(
             B block,
-            ConfiguredTrait<C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
+            ConfiguredTrait<? super B, C, ? extends BlockTrait<? super B, C, ?>> configuredTrait
     ) {
         // Cast is safe because the trait can work with B (since B extends the super type)
         ((BlockTrait<B, C, ?>) configuredTrait.trait).afterBlockRegistration(block, (D) this, configuredTrait.config);

@@ -6,7 +6,13 @@ import net.minecraft.world.level.block.Block;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
-public class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.Config, FlammableBlockTrait.RuntimeTrait> {
+public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.Config, FlammableBlockTrait.RuntimeTrait> {
+    public static final FlammableBlockTrait INSTANCE = new FlammableBlockTrait();
+    private static final BlockDefinition.ConfiguredTrait<Block, FlammableBlockTrait.Config, ?> DEFAULT_CONFIGURED = new BlockDefinition.ConfiguredTrait<>(
+            INSTANCE,
+            Config.DEFAULT
+    );
+
     public record Config(int burn, int speed) implements BlockTrait.Config {
         public static final Config DEFAULT = new Config(5, 5);
     }
@@ -43,8 +49,8 @@ public class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.C
     }
 
     @Override
-    public FlammableBlockTrait.Config getDefaultConfig() {
-        return Config.DEFAULT;
+    public BlockDefinition.ConfiguredTrait<Block, FlammableBlockTrait.Config, ?> getDefaultConfig() {
+        return DEFAULT_CONFIGURED;
     }
 
     @Override

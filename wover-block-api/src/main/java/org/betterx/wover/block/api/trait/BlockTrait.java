@@ -23,11 +23,6 @@ public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R
         protected BlockTraitNoConfig() {
 
         }
-
-        @Override
-        public NoConfig getDefaultConfig() {
-            return NoConfig.NO_CONFIG;
-        }
     }
 
     public static class RuntimeTrait<B extends Block, R extends BlockTrait.RuntimeTrait<B, R>> {
@@ -158,7 +153,7 @@ public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R
         return super.equals(obj);
     }
 
-    public abstract C getDefaultConfig();
+    public abstract BlockDefinition.ConfiguredTrait<B, C, ?> getDefaultConfig();
 
     public void configure(BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition, C config) {
         // Default implementation does nothing
