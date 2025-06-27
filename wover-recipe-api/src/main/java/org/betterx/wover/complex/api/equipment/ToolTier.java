@@ -1,7 +1,9 @@
 package org.betterx.wover.complex.api.equipment;
 
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SmithingTemplateItem;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.NotNull;
@@ -10,45 +12,69 @@ import org.jetbrains.annotations.Nullable;
 public class ToolTier {
 
     public static final ToolSlot.PropertiesBuilder DIGGER_ITEM_PROPERTIES = (slot, tier) -> {
-        var values = tier.getValues(slot);
+        ToolValues values = tier.getValues(slot);
         if (values == null)
             throw new IllegalArgumentException("No values for slot " + slot + " in tier " + tier);
-        return new Item.Properties().attributes(DiggerItem.createAttributes(tier.toolTier, values.attackDamage, values.attackSpeed));
+        return new Item.Properties().tool(
+                tier.toolMaterial,
+                values.minableWithTag,
+                values.attackDamage,
+                values.attackSpeed,
+                0
+        );
     };
 
     public static final ToolSlot.PropertiesBuilder SWORD_ITEM_PROPERTIES = (slot, tier) -> {
-        var values = tier.getValues(slot);
+        ToolValues values = tier.getValues(slot);
         if (values == null)
             throw new IllegalArgumentException("No values for slot " + slot + " in tier " + tier);
-        return new Item.Properties().attributes(SwordItem.createAttributes(tier.toolTier, (int) values.attackDamage, values.attackSpeed));
+        return new Item.Properties().sword(
+                tier.toolMaterial,
+                (int) values.attackDamage,
+                values.attackSpeed
+        );
     };
 
-    public record ToolValues(float attackDamage, float attackSpeed, SmithingTemplateItem smithingTemplate) {
+    public record ToolValues(
+            float attackDamage,
+            float attackSpeed,
+            SmithingTemplateItem smithingTemplate,
+            TagKey<Block> minableWithTag
+    ) {
         public ToolValues(float attackDamage, float attackSpeed) {
-            this(attackDamage, attackSpeed, null);
+            this(attackDamage, attackSpeed, null, null);
+        }
+
+        public ToolValues(float attackDamage, float attackSpeed, SmithingTemplateItem smithingTemplate) {
+            this(attackDamage, attackSpeed, smithingTemplate, null);
+        }
+
+        public ToolValues(float attackDamage, float attackSpeed, TagKey<Block> minableWithTag) {
+            this(attackDamage, attackSpeed, null, minableWithTag);
         }
 
         ToolValues copyWithOffset(ToolValues offset) {
             return new ToolValues(
                     attackDamage + offset.attackDamage,
                     attackSpeed + offset.attackSpeed,
-                    offset.smithingTemplate
+                    offset.smithingTemplate,
+                    offset.minableWithTag != null ? offset.minableWithTag : this.minableWithTag
             );
         }
     }
 
     public final String name;
-    public final Tier toolTier;
+    public final ToolMaterial toolMaterial;
     public final TagKey<Block> blockTag;
     private final ToolValues[] toolValues;
 
     private ToolTier(
             String name,
-            Tier toolTier,
+            ToolMaterial toolMaterial,
             ToolValues[] toolValues,
             TagKey<Block> blockTag
     ) {
-        this.toolTier = toolTier;
+        this.toolMaterial = toolMaterial;
         this.toolValues = toolValues;
         this.name = name;
         this.blockTag = blockTag;
@@ -65,7 +91,7 @@ public class ToolTier {
 
     //a Builder class
     public static class Builder {
-        private Tier toolTier;
+        private ToolMaterial toolMaterial;
         private final ToolValues[] toolValues = new ToolValues[ToolSlot.values().length];
         private final String name;
         private TagKey<Block> blockTag;
@@ -79,8 +105,8 @@ public class ToolTier {
             return this;
         }
 
-        public Builder toolTier(Tier toolTier) {
-            this.toolTier = toolTier;
+        public Builder toolMaterial(ToolMaterial toolMaterial) {
+            this.toolMaterial = toolMaterial;
             return this;
         }
 
@@ -99,7 +125,7 @@ public class ToolTier {
         }
 
         public ToolTier build() {
-            return new ToolTier(name, toolTier, toolValues, blockTag);
+            return new ToolTier(name, toolMaterial, toolValues, blockTag);
         }
     }
 
@@ -118,7 +144,7 @@ public class ToolTier {
      */
     public ToolTier copyWithOffset(
             @NotNull String newName,
-            @Nullable Tier newTier,
+            @Nullable ToolMaterial newTier,
             ToolValues offset,
             @Nullable TagKey<Block> blockTag
     ) {
@@ -127,6 +153,6 @@ public class ToolTier {
             if (toolValues[i] != null)
                 newValues[i] = toolValues[i].copyWithOffset(offset);
         }
-        return new ToolTier(newName, newTier == null ? this.toolTier : newTier, newValues, blockTag);
+        return new ToolTier(newName, newTier == null ? this.toolMaterial : newTier, newValues, blockTag);
     }
 }

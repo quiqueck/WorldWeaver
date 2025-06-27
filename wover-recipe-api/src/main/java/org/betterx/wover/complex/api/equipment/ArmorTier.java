@@ -1,8 +1,8 @@
 package org.betterx.wover.complex.api.equipment;
 
 import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.SmithingTemplateItem;
+import net.minecraft.world.item.equipment.ArmorMaterial;
 
 import java.util.Arrays;
 import org.jetbrains.annotations.NotNull;
@@ -23,13 +23,13 @@ public class ArmorTier {
         }
     }
 
-    public final Holder<ArmorMaterial> armorMaterial;
+    public final ArmorMaterial armorMaterial;
     private final ArmorValues[] armorValues;
     public final String name;
 
     private ArmorTier(
             String name,
-            Holder<ArmorMaterial> armorMaterial,
+            ArmorMaterial armorMaterial,
             ArmorValues[] armorValues
     ) {
         this.armorMaterial = armorMaterial;
@@ -46,8 +46,8 @@ public class ArmorTier {
         return new Builder(name);
     }
 
-    public boolean is(Holder<ArmorMaterial> mat) {
-        return mat.unwrapKey().map(this.armorMaterial::is).orElse(false);
+    public boolean is(ArmorMaterial mat) {
+        return this.armorMaterial == mat;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ArmorTier {
 
     //a Builder class
     public static class Builder {
-        private Holder<ArmorMaterial> armorMaterial;
+        private ArmorMaterial armorMaterial;
         private final ArmorValues[] armorValues = new ArmorValues[ArmorSlot.values().length];
         private final String name;
 
@@ -65,7 +65,25 @@ public class ArmorTier {
             this.name = name;
         }
 
+        /**
+         * Use {@link #armorMaterial(ArmorMaterial)} instead.
+         *
+         * @param armorMaterial
+         * @return
+         * @deprecated Use {@link #armorMaterial(ArmorMaterial)} instead.
+         */
+        @Deprecated(forRemoval = true)
         public Builder armorMaterial(Holder<ArmorMaterial> armorMaterial) {
+            this.armorMaterial = armorMaterial.value();
+            return this;
+        }
+
+
+        public Builder armorMaterialWithValues(ArmorMaterial armorMaterial) {
+            return this.armorMaterial(armorMaterial).allArmorValues(new ArmorValues(armorMaterial.durability()));
+        }
+
+        public Builder armorMaterial(ArmorMaterial armorMaterial) {
             this.armorMaterial = armorMaterial;
             return this;
         }
@@ -103,7 +121,7 @@ public class ArmorTier {
      */
     public ArmorTier copyWithOffset(
             @NotNull String newName,
-            @Nullable Holder<ArmorMaterial> newMaterial,
+            @Nullable ArmorMaterial newMaterial,
             ArmorValues offset
     ) {
         ArmorValues[] newValues = new ArmorValues[armorValues.length];

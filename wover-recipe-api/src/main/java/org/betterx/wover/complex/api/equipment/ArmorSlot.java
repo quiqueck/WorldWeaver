@@ -1,14 +1,14 @@
 package org.betterx.wover.complex.api.equipment;
 
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorType;
 
 public enum ArmorSlot {
-    HELMET_SLOT(0, "helmet", ArmorItem.Type.HELMET, RecipeCategory.COMBAT),
-    CHESTPLATE_SLOT(1, "chestplate", ArmorItem.Type.CHESTPLATE, RecipeCategory.COMBAT),
-    LEGGINGS_SLOT(2, "leggings", ArmorItem.Type.LEGGINGS, RecipeCategory.COMBAT),
-    BOOTS_SLOT(3, "boots", ArmorItem.Type.BOOTS, RecipeCategory.COMBAT);
+    HELMET_SLOT(0, "helmet", ArmorType.HELMET, RecipeCategory.COMBAT),
+    CHESTPLATE_SLOT(1, "chestplate", ArmorType.CHESTPLATE, RecipeCategory.COMBAT),
+    LEGGINGS_SLOT(2, "leggings", ArmorType.LEGGINGS, RecipeCategory.COMBAT),
+    BOOTS_SLOT(3, "boots", ArmorType.BOOTS, RecipeCategory.COMBAT);
 
 
     public interface PropertiesBuilder {
@@ -18,13 +18,13 @@ public enum ArmorSlot {
     public final RecipeCategory category;
     public final String name;
     public final int slotIndex;
-    public final ArmorItem.Type armorType;
+    public final ArmorType armorType;
     private final PropertiesBuilder propertiesBuilder;
 
     ArmorSlot(
             int slotIndex,
             String name,
-            ArmorItem.Type armorType,
+            ArmorType armorType,
             RecipeCategory category
     ) {
         this.name = name;
