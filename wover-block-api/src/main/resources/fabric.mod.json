@@ -1,45 +1,45 @@
 {
-    "schemaVersion": 1,
-    "id": "wover-block",
-    "version": "21.6.0",
-    "name": "WorldWeaver - Block and Item API",
-    "description": "",
-    "authors": [
-        "Quiqueck"
+  "schemaVersion": 1,
+  "id": "wover-block",
+  "version": "21.6.0",
+  "name": "WorldWeaver - Block and Item API",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-block/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.entrypoint.LibWoverBlock"
     ],
-    "contact": {
-        "homepage": "https://github.com/quiqueck/WorldWeaver",
-        "sources": "https://github.com/quiqueck/WorldWeaver",
-        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-    },
-    "license": "MIT",
-    "icon": "assets/wover-block/icon.png",
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "org.betterx.wover.entrypoint.LibWoverBlock"
-        ],
-        "client": [
-            "org.betterx.wover.entrypoint.client.LibWoverBlockClient"
-        ]
-    },
-    "mixins": [
-        "wover.block.mixins.common.json",
-        "wover.poi.mixins.common.json"
-    ],
-    "depends": {
-        "fabricloader": ">=0.16.0",
-        "minecraft": ["1.21.6-rc.1"],
-        "java": ">=21",
-        "fabric-api": ">=0.100.0"
-    },
-    "custom": {
-        "modmenu": {
-            "badges": [
-                "library"
-            ],
-            "parent": "wover"
-        }
-    },
-    "accessWidener": "wover-block.accesswidener"
+    "client": [
+      "org.betterx.wover.entrypoint.client.LibWoverBlockClient"
+    ]
+  },
+  "mixins": [
+    "wover.block.mixins.common.json",
+    "wover.poi.mixins.common.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ["1.21.6"],
+    "java": ">=21",
+    "fabric-api": ">=0.100.0"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  },
+  "accessWidener": "wover-block.accesswidener"
 }

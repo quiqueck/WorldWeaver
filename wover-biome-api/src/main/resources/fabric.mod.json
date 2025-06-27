@@ -1,44 +1,44 @@
 {
-    "schemaVersion": 1,
-    "id": "wover-biome",
-    "version": "21.6.0",
-    "name": "WorldWeaver - Biome API",
-    "description": "",
-    "authors": [
-        "Quiqueck"
+  "schemaVersion": 1,
+  "id": "wover-biome",
+  "version": "21.6.0",
+  "name": "WorldWeaver - Biome API",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-biome/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.entrypoint.LibWoverBiome"
     ],
-    "contact": {
-        "homepage": "https://github.com/quiqueck/WorldWeaver",
-        "sources": "https://github.com/quiqueck/WorldWeaver",
-        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-    },
-    "license": "MIT",
-    "icon": "assets/wover-biome/icon.png",
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "org.betterx.wover.entrypoint.LibWoverBiome"
-        ],
-        "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.BiomeDatapackRegistryEntrypoint"
-        ]
-    },
-    "mixins": [
-        "wover.biome.mixins.common.json"
-    ],
-    "depends": {
-        "fabricloader": ">=0.16.0",
-        "minecraft": ["1.21.6-rc.1"],
-        "java": ">=21",
-        "fabric-api": ">=0.100.0"
-    },
-    "custom": {
-        "modmenu": {
-            "badges": [
-                "library"
-            ],
-            "parent": "wover"
-        }
-    },
-    "accessWidener": "wover-biome.accesswidener"
+    "wover.datapack.registry": [
+      "org.betterx.wover.entrypoint.BiomeDatapackRegistryEntrypoint"
+    ]
+  },
+  "mixins": [
+    "wover.biome.mixins.common.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ["1.21.6"],
+    "java": ">=21",
+    "fabric-api": ">=0.100.0"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  },
+  "accessWidener": "wover-biome.accesswidener"
 }

@@ -1,41 +1,41 @@
 {
-    "schemaVersion": 1,
-    "id": "wover-core",
-    "version": "21.6.0",
-    "name": "WorldWeaver - Core API",
-    "description": "Provides Common functionality for our WorldWeaver Mods.",
-    "authors": [
-        "Quiqueck"
-    ],
-    "contact": {
-        "homepage": "https://github.com/quiqueck/WorldWeaver",
-        "sources": "https://github.com/quiqueck/WorldWeaver",
-        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-    },
-    "license": "MIT",
-    "icon": "assets/wover-core/icon.png",
-    "environment": "*",
-    "entrypoints": {
-        "main": [
-            "org.betterx.wover.entrypoint.LibWoverCore"
-        ]
-    },
-    "mixins": [
-        "wover.core.mixins.common.json"
-    ],
-    "depends": {
-        "fabricloader": ">=0.16.0",
-        "minecraft": ["1.21.6-rc.1"],
-        "java": ">=21",
-        "fabric-api": ">=0.100.0"
-    },
-    "custom": {
-        "modmenu": {
-            "badges": [
-                "library"
-            ],
-            "parent": "wover"
-        }
-    },
-    "accessWidener": "wover.core.accesswidener"
+  "schemaVersion": 1,
+  "id": "wover-core",
+  "version": "21.6.0",
+  "name": "WorldWeaver - Core API",
+  "description": "Provides Common functionality for our WorldWeaver Mods.",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-core/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.entrypoint.LibWoverCore"
+    ]
+  },
+  "mixins": [
+    "wover.core.mixins.common.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ["1.21.6"],
+    "java": ">=21",
+    "fabric-api": ">=0.100.0"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  },
+  "accessWidener": "wover.core.accesswidener"
 }
