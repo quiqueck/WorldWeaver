@@ -1,10 +1,8 @@
 package org.betterx.wover.recipe.impl;
 
+import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.recipe.api.SmithingRecipeBuilder;
 
-import net.minecraft.core.HolderGetter;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -89,18 +87,18 @@ public class SmithingRecipeBuilderImpl extends BaseRecipeBuilderImpl<SmithingRec
     }
 
     @Override
-    public void build(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
+    public void build(RecipeBuilder.Context context) {
         final SmithingTransformRecipeBuilder builder = SmithingTransformRecipeBuilder.smithing(
-                template.createIngredient(provider),
-                base.createIngredient(provider),
-                addon.createIngredient(provider),
+                template.createIngredient(context),
+                base.createIngredient(context),
+                addon.createIngredient(context),
                 category,
                 output.getItem()
         );
 
         for (var item : unlocks.entrySet()) {
-            builder.unlocks(item.getKey(), item.getValue().createCriterion(provider));
+            builder.unlocks(item.getKey(), item.getValue().createCriterion(context));
         }
-        builder.save(ctx, this.key());
+        builder.save(context.recipeOutput(), this.key());
     }
 }

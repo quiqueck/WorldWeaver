@@ -2,13 +2,12 @@ package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.recipe.api.OnBootstrapRecipes;
+import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.state.api.WorldState;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -40,7 +39,7 @@ public class RecipeRuntimeProviderImpl {
         final boolean[] didInit = {false};
         List<RecipeHolder<?>> recipeHolders = new LinkedList<>();
 
-        RecipeOutput context = new RecipeOutput() {
+        RecipeOutput recipeOutput = new RecipeOutput() {
             @Override
             public void accept(
                     ResourceKey<Recipe<?>> resourceKey,
@@ -70,14 +69,11 @@ public class RecipeRuntimeProviderImpl {
 
         };
 
-        var items = WorldState.registryAccess().lookupOrThrow(Registries.ITEM);
-        var provider = new RecipeProvider(WorldState.registryAccess(), context) {
-            @Override
-            public void buildRecipes() {
 
-            }
-        };
-        BOOTSTRAP_RECIPES.emit(c -> c.bootstrap(items, provider, context));
+        final var builderContext = new RecipeBuilder.Context(
+                WorldState.registryAccess(), recipeOutput
+        );
+        BOOTSTRAP_RECIPES.emit(c -> c.bootstrap(builderContext));
 
         if (!didInit[0]) return loaded;
         return RecipeMap.create(recipeHolders);

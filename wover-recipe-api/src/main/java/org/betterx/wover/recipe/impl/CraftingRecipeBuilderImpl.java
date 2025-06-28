@@ -1,10 +1,8 @@
 package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.recipe.api.CraftingRecipeBuilder;
+import org.betterx.wover.recipe.api.RecipeBuilder;
 
-import net.minecraft.core.HolderGetter;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +19,7 @@ import java.util.Map;
 public class CraftingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CraftingRecipeBuilder> implements
         CraftingRecipeBuilder {
     public interface IngredientFactory {
-        Ingredient createIngredient(RecipeProvider provider);
+        Ingredient createIngredient(RecipeBuilder.Context context);
     }
 
     private String[] shape;
@@ -118,50 +116,55 @@ public class CraftingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CraftingRec
         }
     }
 
-    private void buildShaped(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
-        var builder = ShapedRecipeBuilder.shaped(items, category, output.getItem(), output.getCount());
+    private void buildShaped(RecipeBuilder.Context context) {
+        var builder = ShapedRecipeBuilder.shaped(context.itemLookup(), category, output.getItem(), output.getCount());
 
         for (Map.Entry<Character, IngredientFactory> mat : materials.entrySet()) {
-            builder.define(mat.getKey(), mat.getValue().createIngredient(provider));
+            builder.define(mat.getKey(), mat.getValue().createIngredient(context));
         }
 
         for (String row : shape) builder.pattern(row);
 
         if (shouldUnlockAdvancements) {
             for (var item : unlocks.entrySet()) {
-                builder.unlockedBy(item.getKey(), item.getValue().createCriterion(provider));
+                builder.unlockedBy(item.getKey(), item.getValue().createCriterion(context));
             }
         }
 
         builder.showNotification(this.showNotification);
         builder.group(this.group);
-        builder.save(ctx, this.key());
+        builder.save(context.recipeOutput(), this.key());
     }
 
-    private void buildShapeless(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
-        var builder = ShapelessRecipeBuilder.shapeless(items, category, output.getItem(), output.getCount());
+    private void buildShapeless(RecipeBuilder.Context context) {
+        var builder = ShapelessRecipeBuilder.shapeless(
+                context.itemLookup(),
+                category,
+                output.getItem(),
+                output.getCount()
+        );
 
         for (Map.Entry<Character, IngredientFactory> mat : materials.entrySet()) {
-            builder.requires(mat.getValue().createIngredient(provider));
+            builder.requires(mat.getValue().createIngredient(context));
         }
 
         if (shouldUnlockAdvancements) {
             for (var item : unlocks.entrySet()) {
-                builder.unlockedBy(item.getKey(), item.getValue().createCriterion(provider));
+                builder.unlockedBy(item.getKey(), item.getValue().createCriterion(context));
             }
         }
 
         builder.group(this.group);
-        builder.save(ctx, this.key());
+        builder.save(context.recipeOutput(), this.key());
     }
 
     @Override
-    public void build(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
+    public void build(RecipeBuilder.Context context) {
         validate();
         if (isShaped()) {
-            buildShaped(items, provider, ctx);
+            buildShaped(context);
         } else {
-            buildShapeless(items, provider, ctx);
+            buildShapeless(context);
         }
     }
 }

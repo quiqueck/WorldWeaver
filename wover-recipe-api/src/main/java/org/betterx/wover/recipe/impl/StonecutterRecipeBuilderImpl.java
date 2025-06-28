@@ -1,10 +1,8 @@
 package org.betterx.wover.recipe.impl;
 
+import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.recipe.api.StonecutterRecipeBuilder;
 
-import net.minecraft.core.HolderGetter;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SingleItemRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -53,16 +51,16 @@ public class StonecutterRecipeBuilderImpl extends BaseRecipeBuilderImpl<Stonecut
     }
 
     @Override
-    public void build(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
+    public void build(RecipeBuilder.Context context) {
         final SingleItemRecipeBuilder builder = SingleItemRecipeBuilder.stonecutting(
-                input.createIngredient(provider), category, output.getItem(), output.getCount()
+                input.createIngredient(context), category, output.getItem(), output.getCount()
         );
 
         for (var item : unlocks.entrySet()) {
-            builder.unlockedBy(item.getKey(), item.getValue().createCriterion(provider));
+            builder.unlockedBy(item.getKey(), item.getValue().createCriterion(context));
         }
 
         builder.group(group);
-        builder.save(ctx, this.key());
+        builder.save(context.recipeOutput(), this.key());
     }
 }

@@ -4,8 +4,11 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.events.api.Event;
 import org.betterx.wover.recipe.impl.*;
 
+import net.minecraft.advancements.Criterion;
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -13,10 +16,44 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
 public class RecipeBuilder {
+    public record Context(HolderLookup.Provider lookupProvider, HolderGetter<Item> itemLookup,
+                          RecipeProvider recipeProvider, RecipeOutput recipeOutput) {
+        public Context(HolderLookup.Provider lookupProvider, RecipeProvider recipeProvider, RecipeOutput recipeOutput) {
+            this(lookupProvider, lookupProvider.lookupOrThrow(Registries.ITEM), recipeProvider, recipeOutput);
+        }
+
+        public Context(HolderLookup.Provider lookupProvider, RecipeOutput recipeOutput) {
+            this(
+                    lookupProvider,
+                    lookupProvider.lookupOrThrow(Registries.ITEM),
+                    new RecipeProvider(lookupProvider, recipeOutput) {
+                        @Override
+                        public void buildRecipes() {
+
+                        }
+                    },
+                    recipeOutput
+            );
+        }
+
+        public Criterion<?> has(Item value) {
+            return this.recipeProvider.has(value);
+        }
+
+        public Criterion<?> has(TagKey<Item> value) {
+            return this.recipeProvider.has(value);
+        }
+
+        public Ingredient tag(TagKey<Item> in) {
+            return this.recipeProvider.tag(in);
+        }
+    }
+
     public static Event<OnBootstrapRecipes> BOOTSTRAP_RECIPES =
             RecipeRuntimeProviderImpl.BOOTSTRAP_RECIPES;
 
@@ -122,15 +159,11 @@ public class RecipeBuilder {
         private static final String[] SHAPE_FIRE_BOWL = new String[]{"#I#", " # ", "L L"};
 
         private final ModCore C;
-        public final RecipeOutput context;
-        public final HolderGetter<Item> items;
-        public final RecipeProvider provider;
+        public final RecipeBuilder.Context context;
 
-        public Templates(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput context, ModCore modCore) {
+        public Templates(RecipeBuilder.Context context, ModCore modCore) {
             this.C = modCore;
             this.context = context;
-            this.items = items;
-            this.provider = provider;
         }
 
         private void makeSingleRecipe(
@@ -155,7 +188,7 @@ public class RecipeBuilder {
                     .category(category)
                     .shape(shape)
                     .addMaterial('#', source)
-                    .build(items, provider, context);
+                    .build(context);
         }
 
         public void makeRoofRecipe(Block source, Block roof) {
@@ -172,7 +205,7 @@ public class RecipeBuilder {
                          .input(source)
                          .category(RecipeCategory.BUILDING_BLOCKS)
                          .group("stairs")
-                         .build(items, provider, context);
+                         .build(context);
         }
 
 
@@ -188,7 +221,7 @@ public class RecipeBuilder {
                          .input(source)
                          .category(RecipeCategory.BUILDING_BLOCKS)
                          .group("slabs")
-                         .build(items, provider, context);
+                         .build(context);
         }
 
         public void makeButtonRecipe(Block source, Block button) {
@@ -219,13 +252,13 @@ public class RecipeBuilder {
                     .shape(SHAPE_3X2)
                     .category(RecipeCategory.DECORATIONS)
                     .addMaterial('#', source)
-                    .build(items, provider, context);
+                    .build(context);
 
             RecipeBuilder.stonecutting(C.id(name + "_stonecutting"), wall)
                          .input(source)
                          .category(RecipeCategory.BUILDING_BLOCKS)
                          .group("walls")
-                         .build(items, provider, context);
+                         .build(context);
         }
 
         public void makeColoringRecipe(
@@ -245,7 +278,7 @@ public class RecipeBuilder {
                     .shape(SHAPE_COLORING)
                     .addMaterial('#', source)
                     .addMaterial('I', dye)
-                    .build(items, provider, context);
+                    .build(context);
         }
 
         public void makeRoundRecipe(Block source, Block result, String group, RecipeCategory category) {
@@ -257,7 +290,7 @@ public class RecipeBuilder {
                     .category(category)
                     .shape(SHAPE_ROUND)
                     .addMaterial('#', source)
-                    .build(items, provider, context);
+                    .build(context);
         }
 
         public void makeFireBowlRecipe(Block material, Block inside, Item leg, Block result) {
@@ -271,7 +304,7 @@ public class RecipeBuilder {
                     .addMaterial('I', inside)
                     .addMaterial('L', leg)
                     .category(RecipeCategory.DECORATIONS)
-                    .build(items, provider, context);
+                    .build(context);
         }
     }
 

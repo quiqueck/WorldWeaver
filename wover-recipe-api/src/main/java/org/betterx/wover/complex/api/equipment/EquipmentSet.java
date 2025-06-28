@@ -1,11 +1,9 @@
 package org.betterx.wover.complex.api.equipment;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.recipe.api.RecipeBuilder;
 
-import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -116,23 +114,21 @@ public abstract class EquipmentSet {
     }
 
 
-    public void buildRecipes(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
+    public void buildRecipes(RecipeBuilder.Context context) {
         for (var desc : tools.entrySet()) {
-            desc.getValue().addRecipe(items, provider, ctx, toolTier, handleItem, templateBaseSet);
+            desc.getValue().addRecipe(context, toolTier, handleItem, templateBaseSet);
         }
 
         for (var desc : armors.entrySet()) {
-            desc.getValue().addRecipe(items, provider, ctx, armorTier, handleItem, templateBaseSet);
+            desc.getValue().addRecipe(context, armorTier, handleItem, templateBaseSet);
         }
     }
 
     public static void buildAllRecipes(
             ModCore modCore,
-            HolderGetter<Item> items,
-            RecipeProvider provider,
-            RecipeOutput ctx
+            RecipeBuilder.Context context
     ) {
-        SETS.stream().filter(set -> set.C == modCore).forEach(set -> set.buildRecipes(items, provider, ctx));
+        SETS.stream().filter(set -> set.C == modCore).forEach(set -> set.buildRecipes(context));
     }
 
     @NotNull

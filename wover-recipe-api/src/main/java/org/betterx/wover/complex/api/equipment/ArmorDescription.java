@@ -3,10 +3,7 @@ package org.betterx.wover.complex.api.equipment;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
-import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -40,7 +37,7 @@ public class ArmorDescription<I extends Item> extends ItemDescription<I> {
     }
 
     public void addRecipe(
-            HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx,
+            RecipeBuilder.Context context,
             ArmorTier tier,
             ItemLike stick,
             @Nullable EquipmentSet sourceSet
@@ -58,7 +55,7 @@ public class ArmorDescription<I extends Item> extends ItemDescription<I> {
                     .base(sourceSet.get(this.slot))
                     .addon(repairWith)
                     .category(slot.category)
-                    .build(items, provider, ctx);
+                    .build(context);
         } else {
             var builder = RecipeBuilder.crafting(location, item)
                                        .addMaterial('#', repairWith)
@@ -68,7 +65,7 @@ public class ArmorDescription<I extends Item> extends ItemDescription<I> {
             builder
                     .category(slot.category)
                     .group(location.getPath())
-                    .build(items, provider, ctx);
+                    .build(context);
         }
     }
 }

@@ -1,11 +1,9 @@
 package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.recipe.api.CookingRecipeBuilder;
+import org.betterx.wover.recipe.api.RecipeBuilder;
 
-import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -121,12 +119,12 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
     }
 
     @Override
-    public void build(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
+    public void build(RecipeBuilder.Context context) {
         if (smelting) {
             buildRecipe(
-                    provider, ctx, "smelting",
+                    context, "smelting",
                     SimpleCookingRecipeBuilder.smelting(
-                            input.createIngredient(provider),
+                            input.createIngredient(context),
                             category,
                             output.getItem(),
                             xp,
@@ -137,9 +135,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
 
         if (blasting) {
             buildRecipe(
-                    provider, ctx, "blasting",
+                    context, "blasting",
                     SimpleCookingRecipeBuilder.blasting(
-                            input.createIngredient(provider),
+                            input.createIngredient(context),
                             category,
                             output.getItem(),
                             xp,
@@ -150,9 +148,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
 
         if (campfire) {
             buildRecipe(
-                    provider, ctx, "campfire",
+                    context, "campfire",
                     SimpleCookingRecipeBuilder.campfireCooking(
-                            input.createIngredient(provider),
+                            input.createIngredient(context),
                             category,
                             output.getItem(),
                             xp,
@@ -163,9 +161,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
 
         if (smoker) {
             buildRecipe(
-                    provider, ctx, "smoker",
+                    context, "smoker",
                     SimpleCookingRecipeBuilder.campfireCooking(
-                            input.createIngredient(provider),
+                            input.createIngredient(context),
                             category,
                             output.getItem(),
                             xp,
@@ -176,16 +174,15 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
     }
 
     private void buildRecipe(
-            RecipeProvider provider,
-            RecipeOutput ctx,
+            RecipeBuilder.Context context,
             String suffix,
             SimpleCookingRecipeBuilder builder
     ) {
         ResourceLocation loc = id.withSuffix("_" + suffix);
 
         for (var item : unlocks.entrySet()) {
-            builder.unlockedBy(item.getKey(), item.getValue().createCriterion(provider));
+            builder.unlockedBy(item.getKey(), item.getValue().createCriterion(context));
         }
-        builder.save(ctx, ResourceKey.create(Registries.RECIPE, loc));
+        builder.save(context.recipeOutput(), ResourceKey.create(Registries.RECIPE, loc));
     }
 }

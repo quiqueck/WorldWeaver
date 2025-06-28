@@ -2,6 +2,7 @@ package org.betterx.wover.datagen.api.provider;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.WoverDataProvider;
+import org.betterx.wover.recipe.api.RecipeBuilder;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -38,9 +39,7 @@ public abstract class WoverRecipeProvider implements WoverDataProvider<FabricRec
      * @param context The context to add the elements to.
      */
     protected abstract void bootstrap(
-            HolderLookup.Provider lookupProvider,
-            RecipeProvider recipeProvider,
-            RecipeOutput context
+            RecipeBuilder.Context ctx
     );
 
     @Override
@@ -54,7 +53,7 @@ public abstract class WoverRecipeProvider implements WoverDataProvider<FabricRec
                 return new RecipeProvider(registryLookup, exporter) {
                     @Override
                     public void buildRecipes() {
-                        bootstrap(registryLookup, this, exporter);
+                        bootstrap(new RecipeBuilder.Context(registryLookup, this, exporter));
                     }
                 };
             }

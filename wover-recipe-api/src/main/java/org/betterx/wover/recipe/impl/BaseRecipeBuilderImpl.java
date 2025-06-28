@@ -1,13 +1,13 @@
 package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.recipe.api.BaseRecipeBuilder;
+import org.betterx.wover.recipe.api.RecipeBuilder;
 
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> implements BaseRecipeBuilder<I> {
     public interface UnlockCriterionFactory {
-        Criterion<?> createCriterion(RecipeProvider provider);
+        Criterion<?> createCriterion(RecipeBuilder.Context context);
     }
 
     protected RecipeCategory category;
@@ -90,7 +90,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
         ingredient.items().forEach(item -> {
             this.unlocks(
                     "has_" + item.value().getDescriptionId(),
-                    (provider) -> provider.has(item.value())
+                    (context) -> context.has(item.value())
             );
         });
 
@@ -100,7 +100,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     public I unlockedBy(ItemLike item) {
         this.unlocks(
                 "has_" + item.asItem().getDescriptionId(),
-                (provider) -> provider.has(item.asItem())
+                (context) -> context.has(item.asItem())
         );
 
         return (I) this;
@@ -109,7 +109,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     public I unlockedBy(TagKey<Item> tag) {
         this.unlocks(
                 "has_tag_" + tag.location().getNamespace() + "_" + tag.location().getPath(),
-                (provider) -> provider.has(tag)
+                (context) -> context.has(tag)
         );
 
         return (I) this;

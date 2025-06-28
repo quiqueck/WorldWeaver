@@ -18,14 +18,14 @@ public class TestModWoverRecipe implements ModInitializer {
     public void onInitialize() {
         TestEquipmentSet.ensureStaticInit();
 
-        RecipeBuilder.BOOTSTRAP_RECIPES.subscribe((items, provider, ctx) -> {
+        RecipeBuilder.BOOTSTRAP_RECIPES.subscribe((ctx) -> {
             RecipeBuilder.crafting(C.mk("test_diamoan_recipe"), Items.DIAMOND)
                          .addMaterial('C', Items.COAL_BLOCK)
                          .addMaterial('I', Items.IRON_BLOCK)
                          .shape("III", "ICI", "III")
                          .outputCount(1)
                          .showNotification()
-                         .build(items, provider, ctx);
+                         .build(ctx);
         });
 
 
