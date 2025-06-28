@@ -13,7 +13,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(DedicatedServerProperties.WorldDimensionData.class)
 public class WorldDimensionDataMixin {
     //Make sure Servers use our Default World Preset
-    @ModifyArg(method = "create", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/core/Registry;getHolder(Lnet/minecraft/resources/ResourceKey;)Ljava/util/Optional;"))
+    @ModifyArg(
+            method = "create",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/core/HolderLookup;get(Lnet/minecraft/resources/ResourceKey;)Ljava/util/Optional;")
+    )
     private ResourceKey<WorldPreset> wover_returnDefault(ResourceKey<WorldPreset> resourceKey) {
         return WorldPresetsManagerImpl.getDefault();
     }

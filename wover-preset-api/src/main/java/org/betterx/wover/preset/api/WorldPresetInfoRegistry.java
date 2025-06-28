@@ -45,14 +45,15 @@ public class WorldPresetInfoRegistry {
     ) {
         if (key == null) return WorldPresetInfoImpl.DEFAULT;
         final Registry<WorldPresetInfo> infos = WorldState.allStageRegistryAccess()
-                                                          .registry(WORLD_PRESET_INFO_REGISTRY)
+                                                          .lookup(WORLD_PRESET_INFO_REGISTRY)
                                                           .orElse(null);
         if (infos == null) {
             LibWoverWorldPreset.C.LOG.error("WorldPresetInfoRegistry: Registry not read");
             return WorldPresetInfoImpl.DEFAULT;
         }
-        if (!infos.containsKey(key.location())) return WorldPresetInfoImpl.DEFAULT;
-        return infos.get(key.location());
+        final var info = infos.getValue(key.location());
+        if (info == null) return WorldPresetInfoImpl.DEFAULT;
+        return info;
     }
 
     public static @NotNull WorldPresetInfo getFor(
@@ -68,7 +69,7 @@ public class WorldPresetInfoRegistry {
         if (preset == null) return WorldPresetInfoImpl.DEFAULT;
 
         final Registry<WorldPreset> presets = WorldState.allStageRegistryAccess()
-                                                        .registryOrThrow(Registries.WORLD_PRESET);
+                                                        .lookupOrThrow(Registries.WORLD_PRESET);
         final Optional<ResourceKey<WorldPreset>> key = presets.getResourceKey(preset);
         if (key.isPresent()) return getFor(key.get());
         return WorldPresetInfoImpl.DEFAULT;

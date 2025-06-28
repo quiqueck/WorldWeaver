@@ -189,7 +189,15 @@ public class DatapackRegistryBuilder {
                     //TODO: 1.21 creating a new instance of RegistrationInfo might be expensive...
                     return registry.register(resourceKey, object, new RegistrationInfo(Optional.empty(), lifecycle));
                 } else {
-                    return registry.getOrThrow(resourceKey);
+                    var holder = registry.getOrThrow(resourceKey);
+                    if (!holder.isBound()) {
+                        return registry.register(
+                                resourceKey,
+                                object,
+                                new RegistrationInfo(Optional.empty(), lifecycle)
+                        );
+                    }
+                    return holder;
                 }
             }
 

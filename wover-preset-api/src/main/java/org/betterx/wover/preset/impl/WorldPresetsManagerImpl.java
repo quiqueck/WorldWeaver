@@ -7,7 +7,6 @@ import org.betterx.wover.preset.api.event.OnBootstrapWorldPresets;
 import org.betterx.wover.preset.mixin.WorldPresetAccessor;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -29,8 +28,8 @@ public class WorldPresetsManagerImpl {
 
     public static Holder<WorldPreset> get(RegistryAccess access, ResourceKey<WorldPreset> key) {
         return access == null ? null : access
-                .registryOrThrow(Registries.WORLD_PRESET)
-                .getHolderOrThrow(key);
+                .lookupOrThrow(Registries.WORLD_PRESET)
+                .getOrThrow(key);
     }
 
     @ApiStatus.Internal
