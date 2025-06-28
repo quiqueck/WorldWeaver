@@ -2,19 +2,23 @@ package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.recipe.api.OnBootstrapRecipes;
+import org.betterx.wover.state.api.WorldState;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.item.crafting.RecipeType;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -25,36 +29,30 @@ public class RecipeRuntimeProviderImpl {
             new EventImpl<>("BOOTSTRAP_RECIPES");
 
     public record LoadedRecipes(Multimap<RecipeType<?>, RecipeHolder<?>> byType,
-                                Map<ResourceLocation, RecipeHolder<?>> byName) {
+                                Map<ResourceKey<Recipe<?>>, RecipeHolder<?>> byName) {
     }
 
 
     @ApiStatus.Internal
-    public static LoadedRecipes loadedRecipes(
-            LoadedRecipes loaded
+    public static RecipeMap loadedRecipes(
+            RecipeMap loaded
     ) {
         final boolean[] didInit = {false};
-        final ImmutableMultimap.Builder<RecipeType<?>, RecipeHolder<?>> typeBuilder = ImmutableMultimap
-                .<RecipeType<?>, RecipeHolder<?>>builder();
-
-        final ImmutableMap.Builder<ResourceLocation, RecipeHolder<?>> nameBuilder = ImmutableMap
-                .<ResourceLocation, RecipeHolder<?>>builder();
+        List<RecipeHolder<?>> recipeHolders = new LinkedList<>();
 
         RecipeOutput context = new RecipeOutput() {
             @Override
             public void accept(
-                    ResourceLocation resourceLocation,
+                    ResourceKey<Recipe<?>> resourceKey,
                     Recipe<?> recipe,
                     @Nullable AdvancementHolder advancementHolder
             ) {
                 if (!didInit[0]) {
-                    typeBuilder.putAll(loaded.byType);
-                    nameBuilder.putAll(loaded.byName);
+                    recipeHolders.addAll(loaded.values());
                     didInit[0] = true;
                 }
-                RecipeHolder<?> recipeHolder = new RecipeHolder<>(resourceLocation, recipe);
-                typeBuilder.put(recipe.getType(), recipeHolder);
-                nameBuilder.put(resourceLocation, recipeHolder);
+                RecipeHolder<?> recipeHolder = new RecipeHolder<>(resourceKey, recipe);
+                recipeHolders.add(recipeHolder);
             }
 
             @Override
@@ -64,11 +62,24 @@ public class RecipeRuntimeProviderImpl {
                         .recipeAdvancement()
                         .parent(net.minecraft.data.recipes.RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
             }
+
+            @Override
+            public void includeRootAdvancement() {
+                //this is created by vanilla code, so we don't need to do anything here
+            }
+
         };
 
-        BOOTSTRAP_RECIPES.emit(c -> c.bootstrap(context));
+        var items = WorldState.registryAccess().lookupOrThrow(Registries.ITEM);
+        var provider = new RecipeProvider(WorldState.registryAccess(), context) {
+            @Override
+            public void buildRecipes() {
+
+            }
+        };
+        BOOTSTRAP_RECIPES.emit(c -> c.bootstrap(items, provider, context));
 
         if (!didInit[0]) return loaded;
-        return new LoadedRecipes(typeBuilder.build(), nameBuilder.build());
+        return RecipeMap.create(recipeHolders);
     }
 }

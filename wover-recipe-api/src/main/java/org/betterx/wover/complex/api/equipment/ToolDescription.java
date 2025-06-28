@@ -4,8 +4,10 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.tag.api.predefined.CommonItemTags;
 
+import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -44,7 +46,7 @@ class ToolDescription<I extends Item> extends ItemDescription<I> {
     }
 
     public void addRecipe(
-            RecipeOutput ctx,
+            HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx,
             ToolTier tier,
             ItemLike stick,
             @Nullable EquipmentSet sourceSet
@@ -61,14 +63,14 @@ class ToolDescription<I extends Item> extends ItemDescription<I> {
                     .base(sourceSet.get(this.slot))
                     .addon(repairItems)
                     .category(slot.category)
-                    .build(ctx);
+                    .build(items, provider, ctx);
         } else {
             var builder = RecipeBuilder.crafting(location, item)
                                        .addMaterial('#', repairItems)
                                        .category(RecipeCategory.TOOLS);
 
             if (buildRecipe(item, stick, builder)) return;
-            builder.category(slot.category).group(location.getPath()).build(ctx);
+            builder.category(slot.category).group(location.getPath()).build(items, provider, ctx);
         }
     }
 

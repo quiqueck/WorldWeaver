@@ -35,7 +35,7 @@ public enum ArmorSlot {
             var values = material.getValues(slot);
             if (values == null)
                 throw new IllegalArgumentException("No values for slot " + slot + " in tier " + material);
-            return new Item.Properties().durability(slot.armorType.getDurability(values.durability()));
+            return new Item.Properties().humanoidArmor(material.armorMaterial, slot.armorType);
         };
     }
 

@@ -3,8 +3,10 @@ package org.betterx.wover.complex.api.equipment;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
+import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -38,7 +40,7 @@ public class ArmorDescription<I extends Item> extends ItemDescription<I> {
     }
 
     public void addRecipe(
-            RecipeOutput ctx,
+            HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx,
             ArmorTier tier,
             ItemLike stick,
             @Nullable EquipmentSet sourceSet
@@ -46,9 +48,7 @@ public class ArmorDescription<I extends Item> extends ItemDescription<I> {
         if (item == null) return;
         if (tier == null) return;
 
-        var repair = tier.armorMaterial.value().repairIngredient();
-        var ingot = repair.get();
-        if (ingot.isEmpty()) return;
+        var repairWith = tier.armorMaterial.repairIngredient();
 
         var values = tier.getValues(slot);
         if (values != null && values.smithingTemplate() != null && sourceSet != null) {
@@ -56,19 +56,19 @@ public class ArmorDescription<I extends Item> extends ItemDescription<I> {
                     .smithing(location, item)
                     .template(values.smithingTemplate())
                     .base(sourceSet.get(this.slot))
-                    .addon(ingot)
+                    .addon(repairWith)
                     .category(slot.category)
-                    .build(ctx);
+                    .build(items, provider, ctx);
         } else {
             var builder = RecipeBuilder.crafting(location, item)
-                                       .addMaterial('#', ingot)
+                                       .addMaterial('#', repairWith)
                                        .category(RecipeCategory.TOOLS);
 
             if (buildRecipe(item, stick, builder)) return;
             builder
                     .category(slot.category)
                     .group(location.getPath())
-                    .build(ctx);
+                    .build(items, provider, ctx);
         }
     }
 }

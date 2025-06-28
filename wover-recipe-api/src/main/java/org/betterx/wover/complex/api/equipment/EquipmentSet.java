@@ -2,12 +2,12 @@ package org.betterx.wover.complex.api.equipment;
 
 import org.betterx.wover.core.api.ModCore;
 
-import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ToolMaterial;
-import net.minecraft.world.item.equipment.ArmorMaterial;
-import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.HashMap;
@@ -20,11 +20,11 @@ public abstract class EquipmentSet {
     private static final List<EquipmentSet> SETS = new LinkedList<>();
 
     public interface ToolFactory<I extends Item> {
-        I create(ToolMaterial material, Item.Properties properties);
+        I create(Item.Properties properties);
     }
 
     public interface ArmorFactory<I extends Item> {
-        I create(Holder<ArmorMaterial> holder, ArmorType type, Item.Properties properties);
+        I create(Item.Properties properties);
     }
 
     public final ToolTier toolTier;
@@ -60,6 +60,10 @@ public abstract class EquipmentSet {
         SETS.add(this);
     }
 
+    public <I extends Item> void add(ToolSlot slot) {
+        add(slot, Item::new);
+    }
+
     public <I extends Item> void add(ToolSlot slot, ToolFactory<I> toolFactory) {
         add(slot, toolFactory, ToolSlot::buildProperties);
     }
@@ -75,9 +79,16 @@ public abstract class EquipmentSet {
                         C,
                         slot,
                         nameForSlot(slot),
-                        () -> toolFactory.create(toolTier.toolMaterial, propertiesBuilder.build(slot, toolTier))
+                        () -> toolFactory.create(propertiesBuilder
+                                .build(slot, toolTier)
+                                .setId(ResourceKey.create(Registries.ITEM, C.mk(nameForSlot(slot))))
+                        )
                 )
         );
+    }
+
+    public <I extends Item> void add(ArmorSlot slot) {
+        add(slot, Item::new);
     }
 
     public <I extends Item> void add(ArmorSlot slot, ArmorFactory<I> armorFactory) {
@@ -96,27 +107,32 @@ public abstract class EquipmentSet {
                         slot,
                         nameForSlot(slot),
                         () -> armorFactory.create(
-                                armorTier.armorMaterial,
-                                slot.armorType,
-                                propertiesBuilder.build(slot, armorTier)
+                                propertiesBuilder
+                                        .build(slot, armorTier)
+                                        .setId(ResourceKey.create(Registries.ITEM, C.mk(nameForSlot(slot))))
                         )
                 )
         );
     }
 
 
-    public void buildRecipes(RecipeOutput ctx) {
+    public void buildRecipes(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
         for (var desc : tools.entrySet()) {
-            desc.getValue().addRecipe(ctx, toolTier, handleItem, templateBaseSet);
+            desc.getValue().addRecipe(items, provider, ctx, toolTier, handleItem, templateBaseSet);
         }
 
         for (var desc : armors.entrySet()) {
-            desc.getValue().addRecipe(ctx, armorTier, handleItem, templateBaseSet);
+            desc.getValue().addRecipe(items, provider, ctx, armorTier, handleItem, templateBaseSet);
         }
     }
 
-    public static void buildAllRecipes(ModCore modCore, RecipeOutput ctx) {
-        SETS.stream().filter(set -> set.C == modCore).forEach(set -> set.buildRecipes(ctx));
+    public static void buildAllRecipes(
+            ModCore modCore,
+            HolderGetter<Item> items,
+            RecipeProvider provider,
+            RecipeOutput ctx
+    ) {
+        SETS.stream().filter(set -> set.C == modCore).forEach(set -> set.buildRecipes(items, provider, ctx));
     }
 
     @NotNull

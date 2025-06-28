@@ -2,8 +2,12 @@ package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.recipe.api.CookingRecipeBuilder;
 
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -13,7 +17,7 @@ import net.minecraft.world.level.ItemLike;
 public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecipeBuilder> implements CookingRecipeBuilder {
     protected float xp;
     protected int cookingTime;
-    protected Ingredient input;
+    protected CraftingRecipeBuilderImpl.IngredientFactory input;
 
     protected boolean blasting, campfire, smoker, smelting;
 
@@ -84,17 +88,21 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
         return this;
     }
 
-    public CookingRecipeBuilder input(TagKey<Item> input) {
-        return input(Ingredient.of(input));
+    public CookingRecipeBuilder input(TagKey<Item> tagKey) {
+        this.input = provider -> provider.tag(tagKey);
+        unlockedBy(tagKey);
+        return this;
     }
 
     public CookingRecipeBuilder input(ItemLike input) {
-        return input(Ingredient.of(input));
+        this.input = provider -> Ingredient.of(input);
+        unlockedBy(input);
+        return this;
     }
 
     public CookingRecipeBuilder input(Ingredient input) {
-        this.input = input;
-        unlockedBy(input.getItems());
+        this.input = provider -> input;
+        unlockedBy(input);
         return this;
     }
 
@@ -103,7 +111,8 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
         super.validate();
 
         if (!smelting && !blasting && !campfire && !smoker) {
-            throwIllegalStateException("No target (smelting, blasting, campfire or somer) for cooking recipe was selected");
+            throwIllegalStateException(
+                    "No target (smelting, blasting, campfire or somer) for cooking recipe was selected");
         }
 
         if (cookingTime < 0) {
@@ -112,12 +121,12 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
     }
 
     @Override
-    public void build(RecipeOutput ctx) {
+    public void build(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
         if (smelting) {
             buildRecipe(
-                    ctx, "smelting",
+                    provider, ctx, "smelting",
                     SimpleCookingRecipeBuilder.smelting(
-                            input,
+                            input.createIngredient(provider),
                             category,
                             output.getItem(),
                             xp,
@@ -128,9 +137,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
 
         if (blasting) {
             buildRecipe(
-                    ctx, "blasting",
+                    provider, ctx, "blasting",
                     SimpleCookingRecipeBuilder.blasting(
-                            input,
+                            input.createIngredient(provider),
                             category,
                             output.getItem(),
                             xp,
@@ -141,9 +150,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
 
         if (campfire) {
             buildRecipe(
-                    ctx, "campfire",
+                    provider, ctx, "campfire",
                     SimpleCookingRecipeBuilder.campfireCooking(
-                            input,
+                            input.createIngredient(provider),
                             category,
                             output.getItem(),
                             xp,
@@ -154,9 +163,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
 
         if (smoker) {
             buildRecipe(
-                    ctx, "smoker",
+                    provider, ctx, "smoker",
                     SimpleCookingRecipeBuilder.campfireCooking(
-                            input,
+                            input.createIngredient(provider),
                             category,
                             output.getItem(),
                             xp,
@@ -166,12 +175,17 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
         }
     }
 
-    private void buildRecipe(RecipeOutput ctx, String suffix, SimpleCookingRecipeBuilder builder) {
+    private void buildRecipe(
+            RecipeProvider provider,
+            RecipeOutput ctx,
+            String suffix,
+            SimpleCookingRecipeBuilder builder
+    ) {
         ResourceLocation loc = id.withSuffix("_" + suffix);
 
         for (var item : unlocks.entrySet()) {
-            builder.unlockedBy(item.getKey(), item.getValue());
+            builder.unlockedBy(item.getKey(), item.getValue().createCriterion(provider));
         }
-        builder.save(ctx, loc);
+        builder.save(ctx, ResourceKey.create(Registries.RECIPE, loc));
     }
 }

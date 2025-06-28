@@ -2,7 +2,9 @@ package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.recipe.api.StonecutterRecipeBuilder;
 
+import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SingleItemRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -13,7 +15,7 @@ import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.NotNull;
 
 public class StonecutterRecipeBuilderImpl extends BaseRecipeBuilderImpl<StonecutterRecipeBuilder> implements StonecutterRecipeBuilder {
-    Ingredient input;
+    CraftingRecipeBuilderImpl.IngredientFactory input;
 
     public StonecutterRecipeBuilderImpl(
             @NotNull ResourceLocation id,
@@ -23,17 +25,21 @@ public class StonecutterRecipeBuilderImpl extends BaseRecipeBuilderImpl<Stonecut
     }
 
 
-    public StonecutterRecipeBuilder input(TagKey<Item> input) {
-        return input(Ingredient.of(input));
+    public StonecutterRecipeBuilder input(TagKey<Item> tagKey) {
+        this.input = provider -> provider.tag(tagKey);
+        unlockedBy(tagKey);
+        return this;
     }
 
     public StonecutterRecipeBuilder input(ItemLike input) {
-        return input(Ingredient.of(input));
+        this.input = provider -> Ingredient.of(input);
+        unlockedBy(input);
+        return this;
     }
 
     public StonecutterRecipeBuilder input(Ingredient input) {
-        this.input = input;
-        unlockedBy(input.getItems());
+        this.input = provider -> input;
+        unlockedBy(input);
         return this;
     }
 
@@ -47,16 +53,16 @@ public class StonecutterRecipeBuilderImpl extends BaseRecipeBuilderImpl<Stonecut
     }
 
     @Override
-    public void build(RecipeOutput ctx) {
+    public void build(HolderGetter<Item> items, RecipeProvider provider, RecipeOutput ctx) {
         final SingleItemRecipeBuilder builder = SingleItemRecipeBuilder.stonecutting(
-                input, category, output.getItem(), output.getCount()
+                input.createIngredient(provider), category, output.getItem(), output.getCount()
         );
 
         for (var item : unlocks.entrySet()) {
-            builder.unlockedBy(item.getKey(), item.getValue());
+            builder.unlockedBy(item.getKey(), item.getValue().createCriterion(provider));
         }
 
         builder.group(group);
-        builder.save(ctx, id);
+        builder.save(ctx, this.key());
     }
 }

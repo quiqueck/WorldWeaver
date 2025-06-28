@@ -5,13 +5,16 @@ import org.betterx.wover.recipe.api.BaseRecipeBuilder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
@@ -23,6 +26,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> implements BaseRecipeBuilder<I> {
+    public interface UnlockCriterionFactory {
+        Criterion<?> createCriterion(RecipeProvider provider);
+    }
+
     protected RecipeCategory category;
     protected String group;
     protected boolean shouldUnlockAdvancements;
@@ -39,6 +46,10 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
         this.output = output;
         this.unlocks = new HashMap<>();
         this.shouldUnlockAdvancements = true;
+    }
+
+    public ResourceKey<Recipe<?>> key() {
+        return ResourceKey.create(Registries.RECIPE, id);
     }
 
     public I shouldUnlockAdvancements(boolean shouldUnlockAdvancements) {
@@ -63,17 +74,33 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     }
 
     // Advancements
-    protected final Map<String, Criterion<?>> unlocks;
+    protected final Map<String, UnlockCriterionFactory> unlocks;
 
     public I unlocks(String name, Criterion<?> criterion) {
-        this.unlocks.put(name, criterion);
+        this.unlocks.put(name, (provider) -> criterion);
+        return (I) this;
+    }
+
+    public I unlocks(String name, UnlockCriterionFactory criterionFactory) {
+        this.unlocks.put(name, criterionFactory);
+        return (I) this;
+    }
+
+    public I unlockedBy(Ingredient ingredient) {
+        ingredient.items().forEach(item -> {
+            this.unlocks(
+                    "has_" + item.value().getDescriptionId(),
+                    (provider) -> provider.has(item.value())
+            );
+        });
+
         return (I) this;
     }
 
     public I unlockedBy(ItemLike item) {
         this.unlocks(
                 "has_" + item.asItem().getDescriptionId(),
-                RecipeProvider.has(item.asItem())
+                (provider) -> provider.has(item.asItem())
         );
 
         return (I) this;
@@ -82,7 +109,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     public I unlockedBy(TagKey<Item> tag) {
         this.unlocks(
                 "has_tag_" + tag.location().getNamespace() + "_" + tag.location().getPath(),
-                RecipeProvider.has(tag)
+                (provider) -> provider.has(tag)
         );
 
         return (I) this;
