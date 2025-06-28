@@ -44,7 +44,13 @@ public class RegistryDataLoaderMixin {
         wt_set_WORLDGEN_REGISTRIES(enhanced);
     }
 
-    @Inject(method = "loadContentsFromManager", at = @At("TAIL"))
+    @Inject(
+            method = "loadContentsFromManager",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/tags/TagLoader;loadTagsForRegistry(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/core/WritableRegistry;)V",
+                    shift = At.Shift.BEFORE
+            )
+    )
     private static <E> void wover_bootstrap(
             ResourceManager resourceManager,
             RegistryOps.RegistryInfoLookup registryInfoLookup,
