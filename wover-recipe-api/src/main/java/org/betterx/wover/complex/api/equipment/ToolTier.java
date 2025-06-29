@@ -1,5 +1,10 @@
 package org.betterx.wover.complex.api.equipment;
 
+import org.betterx.wover.entrypoint.LibWoverRecipe;
+import org.betterx.wover.item.api.ItemDefinition;
+import org.betterx.wover.item.api.trait.ItemTrait;
+import org.betterx.wover.item.api.trait.ItemTraitKey;
+
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SmithingTemplateItem;
@@ -10,30 +15,77 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ToolTier {
+    interface TraitBuilder {
+        ItemTrait<Item, ?> with(ToolSlot slot, ToolTier tier);
+    }
 
-    public static final ToolSlot.PropertiesBuilder DIGGER_ITEM_PROPERTIES = (slot, tier) -> {
-        ToolValues values = tier.getValues(slot);
-        if (values == null)
-            throw new IllegalArgumentException("No values for slot " + slot + " in tier " + tier);
-        return new Item.Properties().tool(
-                tier.toolMaterial,
-                values.minableWithTag,
-                values.attackDamage,
-                values.attackSpeed,
-                0
-        );
-    };
+    static abstract class ConfigureToolItemTrait extends ItemTrait<Item, ItemTrait.VoidRuntime> {
+        protected final ToolSlot slot;
+        protected final ToolTier tier;
 
-    public static final ToolSlot.PropertiesBuilder SWORD_ITEM_PROPERTIES = (slot, tier) -> {
-        ToolValues values = tier.getValues(slot);
-        if (values == null)
-            throw new IllegalArgumentException("No values for slot " + slot + " in tier " + tier);
-        return new Item.Properties().sword(
-                tier.toolMaterial,
-                (int) values.attackDamage,
-                values.attackSpeed
+        protected ConfigureToolItemTrait(ItemTraitKey traitKey, ToolSlot slot, ToolTier tier) {
+            super(traitKey);
+            this.slot = slot;
+            this.tier = tier;
+        }
+
+        @Override
+        public void configure(ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition) {
+            ToolTier.ToolValues values = this.tier.getValues(slot);
+            if (values == null)
+                throw new IllegalArgumentException("No values for slot " + slot + " in tier " + this.tier);
+
+            configure(definition, values);
+        }
+
+        protected abstract void configure(
+                ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
+                ToolTier.ToolValues values
         );
-    };
+    }
+
+    static class ConfigureDiggerItemTrait extends ConfigureToolItemTrait {
+        public static final ItemTraitKey ID = ItemTraitKey.of(LibWoverRecipe.C, "configure_digger_item");
+
+        public ConfigureDiggerItemTrait(ToolSlot slot, ToolTier tier) {
+            super(ID, slot, tier);
+        }
+
+        @Override
+        protected void configure(
+                ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
+                ToolTier.ToolValues values
+        ) {
+            definition.getProperties().tool(
+                    this.tier.toolMaterial,
+                    values.minableWithTag,
+                    values.attackDamage,
+                    values.attackSpeed,
+                    0
+            );
+        }
+    }
+
+    static class ConfigureSwordItemTrait extends ConfigureToolItemTrait {
+        public static final ItemTraitKey ID = ItemTraitKey.of(LibWoverRecipe.C, "configure_sword_item");
+
+        public ConfigureSwordItemTrait(ToolSlot slot, ToolTier tier) {
+            super(ID, slot, tier);
+        }
+
+        @Override
+        protected void configure(
+                ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
+                ToolTier.ToolValues values
+        ) {
+            definition.getProperties().sword(
+                    tier.toolMaterial,
+                    (int) values.attackDamage,
+                    values.attackSpeed
+            );
+        }
+    }
+
 
     public record ToolValues(
             float attackDamage,

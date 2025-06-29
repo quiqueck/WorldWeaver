@@ -2,6 +2,7 @@ package org.betterx.wover.block.api;
 
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockWithTraits;
+import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.util.GrowableArray;
 
@@ -68,7 +69,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @SuppressWarnings("unchecked")
     public final B build() {
         this.beforeBuild();
-        final List<BlockTrait.RuntimeTrait<B, ?>> runtimeTraits;
+        final List<RuntimeBlockTrait<B, ?>> runtimeTraits;
 
         // If traits are defined, configure them and collect RuntimeTraits
         if (this.traits != null && !this.traits.isEmpty()) {
@@ -76,7 +77,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
             for (var configuredTrait : this.traits) {
                 this.configurePropertiesUnchecked(configuredTrait);
 
-                final BlockTrait.RuntimeTrait<B, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
+                final RuntimeBlockTrait<B, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
                 if (runtimeTrait != null) runtimeTraits.add(runtimeTrait);
             }
         } else runtimeTraits = null;
@@ -670,11 +671,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     }
 
     @SuppressWarnings("unchecked")
-    private BlockTrait.RuntimeTrait<B, ?> forRuntimeUnchecked(
+    private RuntimeBlockTrait<B, ?> forRuntimeUnchecked(
             BlockTrait<? super B, ?> trait
     ) {
         // Cast is safe because the trait can work with B (since B extends the super type)
-        return (BlockTrait.RuntimeTrait<B, ?>) trait.forRuntime();
+        return (RuntimeBlockTrait<B, ?>) trait.forRuntime();
     }
 
     @SuppressWarnings("unchecked")

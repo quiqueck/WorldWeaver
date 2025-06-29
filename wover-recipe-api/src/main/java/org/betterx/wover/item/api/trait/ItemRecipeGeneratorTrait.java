@@ -5,9 +5,10 @@ import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.item.api.ItemRegistry;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGeneratorTrait.RuntimeTrait> {
@@ -24,7 +25,7 @@ public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGenerato
         }
     }
 
-    public static class RuntimeTrait extends ItemTrait.RuntimeTrait<Item, ItemRecipeGeneratorTrait.RuntimeTrait> {
+    public static class RuntimeTrait extends RuntimeItemTrait<Item, RuntimeTrait> {
         public final RecipeFactory recipeFactory;
 
         private RuntimeTrait(RecipeFactory recipeFactory) {
@@ -34,7 +35,7 @@ public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGenerato
     }
 
     public interface RecipeFactory {
-        void buildRecipe(Item item, RecipeBuilder.Context context);
+        void buildRecipe(ResourceKey<Item> key, Item item, RecipeBuilder.Context context);
     }
 
     public final RecipeFactory recipeFactory;
@@ -60,16 +61,20 @@ public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGenerato
     }
 
     public static void bootstrapRecipes(ModCore modCore, RecipeBuilder.Context context) {
-        bootstrapRecipes(modCore, context, item -> true);
+        bootstrapRecipes(modCore, context, (r, i) -> true);
     }
 
-    public static void bootstrapRecipes(ModCore modCore, RecipeBuilder.Context context, Predicate<Item> filter) {
+    public static void bootstrapRecipes(
+            ModCore modCore,
+            RecipeBuilder.Context context,
+            BiPredicate<ResourceKey<Item>, Item> filter
+    ) {
         ItemRegistry
                 .forMod(modCore)
-                .allItems().filter(filter).forEach(item -> {
-                    ItemTrait.<Item, ItemRecipeGeneratorTrait.RuntimeTrait>getRuntimeTraits(item, BUILDER.ID)
-                             .forEach(trait -> trait.recipeFactory.buildRecipe(item, context));
-
+                .allEntries().filter(e -> filter.test(e.getKey(), e.getValue())).forEach(e -> {
+                    var runtimeTraits = ItemTrait.<Item, RuntimeTrait>getRuntimeTraits(e.getValue(), BUILDER.ID);
+                    if (runtimeTraits == null) return;
+                    runtimeTraits.forEach(trait -> trait.recipeFactory.buildRecipe(e.getKey(), e.getValue(), context));
                 });
     }
 }

@@ -3,6 +3,7 @@ package org.betterx.wover.item.api;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.trait.ItemTrait;
 import org.betterx.wover.item.api.trait.ItemWithTraits;
+import org.betterx.wover.item.api.trait.RuntimeItemTrait;
 import org.betterx.wover.util.GrowableArray;
 
 import net.minecraft.core.component.DataComponentType;
@@ -120,7 +121,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     public final I build() {
         this.beforeBuild();
 
-        final List<ItemTrait.RuntimeTrait<I, ?>> runtimeTraits;
+        final List<RuntimeItemTrait<I, ?>> runtimeTraits;
 
         // If traits are defined, configure them and collect RuntimeTraits
         if (this.traits != null && !this.traits.isEmpty()) {
@@ -128,7 +129,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
             for (var configuredTrait : this.traits) {
                 this.configurePropertiesUnchecked(configuredTrait);
 
-                final ItemTrait.RuntimeTrait<I, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
+                final RuntimeItemTrait<I, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
                 if (runtimeTrait != null) runtimeTraits.add(runtimeTrait);
             }
         } else runtimeTraits = null;
@@ -488,11 +489,11 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     }
 
     @SuppressWarnings("unchecked")
-    private ItemTrait.RuntimeTrait<I, ?> forRuntimeUnchecked(
+    private RuntimeItemTrait<I, ?> forRuntimeUnchecked(
             ItemTrait<? super I, ?> trait
     ) {
         // Cast is safe because the trait can work with B (since B extends the super type)
-        return (ItemTrait.RuntimeTrait<I, ?>) trait.forRuntime();
+        return (RuntimeItemTrait<I, ?>) trait.forRuntime();
     }
 
     @SuppressWarnings("unchecked")

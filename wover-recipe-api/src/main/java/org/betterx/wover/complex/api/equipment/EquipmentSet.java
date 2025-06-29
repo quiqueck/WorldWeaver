@@ -1,10 +1,9 @@
 package org.betterx.wover.complex.api.equipment;
 
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.recipe.api.RecipeBuilder;
+import org.betterx.wover.item.api.ArmorItemDefinition;
+import org.betterx.wover.item.api.ToolItemDefinition;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 
@@ -17,12 +16,10 @@ import org.jetbrains.annotations.NotNull;
 public abstract class EquipmentSet {
     private static final List<EquipmentSet> SETS = new LinkedList<>();
 
-    public interface ToolFactory<I extends Item> {
-        I create(Item.Properties properties);
+    public interface ToolFactory<I extends Item> extends ToolItemDefinition.ItemFactory<I> {
     }
 
-    public interface ArmorFactory<I extends Item> {
-        I create(Item.Properties properties);
+    public interface ArmorFactory<I extends Item> extends ArmorItemDefinition.ItemFactory<I> {
     }
 
     public final ToolTier toolTier;
@@ -59,76 +56,44 @@ public abstract class EquipmentSet {
     }
 
     public <I extends Item> void add(ToolSlot slot) {
-        add(slot, Item::new);
+        add(slot, definition -> new Item(definition.getProperties()));
     }
 
-    public <I extends Item> void add(ToolSlot slot, ToolFactory<I> toolFactory) {
-        add(slot, toolFactory, ToolSlot::buildProperties);
-    }
 
     public <I extends Item> void add(
             ToolSlot slot,
-            ToolFactory<I> toolFactory,
-            ToolSlot.PropertiesBuilder propertiesBuilder
+            ToolFactory<I> toolFactory
     ) {
         tools.put(
                 slot,
-                new ToolDescription<>(
+                ToolDescription.registerTool(
                         C,
                         slot,
                         nameForSlot(slot),
-                        () -> toolFactory.create(propertiesBuilder
-                                .build(slot, toolTier)
-                                .setId(ResourceKey.create(Registries.ITEM, C.mk(nameForSlot(slot))))
-                        )
+                        toolFactory,
+                        this
                 )
         );
     }
 
-    public <I extends Item> void add(ArmorSlot slot) {
-        add(slot, Item::new);
-    }
-
-    public <I extends Item> void add(ArmorSlot slot, ArmorFactory<I> armorFactory) {
-        add(slot, armorFactory, ArmorSlot::buildProperties);
+    public void add(ArmorSlot slot) {
+        add(slot, (definition) -> new Item(definition.getProperties()));
     }
 
     public <I extends Item> void add(
             ArmorSlot slot,
-            ArmorFactory<I> armorFactory,
-            ArmorSlot.PropertiesBuilder propertiesBuilder
+            ArmorFactory<I> armorFactory
     ) {
         armors.put(
                 slot,
-                new ArmorDescription<>(
+                ArmorDescription.registerArmor(
                         C,
                         slot,
                         nameForSlot(slot),
-                        () -> armorFactory.create(
-                                propertiesBuilder
-                                        .build(slot, armorTier)
-                                        .setId(ResourceKey.create(Registries.ITEM, C.mk(nameForSlot(slot))))
-                        )
+                        armorFactory,
+                        this
                 )
         );
-    }
-
-
-    public void buildRecipes(RecipeBuilder.Context context) {
-        for (var desc : tools.entrySet()) {
-            desc.getValue().addRecipe(context, toolTier, handleItem, templateBaseSet);
-        }
-
-        for (var desc : armors.entrySet()) {
-            desc.getValue().addRecipe(context, armorTier, handleItem, templateBaseSet);
-        }
-    }
-
-    public static void buildAllRecipes(
-            ModCore modCore,
-            RecipeBuilder.Context context
-    ) {
-        SETS.stream().filter(set -> set.C == modCore).forEach(set -> set.buildRecipes(context));
     }
 
     @NotNull
@@ -147,18 +112,18 @@ public abstract class EquipmentSet {
     }
 
     public <I extends Item> I get(ToolSlot slot) {
-        return (I) tools.get(slot).getItem();
+        return (I) tools.get(slot).item();
     }
 
     public <I extends Item> I get(ArmorSlot slot) {
-        return (I) armors.get(slot).getItem();
+        return (I) armors.get(slot).item();
     }
 
     public Item[] getTools() {
         var items = new Item[tools.size()];
         int i = 0;
         for (var desc : tools.values()) {
-            items[i++] = desc.getItem();
+            items[i++] = desc.item();
         }
         return items;
     }
@@ -167,7 +132,7 @@ public abstract class EquipmentSet {
         var items = new Item[armors.size()];
         int i = 0;
         for (var desc : armors.values()) {
-            items[i++] = desc.getItem();
+            items[i++] = desc.item();
         }
         return items;
     }
@@ -176,10 +141,10 @@ public abstract class EquipmentSet {
         var items = new Item[tools.size() + armors.size()];
         int i = 0;
         for (var desc : tools.values()) {
-            items[i++] = desc.getItem();
+            items[i++] = desc.item();
         }
         for (var desc : armors.values()) {
-            items[i++] = desc.getItem();
+            items[i++] = desc.item();
         }
         return items;
     }

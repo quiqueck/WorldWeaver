@@ -5,9 +5,10 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 
-import java.util.function.Predicate;
+import java.util.function.BiPredicate;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGeneratorTrait.RuntimeTrait> {
@@ -24,7 +25,7 @@ public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGene
         }
     }
 
-    public static class RuntimeTrait extends BlockTrait.RuntimeTrait<Block, BlockRecipeGeneratorTrait.RuntimeTrait> {
+    public static class RuntimeTrait extends RuntimeBlockTrait<Block, RuntimeTrait> {
         public final BlockRecipeGeneratorTrait.RecipeFactory recipeFactory;
 
         private RuntimeTrait(BlockRecipeGeneratorTrait.RecipeFactory recipeFactory) {
@@ -34,7 +35,7 @@ public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGene
     }
 
     public interface RecipeFactory {
-        void buildRecipe(Block block, RecipeBuilder.Context context);
+        void buildRecipe(ResourceKey<Block> key, Block block, RecipeBuilder.Context context);
     }
 
     public final BlockRecipeGeneratorTrait.RecipeFactory recipeFactory;
@@ -60,16 +61,23 @@ public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGene
     }
 
     public static void bootstrapRecipes(ModCore modCore, RecipeBuilder.Context context) {
-        bootstrapRecipes(modCore, context, item -> true);
+        bootstrapRecipes(modCore, context, (r, i) -> true);
     }
 
-    public static void bootstrapRecipes(ModCore modCore, RecipeBuilder.Context context, Predicate<Block> filter) {
+    public static void bootstrapRecipes(
+            ModCore modCore,
+            RecipeBuilder.Context context,
+            BiPredicate<ResourceKey<Block>, Block> filter
+    ) {
         BlockRegistry
                 .forMod(modCore)
-                .allBlocks().filter(filter).forEach(item -> {
-                    BlockTrait.<Block, BlockRecipeGeneratorTrait.RuntimeTrait>getRuntimeTraits(item, BUILDER.ID)
-                              .forEach(trait -> trait.recipeFactory.buildRecipe(item, context));
-
+                .allEntries().filter(e -> filter.test(e.getKey(), e.getValue())).forEach(e -> {
+                    var runtimeTraits = BlockTrait.<Block, BlockRecipeGeneratorTrait.RuntimeTrait>getRuntimeTraits(
+                            e.getValue(),
+                            BUILDER.ID
+                    );
+                    if (runtimeTraits == null) return;
+                    runtimeTraits.forEach(trait -> trait.recipeFactory.buildRecipe(e.getKey(), e.getValue(), context));
                 });
     }
 }

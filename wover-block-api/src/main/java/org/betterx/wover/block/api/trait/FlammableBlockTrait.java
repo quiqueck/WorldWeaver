@@ -37,7 +37,7 @@ public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockT
         }
     }
 
-    public final static class RuntimeTrait extends BlockTrait.RuntimeTrait<Block, RuntimeTrait> {
+    public final static class RuntimeTrait extends RuntimeBlockTrait<Block, RuntimeTrait> {
         private RuntimeTrait(FlammableBlockTrait sourceTrait) {
             super(sourceTrait);
         }

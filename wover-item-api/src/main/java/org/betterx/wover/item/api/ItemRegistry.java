@@ -2,8 +2,6 @@ package org.betterx.wover.item.api;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.smithing.SmithingTemplates;
-import org.betterx.wover.item.api.trait.ItemTrait;
-import org.betterx.wover.item.api.trait.ItemTraitKey;
 import org.betterx.wover.item.impl.api.ItemRegistryImpl;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
@@ -73,7 +71,7 @@ public abstract class ItemRegistry {
     /**
      * Map of all registered items by their resource location
      */
-    private final Map<ResourceLocation, Item> items = new HashMap<>();
+    private final Map<ResourceKey<Item>, Item> items = new HashMap<>();
 
     /**
      * Map of items to their tags for data generation (only populated during datagen)
@@ -134,8 +132,8 @@ public abstract class ItemRegistry {
      *
      * @return Stream of all registered Item instances
      */
-    public Stream<Item> allItemsWith(ItemTraitKey key) {
-        return this.allItems().filter(item -> ItemTrait.runtimeTraits(item).anyMatch(t -> t.is(key)));
+    public Stream<Map.Entry<ResourceKey<Item>, Item>> allEntries() {
+        return items.entrySet().stream();
     }
 
     /**
@@ -310,7 +308,7 @@ public abstract class ItemRegistry {
     protected <T extends Item> void register(@NotNull ResourceKey<Item> key, T item, @Nullable TagKey<Item>[] tags) {
         if (item != null && item != Items.AIR) {
             Registry.register(BuiltInRegistries.ITEM, key, item);
-            items.put(key.location(), item);
+            items.put(key, item);
 
             if (datagenTags != null && tags != null && tags.length > 0) datagenTags.put(item, tags);
         }
@@ -436,6 +434,6 @@ public abstract class ItemRegistry {
                 .entrySet()
                 .stream()
                 .filter(i -> i.getValue() instanceof ItemTagProvider)
-                .forEach(i -> ((ItemTagProvider) i.getValue()).registerItemTags(i.getKey(), ctx));
+                .forEach(i -> ((ItemTagProvider) i.getValue()).registerItemTags(i.getKey().location(), ctx));
     }
 }

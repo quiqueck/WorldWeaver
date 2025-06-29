@@ -58,6 +58,10 @@ public abstract class BlockRegistry {
         return blocks.values().stream();
     }
 
+    public Stream<Map.Entry<ResourceKey<Block>, Block>> allEntries() {
+        return blocks.entrySet().stream();
+    }
+
     public Stream<BlockItem> allBlockItems() {
         return blocks
                 .values()

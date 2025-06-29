@@ -8,7 +8,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 public interface BlockWithTraits<B extends Block> {
-    void wover_setTraits(@Nullable List<BlockTrait.RuntimeTrait<B, ?>> traits);
+    void wover_setTraits(@Nullable List<RuntimeBlockTrait<B, ?>> traits);
 
-    @Nullable Collection<BlockTrait.RuntimeTrait<B, ?>> wover_traits();
+    @Nullable Collection<RuntimeBlockTrait<B, ?>> wover_traits();
 }

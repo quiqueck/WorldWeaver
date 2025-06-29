@@ -8,7 +8,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 public interface ItemWithTraits<I extends Item> {
-    void wover_setItemTraits(@Nullable List<ItemTrait.RuntimeTrait<I, ?>> traits);
+    void wover_setItemTraits(@Nullable List<RuntimeItemTrait<I, ?>> traits);
 
-    @Nullable Collection<ItemTrait.RuntimeTrait<I, ?>> wover_itemTraits();
+    @Nullable Collection<RuntimeItemTrait<I, ?>> wover_itemTraits();
 }

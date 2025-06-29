@@ -1,37 +1,33 @@
 package org.betterx.wover.complex.api.equipment;
 
-import static org.betterx.wover.complex.api.equipment.ToolTier.DIGGER_ITEM_PROPERTIES;
-import static org.betterx.wover.complex.api.equipment.ToolTier.SWORD_ITEM_PROPERTIES;
+import org.betterx.wover.item.api.ToolItemDefinition;
 
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.world.item.Item;
 
 public enum ToolSlot {
-    PICKAXE_SLOT(0, "pickaxe", RecipeCategory.TOOLS, DIGGER_ITEM_PROPERTIES),
-    AXE_SLOT(1, "axe", RecipeCategory.TOOLS, DIGGER_ITEM_PROPERTIES),
-    SHOVEL_SLOT(2, "shovel", RecipeCategory.TOOLS, DIGGER_ITEM_PROPERTIES),
-    SWORD_SLOT(3, "sword", RecipeCategory.COMBAT, SWORD_ITEM_PROPERTIES),
-    HOE_SLOT(4, "hoe", RecipeCategory.TOOLS, DIGGER_ITEM_PROPERTIES),
-    SHEARS_SLOT(5, "shears", RecipeCategory.TOOLS, DIGGER_ITEM_PROPERTIES),
-    HAMMER_SLOT(6, "hammer", RecipeCategory.COMBAT, DIGGER_ITEM_PROPERTIES);
+    PICKAXE_SLOT(0, "pickaxe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
+    AXE_SLOT(1, "axe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
+    SHOVEL_SLOT(2, "shovel", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
+    SWORD_SLOT(3, "sword", RecipeCategory.COMBAT, ToolTier.ConfigureSwordItemTrait::new),
+    HOE_SLOT(4, "hoe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
+    SHEARS_SLOT(5, "shears", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
+    HAMMER_SLOT(6, "hammer", RecipeCategory.COMBAT, ToolTier.ConfigureDiggerItemTrait::new);
 
-    public interface PropertiesBuilder {
-        Item.Properties build(ToolSlot slot, ToolTier tier);
-    }
 
     public final RecipeCategory category;
     public final String name;
     public final int slotIndex;
-    private final PropertiesBuilder propertiesBuilder;
+    private final ToolTier.TraitBuilder traitBuilder;
 
-    ToolSlot(int slotIndex, String name, RecipeCategory category, PropertiesBuilder propertiesBuilder) {
+    ToolSlot(int slotIndex, String name, RecipeCategory category, ToolTier.TraitBuilder traitBuilder) {
         this.name = name;
         this.category = category;
         this.slotIndex = slotIndex;
-        this.propertiesBuilder = propertiesBuilder;
+        this.traitBuilder = traitBuilder;
     }
 
-    public Item.Properties buildProperties(ToolTier tier) {
-        return propertiesBuilder.build(this, tier);
+    public <I extends Item> void addToolConfigTrait(ToolItemDefinition<I> definition, ToolTier tier) {
+        definition.addTrait(traitBuilder.with(ToolSlot.this, tier));
     }
 }
