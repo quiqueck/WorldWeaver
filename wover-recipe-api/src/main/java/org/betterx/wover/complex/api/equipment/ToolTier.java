@@ -61,7 +61,7 @@ public class ToolTier {
                     values.minableWithTag,
                     values.attackDamage,
                     values.attackSpeed,
-                    0
+                    values.disableBlockingForSeconds
             );
         }
     }
@@ -90,25 +90,49 @@ public class ToolTier {
     public record ToolValues(
             float attackDamage,
             float attackSpeed,
+            float disableBlockingForSeconds,
             SmithingTemplateItem smithingTemplate,
             TagKey<Block> minableWithTag
     ) {
         public ToolValues(float attackDamage, float attackSpeed) {
-            this(attackDamage, attackSpeed, null, null);
+            this(attackDamage, attackSpeed, 0, null, null);
+        }
+
+        public ToolValues(float attackDamage, float attackSpeed, float disableBlockingForSeconds) {
+            this(attackDamage, attackSpeed, disableBlockingForSeconds, null, null);
         }
 
         public ToolValues(float attackDamage, float attackSpeed, SmithingTemplateItem smithingTemplate) {
-            this(attackDamage, attackSpeed, smithingTemplate, null);
+            this(attackDamage, attackSpeed, 0, smithingTemplate, null);
         }
 
         public ToolValues(float attackDamage, float attackSpeed, TagKey<Block> minableWithTag) {
-            this(attackDamage, attackSpeed, null, minableWithTag);
+            this(attackDamage, attackSpeed, 0, null, minableWithTag);
+        }
+
+        public ToolValues(
+                float attackDamage,
+                float attackSpeed,
+                float disableBlockingForSeconds,
+                SmithingTemplateItem smithingTemplate
+        ) {
+            this(attackDamage, attackSpeed, disableBlockingForSeconds, smithingTemplate, null);
+        }
+
+        public ToolValues(
+                float attackDamage,
+                float attackSpeed,
+                float disableBlockingForSeconds,
+                TagKey<Block> minableWithTag
+        ) {
+            this(attackDamage, attackSpeed, disableBlockingForSeconds, null, minableWithTag);
         }
 
         ToolValues copyWithOffset(ToolValues offset) {
             return new ToolValues(
                     attackDamage + offset.attackDamage,
                     attackSpeed + offset.attackSpeed,
+                    disableBlockingForSeconds + offset.disableBlockingForSeconds,
                     offset.smithingTemplate,
                     offset.minableWithTag != null ? offset.minableWithTag : this.minableWithTag
             );

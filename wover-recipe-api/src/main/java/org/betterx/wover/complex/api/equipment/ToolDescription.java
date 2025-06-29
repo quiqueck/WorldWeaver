@@ -38,12 +38,23 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
             ModCore modCore,
             ToolSlot slot,
             String path,
-            ToolItemDefinition.ItemFactory<I> creator,
+            EquipmentSet.ToolFactory<I> creator,
             EquipmentSet equipmentSet
     ) {
         var itemDefinition = ItemRegistry
                 .forMod(modCore)
-                .defineToolItem(path, creator)
+                .defineToolItem(
+                        path, definition -> {
+                            var values = equipmentSet.toolTier.getValues(slot);
+                            if (values == null) {
+                                throw new IllegalArgumentException("No values for slot " + slot + " in tier " + equipmentSet.toolTier);
+                            }
+                            return creator.create(
+                                    (ToolItemDefinition<I>) definition,
+                                    values
+                            );
+                        }
+                )
                 .addTags(getTagKey(slot));
 
         slot.addToolConfigTrait(itemDefinition, equipmentSet.toolTier);
@@ -61,7 +72,7 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
                         ))
         );
 
-        return new ToolDescription<>(itemDefinition.buildAndRegister(), itemDefinition.itemKey, slot);
+        return new ToolDescription<>((I) itemDefinition.buildAndRegister(), itemDefinition.itemKey, slot);
     }
 
     private static void addRecipe(

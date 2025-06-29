@@ -4,7 +4,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ArmorItemDefinition;
 import org.betterx.wover.item.api.ToolItemDefinition;
 
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.HashMap;
@@ -16,7 +16,8 @@ import org.jetbrains.annotations.NotNull;
 public abstract class EquipmentSet {
     private static final List<EquipmentSet> SETS = new LinkedList<>();
 
-    public interface ToolFactory<I extends Item> extends ToolItemDefinition.ItemFactory<I> {
+    public interface ToolFactory<I extends Item> {
+        @NotNull I create(@NotNull ToolItemDefinition<I> definition, @NotNull ToolTier.ToolValues values);
     }
 
     public interface ArmorFactory<I extends Item> extends ArmorItemDefinition.ItemFactory<I> {
@@ -56,7 +57,33 @@ public abstract class EquipmentSet {
     }
 
     public <I extends Item> void add(ToolSlot slot) {
-        add(slot, definition -> new Item(definition.getProperties()));
+        if (slot == ToolSlot.AXE_SLOT) {
+            add(
+                    slot, (definition, values) -> new AxeItem(
+                            this.toolTier.toolMaterial,
+                            values.attackDamage(), values.attackSpeed(),
+                            definition.getProperties()
+                    )
+            );
+        } else if (slot == ToolSlot.HOE_SLOT) {
+            add(
+                    slot, (definition, values) -> new HoeItem(
+                            this.toolTier.toolMaterial,
+                            values.attackDamage(), values.attackSpeed(),
+                            definition.getProperties()
+                    )
+            );
+        } else if (slot == ToolSlot.SHOVEL_SLOT) {
+            add(
+                    slot, (definition, values) -> new ShovelItem(
+                            this.toolTier.toolMaterial,
+                            values.attackDamage(), values.attackSpeed(),
+                            definition.getProperties()
+                    )
+            );
+        } else if (slot == ToolSlot.SHEARS_SLOT) {
+            add(slot, (definition, values) -> new ShearsItem(definition.getProperties()));
+        } else add(slot, (definition, values) -> new Item(definition.getProperties()));
     }
 
 
