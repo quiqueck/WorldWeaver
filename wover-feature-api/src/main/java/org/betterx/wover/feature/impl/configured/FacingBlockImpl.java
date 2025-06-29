@@ -11,7 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockConfig, PlaceBlockFeature<PlaceFacingBlockConfig>> implements org.betterx.wover.feature.api.configured.configurators.FacingBlock {
-    private final SimpleWeightedRandomList.Builder<BlockState> stateBuilder = SimpleWeightedRandomList.builder();
+    private final WeightedList.Builder<BlockState> stateBuilder = WeightedList.builder();
     BlockState firstState;
     private int count = 0;
     private List<Direction> directions = BlockHelper.HORIZONTAL;
@@ -102,7 +102,7 @@ public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockCon
         if (count == 1) {
             provider = SimpleStateProvider.simple(firstState);
         } else {
-            SimpleWeightedRandomList<BlockState> list = stateBuilder.build();
+            WeightedList<BlockState> list = stateBuilder.build();
             if (!list.isEmpty()) {
                 provider = new WeightedStateProvider(list);
             }

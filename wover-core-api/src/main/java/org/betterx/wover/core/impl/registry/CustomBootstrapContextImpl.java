@@ -42,7 +42,7 @@ public abstract class CustomBootstrapContextImpl<T> {
         if (lookupContext == null) return contextObject.bootstrapContext;
 
         final HolderGetter<T> biomeGetter = lookupContext.lookup(registryKey);
-        if (biomeGetter != contextObject.lastGetter) {
+        if (biomeGetter != contextObject.lastGetter || contextObject.bootstrapContext == null) {
             contextObject.lastGetter = biomeGetter;
 
             contextObject.bootstrapContext = contextSupplier.get();

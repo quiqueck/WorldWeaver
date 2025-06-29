@@ -5,6 +5,7 @@ import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 
 import net.minecraft.core.Holder;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -22,13 +23,13 @@ public class BiomeModificationImpl implements BiomeModification {
     private final List<TagKey<Biome>> biomeTags;
 
     @NotNull
-    private final List<MobSpawnSettings.SpawnerData> spawns;
+    private final WeightedList<MobSpawnSettings.SpawnerData> spawns;
 
     public BiomeModificationImpl(
             @NotNull BiomePredicate predicate,
             @NotNull List<List<Holder<PlacedFeature>>> features,
             @Nullable List<TagKey<Biome>> biomeTags,
-            @Nullable List<MobSpawnSettings.SpawnerData> spawns
+            @Nullable WeightedList<MobSpawnSettings.SpawnerData> spawns
     ) {
         this.predicate = predicate;
         this.features = FeatureMap.of(features);
@@ -52,7 +53,7 @@ public class BiomeModificationImpl implements BiomeModification {
     }
 
     @Override
-    public List<MobSpawnSettings.SpawnerData> spawns() {
+    public WeightedList<MobSpawnSettings.SpawnerData> spawns() {
         return this.spawns;
     }
 

@@ -9,6 +9,7 @@ import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.entrypoint.LibWoverBiome;
 import org.betterx.wover.events.api.WorldLifecycle;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
+import static org.betterx.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
 import org.betterx.wover.events.impl.EventImpl;
 import org.betterx.wover.state.api.WorldState;
 
@@ -26,7 +27,6 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
 import com.google.common.base.Stopwatch;
-import static org.betterx.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
 
 import java.util.Comparator;
 import java.util.List;
@@ -70,19 +70,19 @@ public class BiomeModificationRegistryImpl {
 
         final RegistryAccess registryAccess = WorldState.registryAccess();
         final Registry<BiomeModification> modifications = registryAccess
-                .registry(BiomeModificationRegistry.BIOME_MODIFICATION_REGISTRY)
+                .lookup(BiomeModificationRegistry.BIOME_MODIFICATION_REGISTRY)
                 .orElse(null);
         if (modifications == null) {
             LibWoverBiome.C.log.error("Biome Modification Registry is missing. Cannot apply Biome Modifications.");
             return;
         }
-        final Registry<Biome> biomes = registryAccess.registryOrThrow(Registries.BIOME);
+        final Registry<Biome> biomes = registryAccess.lookupOrThrow(Registries.BIOME);
 
         final List<ResourceKey<Biome>> keys = biomes
                 .entrySet()
                 .stream()
                 .map(Map.Entry::getKey)
-                .sorted(Comparator.comparingInt(key -> biomes.getId(biomes.getOrThrow(key))))
+                .sorted(Comparator.comparingInt(key -> biomes.getId(biomes.getOrThrow(key).value())))
                 .toList();
 
         final BiomeTagModificationWorker biomeTagWorker = new BiomeTagModificationWorker();
@@ -150,7 +150,7 @@ public class BiomeModificationRegistryImpl {
 
         if (tagsAdded > 0) {
             //We need to reload all BiomeSources, as some tags have changed
-            final Registry<LevelStem> dimensions = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
+            final Registry<LevelStem> dimensions = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
             dimensions.forEach(stem -> {
                 if (stem.generator().getBiomeSource() instanceof ReloadableBiomeSource reloadable) {
                     reloadable.reloadBiomes();
@@ -161,7 +161,7 @@ public class BiomeModificationRegistryImpl {
         if (biomesProcessed > 0) {
             //We need to rebuild all feature maps, as we might have added feature that did not yet exist on any
             //of the valid biomes
-            final Registry<LevelStem> dimensions = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
+            final Registry<LevelStem> dimensions = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
             dimensions.forEach(stem -> {
                 if (stem.generator() instanceof RebuildableFeaturesPerStep<?> generator) {
                     generator.wover_rebuildFeaturesPerStep();

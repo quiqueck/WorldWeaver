@@ -26,7 +26,7 @@ public class BiomeTagModificationWorker {
             ResourceKey<Biome> biomeKey,
             Holder<Biome> biomeHolder
     ) {
-        HolderSet.Named<Biome> tagHolder = biomes.getOrCreateTag(tag);
+        HolderSet.Named<Biome> tagHolder = biomes.getOrThrow(tag);
         if (tagHolder instanceof HolderSetNamedAccessor<?>) {
             HolderSetNamedAccessor<Biome> biomeTagHolder = (HolderSetNamedAccessor<Biome>) tagHolder;
 

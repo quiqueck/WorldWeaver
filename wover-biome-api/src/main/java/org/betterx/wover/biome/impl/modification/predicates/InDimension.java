@@ -28,10 +28,11 @@ public record InDimension(ResourceKey<LevelStem> dimensionKey) implements BiomeP
 
     @Override
     public boolean test(Context ctx) {
-        final LevelStem dimension = ctx.levelStems.get(dimensionKey);
-        if (dimension == null) return false;
+        final Holder<LevelStem> dimension = ctx.levelStems.get(dimensionKey).orElse(null);
+        if (dimension == null || !dimension.isBound()) return false;
 
-        return dimension.generator()
+        return dimension.value()
+                        .generator()
                         .getBiomeSource()
                         .possibleBiomes()
                         .stream()

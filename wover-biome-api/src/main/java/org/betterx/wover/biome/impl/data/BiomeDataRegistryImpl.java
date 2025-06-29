@@ -43,7 +43,7 @@ public class BiomeDataRegistryImpl {
     ) {
         if (WorldState.allStageRegistryAccess() == null) return null;
         final Registry<BiomeData> registry = WorldState.allStageRegistryAccess()
-                                                       .registryOrThrow(BiomeDataRegistry.BIOME_DATA_REGISTRY);
+                                                       .lookupOrThrow(BiomeDataRegistry.BIOME_DATA_REGISTRY);
         return getFromRegistryOrTemp(registry, key, factory);
     }
 

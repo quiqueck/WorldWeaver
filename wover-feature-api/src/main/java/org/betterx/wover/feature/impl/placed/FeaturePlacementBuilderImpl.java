@@ -305,12 +305,12 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl isAbove(BlockPredicate... predicates) {
-        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.DOWN.getNormal())));
+        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.DOWN.getUnitVec3i())));
     }
 
     @Override
     public FeaturePlacementBuilderImpl isUnder(BlockPredicate... predicates) {
-        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.UP.getNormal())));
+        return modifier(new Is(BlockPredicate.anyOf(predicates), Optional.of(Direction.UP.getUnitVec3i())));
     }
 
     @Override
@@ -487,7 +487,7 @@ public class FeaturePlacementBuilderImpl implements org.betterx.wover.feature.ap
 
     @Override
     public FeaturePlacementBuilderImpl belowIsNextTo(BlockPredicate predicate) {
-        return modifier(IsNextTo.offset(predicate, Direction.DOWN.getNormal()));
+        return modifier(IsNextTo.offset(predicate, Direction.DOWN.getUnitVec3i()));
     }
 
     @Override

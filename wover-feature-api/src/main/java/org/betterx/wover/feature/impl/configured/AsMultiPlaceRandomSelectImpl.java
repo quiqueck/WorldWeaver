@@ -11,7 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -80,7 +80,7 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     @Override
     public AsMultiPlaceRandomSelect addAllStates(Block block, int weight, int id) {
         Set<BlockState> states = BlockHelper.getPossibleStates(block);
-        SimpleWeightedRandomList.Builder<BlockState> builder = SimpleWeightedRandomList.builder();
+        WeightedList.Builder<BlockState> builder = WeightedList.builder();
         states.forEach(s -> builder.add(block.defaultBlockState(), 1));
 
         this.add(new WeightedStateProvider(builder.build()), weight, id);
@@ -89,7 +89,7 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
 
     @Override
     public AsMultiPlaceRandomSelect addAll(int weight, int id, Block... blocks) {
-        SimpleWeightedRandomList.Builder<BlockState> builder = SimpleWeightedRandomList.builder();
+        WeightedList.Builder<BlockState> builder = WeightedList.builder();
         for (Block block : blocks) {
             builder.add(block.defaultBlockState(), 1);
         }
@@ -101,7 +101,7 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     @Override
     public AsMultiPlaceRandomSelect addAllStatesFor(IntegerProperty prop, Block block, int weight, int id) {
         Collection<Integer> values = prop.getPossibleValues();
-        SimpleWeightedRandomList.Builder<BlockState> builder = SimpleWeightedRandomList.builder();
+        WeightedList.Builder<BlockState> builder = WeightedList.builder();
         values.forEach(s -> builder.add(block.defaultBlockState().setValue(prop, s), 1));
         this.add(new WeightedStateProvider(builder.build()), weight, id);
         return this;

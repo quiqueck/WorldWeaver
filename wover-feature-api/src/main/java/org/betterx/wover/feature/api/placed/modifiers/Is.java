@@ -2,7 +2,6 @@ package org.betterx.wover.feature.api.placed.modifiers;
 
 import org.betterx.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
@@ -72,7 +71,7 @@ public class Is extends PlacementFilter {
      * @return a new instance
      */
     public static Is below(BlockPredicate predicate) {
-        return new Is(predicate, Optional.of(Direction.DOWN.getNormal()));
+        return new Is(predicate, Optional.of(Direction.DOWN.getUnitVec3i()));
     }
 
     /**
@@ -82,7 +81,7 @@ public class Is extends PlacementFilter {
      * @return a new instance
      */
     public static Is above(BlockPredicate predicate) {
-        return new Is(predicate, Optional.of(Direction.UP.getNormal()));
+        return new Is(predicate, Optional.of(Direction.UP.getUnitVec3i()));
     }
 
     /**

@@ -7,7 +7,7 @@ import org.betterx.wover.feature.api.configured.configurators.NetherForrestVeget
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherForestVegetationConfig, NetherForestVegetationFeature> implements org.betterx.wover.feature.api.configured.configurators.NetherForrestVegetation {
-    private SimpleWeightedRandomList.Builder<BlockState> blocks;
+    private WeightedList.Builder<BlockState> blocks;
     private WeightedStateProvider stateProvider;
     private int spreadWidth = 8;
     private int spreadHeight = 4;
@@ -73,7 +73,7 @@ public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherF
             throw new IllegalStateException("You can not add new state once a WeightedStateProvider was built. (" + state + ", " + weight + ")");
         }
         if (blocks == null) {
-            blocks = SimpleWeightedRandomList.builder();
+            blocks = WeightedList.builder();
         }
         blocks.add(state, weight);
         return this;

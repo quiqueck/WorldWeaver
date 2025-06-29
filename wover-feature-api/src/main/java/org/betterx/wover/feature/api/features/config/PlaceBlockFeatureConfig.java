@@ -3,7 +3,7 @@ package org.betterx.wover.feature.api.features.config;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,26 +35,26 @@ public abstract class PlaceBlockFeatureConfig implements FeatureConfiguration {
 
 
     /**
-     * Builds a {@link SimpleWeightedRandomList} from a list of {@link BlockState}s. Every entry
+     * Builds a {@link WeightedList} from a list of {@link BlockState}s. Every entry
      * will have the same weight.
      *
      * @param states The states to build the list from.
      * @return The built list.
      */
-    protected static SimpleWeightedRandomList<BlockState> buildWeightedList(List<BlockState> states) {
-        var builder = SimpleWeightedRandomList.<BlockState>builder();
+    protected static WeightedList<BlockState> buildWeightedList(List<BlockState> states) {
+        var builder = WeightedList.<BlockState>builder();
         for (BlockState s : states) builder.add(s, 1);
         return builder.build();
     }
 
     /**
-     * Builds a {@link SimpleWeightedRandomList} from a single {@link BlockState}.
+     * Builds a {@link WeightedList} from a single {@link BlockState}.
      *
      * @param state The state to build the list from.
      * @return The built list.
      */
-    protected static SimpleWeightedRandomList<BlockState> buildWeightedList(BlockState state) {
-        return SimpleWeightedRandomList
+    protected static WeightedList<BlockState> buildWeightedList(BlockState state) {
+        return WeightedList
                 .<BlockState>builder()
                 .add(state, 1)
                 .build();
@@ -93,7 +93,7 @@ public abstract class PlaceBlockFeatureConfig implements FeatureConfiguration {
      *
      * @param blocks The blocks to place.
      */
-    public PlaceBlockFeatureConfig(SimpleWeightedRandomList<BlockState> blocks) {
+    public PlaceBlockFeatureConfig(WeightedList<BlockState> blocks) {
         this.stateProvider = new WeightedStateProvider(blocks);
     }
 

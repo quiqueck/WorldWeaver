@@ -20,6 +20,7 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.Biome;
@@ -63,9 +64,9 @@ public interface BiomeModification {
                           .listOf()
                           .optionalFieldOf("biome_tags", List.of())
                           .forGetter(BiomeModification::biomeTags),
-                    Codec.list(MobSpawnSettings.SpawnerData.CODEC)
-                         .optionalFieldOf("spawns", List.of())
-                         .forGetter(BiomeModification::spawns)
+                    WeightedList.codec(MobSpawnSettings.SpawnerData.CODEC)
+                                .optionalFieldOf("spawns", WeightedList.<MobSpawnSettings.SpawnerData>builder().build())
+                                .forGetter(BiomeModification::spawns)
             ).apply(instance, BiomeModificationImpl::new)
     );
 
@@ -91,7 +92,7 @@ public interface BiomeModification {
      *
      * @return all spawns
      */
-    List<MobSpawnSettings.SpawnerData> spawns();
+    WeightedList<MobSpawnSettings.SpawnerData> spawns();
 
     /**
      * The biome tags the biome should be added to
@@ -148,7 +149,7 @@ public interface BiomeModification {
         private final BootstrapContext<BiomeModification> bootstrapContext;
         private BiomePredicate predicate;
         private final FeatureMap features;
-        private final List<MobSpawnSettings.SpawnerData> spawns;
+        private final WeightedList.Builder<MobSpawnSettings.SpawnerData> spawns;
         private final Set<TagKey<Biome>> tags = new HashSet<>();
 
         private final ResourceKey<BiomeModification> key;
@@ -161,7 +162,7 @@ public interface BiomeModification {
             this.key = key;
             this.predicate = BiomePredicate.always();
             this.features = FeatureMap.of(new ArrayList<>(GenerationStep.Decoration.values().length));
-            this.spawns = new ArrayList<>(2);
+            this.spawns = WeightedList.builder();
         }
 
         /**
@@ -518,7 +519,7 @@ public interface BiomeModification {
                 int minGroupCount,
                 int maxGroupCount
         ) {
-            return addSpawn(new MobSpawnSettings.SpawnerData(entityType, weight, minGroupCount, maxGroupCount));
+            return addSpawn(weight, new MobSpawnSettings.SpawnerData(entityType, minGroupCount, maxGroupCount));
         }
 
         /**
@@ -529,9 +530,10 @@ public interface BiomeModification {
          * @return This builder.
          */
         public <M extends Mob> Builder addSpawn(
+                int weight,
                 MobSpawnSettings.SpawnerData spawnerData
         ) {
-            this.spawns.add(spawnerData);
+            this.spawns.add(spawnerData, weight);
             return this;
         }
 
@@ -578,7 +580,7 @@ public interface BiomeModification {
                     predicate,
                     features.generic(),
                     tags != null ? tags.stream().toList() : null,
-                    spawns
+                    spawns.build()
             );
         }
     }

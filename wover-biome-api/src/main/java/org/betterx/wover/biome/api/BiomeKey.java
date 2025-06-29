@@ -53,7 +53,7 @@ public abstract class BiomeKey<B extends BiomeBuilder<B>> {
     public Holder<Biome> getHolder(@Nullable RegistryAccess access) {
         return access == null
                 ? null
-                : access.registryOrThrow(Registries.BIOME).getHolder(this.key).orElse(null);
+                : access.lookupOrThrow(Registries.BIOME).get(this.key).orElse(null);
     }
 
     /**

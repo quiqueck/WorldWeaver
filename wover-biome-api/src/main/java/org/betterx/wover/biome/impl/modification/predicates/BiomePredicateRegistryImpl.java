@@ -40,7 +40,7 @@ public class BiomePredicateRegistryImpl {
     private static MapCodec<? extends BiomePredicate> onBootstrap(Registry<MapCodec<? extends BiomePredicate>> registry) {
         final var all = LibWoverBiome.C.id("all");
         if (registry.containsKey(all)) {
-            return registry.get(all);
+            return registry.get(all).orElseThrow().value();
         }
         register(registry, LibWoverBiome.C.id("not"), Not.CODEC);
         register(registry, LibWoverBiome.C.id("and"), And.CODEC);

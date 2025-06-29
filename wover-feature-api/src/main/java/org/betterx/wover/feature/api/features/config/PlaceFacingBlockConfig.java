@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -73,7 +73,7 @@ public class PlaceFacingBlockConfig extends PlaceBlockFeatureConfig {
      * @param blocks The blockstates to place.
      * @param dir    The allowed directions to place the block in.
      */
-    public PlaceFacingBlockConfig(SimpleWeightedRandomList<BlockState> blocks, List<Direction> dir) {
+    public PlaceFacingBlockConfig(WeightedList<BlockState> blocks, List<Direction> dir) {
         this(new WeightedStateProvider(blocks), dir);
     }
 

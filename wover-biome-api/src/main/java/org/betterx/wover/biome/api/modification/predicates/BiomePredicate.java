@@ -366,13 +366,13 @@ public interface BiomePredicate {
             this.biomeKey = biomeKey;
             this.biomes = biomes;
 
-            this.levelStems = registryAccess.registryOrThrow(Registries.LEVEL_STEM);
-            this.structures = registryAccess.registryOrThrow(Registries.STRUCTURE);
-            this.placedFeatures = registryAccess.registryOrThrow(Registries.PLACED_FEATURE);
-            this.configuredFeatures = registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE);
+            this.levelStems = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
+            this.structures = registryAccess.lookupOrThrow(Registries.STRUCTURE);
+            this.placedFeatures = registryAccess.lookupOrThrow(Registries.PLACED_FEATURE);
+            this.configuredFeatures = registryAccess.lookupOrThrow(Registries.CONFIGURED_FEATURE);
 
             this.biome = biome;
-            this.biomeHolder = biomes.getHolderOrThrow(biomeKey);
+            this.biomeHolder = biomes.getOrThrow(biomeKey);
         }
 
         /**
@@ -388,7 +388,7 @@ public interface BiomePredicate {
                 @NotNull ResourceKey<Biome> biomeKey
         ) {
             if (registryAccess == null) return null;
-            var biomes = registryAccess.registryOrThrow(Registries.BIOME);
+            var biomes = registryAccess.lookupOrThrow(Registries.BIOME);
             return of(registryAccess, biomes, biomeKey);
         }
 
@@ -409,10 +409,10 @@ public interface BiomePredicate {
 
         ) {
             if (biomes == null || registryAccess == null) return null;
-            var biome = biomes.get(biomeKey);
-            if (biome == null) return null;
+            var biome = biomes.get(biomeKey).orElse(null);
+            if (biome == null || !biome.isBound()) return null;
 
-            return new Context(registryAccess, biomes, biomeKey, biome);
+            return new Context(registryAccess, biomes, biomeKey, biome.value());
         }
     }
 

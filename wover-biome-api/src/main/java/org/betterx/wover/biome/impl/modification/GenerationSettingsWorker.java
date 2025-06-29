@@ -1,5 +1,8 @@
 package org.betterx.wover.biome.impl.modification;
 
+import org.betterx.wover.feature.mixin.BiomeGenerationSettingsAccessor;
+import org.betterx.wover.util.MutableHolderSet;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -15,38 +18,40 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 public class GenerationSettingsWorker {
-    private final Registry<ConfiguredWorldCarver<?>> carvers;
-    private final Registry<PlacedFeature> features;
+    private final Registry<ConfiguredWorldCarver<?>> carverLookup;
+    private final Registry<PlacedFeature> featureLookup;
     private final BiomeGenerationSettings generationSettings;
     private final Biome biome;
-    Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> customizedCarvers;
+    MutableHolderSet<ConfiguredWorldCarver<?>> customizedCarvers;
     List<HolderSet<PlacedFeature>> customizedFeatures;
 
     public GenerationSettingsWorker(RegistryAccess registries, Biome biome) {
         this.biome = biome;
         this.generationSettings = biome.getGenerationSettings();
-        this.carvers = registries.registryOrThrow(Registries.CONFIGURED_CARVER);
-        this.features = registries.registryOrThrow(Registries.PLACED_FEATURE);
+        this.carverLookup = registries.lookupOrThrow(Registries.CONFIGURED_CARVER);
+        this.featureLookup = registries.lookupOrThrow(Registries.PLACED_FEATURE);
     }
 
     private void unfreezeCarvers() {
-        if (customizedCarvers == null) {
-            customizedCarvers = new EnumMap<>(GenerationStep.Carving.class);
-            generationSettings.carvers = customizedCarvers;
+        if (customizedCarvers == null && generationSettings instanceof BiomeGenerationSettingsAccessor accessor) {
+            customizedCarvers = MutableHolderSet.of(accessor.wover_getCarvers());
+            accessor.wover_setCarvers(customizedCarvers);
         }
     }
 
     private void freezeCarvers() {
-        if (customizedCarvers != null) {
-            generationSettings.carvers = ImmutableMap.copyOf(customizedCarvers);
+        if (customizedCarvers != null && generationSettings instanceof BiomeGenerationSettingsAccessor accessor) {
+            accessor.wover_setCarvers(customizedCarvers.asDirectHolderSet());
             customizedCarvers = null;
         }
     }

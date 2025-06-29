@@ -4,6 +4,7 @@ import org.betterx.wover.biome.api.modification.predicates.BiomePredicate;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.KeyDispatchDataCodec;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -33,8 +34,8 @@ public record Spawns(EntityType<?> entityType) implements BiomePredicate {
         final MobSpawnSettings spawns = ctx.biome.getMobSettings();
 
         for (MobCategory spawnGroup : MobCategory.values()) {
-            for (MobSpawnSettings.SpawnerData spawnEntry : spawns.getMobs(spawnGroup).unwrap()) {
-                if (spawnEntry.type.equals(entityType)) {
+            for (Weighted<MobSpawnSettings.SpawnerData> spawnEntry : spawns.getMobs(spawnGroup).unwrap()) {
+                if (spawnEntry.value().type().equals(entityType)) {
                     return true;
                 }
             }

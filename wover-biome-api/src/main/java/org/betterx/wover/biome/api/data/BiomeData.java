@@ -293,11 +293,11 @@ public class BiomeData {
             if (preFinalAccessWarning++ < 5)
                 LibWoverBiome.C.log.verboseWarning("Accessing biome holder for " + biomeKey + " before registry is ready!");
             return WorldState.allStageRegistryAccess()
-                             .registryOrThrow(Registries.BIOME)
-                             .getHolder(biomeKey)
+                             .lookupOrThrow(Registries.BIOME)
+                             .get(biomeKey)
                              .orElse(null);
         }
-        return WorldState.registryAccess().registryOrThrow(Registries.BIOME).getHolder(biomeKey).orElse(null);
+        return WorldState.registryAccess().lookupOrThrow(Registries.BIOME).get(biomeKey).orElse(null);
     }
 
     public @Nullable Biome biome() {
@@ -306,11 +306,11 @@ public class BiomeData {
             if (preFinalAccessWarning++ < 5)
                 LibWoverBiome.C.log.verboseWarning("Accessing biome for " + biomeKey + " before registry is ready!");
             return WorldState.allStageRegistryAccess()
-                             .registryOrThrow(Registries.BIOME)
+                             .lookupOrThrow(Registries.BIOME)
                              .getOptional(biomeKey)
                              .orElse(null);
         }
-        return WorldState.registryAccess().registryOrThrow(Registries.BIOME).getOptional(biomeKey).orElse(null);
+        return WorldState.registryAccess().lookupOrThrow(Registries.BIOME).getOptional(biomeKey).orElse(null);
     }
 
     /**

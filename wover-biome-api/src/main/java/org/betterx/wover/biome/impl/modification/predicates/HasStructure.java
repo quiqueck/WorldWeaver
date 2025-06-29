@@ -22,7 +22,7 @@ public record HasStructure(ResourceKey<Structure> key) implements BiomePredicate
 
     @Override
     public boolean test(Context ctx) {
-        final Structure instance = ctx.structures.get(key);
+        final Structure instance = ctx.structures.get(key).orElse(null).value();
         if (instance == null) return false;
 
         return instance.biomes().contains(ctx.biomeHolder);

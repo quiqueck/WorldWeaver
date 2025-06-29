@@ -40,7 +40,7 @@ public class BiomeCodecRegistryImpl {
     private static MapCodec<? extends BiomeData> onBootstrap(Registry<MapCodec<? extends BiomeData>> registry) {
         final var biomeData = LibWoverBiome.C.id("vanilla_data");
         if (registry.containsKey(biomeData)) {
-            return registry.get(biomeData);
+            return registry.get(biomeData).orElseThrow().value();
         }
 
         return register(registry, biomeData, BiomeData.KEY_CODEC);

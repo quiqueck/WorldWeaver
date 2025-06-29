@@ -159,7 +159,7 @@ public class EveryLayer
         final int z = pos.getZ();
         final int x = pos.getX();
         final int levelHeight = ctx.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
-        final int minLevelHeight = ctx.getMinBuildHeight();
+        final int minLevelHeight = ctx.getMinY();
         int y = Math.min(levelHeight, this.maxHeight);
         final int minHeight = Math.max(minLevelHeight, this.minHeight);
 

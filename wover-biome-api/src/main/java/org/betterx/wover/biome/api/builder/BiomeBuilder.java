@@ -4,7 +4,6 @@ import de.ambertation.wunderlib.ui.ColorHelper;
 import org.betterx.wover.biome.api.BiomeKey;
 import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.impl.builder.BiomeSurfaceRuleBuilderImpl;
-import org.betterx.wover.biome.mixin.BiomeGenerationSettingsAccessor;
 import org.betterx.wover.feature.api.placed.BasePlacedFeatureKey;
 import org.betterx.wover.feature.api.placed.PlacedFeatureManager;
 import org.betterx.wover.structure.api.StructureKey;
@@ -13,7 +12,6 @@ import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
@@ -32,12 +30,8 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
-import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -283,16 +277,15 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             return feature(BiomeDefaultFeatures::addNetherDefaultOres);
         }
 
-        public B carver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carver) {
+        public B carver(ResourceKey<ConfiguredWorldCarver<?>> carver) {
             generationSettings.addCarver(
-                    step,
                     bootstrapContext.lookup(Registries.CONFIGURED_CARVER).getOrThrow(carver)
             );
             return (B) this;
         }
 
-        public B carver(GenerationStep.Carving step, Holder<ConfiguredWorldCarver<?>> carver) {
-            generationSettings.addCarver(step, carver);
+        public B carver(Holder<ConfiguredWorldCarver<?>> carver) {
+            generationSettings.addCarver(carver);
             return (B) this;
         }
 
@@ -462,7 +455,8 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         public B spawn(EntityType<?> entityType, int weight, int minGroupCount, int maxGroupCount) {
             mobSpawnSettings.addSpawn(
                     entityType.getCategory(),
-                    new MobSpawnSettings.SpawnerData(entityType, weight, minGroupCount, maxGroupCount)
+                    weight,
+                    new MobSpawnSettings.SpawnerData(entityType, minGroupCount, maxGroupCount)
             );
             return (B) this;
         }
@@ -488,21 +482,6 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         public abstract void registerBiomeData(BootstrapContext<BiomeData> dataContext);
 
 
-        private static BiomeGenerationSettings fixGenerationSettings(BiomeGenerationSettings settings) {
-            //Fabric Biome Modification API can not handle an empty carver map, thus we will create one with
-            //an empty HolderSet for every possible step:
-            //https://github.com/FabricMC/fabric/issues/2079
-            //TODO: Remove, once fabric gets fixed
-            if (settings instanceof BiomeGenerationSettingsAccessor acc) {
-                Map<GenerationStep.Carving, HolderSet<ConfiguredWorldCarver<?>>> carvers = new HashMap<>(acc.wover_getCarvers());
-                for (GenerationStep.Carving step : GenerationStep.Carving.values()) {
-                    carvers.computeIfAbsent(step, __ -> HolderSet.direct(Lists.newArrayList()));
-                }
-                acc.wover_setCarvers(Map.copyOf(carvers));
-            }
-            return settings;
-        }
-
         protected Biome buildBiome() {
             Biome.BiomeBuilder vanillaBuilder = new Biome.BiomeBuilder();
 
@@ -511,7 +490,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             vanillaBuilder.temperature(temperature);
             vanillaBuilder.temperatureAdjustment(temperatureModifier);
 
-            vanillaBuilder.generationSettings(fixGenerationSettings(generationSettings.build()));
+            vanillaBuilder.generationSettings(generationSettings.build());
             vanillaBuilder.specialEffects(fx.build());
             vanillaBuilder.mobSpawnSettings(mobSpawnSettings.build());
 

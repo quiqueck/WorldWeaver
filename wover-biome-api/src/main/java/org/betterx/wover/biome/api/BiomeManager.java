@@ -105,7 +105,7 @@ public class BiomeManager {
      * @param biome {@link Holder<Biome>} instance. Should be biome from world.
      */
     public static void setBiome(ChunkAccess chunk, BlockPos pos, Holder<Biome> biome) {
-        final int sectionY = (pos.getY() - chunk.getMinBuildHeight()) >> 4;
+        final int sectionY = (pos.getY() - chunk.getMinY()) >> 4;
         final PalettedContainerRO<Holder<Biome>> biomes = chunk.getSection(sectionY).getBiomes();
         if (biomes instanceof PalettedContainer<Holder<Biome>> palette) {
             palette.set((pos.getX() & 15) >> 2, (pos.getY() & 15) >> 2, (pos.getZ() & 15) >> 2, biome);
