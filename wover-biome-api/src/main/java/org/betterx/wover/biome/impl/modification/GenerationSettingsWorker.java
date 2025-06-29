@@ -1,5 +1,6 @@
 package org.betterx.wover.biome.impl.modification;
 
+import org.betterx.wover.entrypoint.LibWoverFeature;
 import org.betterx.wover.feature.mixin.BiomeGenerationSettingsAccessor;
 import org.betterx.wover.util.MutableHolderSet;
 
@@ -46,6 +47,8 @@ public class GenerationSettingsWorker {
         if (customizedCarvers == null && generationSettings instanceof BiomeGenerationSettingsAccessor accessor) {
             customizedCarvers = MutableHolderSet.of(accessor.wover_getCarvers());
             accessor.wover_setCarvers(customizedCarvers);
+        } else if (!(generationSettings instanceof BiomeGenerationSettingsAccessor)) {
+            LibWoverFeature.C.LOG.error("Cannot unfreeze generation carvers");
         }
     }
 
@@ -58,17 +61,20 @@ public class GenerationSettingsWorker {
 
 
     private void unfreezeFeatures() {
-        if (customizedFeatures == null) {
-            customizedFeatures = new LinkedList<>(generationSettings.features);
-            generationSettings.features = customizedFeatures;
+        if (customizedFeatures == null && generationSettings instanceof BiomeGenerationSettingsAccessor accessor) {
+            customizedFeatures = new LinkedList<>(accessor.wover_getFeatures());
+            accessor.wover_setFeatures(customizedFeatures);
+        } else if (!(generationSettings instanceof BiomeGenerationSettingsAccessor)) {
+            LibWoverFeature.C.LOG.error("Cannot unfreeze generation features");
         }
     }
 
     private void freezeFeatures() {
-        if (customizedFeatures != null) {
-            generationSettings.features = ImmutableList.copyOf(customizedFeatures);
-            generationSettings.featureSet = Suppliers.memoize(this::createPlacedFeatrueSet);
-            generationSettings.flowerFeatures = Suppliers.memoize(this::createFlowerFeatures);
+        if (customizedFeatures != null && generationSettings instanceof BiomeGenerationSettingsAccessor accessor) {
+            accessor.wover_setFeatures(ImmutableList.copyOf(customizedFeatures));
+            accessor.wover_setFeatureSet(Suppliers.memoize(this::createPlacedFeatrueSet));
+            accessor.wover_setFlowerFeatures(Suppliers.memoize(this::createFlowerFeatures));
+
             customizedFeatures = null;
         }
     }
@@ -93,11 +99,16 @@ public class GenerationSettingsWorker {
 
     @NotNull
     private Stream<PlacedFeature> getFlatFeatureStream() {
-        return generationSettings
-                .features
-                .stream()
-                .flatMap(HolderSet::stream)
-                .map(Holder::value);
+        if (generationSettings instanceof BiomeGenerationSettingsAccessor accessor) {
+            return accessor
+                    .wover_getFeatures()
+                    .stream()
+                    .flatMap(HolderSet::stream)
+                    .map(Holder::value);
+        } else {
+            LibWoverFeature.C.LOG.error("Cannot get flat feature stream from generation settings");
+            return Stream.empty();
+        }
     }
 
     public void addFeatures(FeatureMap features) {
