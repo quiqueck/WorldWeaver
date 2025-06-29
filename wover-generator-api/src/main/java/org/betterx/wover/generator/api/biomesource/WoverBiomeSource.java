@@ -188,7 +188,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
                 return this;
             }
         }
-        final Registry<Biome> biomes = access.registryOrThrow(Registries.BIOME);
+        final Registry<Biome> biomes = access.lookupOrThrow(Registries.BIOME);
 
         final BiomeTagModificationWorker biomeTagWorker = new BiomeTagModificationWorker();
         int biomesAdded = 0;

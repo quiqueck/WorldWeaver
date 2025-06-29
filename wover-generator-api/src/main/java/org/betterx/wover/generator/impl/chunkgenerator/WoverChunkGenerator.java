@@ -162,7 +162,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                 access,
                 dimensionRegistry.entrySet(),
                 referenceGenerator,
-                dimensionRegistry::get,
+                key -> dimensionRegistry.get(key).map(Holder.Reference::value).orElse(null),
                 (registry, key, stem) -> registry.register(
                         key, stem,
                         dimensionRegistry.registrationInfo(key).orElse(RegistrationInfo.BUILT_IN)

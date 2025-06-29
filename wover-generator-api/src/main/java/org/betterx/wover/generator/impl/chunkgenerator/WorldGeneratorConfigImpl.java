@@ -15,7 +15,6 @@ import org.betterx.wover.state.api.WorldState;
 
 import com.mojang.serialization.Dynamic;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.*;
 import net.minecraft.resources.RegistryOps;
@@ -59,8 +58,8 @@ public class WorldGeneratorConfigImpl {
                 LibWoverEvents.C.log.error("NBT loading failed", e);
             }
         }
-        if (root != null && root.contains(TAG_PRESET))
-            return root.getCompound(TAG_PRESET);
+        if (root != null)
+            return root.getCompound(TAG_PRESET).orElse(new CompoundTag());
 
         return new CompoundTag();
     }
@@ -117,12 +116,8 @@ public class WorldGeneratorConfigImpl {
                 if (oldGen.contains("type")) {
                     LibWoverWorldGenerator.C.log.info("Found World with beta generator Settings.");
                     if ("bclib:bcl_world_preset_settings".equals(oldGen.getString("type"))) {
-                        int netherVersion = 18;
-                        int endVersion = 18;
-                        if (oldGen.contains("minecraft:the_nether"))
-                            netherVersion = oldGen.getInt("minecraft:the_nether");
-                        if (oldGen.contains("minecraft:the_end"))
-                            endVersion = oldGen.getInt("minecraft:the_end");
+                        int netherVersion = oldGen.getInt("minecraft:the_nether").orElse(18);
+                        int endVersion = oldGen.getInt("minecraft:the_end").orElse(18);
 
                         if (netherVersion == 18) netherVersion = 0;
                         else if (netherVersion == 17) netherVersion = 1;
@@ -155,10 +150,7 @@ public class WorldGeneratorConfigImpl {
             // This is to prevent the world from being loaded as a legacy bclib world.
             final CompoundTag bclRoot = WorldConfig.getRootTag(LegacyHelper.BCLIB_CORE);
 
-            Version bclVersion = new Version("0.0.0");
-            if (bclRoot.contains(LEGACY_TAG_VERSION)) {
-                bclVersion = new Version(bclRoot.getString(LEGACY_TAG_VERSION));
-            }
+            Version bclVersion = new Version(bclRoot.getString(LEGACY_TAG_VERSION).orElse("0.0.0"));
             boolean isPre18 = !bclVersion.isLargerOrEqualVersion("1.0.0");
 
             if (isPre18) {

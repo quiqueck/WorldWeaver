@@ -166,8 +166,8 @@ public class BiomeSourceManagerImpl {
 
         if (WorldState.registryAccess() != null && !EXCLUSIONS.isEmpty()) {
             WorldState.registryAccess()
-                      .registry(Registries.LEVEL_STEM)
-                      .ifPresent(levelStems -> levelStems.holders().forEach(holder -> {
+                      .lookup(Registries.LEVEL_STEM)
+                      .ifPresent(levelStems -> levelStems.listElements().forEach(holder -> {
                           if (holder.isBound()
                                   && holder.value().generator().getBiomeSource() instanceof ReloadableBiomeSource bs
                           ) {

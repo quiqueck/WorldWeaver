@@ -2,7 +2,7 @@ package org.betterx.wover.generator.impl.biomesource.end;
 
 import org.betterx.wover.generator.api.biomesource.end.BiomeDecider;
 
-import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
@@ -15,7 +15,7 @@ public abstract class TypeBiomeDecider extends BiomeDecider {
     }
 
     protected TypeBiomeDecider(
-            HolderGetter<Biome> biomeRegistry,
+            HolderLookup<Biome> biomeRegistry,
             ResourceKey<Biome> fallbackBiome,
             TagKey<Biome> assignedType
     ) {

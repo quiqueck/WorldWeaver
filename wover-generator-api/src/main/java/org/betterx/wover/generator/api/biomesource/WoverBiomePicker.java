@@ -5,10 +5,7 @@ import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.util.RandomizedWeightedList;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.Registry;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
@@ -33,16 +30,12 @@ public class WoverBiomePicker {
         this(
                 WorldState.allStageRegistryAccess() == null
                         ? null
-                        : WorldState.allStageRegistryAccess().registry(Registries.BIOME).orElse(null),
+                        : WorldState.allStageRegistryAccess().lookup(Registries.BIOME).orElse(null),
                 fallbackBiome
         );
     }
 
-    public WoverBiomePicker(Registry<Biome> biomeRegistry, ResourceKey<Biome> fallbackBiome) {
-        this(biomeRegistry != null ? biomeRegistry.asLookup() : null, fallbackBiome);
-    }
-
-    public WoverBiomePicker(HolderGetter<Biome> biomeRegistry, ResourceKey<Biome> fallbackBiome) {
+    public WoverBiomePicker(HolderLookup<Biome> biomeRegistry, ResourceKey<Biome> fallbackBiome) {
         this.biomeRegistry = biomeRegistry;
         this.fallbackBiome = create(BiomeData.tempOf(fallbackBiome));
     }

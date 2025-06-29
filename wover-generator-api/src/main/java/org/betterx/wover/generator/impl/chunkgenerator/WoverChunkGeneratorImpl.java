@@ -17,11 +17,12 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.jetbrains.annotations.ApiStatus;
 
 public class WoverChunkGeneratorImpl {
@@ -45,7 +46,7 @@ public class WoverChunkGeneratorImpl {
     ) {
         if (WorldState.registryAccess() != null) {
             final Registry<LevelStem> dimensionsRegistry = WorldState.registryAccess()
-                                                                     .registryOrThrow(Registries.LEVEL_STEM);
+                                                                     .lookupOrThrow(Registries.LEVEL_STEM);
             ChunkGeneratorManagerImpl.printDimensionInfo(dimensionsRegistry);
         }
     }
@@ -65,7 +66,7 @@ public class WoverChunkGeneratorImpl {
             PackRepository packRepository,
             WorldStem worldStem
     ) {
-        for (var entry : WorldState.registryAccess().registryOrThrow(Registries.LEVEL_STEM).entrySet()) {
+        for (var entry : WorldState.registryAccess().lookupOrThrow(Registries.LEVEL_STEM).entrySet()) {
             ResourceKey<LevelStem> key = entry.getKey();
             LevelStem stem = entry.getValue();
 
@@ -79,7 +80,7 @@ public class WoverChunkGeneratorImpl {
         WorldGeneratorConfigImpl.migrateGeneratorSettings();
 
         final RegistryAccess.Frozen access = registries.compositeAccess();
-        final Registry<LevelStem> dimensions = access.registryOrThrow(Registries.LEVEL_STEM);
+        final Registry<LevelStem> dimensions = access.lookupOrThrow(Registries.LEVEL_STEM);
 
         final BiomeRepairHelper biomeHelper = new BiomeRepairHelper();
         final Registry<LevelStem> changedDimensions = biomeHelper.repairBiomeSourceInAllDimensions(access, dimensions);
@@ -95,11 +96,15 @@ public class WoverChunkGeneratorImpl {
         return registries;
     }
 
-    public interface RegisterHelper{
-        Holder.Reference<LevelStem> register(MappedRegistry<LevelStem> writableRegistry, ResourceKey<LevelStem> key, LevelStem stem);
+    public interface RegisterHelper {
+        Holder.Reference<LevelStem> register(
+                MappedRegistry<LevelStem> writableRegistry,
+                ResourceKey<LevelStem> key,
+                LevelStem stem
+        );
     }
 
-    public interface StemGetter{
+    public interface StemGetter {
         LevelStem get(ResourceKey<LevelStem> key);
     }
 
@@ -112,11 +117,11 @@ public class WoverChunkGeneratorImpl {
             StemGetter getter,
             RegisterHelper registerHelper
     ) {
-        final Registry<DimensionType> dimensionTypeRegistry = registryAccess.registryOrThrow(Registries.DIMENSION_TYPE);
+        final Registry<DimensionType> dimensionTypeRegistry = registryAccess.lookupOrThrow(Registries.DIMENSION_TYPE);
         final LevelStem levelStem = getter.get(dimensionKey);
 
         Holder<DimensionType> dimensionType = levelStem == null
-                ? dimensionTypeRegistry.getHolderOrThrow(dimensionTypeKey)
+                ? dimensionTypeRegistry.getOrThrow(dimensionTypeKey)
                 : levelStem.type();
 
         MappedRegistry<LevelStem> writableRegistry = new MappedRegistry<>(

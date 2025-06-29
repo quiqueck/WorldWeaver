@@ -18,7 +18,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.WorldDimensions;
 
 import net.fabricmc.fabric.api.biome.v1.NetherBiomes;
 
@@ -44,12 +43,12 @@ class BiomeRepairHelper {
                 registryAccess,
                 WorldGeneratorConfigImpl.getPresetsNbt()
         );
-        final Registry<Biome> biomes = registryAccess.registryOrThrow(Registries.BIOME);
+        final Registry<Biome> biomes = registryAccess.lookupOrThrow(Registries.BIOME);
 
         // we ensure that all biomes registered using fabric have the proper biome tags
         registerAllBiomesFromFabric(biomes);
-        var originalSet =  dimensionRegistry.entrySet();
-        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry :originalSet) {
+        var originalSet = dimensionRegistry.entrySet();
+        for (Map.Entry<ResourceKey<LevelStem>, LevelStem> entry : originalSet) {
             boolean didRepair = false;
             ResourceKey<LevelStem> key = entry.getKey();
             LevelStem loadedStem = entry.getValue();
@@ -139,7 +138,7 @@ class BiomeRepairHelper {
             }
 
             if (tag != null) {
-                final Holder.Reference<Biome> holder = biomes.getHolderOrThrow(e.getKey());
+                final Holder.Reference<Biome> holder = biomes.getOrThrow(e.getKey());
                 if (!holder.is(tag)) {
                     biomeTagWorker.addBiomeToTag(tag, biomes, e.getKey(), holder);
                     biomesAdded++;

@@ -6,7 +6,6 @@ import org.betterx.wover.state.api.WorldState;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -56,8 +55,8 @@ public class DimensionsWrapper {
             LibWoverWorldGenerator.C.log.error("No valid registry found!");
             return null;
         }
-        final Optional<Holder.Reference<WorldPreset>> preset = access.registryOrThrow(Registries.WORLD_PRESET)
-                                                                     .getHolder(key);
+        final Optional<Holder.Reference<WorldPreset>> preset = access.lookupOrThrow(Registries.WORLD_PRESET)
+                                                                     .get(key);
         return preset
                 .map(worldPresetReference -> worldPresetReference
                         .value()
@@ -70,12 +69,10 @@ public class DimensionsWrapper {
             LibWoverWorldGenerator.C.log.error("No valid registry found!");
             return null;
         }
-        var preset = access.registryOrThrow(Registries.WORLD_PRESET).getHolder(key);
-        if (preset.isEmpty()) return null;
-        return preset
-                .get()
+        var preset = access.lookupOrThrow(Registries.WORLD_PRESET).get(key);
+        return preset.map(worldPresetReference -> worldPresetReference
                 .value()
-                .createWorldDimensions();
+                .createWorldDimensions()).orElse(null);
     }
 
     public static @NotNull Map<ResourceKey<LevelStem>, ChunkGenerator> getDimensionsMap(

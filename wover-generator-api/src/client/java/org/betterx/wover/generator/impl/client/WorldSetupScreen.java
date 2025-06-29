@@ -171,9 +171,9 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
 
         final Registry<WorldPreset> worldPresets = WorldState
                 .allStageRegistryAccess()
-                .registryOrThrow(Registries.WORLD_PRESET);
+                .lookupOrThrow(Registries.WORLD_PRESET);
 
-        final Optional<HolderSet.Named<WorldPreset>> normal = worldPresets.getTag(WorldPresetTags.NORMAL);
+        final Optional<HolderSet.Named<WorldPreset>> normal = worldPresets.get(WorldPresetTags.NORMAL);
         if (normal.isPresent()) {
             Set<ChunkGenerator> generators = new HashSet<>();
             final Language language = Language.getInstance();

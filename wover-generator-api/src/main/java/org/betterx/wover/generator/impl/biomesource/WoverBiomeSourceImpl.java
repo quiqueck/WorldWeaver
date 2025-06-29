@@ -66,11 +66,11 @@ public class WoverBiomeSourceImpl {
 
         final Set<Holder<Biome>> allBiomes = new HashSet<>();
         final Set<ResourceKey<Biome>> addedBiomes = new HashSet<>();
-        final Registry<Biome> biomes = access.registryOrThrow(Registries.BIOME);
-        final Registry<BiomeData> biomeData = access.registryOrThrow(BiomeDataRegistry.BIOME_DATA_REGISTRY);
+        final Registry<Biome> biomes = access.lookupOrThrow(Registries.BIOME);
+        final Registry<BiomeData> biomeData = access.lookupOrThrow(BiomeDataRegistry.BIOME_DATA_REGISTRY);
 
         for (WoverBiomeSource.TagToPicker mapper : pickers) {
-            final Optional<HolderSet.Named<Biome>> optionalTag = biomes.getTag(mapper.tag());
+            final Optional<HolderSet.Named<Biome>> optionalTag = biomes.get(mapper.tag());
             if (optionalTag.isPresent()) {
                 final HolderSet.Named<Biome> tag = optionalTag.get();
                 final Set<ResourceLocation> excluded = BiomeSourceManagerImpl.getExcludedBiomes(tag.key());
