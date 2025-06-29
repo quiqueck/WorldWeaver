@@ -36,10 +36,13 @@ public class SurfaceRuleUtil {
         Registry<AssignedSurfaceRule> registry = null;
         if (WorldState.registryAccess() != null)
             registry = WorldState.registryAccess()
-                                 .registry(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY).orElse(null);
+                                 .lookup(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY).orElse(null);
 
         if (registry == null) {
-            LibWoverSurface.C.LOG.warn("No Surface Rule Registry found. Skipping Surface Rule Injection for Biome {}", biomeKey.location());
+            LibWoverSurface.C.LOG.warn(
+                    "No Surface Rule Registry found. Skipping Surface Rule Injection for Biome {}",
+                    biomeKey.location()
+            );
             return List.of();
         }
 
@@ -141,7 +144,7 @@ public class SurfaceRuleUtil {
     ) {
         final Registry<LevelStem> dimensionRegistry = registries
                 .compositeAccess()
-                .registryOrThrow(Registries.LEVEL_STEM);
+                .lookupOrThrow(Registries.LEVEL_STEM);
 
         for (var entry : dimensionRegistry.entrySet()) {
             ResourceKey<LevelStem> dimensionKey = entry.getKey();

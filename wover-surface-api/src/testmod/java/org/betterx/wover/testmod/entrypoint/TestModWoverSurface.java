@@ -30,7 +30,7 @@ public class TestModWoverSurface implements ModInitializer {
     public void onInitialize() {
         RandomSource rSource = new SingleThreadedRandomSource(9324765982365L);
         WorldLifecycle.WORLD_REGISTRY_READY.subscribe((registry, stage) -> {
-            Registry<AssignedSurfaceRule> surfaceRegistr = registry.registryOrThrow(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY);
+            Registry<AssignedSurfaceRule> surfaceRegistr = registry.lookupOrThrow(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY);
             C.log.info("Surface rule registry: " + Integer.toHexString(surfaceRegistr.hashCode()));
 
             if (stage != OnRegistryReady.Stage.FINAL) return;

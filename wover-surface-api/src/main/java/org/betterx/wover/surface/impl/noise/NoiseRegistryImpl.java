@@ -26,7 +26,7 @@ public class NoiseRegistryImpl {
             RandomSource randomSource,
             ResourceKey<NormalNoise.NoiseParameters> resourceKey
     ) {
-        Holder<NormalNoise.NoiseParameters> holder = registry.getHolderOrThrow(resourceKey);
+        Holder<NormalNoise.NoiseParameters> holder = registry.getOrThrow(resourceKey);
         return NormalNoise.create(randomSource, holder.value());
     }
 
@@ -37,7 +37,7 @@ public class NoiseRegistryImpl {
             RandomSource randomSource,
             ResourceKey<NormalNoise.NoiseParameters> noise
     ) {
-        final Registry<NormalNoise.NoiseParameters> registry = registryAccess.registryOrThrow(Registries.NOISE);
+        final Registry<NormalNoise.NoiseParameters> registry = registryAccess.lookupOrThrow(Registries.NOISE);
         return noiseIntances.computeIfAbsent(
                 noise,
                 (key) -> NoiseRegistryImpl.createNoise(registry, randomSource, noise)

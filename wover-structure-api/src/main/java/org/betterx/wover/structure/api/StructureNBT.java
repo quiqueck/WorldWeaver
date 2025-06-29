@@ -126,7 +126,7 @@ public class StructureNBT {
 
         StructureTemplate template = new StructureTemplate();
 
-        template.load(BuiltInRegistries.BLOCK.asLookup(), nbttagcompound);
+        template.load(BuiltInRegistries.BLOCK, nbttagcompound);
 
         return template;
     }

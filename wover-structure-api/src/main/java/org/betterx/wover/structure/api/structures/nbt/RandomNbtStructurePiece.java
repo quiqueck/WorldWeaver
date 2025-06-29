@@ -47,7 +47,7 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
     public RandomNbtStructurePiece(StructurePieceSerializationContext context, CompoundTag compoundTag) {
         this(
                 context, compoundTag,
-                compoundTag.contains("A") && compoundTag.getBoolean("A")
+                compoundTag.getBoolean("A").orElse(false)
         );
 
     }
@@ -69,9 +69,13 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
 
     private static StructurePlaceSettings fromNbt(CompoundTag compoundTag, boolean keepAir) {
         return settings(
-                Rotation.valueOf(compoundTag.getString("R")),
-                Mirror.valueOf(compoundTag.getString("M")),
-                new BlockPos(compoundTag.getInt("RX"), compoundTag.getInt("RY"), compoundTag.getInt("RZ")),
+                Rotation.valueOf(compoundTag.getString("R").orElse(Rotation.NONE.name())),
+                Mirror.valueOf(compoundTag.getString("M").orElse(Mirror.NONE.name())),
+                new BlockPos(
+                        compoundTag.getInt("RX").orElse(0),
+                        compoundTag.getInt("RY").orElse(0),
+                        compoundTag.getInt("RZ").orElse(0)
+                ),
                 keepAir
         );
 
