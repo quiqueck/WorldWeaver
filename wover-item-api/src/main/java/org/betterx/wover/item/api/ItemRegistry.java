@@ -2,6 +2,8 @@ package org.betterx.wover.item.api;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.smithing.SmithingTemplates;
+import org.betterx.wover.item.api.trait.ItemTrait;
+import org.betterx.wover.item.api.trait.ItemTraitKey;
 import org.betterx.wover.item.impl.api.ItemRegistryImpl;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
@@ -123,6 +125,17 @@ public abstract class ItemRegistry {
      */
     public Stream<Item> allItems() {
         return items.values().stream();
+    }
+
+    /**
+     * Returns a stream of all items registered through this registry.
+     * This is useful for operations that need to iterate over all items
+     * belonging to a specific mod.
+     *
+     * @return Stream of all registered Item instances
+     */
+    public Stream<Item> allItemsWith(ItemTraitKey key) {
+        return this.allItems().filter(item -> ItemTrait.runtimeTraits(item).anyMatch(t -> t.is(key)));
     }
 
     /**

@@ -6,10 +6,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": [
-    "item_stack_setup.CraftingRecipeMixin",
-    "item_stack_setup.ItemInputMixin",
-    "item_stack_setup.LootItemFunctionMixin",
-    "item_stack_setup.SmithingTransformRecipeMixin"
-  ]
+  "mixins": ["ItemMixin", "item_stack_setup.CraftingRecipeMixin", "item_stack_setup.ItemInputMixin", "item_stack_setup.LootItemFunctionMixin", "item_stack_setup.SmithingTransformRecipeMixin"]
 }

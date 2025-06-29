@@ -1,20 +1,40 @@
 package org.betterx.wover.block.api.trait;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.entrypoint.LibWoverBlock;
 
 import net.minecraft.world.level.block.Block;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
-public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.Config, FlammableBlockTrait.RuntimeTrait> {
-    public static final FlammableBlockTrait INSTANCE = new FlammableBlockTrait();
-    private static final BlockDefinition.ConfiguredTrait<Block, FlammableBlockTrait.Config, ?> DEFAULT_CONFIGURED = new BlockDefinition.ConfiguredTrait<>(
-            INSTANCE,
-            Config.DEFAULT
-    );
+import java.util.List;
 
-    public record Config(int burn, int speed) implements BlockTrait.Config {
-        public static final Config DEFAULT = new Config(5, 5);
+public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.RuntimeTrait> {
+    private static final FlammableBlockTrait DEFAULT = new FlammableBlockTrait(5, 5);
+    public static final FlammableBlockTrait.Builder BUILDER = new Builder();
+
+    public static class Builder extends BlockTrait.TraitBuilder {
+        private Builder() {
+            super(BlockTraitKey.of(LibWoverBlock.C, "flammable"));
+        }
+
+        public FlammableBlockTrait withDefault() {
+            return DEFAULT;
+        }
+
+        public FlammableBlockTrait with(int burn, int speed) {
+            if (burn == 5 && speed == 5) {
+                return DEFAULT;
+            }
+
+            return new FlammableBlockTrait(burn, speed);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public List<RuntimeTrait> getRuntimeTraits(Block block) {
+            return BlockTrait.getRuntimeTraits(block, ID);
+        }
     }
 
     public final static class RuntimeTrait extends BlockTrait.RuntimeTrait<Block, RuntimeTrait> {
@@ -23,7 +43,13 @@ public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockT
         }
     }
 
-    FlammableBlockTrait() {
+    public final int burn;
+    public final int speed;
+
+    FlammableBlockTrait(int burn, int speed) {
+        super(BUILDER.ID);
+        this.burn = burn;
+        this.speed = speed;
     }
 
     public static void registerAsFlammable(Block block) {
@@ -44,26 +70,20 @@ public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockT
     }
 
     @Override
-    public FlammableBlockTrait.RuntimeTrait forRuntime(FlammableBlockTrait.Config config) {
+    public FlammableBlockTrait.RuntimeTrait forRuntime() {
         return new RuntimeTrait(this);
     }
 
     @Override
-    public BlockDefinition.ConfiguredTrait<Block, FlammableBlockTrait.Config, ?> getDefaultConfig() {
-        return DEFAULT_CONFIGURED;
-    }
-
-    @Override
-    public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition, Config config) {
+    public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
         definition.getProperties().ignitedByLava();
     }
 
     @Override
     public void afterBlockRegistration(
             Block block,
-            BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition,
-            FlammableBlockTrait.Config config
+            BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition
     ) {
-        registerAsFlammable(block, config.burn, config.speed);
+        registerAsFlammable(block, this.burn, this.speed);
     }
 }

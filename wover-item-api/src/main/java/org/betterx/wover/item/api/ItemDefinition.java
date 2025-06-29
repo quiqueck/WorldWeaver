@@ -1,5 +1,8 @@
 package org.betterx.wover.item.api;
 
+import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.item.api.trait.ItemTrait;
+import org.betterx.wover.item.api.trait.ItemWithTraits;
 import org.betterx.wover.util.GrowableArray;
 
 import net.minecraft.core.component.DataComponentType;
@@ -12,6 +15,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+
+import java.util.LinkedList;
+import java.util.List;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Abstract base class for configuring and building Minecraft items with a fluent API.
@@ -61,6 +68,12 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     protected GrowableArray<TagKey<Item>> tags;
 
     /**
+     * List of traits applied to this item.
+     * Each trait is configured with its own configuration object.
+     */
+    protected List<ItemTrait<? super I, ?>> traits;
+
+    /**
      * Factory instance used to create the item
      */
     protected final ItemDefinition.ItemFactory<I, D> itemFactory;
@@ -106,7 +119,28 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     @SuppressWarnings("unchecked")
     public final I build() {
         this.beforeBuild();
-        return itemFactory.createItem((D) this);
+
+        final List<ItemTrait.RuntimeTrait<I, ?>> runtimeTraits;
+
+        // If traits are defined, configure them and collect RuntimeTraits
+        if (this.traits != null && !this.traits.isEmpty()) {
+            runtimeTraits = new LinkedList<>();
+            for (var configuredTrait : this.traits) {
+                this.configurePropertiesUnchecked(configuredTrait);
+
+                final ItemTrait.RuntimeTrait<I, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
+                if (runtimeTrait != null) runtimeTraits.add(runtimeTrait);
+            }
+        } else runtimeTraits = null;
+
+        I item = itemFactory.createItem((D) this);
+
+        // If runtime traits were collected, set them on the item
+        if (runtimeTraits != null && !runtimeTraits.isEmpty() && item instanceof ItemWithTraits<?>) {
+            ((ItemWithTraits<I>) item).wover_setItemTraits(runtimeTraits);
+        }
+
+        return item;
     }
 
     /**
@@ -119,7 +153,48 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     public final I buildAndRegister() {
         I item = this.beforeRegister(this.build());
         this.registry.register(this.itemKey, item, tags == null ? null : tags.elements());
+
+        // If traits are defined, call afterItemRegistration for each trait
+        if (this.traits != null) {
+            for (var trait : this.traits) {
+
+                this.afterItemRegistrationUnchecked(item, trait);
+            }
+        }
+
         return item;
+    }
+
+    /**
+     * Adds a trait to this item definition.
+     * Traits are used to add additional behaviors or properties to the item.
+     *
+     * @param trait The trait to add
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends ItemTrait<? super I, ?>> D addTrait(
+            @Nullable T trait
+    ) {
+        if (trait == null) {
+            // Skip null traits
+            return (D) this;
+        }
+
+        if (trait.clientOnly() && !ModCore.isClient()) {
+            // Skip traits that are only for the client side
+            return (D) this;
+        }
+        if (trait.datagenOnly() && !ModCore.isDatagen()) {
+            // Skip traits that are only for data generation
+            return (D) this;
+        }
+
+
+        if (this.traits == null) this.traits = new LinkedList<>();
+
+        this.traits.add(trait);
+        return (D) this;
     }
 
     // **********************************************************************
@@ -401,5 +476,31 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     public Item.Properties getProperties() {
         return this.properties;
+    }
+
+
+    // Helper methods to handle generic type casting
+    @SuppressWarnings("unchecked")
+    private void configurePropertiesUnchecked(
+            ItemTrait<? super I, ?> trait
+    ) {
+        ((ItemTrait<I, ?>) trait).configure((D) this);
+    }
+
+    @SuppressWarnings("unchecked")
+    private ItemTrait.RuntimeTrait<I, ?> forRuntimeUnchecked(
+            ItemTrait<? super I, ?> trait
+    ) {
+        // Cast is safe because the trait can work with B (since B extends the super type)
+        return (ItemTrait.RuntimeTrait<I, ?>) trait.forRuntime();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void afterItemRegistrationUnchecked(
+            I item,
+            ItemTrait<? super I, ?> trait
+    ) {
+        // Cast is safe because the trait can work with B (since B extends the super type)
+        ((ItemTrait<I, ?>) trait).afterItemRegistration(item, (D) this);
     }
 }

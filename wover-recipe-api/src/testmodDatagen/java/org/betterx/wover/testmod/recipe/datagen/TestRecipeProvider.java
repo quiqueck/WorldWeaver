@@ -1,7 +1,9 @@
 package org.betterx.wover.testmod.recipe.datagen;
 
+import org.betterx.wover.block.api.trait.BlockRecipeGeneratorTrait;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.WoverRecipeProvider;
+import org.betterx.wover.item.api.trait.ItemRecipeGeneratorTrait;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.testmod.recipe.TestEquipmentSet;
 
@@ -23,5 +25,7 @@ public class TestRecipeProvider extends WoverRecipeProvider {
                      .build(context);
 
         TestEquipmentSet.INSTANCE.buildRecipes(context);
+        ItemRecipeGeneratorTrait.bootstrapRecipes(this.modCore, context);
+        BlockRecipeGeneratorTrait.bootstrapRecipes(this.modCore, context);
     }
 }

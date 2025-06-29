@@ -36,7 +36,7 @@ public abstract class WoverRecipeProvider implements WoverDataProvider<FabricRec
     /**
      * Called, when the Recipes need to be created and added
      *
-     * @param context The context to add the elements to.
+     * @param ctx The context to add the elements to.
      */
     protected abstract void bootstrap(
             RecipeBuilder.Context ctx

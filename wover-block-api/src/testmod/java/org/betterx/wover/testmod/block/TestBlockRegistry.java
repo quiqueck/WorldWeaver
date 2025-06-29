@@ -2,7 +2,6 @@ package org.betterx.wover.testmod.block;
 
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.block.api.trait.BlockTraits;
-import org.betterx.wover.block.api.trait.FlammableBlockTrait;
 import org.betterx.wover.tag.api.predefined.CommonPoiTags;
 import org.betterx.wover.testmod.entrypoint.TestModWoverBlock;
 
@@ -21,7 +20,7 @@ public class TestBlockRegistry {
 
     public static final TestBlock TEST_BLOCK = R
             .defineDefaultBlockWithProps("test_block", TestBlock::new)
-            .addTrait(BlockTraits.FLAMMABLE)
+            .addTrait(BlockTraits.FLAMMABLE.withDefault())
             .addTags(CommonPoiTags.MASON_WORKSTATION)
             .instabreak()
             .buildAndRegister();
@@ -33,7 +32,7 @@ public class TestBlockRegistry {
                             props
                     )
             )
-            .addTrait(BlockTraits.FLAMMABLE)
+            .addTrait(BlockTraits.FLAMMABLE.withDefault())
             .addTags(BlockTags.DOORS)
             .addItemTags(ItemTags.DOORS)
             .pushReaction(PushReaction.DESTROY)
@@ -41,7 +40,7 @@ public class TestBlockRegistry {
 
     public static final TestWall TEST_WALL = R
             .defineDefaultBlockWithProps("test_wall", TestWall::new)
-            .addTrait(BlockTraits.FLAMMABLE)
+            .addTrait(BlockTraits.FLAMMABLE.withDefault())
             .addTags(BlockTags.WALLS)
             .addItemTags(ItemTags.WALLS)
             .forceSolidOn()
@@ -51,7 +50,7 @@ public class TestBlockRegistry {
     public static void ensureStaticallyLoaded() {
         // NO-OP
 
-        FlammableBlockTrait.RuntimeTrait trait = BlockTraits.FLAMMABLE.getRuntimeTrait(TEST_BLOCK);
-        TestModWoverBlock.C.LOG.info("Trait: " + trait);
+        var traits = BlockTraits.FLAMMABLE.getRuntimeTraits(TEST_BLOCK);
+        TestModWoverBlock.C.LOG.info("Trait: " + traits);
     }
 }

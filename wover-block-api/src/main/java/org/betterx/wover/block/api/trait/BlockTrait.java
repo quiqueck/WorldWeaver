@@ -1,53 +1,70 @@
 package org.betterx.wover.block.api.trait;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.entrypoint.LibWoverEvents;
 
 import net.minecraft.world.level.block.Block;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R extends BlockTrait.RuntimeTrait<B, R>> {
-    public interface Config {
+public abstract class BlockTrait<B extends Block, R extends BlockTrait.RuntimeTrait<B, R>> {
+    public static final BlockTrait.VoidRuntime VOID_RUNTIME = new BlockTrait.VoidRuntime();
 
+    public abstract static class TraitBuilder {
+        public final BlockTraitKey ID;
+
+        protected TraitBuilder(BlockTraitKey id) {
+            this.ID = id;
+        }
+
+        public <B extends Block, R extends BlockTrait.RuntimeTrait<B, R>> List<R> getRuntimeTraits(B block) {
+            return BlockTrait.getRuntimeTraits(block, ID);
+        }
     }
 
-    public final static class NoConfig implements Config {
-        public static final NoConfig NO_CONFIG = new NoConfig();
-    }
+    public static final class VoidRuntime extends BlockTrait.RuntimeTrait<Block, BlockTrait.VoidRuntime> {
+        public static final BlockTraitKey ID = BlockTraitKey.of(LibWoverEvents.C, "void_trait");
 
-    public abstract static class BlockTraitNoConfig<B extends Block, R extends BlockTrait.RuntimeTrait<B, R>>
-            extends BlockTrait<B, NoConfig, R> {
-
-        protected BlockTraitNoConfig() {
-
+        private VoidRuntime() {
+            super(ID);
         }
     }
 
     public static class RuntimeTrait<B extends Block, R extends BlockTrait.RuntimeTrait<B, R>> {
-        private final Class<BlockTrait<B, ?, R>> traitClass;
+        public final BlockTraitKey traitID;
 
         @SuppressWarnings("unchecked")
-        protected RuntimeTrait(@NotNull BlockTrait<B, ?, R> sourceTrait) {
-            this((Class<BlockTrait<B, ?, R>>) sourceTrait.getClass());
+        protected RuntimeTrait(@NotNull BlockTrait<B, R> sourceTrait) {
+            this(sourceTrait.traitID);
         }
 
         @SuppressWarnings("unchecked")
-        protected RuntimeTrait(Class<? extends BlockTrait<B, ?, R>> traitClass) {
-            this.traitClass = (Class<BlockTrait<B, ?, R>>) traitClass;
+        protected RuntimeTrait(BlockTraitKey traitID) {
+            this.traitID = traitID;
         }
 
-        public boolean is(@Nullable BlockTrait<?, ?, ?> trait) {
+        public boolean is(@Nullable BlockTrait<?, ?> trait) {
             if (trait == null) return false;
-            return this.traitClass.equals(trait.getClass());
+            return this.is(trait.traitID);
+        }
+
+        public boolean is(@Nullable BlockTraitKey traitID) {
+            if (traitID == null) return false;
+            return this.traitID.equals(traitID);
         }
 
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj != null && getClass() == obj.getClass()) return true;
-            if (obj instanceof BlockTrait<?, ?, ?> bt) {
+            if (obj instanceof BlockTraitKey key) {
+                return this.is(key);
+            }
+            if (obj instanceof BlockTrait<?, ?> bt) {
                 return this.is(bt);
             }
 
@@ -95,33 +112,38 @@ public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R
         }
     }
 
-    protected BlockTrait() {
+    public final BlockTraitKey traitID;
+
+    protected BlockTrait(BlockTraitKey id) {
+        this.traitID = id;
     }
 
 
-    public boolean hasRuntimeTrait(@Nullable B block) {
+    public static boolean hasRuntimeTrait(@Nullable Block block, BlockTraitKey traitKey) {
         var blockWithTraits = asBlockWithTraits(block);
         if (blockWithTraits == null) return false;
 
         final var traits = blockWithTraits.wover_traits();
-        return traits != null && traits.stream().anyMatch(this::is);
+        return traits != null && traits.stream().anyMatch(t -> t.is(traitKey));
     }
 
-    public @Nullable R getRuntimeTrait(B block) {
+    public static <B extends Block, R extends BlockTrait.RuntimeTrait<B, R>> @Nullable List<R> getRuntimeTraits(
+            B block,
+            BlockTraitKey traitKey
+    ) {
         var blockWithTraits = asBlockWithTraits(block);
         if (blockWithTraits == null) return null;
-
+        List<R> result = new ArrayList<>();
         final var traits = blockWithTraits.wover_traits();
         if (traits != null) {
             for (BlockTrait.RuntimeTrait<B, ?> trait : traits) {
-                if (trait != null && trait.is(this)) {
-                    @SuppressWarnings("unchecked")
-                    R result = (R) trait;
-                    return result;
+                if (trait != null && trait.is(traitKey)) {
+                    result.add((R) trait);
                 }
             }
         }
-        return null;
+
+        return result;
     }
 
 
@@ -133,7 +155,7 @@ public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R
         return false;
     }
 
-    public R forRuntime(C config) {
+    public R forRuntime() {
         return null;
     }
 
@@ -153,16 +175,13 @@ public abstract class BlockTrait<B extends Block, C extends BlockTrait.Config, R
         return super.equals(obj);
     }
 
-    public abstract BlockDefinition.ConfiguredTrait<B, C, ?> getDefaultConfig();
-
-    public void configure(BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition, C config) {
+    public void configure(BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition) {
         // Default implementation does nothing
     }
 
     public void afterBlockRegistration(
             B block,
-            BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition,
-            C config
+            BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition
     ) {
         // Default implementation does nothing
     }
