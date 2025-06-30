@@ -18,7 +18,7 @@ public class StripableBlockTrait extends BlockTrait<Block, StripableBlockTrait.R
 
     public static class Builder extends BlockTrait.TraitBuilder {
         private Builder() {
-            super(BlockTraitKey.of(LibWoverBlock.C, "flammable"));
+            super(BlockTraitKey.of(LibWoverBlock.C, "stripable"));
         }
 
         public StripableBlockTrait with(Block strippedBlock) {

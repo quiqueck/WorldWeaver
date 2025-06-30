@@ -57,7 +57,7 @@ public class RecipeTraitLibrary {
                 (key, block, context) -> {
                     if (!barkMaterial.isValid()) {
                         LibWoverSets.C.LOG.warn(
-                                "Skipping log recipe for {}: source material is invalid",
+                                "Skipping log recipe for {}: bark material is invalid",
                                 key.location()
                         );
                         return;
