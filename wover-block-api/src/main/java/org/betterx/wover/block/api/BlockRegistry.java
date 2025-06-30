@@ -103,16 +103,39 @@ public abstract class BlockRegistry {
         return new DefaultBlockDefinition<>(this, blockName, (def) -> blockFactory.apply(def.properties));
     }
 
-    <T extends Block> void register(
+    <T extends Block> boolean register(
+            @NotNull ResourceKey<Block> key,
+            T block,
+            @Nullable TagKey<Block>[] tags
+    ) {
+        if (block != null && block != Blocks.AIR) {
+            _registerBlockOnly(key, block, tags);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This is here for legacy support. It allows registering a block with a
+     * {@link CustomBlockItemProvider}. Going forward we use the BlockDefinition system
+     * to handle block registration and item creation.
+     *
+     * @param key
+     * @param block
+     * @param tags
+     * @param itemKey
+     * @param itemTags
+     * @param <T>
+     * @deprecated Will be removed in the 21.6.x series once BetterNether and BetterEnd were updated to use the new system.
+     */
+    <T extends Block> void registerLegacy(
             @NotNull ResourceKey<Block> key,
             T block,
             @Nullable TagKey<Block>[] tags,
             @NotNull ResourceKey<Item> itemKey,
             @Nullable TagKey<Item>[] itemTags
     ) {
-        if (block != null && block != Blocks.AIR) {
-            _registerBlockOnly(key, block, tags);
-
+        if (register(key, block, tags)) {
             final BlockItem item;
 
             if (block instanceof CustomBlockItemProvider provider) {
@@ -126,6 +149,7 @@ public abstract class BlockRegistry {
             } else {
                 item = WoverBlockItemImpl.create(block, defaultBlockItemSettings().setId(itemKey));
             }
+
             if (itemTags == null)
                 registerBlockItem(itemKey, item);
             else
@@ -142,7 +166,7 @@ public abstract class BlockRegistry {
     public <T extends Block> T register(String path, T block, TagKey<Block>[] tags, TagKey<Item>[] itemTags) {
         var blockKey = key(path);
         var itemKey = blockItemKey(blockKey);
-        register(blockKey, block, tags, itemKey, itemTags);
+        registerLegacy(blockKey, block, tags, itemKey, itemTags);
 
         FlammableBlockTrait.registerAsFlammable(block);
         return block;

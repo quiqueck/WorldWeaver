@@ -1,6 +1,8 @@
 package org.betterx.wover.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.datagen.api.WoverDataGenEntryPoint;
+import org.betterx.wover.datagen.impl.provider.AutoRecipeProvider;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -9,6 +11,6 @@ public class LibWoverRecipe implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
+        WoverDataGenEntryPoint.registerAutoProvider(AutoRecipeProvider::new);
     }
 }

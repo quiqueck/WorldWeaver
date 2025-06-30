@@ -1,15 +1,17 @@
 package org.betterx.wover.block.api;
 
 import org.betterx.wover.block.api.trait.BlockTrait;
+import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.BlockWithTraits;
 import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
-import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.util.GrowableArray;
+import org.betterx.wover.item.api.BlockItemDefinition;
+import org.betterx.wover.item.api.VanillaBlockItemDefinition;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -21,6 +23,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootTable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -42,29 +45,68 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     protected final BlockBehaviour.Properties properties;
 
-    protected GrowableArray<TagKey<Block>> tags;
-    protected GrowableArray<TagKey<Item>> itemTags;
+    protected List<TagKey<Block>> tags;
+    protected List<TagKey<Item>> itemTags;
 
     protected List<BlockTrait<? super B, ?>> traits;
 
     protected final BlockDefinition.BlockFactory<B, D> blockFactory;
+
+    private BlockDefinition(
+            BlockRegistry registry,
+            String blockName,
+            BlockDefinition.BlockFactory<B, D> blockFactory,
+            BlockBehaviour.Properties properties
+    ) {
+        this.blockKey = registry.key(blockName);
+        this.itemKey = registry.blockItemKey(blockKey);
+
+        this.properties = properties.setId(registry.key(blockName));
+        this.blockFactory = blockFactory;
+        this.registry = registry;
+    }
 
     protected BlockDefinition(
             BlockRegistry registry,
             String blockName,
             BlockDefinition.BlockFactory<B, D> blockFactory
     ) {
-        this.blockKey = registry.key(blockName);
-        this.itemKey = registry.blockItemKey(blockKey);
+        this(
+                registry,
+                blockName,
+                blockFactory,
+                BlockBehaviour.Properties.of()
+        );
+    }
 
-        this.properties = BlockBehaviour.Properties.of().setId(this.blockKey);
-        this.blockFactory = blockFactory;
-        this.registry = registry;
+    protected BlockDefinition(
+            BlockRegistry registry,
+            String blockName,
+            BlockDefinition.BlockFactory<B, D> blockFactory,
+            BlockBehaviour templateBlock
+    ) {
+        this(
+                registry,
+                blockName,
+                blockFactory,
+                BlockBehaviour.Properties.ofFullCopy(templateBlock)
+        );
     }
 
     abstract protected void beforeBuild();
 
     abstract protected B beforeRegister(B block);
+
+    /**
+     * Used in {@link #buildAndRegister()} to generate the BlockItem.
+     *
+     * @param sourceBlock The block for which the BlockItemDefinition is created.
+     * @param <BI>
+     * @return
+     */
+    protected <BI extends BlockItem> @NotNull BlockItemDefinition<? super BI, ?> getBlockItemDefinition(Block sourceBlock) {
+        return new VanillaBlockItemDefinition(this, sourceBlock);
+    }
 
     @SuppressWarnings("unchecked")
     public final B build() {
@@ -95,13 +137,8 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     public final B buildAndRegister() {
         B block = this.beforeRegister(this.build());
-        this.registry.register(
-                this.blockKey,
-                block,
-                tags == null ? null : tags.elements(),
-                this.itemKey,
-                itemTags == null ? null : itemTags.elements()
-        );
+        final TagKey<Block>[] tags = this.tags == null ? null : this.tags.toArray(new TagKey[0]);
+        this.registry.register(this.blockKey, block, tags);
 
         // If traits are defined, call afterBlockRegistration for each trait
         if (this.traits != null) {
@@ -110,11 +147,30 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
             }
         }
 
+        // Register the block item for this block. At this point the Block is fully configured
+        var blockitemDefinition = this.getBlockItemDefinition(block);
+        blockitemDefinition.addTags(itemTags == null ? null : itemTags.toArray(new TagKey[0]));
+        blockitemDefinition.buildAndRegister();
+
         return block;
     }
 
     public final ResourceKey<Item> itemKey() {
         return this.itemKey;
+    }
+
+    @SuppressWarnings("unchecked")
+    public D addTrait(
+            @Nullable List<BlockTrait<?, ?>> traits
+    ) {
+        if (traits == null || traits.isEmpty()) {
+            // Skip null or empty trait lists
+            return (D) this;
+        }
+
+        traits.forEach(this::addTrait);
+
+        return (D) this;
     }
 
     /**
@@ -125,27 +181,32 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public <T extends BlockTrait<? super B, ?>> D addTrait(
-            @Nullable T trait
+    public D addTrait(
+            @Nullable BlockTrait<?, ?> trait
     ) {
         if (trait == null) {
             // Skip null traits
             return (D) this;
         }
-        if (trait.clientOnly() && !ModCore.isClient()) {
-            // Skip traits that are only for the client side
-            return (D) this;
-        }
-        if (trait.datagenOnly() && !ModCore.isDatagen()) {
-            // Skip traits that are only for data generation
-            return (D) this;
-        }
-
 
         if (this.traits == null) this.traits = new LinkedList<>();
 
-        this.traits.add(trait);
+        this.traits.add((BlockTrait<? super B, ?>) trait);
         return (D) this;
+    }
+
+    public boolean hasTrait(BlockTrait<?, ?> trait) {
+        if (this.traits == null || this.traits.isEmpty()) {
+            return false;
+        }
+        return this.traits.stream().anyMatch(t -> t.is(trait));
+    }
+
+    public boolean hasTrait(BlockTraitKey traitKey) {
+        if (this.traits == null || this.traits.isEmpty()) {
+            return false;
+        }
+        return this.traits.stream().anyMatch(trait -> trait.is(traitKey));
     }
 
     /**
@@ -158,10 +219,15 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @SuppressWarnings("unchecked")
     public final D addTags(TagKey<Block>... blockTags) {
         if (this.tags == null) {
-            this.tags = new GrowableArray<>(blockTags);
-        } else {
-            this.tags.add(blockTags);
+            this.tags = new ArrayList<>(blockTags.length);
         }
+
+        for (TagKey<Block> tag : blockTags) {
+            if (tag != null) {
+                this.tags.add(tag);
+            }
+        }
+
         return (D) this;
     }
 
@@ -171,7 +237,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return Array of tags applied to this block, may be null
      */
     public TagKey<Block>[] tags() {
-        return this.tags.elements();
+        return this.tags.toArray(new TagKey[0]);
     }
 
     /**
@@ -184,10 +250,15 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @SuppressWarnings("unchecked")
     public final D addItemTags(TagKey<Item>... itemTags) {
         if (this.itemTags == null) {
-            this.itemTags = new GrowableArray<>(itemTags);
-        } else {
-            this.itemTags.add(itemTags);
+            this.itemTags = new ArrayList<>(itemTags.length);
         }
+
+        for (TagKey<Item> tag : itemTags) {
+            if (tag != null) {
+                this.itemTags.add(tag);
+            }
+        }
+
         return (D) this;
     }
 
@@ -197,7 +268,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return Array of tags applied to this blockItem, may be null
      */
     public TagKey<Item>[] itemTags() {
-        return this.itemTags.elements();
+        return this.itemTags.toArray(new TagKey[0]);
     }
 
     // **********************************************************************

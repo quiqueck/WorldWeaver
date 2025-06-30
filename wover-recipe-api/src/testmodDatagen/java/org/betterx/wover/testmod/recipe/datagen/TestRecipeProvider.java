@@ -1,9 +1,7 @@
 package org.betterx.wover.testmod.recipe.datagen;
 
-import org.betterx.wover.block.api.trait.BlockRecipeGeneratorTrait;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.WoverRecipeProvider;
-import org.betterx.wover.item.api.trait.ItemRecipeGeneratorTrait;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
 import net.minecraft.world.item.Items;
@@ -22,8 +20,5 @@ public class TestRecipeProvider extends WoverRecipeProvider {
                      .outputCount(2)
                      .showNotification()
                      .build(context);
-
-        ItemRecipeGeneratorTrait.bootstrapRecipes(this.modCore, context);
-        BlockRecipeGeneratorTrait.bootstrapRecipes(this.modCore, context);
     }
 }

@@ -22,7 +22,7 @@ public abstract class WoverRecipeProvider implements WoverDataProvider<FabricRec
     /**
      * The ModCore instance of the Mod that is providing this instance.
      */
-    protected final ModCore modCore;
+    public final ModCore modCore;
 
     public WoverRecipeProvider(
             ModCore modCore,

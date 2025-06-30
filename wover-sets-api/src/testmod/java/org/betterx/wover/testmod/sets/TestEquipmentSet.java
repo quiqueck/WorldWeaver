@@ -1,7 +1,7 @@
-package org.betterx.wover.testmod.recipe;
+package org.betterx.wover.testmod.sets;
 
 import org.betterx.wover.complex.api.equipment.*;
-import org.betterx.wover.testmod.entrypoint.TestModWoverRecipe;
+import org.betterx.wover.testmod.entrypoint.TestModWoverSets;
 
 import net.minecraft.world.item.Items;
 
@@ -11,7 +11,7 @@ public class TestEquipmentSet extends EquipmentSet {
     public static final TestEquipmentSet INSTANCE = new TestEquipmentSet();
 
     public TestEquipmentSet() {
-        super(TestModWoverRecipe.C, "test_equipment_set", ToolTiers.DIAMOND_TOOL, ArmorTiers.TURTLE_ARMOR, Items.STONE);
+        super(TestModWoverSets.C, "test_equipment_set", ToolTiers.DIAMOND_TOOL, ArmorTiers.TURTLE_ARMOR, Items.STONE);
 
         add(ToolSlot.PICKAXE_SLOT);
         add(ToolSlot.AXE_SLOT);

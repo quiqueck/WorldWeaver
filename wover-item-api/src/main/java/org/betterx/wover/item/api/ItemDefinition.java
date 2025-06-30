@@ -79,6 +79,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     protected final ItemDefinition.ItemFactory<I, D> itemFactory;
 
+
     /**
      * Creates a new item configuration.
      *
@@ -87,7 +88,23 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      * @param itemFactory The factory used to create the item instance
      */
     protected ItemDefinition(ItemRegistry registry, String itemName, ItemDefinition.ItemFactory<I, D> itemFactory) {
-        this.itemKey = registry.key(itemName);
+        this(registry, registry.key(itemName), itemFactory);
+    }
+
+    /**
+     * Creates a new item configuration with a given ResourceKey.
+     *
+     * @param registry    The item registry to use for registration
+     * @param itemKey     The resource key identifying the item
+     * @param itemFactory The factory used to create the item instance
+     */
+    protected ItemDefinition(
+            ItemRegistry registry,
+            ResourceKey<Item> itemKey,
+            ItemDefinition.ItemFactory<I, D> itemFactory
+    ) {
+        assert (registry.C.namespace.equals(itemKey.location().getNamespace()));
+        this.itemKey = itemKey;
         this.properties = new Item.Properties().setId(this.itemKey);
         this.itemFactory = itemFactory;
         this.registry = registry;

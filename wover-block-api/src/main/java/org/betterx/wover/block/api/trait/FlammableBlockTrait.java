@@ -10,8 +10,8 @@ import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import java.util.List;
 
 public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockTrait.RuntimeTrait> {
-    private static final FlammableBlockTrait DEFAULT = new FlammableBlockTrait(5, 5);
     public static final FlammableBlockTrait.Builder BUILDER = new Builder();
+    private static final FlammableBlockTrait DEFAULT = new FlammableBlockTrait(5, 5);
 
     public static class Builder extends BlockTrait.TraitBuilder {
         private Builder() {

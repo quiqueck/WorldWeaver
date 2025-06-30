@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-sets-testmod",
+  "version": "21.6.0",
+  "name": "WorldWeaver - Sets (TestMod)",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-sets-testmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.testmod.entrypoint.TestModWoverSets"
+    ],
+    "fabric-datagen": [
+      "org.betterx.wover.testmod.sets.datagen.TestModWoverSetsDatagen"
+    ],
+    "client": [
+      "org.betterx.wover.testmod.entrypoint.client.TestModWoverSetsClient"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ["1.21.6"],
+    "java": ">=17",
+    "fabric-api": ">=0.100.1"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  }
+}

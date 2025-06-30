@@ -50,16 +50,6 @@ public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGene
         return new BlockRecipeGeneratorTrait.RuntimeTrait(recipeFactory);
     }
 
-    @Override
-    public boolean datagenOnly() {
-        return true;
-    }
-
-    @Override
-    public boolean clientOnly() {
-        return true;
-    }
-
     public static void bootstrapRecipes(ModCore modCore, RecipeBuilder.Context context) {
         bootstrapRecipes(modCore, context, (r, i) -> true);
     }

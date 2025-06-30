@@ -14,5 +14,6 @@ ext.knownWoverModules = [
         'wover-feature-api',
         'wover-structure-api',
         'wover-biome-api',
-        'wover-generator-api'
+        'wover-generator-api',
+        'wover-sets-api',
 ]

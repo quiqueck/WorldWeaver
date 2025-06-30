@@ -12,13 +12,52 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> {
-    public static final BlockTrait.VoidRuntime VOID_RUNTIME = new BlockTrait.VoidRuntime();
+    public static final BlockTrait.VoidRuntime<Block> VOID_RUNTIME = new BlockTrait.VoidRuntime<>();
 
     public abstract static class TraitBuilder {
+        private static final List<BlockTrait<?, ?>> EMPTY = List.of();
         public final BlockTraitKey ID;
 
         protected TraitBuilder(BlockTraitKey id) {
             this.ID = id;
+        }
+
+        protected static @NotNull List<BlockTrait<?, ?>> combine(BlockTrait<?, ?> t0) {
+            if (t0 == null) return EMPTY;
+            return List.of(t0);
+        }
+
+        protected static @NotNull List<BlockTrait<?, ?>> combine(BlockTrait<?, ?> t0, BlockTrait<?, ?> t1) {
+            if (t0 == null && t1 == null) return EMPTY;
+            if (t0 == null) return List.of(t1);
+            if (t1 == null) return List.of(t0);
+            return List.of(t0, t1);
+        }
+
+        protected static @NotNull List<BlockTrait<?, ?>> combine(
+                BlockTrait<?, ?> t0,
+                BlockTrait<?, ?> t1,
+                BlockTrait<?, ?> t2
+        ) {
+            if (t0 == null && t1 == null && t2 == null) return EMPTY;
+            if (t0 == null && t1 == null) return List.of(t2);
+            if (t0 == null && t2 == null) return List.of(t1);
+            if (t1 == null && t2 == null) return List.of(t0);
+            if (t0 == null) return combine(t1, t2);
+            if (t1 == null) return combine(t0, t2);
+            if (t2 == null) return combine(t0, t1);
+            return List.of(t0, t1, t2);
+        }
+
+        protected static @NotNull List<BlockTrait<?, ?>> combine(BlockTrait<?, ?>... traits) {
+            if (traits == null || traits.length == 0) return EMPTY;
+            List<BlockTrait<?, ?>> result = new ArrayList<>();
+            for (BlockTrait<?, ?> trait : traits) {
+                if (trait != null) {
+                    result.add(trait);
+                }
+            }
+            return result.isEmpty() ? EMPTY : result;
         }
 
         public <B extends Block, R extends RuntimeBlockTrait<B, R>> List<R> getRuntimeTraits(B block) {
@@ -26,7 +65,7 @@ public abstract class BlockTrait<B extends Block, R extends RuntimeBlockTrait<B,
         }
     }
 
-    public static final class VoidRuntime extends RuntimeBlockTrait<Block, VoidRuntime> {
+    public static final class VoidRuntime<B extends Block> extends RuntimeBlockTrait<B, VoidRuntime<B>> {
         public static final BlockTraitKey ID = BlockTraitKey.of(LibWoverEvents.C, "void_trait");
 
         private VoidRuntime() {
@@ -108,13 +147,6 @@ public abstract class BlockTrait<B extends Block, R extends RuntimeBlockTrait<B,
         this.traitID = id;
     }
 
-    public boolean datagenOnly() {
-        return this.clientOnly();
-    }
-
-    public boolean clientOnly() {
-        return false;
-    }
 
     public R forRuntime() {
         return null;
