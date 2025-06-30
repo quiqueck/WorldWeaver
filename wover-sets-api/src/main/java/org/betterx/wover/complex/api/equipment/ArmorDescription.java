@@ -4,7 +4,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.item.api.ArmorItemDefinition;
 import org.betterx.wover.item.api.ItemRegistry;
-import org.betterx.wover.item.api.trait.ItemRecipeGeneratorTrait;
+import org.betterx.wover.item.api.trait.ItemRecipeTrait;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
 import net.minecraft.data.recipes.RecipeCategory;
@@ -42,7 +42,7 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
                 .humanoidArmor(equipmentSet.armorTier.armorMaterial, slot.armorType);
 
         itemDefinition.addTrait(
-                ItemRecipeGeneratorTrait
+                ItemRecipeTrait
                         .BUILDER
                         .with((key, item, context) -> addRecipe(
                                 context,

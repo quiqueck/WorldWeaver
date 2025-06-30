@@ -1,10 +1,10 @@
 package org.betterx.wover.sets.api.blocks;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.core.api.ModCore;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -35,14 +35,7 @@ public class BlockSet<S extends BlockSet<S>> {
     }
 
     public S register() {
-        return register(null);
-    }
 
-    @SuppressWarnings("unchecked")
-    public S register(@Nullable BlockRegistry blockRegistry) {
-        if (blockRegistry == null) {
-            blockRegistry = BlockRegistry.forMod(C);
-        }
         final BiConsumer<SlotDefinition, BlockDefinition<?, ?>> acceptDefinition = (slotDefinition, blockDefinition) -> {
             Block block = blockDefinition.buildAndRegister();
             slots.put(slotDefinition.slot, new SlotData(slotDefinition.slot, block));
@@ -73,9 +66,10 @@ public class BlockSet<S extends BlockSet<S>> {
     }
 
     /**
-     * Get initiated {@link Block} from this {@link BlockSet}.
+     * Get the {@link Block} for the given {@link SlotType} from this set of blocks.
+     * This method will return {@code null} if no block is stored for the given type.
      *
-     * @param type {@link SlotType} The Block Entry
+     * @param type {@link SlotType} The Block Type
      * @return {@link Block} or {@code null} if nothing is stored.
      */
     @Nullable
@@ -86,6 +80,31 @@ public class BlockSet<S extends BlockSet<S>> {
         }
 
         return null;
+    }
+
+
+    /**
+     * Get the {@link Block} for the given {@link SlotType} from this set of blocks.
+     * This method will try to find a block for the given types in the given order and return the first found block.
+     * If no block is found for the given types, it will try to find a block for the {@link #baseSlot}.
+     * If no block is found for the {@link #baseSlot} either, it will return a default Minecraft Stone block.
+     *
+     * @param type {@link SlotType} The Block Type(s) to check
+     * @return {@link Block} or a default Minecraft Stone block if nothing is stored.
+     */
+    public @NotNull Block getBlockWithFallback(@NotNull SlotType... type) {
+        // Try the given types in order, first found block will be returned
+        for (SlotType slotType : type) {
+            final Block block = this.getBlock(slotType);
+            if (block != null) return block;
+        }
+
+        //Try the base Block slot
+        final Block baseBlock = this.getBlock(this.baseSlot);
+        if (baseBlock != null) return baseBlock;
+
+        // If no block was found, return a default Minecraft Stone block
+        return Blocks.STONE;
     }
 
     @NotNull

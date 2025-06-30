@@ -86,12 +86,25 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
         return (I) this;
     }
 
+    /**
+     * The Recipe will be unlocked by one of the passed Items. As sonn als players have one in their Inventory
+     * the recipe will unlock. Those Items are mostly the input Items for the recipe.
+     *
+     * @param name  The name for this unlock-Criteria
+     * @param items {@link Item}s or {@link Block}s that will unlock the recipe.
+     */
+    public I unlocks(String name, ItemLike... items) {
+        return unlocks(name, InventoryChangeTrigger.TriggerInstance.hasItems(items));
+    }
+
     public I unlockedBy(Ingredient ingredient) {
         ingredient.items().forEach(item -> {
+
             this.unlocks(
                     "has_" + item.value().getDescriptionId(),
                     (context) -> context.has(item.value())
             );
+
         });
 
         return (I) this;
@@ -135,17 +148,6 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
                       .collect(Collectors.joining("_"));
         if (name.length() > 45) name = name.substring(0, 42);
         return unlocks(name, items);
-    }
-
-    /**
-     * The Recipe will be unlocked by one of the passed Items. As sonn als players have one in their Inventory
-     * the recipe will unlock. Those Items are mostly the input Items for the recipe.
-     *
-     * @param name  The name for this unlock-Criteria
-     * @param items {@link Item}s or {@link Block}s that will unlock the recipe.
-     */
-    public I unlocks(String name, ItemLike... items) {
-        return unlocks(name, InventoryChangeTrigger.TriggerInstance.hasItems(items));
     }
 
     /**

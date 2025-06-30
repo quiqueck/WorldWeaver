@@ -1,11 +1,13 @@
-package org.betterx.wover.block.api.trait;
+package org.betterx.wover.block.api.trait.behaviour;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.block.api.BlockRegistry;
+import org.betterx.wover.block.api.trait.BlockTrait;
+import org.betterx.wover.block.api.trait.BlockTraitKey;
+import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
 import org.betterx.wover.entrypoint.LibWoverBlock;
 
 import net.minecraft.world.level.block.Block;
-
-import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 import java.util.List;
 
@@ -52,22 +54,6 @@ public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockT
         this.speed = speed;
     }
 
-    public static void registerAsFlammable(Block block) {
-        registerAsFlammable(block, 5, 5);
-    }
-
-    public static void registerAsFlammable(
-            Block block,
-            int burn,
-            int spread
-    ) {
-        if (block.defaultBlockState().ignitedByLava()
-                && FlammableBlockRegistry.getDefaultInstance()
-                                         .get(block)
-                                         .getBurnChance() == 0) {
-            FlammableBlockRegistry.getDefaultInstance().add(block, burn, spread);
-        }
-    }
 
     @Override
     public FlammableBlockTrait.RuntimeTrait forRuntime() {
@@ -84,6 +70,6 @@ public final class FlammableBlockTrait extends BlockTrait<Block, FlammableBlockT
             Block block,
             BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition
     ) {
-        registerAsFlammable(block, this.burn, this.speed);
+        BlockRegistry.registerAsFlammable(block, this.burn, this.speed);
     }
 }

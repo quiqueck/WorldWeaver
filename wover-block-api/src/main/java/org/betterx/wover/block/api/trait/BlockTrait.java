@@ -6,6 +6,7 @@ import org.betterx.wover.entrypoint.LibWoverEvents;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +104,8 @@ public abstract class BlockTrait<B extends Block, R extends RuntimeBlockTrait<B,
         if (traits == null || traits.isEmpty()) {
             return Stream.empty();
         }
-        return traits.stream();
+        // Flatten the map values into a single stream
+        return traits.values().stream().flatMap(Collection::stream);
     }
 
     public static boolean hasRuntimeTraits(Block block) {
@@ -118,7 +120,7 @@ public abstract class BlockTrait<B extends Block, R extends RuntimeBlockTrait<B,
         if (blockWithTraits == null) return false;
 
         final var traits = blockWithTraits.wover_traits();
-        return traits != null && traits.stream().anyMatch(t -> t.is(traitKey));
+        return traits != null && traits.get(traitKey) != null;
     }
 
     public static <B extends Block, R extends RuntimeBlockTrait<B, R>> @Nullable List<R> getRuntimeTraits(
@@ -127,16 +129,14 @@ public abstract class BlockTrait<B extends Block, R extends RuntimeBlockTrait<B,
     ) {
         var blockWithTraits = asBlockWithTraits(block);
         if (blockWithTraits == null) return null;
-        List<R> result = new ArrayList<>();
+
         final var traits = blockWithTraits.wover_traits();
+        List<R> result = null;
         if (traits != null) {
-            for (RuntimeBlockTrait<B, ?> trait : traits) {
-                if (trait != null && trait.is(traitKey)) {
-                    result.add((R) trait);
-                }
-            }
+            result = (List<R>) traits.get(traitKey);
         }
 
+        if (result == null || result.isEmpty()) return null;
         return result;
     }
 

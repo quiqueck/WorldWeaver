@@ -23,10 +23,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -111,16 +108,22 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @SuppressWarnings("unchecked")
     public final B build() {
         this.beforeBuild();
-        final List<RuntimeBlockTrait<B, ?>> runtimeTraits;
+        final Map<BlockTraitKey, List<RuntimeBlockTrait<B, ?>>> runtimeTraits;
 
         // If traits are defined, configure them and collect RuntimeTraits
         if (this.traits != null && !this.traits.isEmpty()) {
-            runtimeTraits = new LinkedList<>();
+            runtimeTraits = new HashMap<>(8);
             for (var configuredTrait : this.traits) {
                 this.configurePropertiesUnchecked(configuredTrait);
 
                 final RuntimeBlockTrait<B, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
-                if (runtimeTrait != null) runtimeTraits.add(runtimeTrait);
+                if (runtimeTrait != null) {
+                    // Collect runtime traits by their key
+                    runtimeTraits.computeIfAbsent(
+                            runtimeTrait.traitID,
+                            k -> new ArrayList<>()
+                    ).add(runtimeTrait);
+                }
             }
         } else runtimeTraits = null;
 
@@ -137,6 +140,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     public final B buildAndRegister() {
         B block = this.beforeRegister(this.build());
+
         final TagKey<Block>[] tags = this.tags == null ? null : this.tags.toArray(new TagKey[0]);
         this.registry.register(this.blockKey, block, tags);
 
@@ -150,7 +154,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         // Register the block item for this block. At this point the Block is fully configured
         var blockitemDefinition = this.getBlockItemDefinition(block);
         blockitemDefinition.addTags(itemTags == null ? null : itemTags.toArray(new TagKey[0]));
-        blockitemDefinition.buildAndRegister();
+        var blockItem = blockitemDefinition.buildAndRegister();
 
         return block;
     }
@@ -475,10 +479,10 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     /**
      * Makes this block ignitable by lava. You should add the
-     * {@link org.betterx.wover.block.api.trait.FlammableBlockTrait} to register it properly.
+     * FlammableBlockTrait to register it properly.
      *
      * @return This configuration instance for method chaining
-     * @deprecated Use {@link org.betterx.wover.block.api.trait.FlammableBlockTrait} instead, as this method is
+     * @deprecated Use FlammableBlockTrait instead, as this method is
      * deprecated and will be removed in future versions.
      */
     @Deprecated(forRemoval = true)

@@ -11,24 +11,24 @@ import net.minecraft.world.level.block.Block;
 import java.util.function.BiPredicate;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGeneratorTrait.RuntimeTrait> {
-    public static final BlockRecipeGeneratorTrait.Builder BUILDER = new BlockRecipeGeneratorTrait.Builder();
+public class BlockRecipeTrait extends BlockTrait<Block, BlockRecipeTrait.RuntimeTrait> {
+    public static final BlockRecipeTrait.Builder BUILDER = new BlockRecipeTrait.Builder();
 
     public static class Builder extends BlockTrait.TraitBuilder {
         private Builder() {
             super(BlockTraitKey.of(LibWoverRecipe.C, "recipe_generator"));
         }
 
-        public @Nullable BlockRecipeGeneratorTrait with(BlockRecipeGeneratorTrait.RecipeFactory recipeFactory) {
+        public @Nullable BlockRecipeTrait with(BlockRecipeTrait.RecipeFactory recipeFactory) {
             if (!ModCore.isDatagen()) return null;
-            return new BlockRecipeGeneratorTrait(recipeFactory);
+            return new BlockRecipeTrait(recipeFactory);
         }
     }
 
     public static class RuntimeTrait extends RuntimeBlockTrait<Block, RuntimeTrait> {
-        public final BlockRecipeGeneratorTrait.RecipeFactory recipeFactory;
+        public final BlockRecipeTrait.RecipeFactory recipeFactory;
 
-        private RuntimeTrait(BlockRecipeGeneratorTrait.RecipeFactory recipeFactory) {
+        private RuntimeTrait(BlockRecipeTrait.RecipeFactory recipeFactory) {
             super(BUILDER.ID);
             this.recipeFactory = recipeFactory;
         }
@@ -38,16 +38,16 @@ public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGene
         void buildRecipe(ResourceKey<Block> key, Block block, RecipeBuilder.Context context);
     }
 
-    public final BlockRecipeGeneratorTrait.RecipeFactory recipeFactory;
+    public final BlockRecipeTrait.RecipeFactory recipeFactory;
 
-    BlockRecipeGeneratorTrait(BlockRecipeGeneratorTrait.RecipeFactory recipeFactory) {
+    BlockRecipeTrait(BlockRecipeTrait.RecipeFactory recipeFactory) {
         super(BUILDER.ID);
         this.recipeFactory = recipeFactory;
     }
 
     @Override
-    public BlockRecipeGeneratorTrait.RuntimeTrait forRuntime() {
-        return new BlockRecipeGeneratorTrait.RuntimeTrait(recipeFactory);
+    public BlockRecipeTrait.RuntimeTrait forRuntime() {
+        return new BlockRecipeTrait.RuntimeTrait(recipeFactory);
     }
 
     public static void bootstrapRecipes(ModCore modCore, RecipeBuilder.Context context) {
@@ -62,12 +62,18 @@ public class BlockRecipeGeneratorTrait extends BlockTrait<Block, BlockRecipeGene
         BlockRegistry
                 .forMod(modCore)
                 .allEntries().filter(e -> filter.test(e.getKey(), e.getValue())).forEach(e -> {
-                    var runtimeTraits = BlockTrait.<Block, BlockRecipeGeneratorTrait.RuntimeTrait>getRuntimeTraits(
+                    var runtimeTraits = BlockTrait.<Block, BlockRecipeTrait.RuntimeTrait>getRuntimeTraits(
                             e.getValue(),
                             BUILDER.ID
                     );
                     if (runtimeTraits == null) return;
-                    runtimeTraits.forEach(trait -> trait.recipeFactory.buildRecipe(e.getKey(), e.getValue(), context));
+                    runtimeTraits.forEach(trait -> {
+                        try {
+                            trait.recipeFactory.buildRecipe(e.getKey(), e.getValue(), context);
+                        } catch (Exception ex) {
+                            LibWoverRecipe.C.LOG.error("Failed to build recipe for block: " + e.getKey(), ex);
+                        }
+                    });
                 });
     }
 }

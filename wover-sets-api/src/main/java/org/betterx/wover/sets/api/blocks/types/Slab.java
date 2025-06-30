@@ -1,17 +1,19 @@
 package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraits;
-import org.betterx.wover.recipe.api.RecipeBuilder;
+import org.betterx.wover.recipe.api.RecipeMaterial;
+import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.block.Block;
-
 public class Slab extends SlotDefinition {
+    public Slab() {
+        this(SlotType.SLAB);
+    }
+
     public Slab(SlotType slot) {
         super(slot);
     }
@@ -22,14 +24,9 @@ public class Slab extends SlotDefinition {
     }
 
     @Override
-    protected void buildRecipe(BlockSet<?> set, ResourceKey<Block> key, Block block, RecipeBuilder.Context context) {
-        RecipeBuilder
-                .crafting(key.location(), block)
-                .outputCount(6)
-                .shape("###")
-                .addMaterial('#', set.getBaseBlock())
-                .group("slab")
-                .category(RecipeCategory.BUILDING_BLOCKS)
-                .build(context);
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set) {
+        // The Recipe is built before the block was created, so we need to defer the read
+        // of the material until the recipe is actually created
+        return RecipeTraitLibrary.slab(RecipeMaterial.ofDeferredItemLike(set::getBaseBlock));
     }
 }

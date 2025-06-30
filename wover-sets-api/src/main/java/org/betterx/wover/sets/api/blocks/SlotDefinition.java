@@ -2,11 +2,7 @@ package org.betterx.wover.sets.api.blocks;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
-import org.betterx.wover.block.api.trait.BlockRecipeGeneratorTrait;
-import org.betterx.wover.recipe.api.RecipeBuilder;
-
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.block.Block;
+import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 
 import java.util.function.Consumer;
 
@@ -22,23 +18,23 @@ public class SlotDefinition {
     }
 
     public void createBlockDefinition(BlockSet<?> set, Consumer<BlockDefinition<?, ?>> blockDefinitionConsumer) {
-        var definition = BlockRegistry
-                .forMod(set.C)
-                .defineDefaultBlock(this.getName(set))
-                .addTrait(BlockRecipeGeneratorTrait.BUILDER.with(
-                        (key, block, context) -> this.buildRecipe(set, key, block, context)
-                ));
+        var definition = startBlockDefinition(BlockRegistry.forMod(set.C), this.getName(set));
 
+        definition.addTrait(this.buildRecipe(set));
         this.addSlotSpecificDefinitions(set, definition);
         set.addCommonBlockDefinitions(this.slot, definition);
 
         blockDefinitionConsumer.accept(definition);
     }
 
+    protected BlockDefinition<?, ?> startBlockDefinition(BlockRegistry registry, String name) {
+        return registry.defineDefaultBlock(name);
+    }
+
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
     }
 
-    protected void buildRecipe(BlockSet<?> set, ResourceKey<Block> key, Block block, RecipeBuilder.Context context) {
-
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set) {
+        return null;
     }
 }

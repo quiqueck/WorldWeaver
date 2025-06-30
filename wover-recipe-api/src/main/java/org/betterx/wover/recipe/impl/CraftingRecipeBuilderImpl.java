@@ -2,6 +2,7 @@ package org.betterx.wover.recipe.impl;
 
 import org.betterx.wover.recipe.api.CraftingRecipeBuilder;
 import org.betterx.wover.recipe.api.RecipeBuilder;
+import org.betterx.wover.recipe.api.RecipeMaterial;
 
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -57,6 +58,35 @@ public class CraftingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CraftingRec
     public CraftingRecipeBuilderImpl addMaterial(char key, Ingredient value) {
         unlockedBy(value);
         return _addMaterial(key, items -> value);
+    }
+
+    @Override
+    public CraftingRecipeBuilderImpl addMaterial(char key, RecipeMaterial value) {
+        final var self = this;
+        value.consume(
+                new RecipeMaterial.Consumer() {
+                    @Override
+                    public void apply(TagKey<Item> tag) {
+                        self.addMaterial(key, tag);
+                    }
+
+                    @Override
+                    public void apply(ItemStack... stacks) {
+                        self.addMaterial(key, stacks);
+                    }
+
+                    @Override
+                    public void apply(ItemLike... items) {
+                        self.addMaterial(key, items);
+                    }
+
+                    @Override
+                    public void apply(Ingredient ingredient) {
+                        self.addMaterial(key, ingredient);
+                    }
+                }
+        );
+        return this;
     }
 
     public CraftingRecipeBuilderImpl _addMaterial(char key, IngredientFactory factory) {

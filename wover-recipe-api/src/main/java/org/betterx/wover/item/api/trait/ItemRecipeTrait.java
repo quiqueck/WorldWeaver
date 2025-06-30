@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import java.util.function.BiPredicate;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGeneratorTrait.RuntimeTrait> {
+public class ItemRecipeTrait extends ItemTrait<Item, ItemRecipeTrait.RuntimeTrait> {
     public static final Builder BUILDER = new Builder();
 
     public static class Builder extends ItemTrait.TraitBuilder {
@@ -19,9 +19,9 @@ public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGenerato
             super(ItemTraitKey.of(LibWoverRecipe.C, "recipe_generator"));
         }
 
-        public @Nullable ItemRecipeGeneratorTrait with(RecipeFactory recipeFactory) {
+        public @Nullable ItemRecipeTrait with(RecipeFactory recipeFactory) {
             if (!ModCore.isDatagen()) return null;
-            return new ItemRecipeGeneratorTrait(recipeFactory);
+            return new ItemRecipeTrait(recipeFactory);
         }
     }
 
@@ -40,7 +40,7 @@ public class ItemRecipeGeneratorTrait extends ItemTrait<Item, ItemRecipeGenerato
 
     public final RecipeFactory recipeFactory;
 
-    ItemRecipeGeneratorTrait(RecipeFactory recipeFactory) {
+    ItemRecipeTrait(RecipeFactory recipeFactory) {
         super(BUILDER.ID);
         this.recipeFactory = recipeFactory;
     }

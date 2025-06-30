@@ -13,11 +13,16 @@ public interface CraftingRecipeBuilder extends BaseRecipeBuilder<CraftingRecipeB
     CraftingRecipeBuilder outputCount(int count);
 
     CraftingRecipeBuilder addMaterial(char key, TagKey<Item> value);
-    CraftingRecipeBuilder addMaterial(char key, ItemStack... values);
     CraftingRecipeBuilder addMaterial(char key, ItemLike... values);
-    CraftingRecipeBuilder addMaterial(char key, Ingredient ingredient);
+    CraftingRecipeBuilder addMaterial(char key, RecipeMaterial value);
     CraftingRecipeBuilder shape(String... shape);
 
     CraftingRecipeBuilder shapeless();
     CraftingRecipeBuilder showNotification();
+
+    @Deprecated(forRemoval = true)
+    CraftingRecipeBuilder addMaterial(char key, Ingredient ingredient);
+    @Deprecated(forRemoval = true)
+    CraftingRecipeBuilder addMaterial(char key, ItemStack... values);
+
 }

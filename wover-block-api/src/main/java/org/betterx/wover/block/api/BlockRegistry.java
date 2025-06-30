@@ -1,6 +1,5 @@
 package org.betterx.wover.block.api;
 
-import org.betterx.wover.block.api.trait.FlammableBlockTrait;
 import org.betterx.wover.block.impl.WoverBlockItemImpl;
 import org.betterx.wover.block.impl.api.BlockRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
@@ -21,6 +20,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.storage.loot.LootTable;
+
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -168,7 +169,7 @@ public abstract class BlockRegistry {
         var itemKey = blockItemKey(blockKey);
         registerLegacy(blockKey, block, tags, itemKey, itemTags);
 
-        FlammableBlockTrait.registerAsFlammable(block);
+        registerAsFlammable(block);
         return block;
     }
 
@@ -235,5 +236,22 @@ public abstract class BlockRegistry {
                     if (builder != null)
                         biConsumer.accept(key, builder);
                 });
+    }
+
+    public static void registerAsFlammable(Block block) {
+        registerAsFlammable(block, 5, 5);
+    }
+
+    public static void registerAsFlammable(
+            Block block,
+            int burn,
+            int spread
+    ) {
+        if (block.defaultBlockState().ignitedByLava()
+                && FlammableBlockRegistry.getDefaultInstance()
+                                         .get(block)
+                                         .getBurnChance() == 0) {
+            FlammableBlockRegistry.getDefaultInstance().add(block, burn, spread);
+        }
     }
 }
