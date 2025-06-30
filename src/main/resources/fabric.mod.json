@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover",
-  "version": "21.6.0",
+  "version": "21.7.0",
   "name": "WorldWeaver",
   "description": "Unleash your world-building potential with WorldWeaver, a Minecraft utility mod for Fabric, simplifying tasks and enhancing the possibilities of data-driven world generation.",
   "authors": [
@@ -26,7 +26,7 @@
   "accessWidener": "wover.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6"],
+    "minecraft": ["1.21.6", "1.21.7"],
     "java": ">=21",
     "fabric-api": ">=0.100.0",
     "wunderlib": "21.6.x"

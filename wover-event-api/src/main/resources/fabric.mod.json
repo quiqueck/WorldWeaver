@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover-events",
-  "version": "21.6.0",
+  "version": "21.7.0",
   "name": "WorldWeaver - Events API",
   "description": "Provides an API for registering events in the Lifecycle of a Minecraft World.",
   "authors": [
@@ -30,7 +30,7 @@
   "accessWidener": "wover.event.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6"],
+    "minecraft": ["1.21.6", "1.21.7"],
     "java": ">=21",
     "fabric-api": ">=0.100.0"
   },

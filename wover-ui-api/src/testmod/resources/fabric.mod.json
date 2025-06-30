@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover-ui-testmod",
-  "version": "21.6.0",
+  "version": "21.7.0",
   "name": "WorldWeaver - UI (TestMod)",
   "description": "",
   "authors": [
@@ -26,7 +26,7 @@
   "mixins": [],
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6"],
+    "minecraft": ["1.21.6", "1.21.7"],
     "java": ">=17",
     "fabric-api": ">=0.100.1"
   },
