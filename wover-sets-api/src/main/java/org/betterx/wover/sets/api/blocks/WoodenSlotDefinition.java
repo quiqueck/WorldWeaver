@@ -1,7 +1,11 @@
 package org.betterx.wover.sets.api.blocks;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class WoodenSlotDefinition extends SlotDefinition {
     protected WoodenSlotDefinition(SlotType slot) {
@@ -19,6 +23,21 @@ public class WoodenSlotDefinition extends SlotDefinition {
 
     protected void addWoodSlotSpecificDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
 
+    }
+
+    @Override
+    @Environment(EnvType.CLIENT)
+    protected BlockModelTrait buildModel(BlockSet<?> set) {
+        if (set instanceof WoodenBlockSet<?> woodenSet) {
+            return buildWoodModel(woodenSet);
+        } else {
+            throw new IllegalArgumentException("WoodenSlotDefinition can only be used with WoodenBlockSet");
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set) {
+        return null;
     }
 
     @Override

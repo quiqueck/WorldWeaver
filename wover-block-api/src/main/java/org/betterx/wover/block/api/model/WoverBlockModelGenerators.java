@@ -12,6 +12,7 @@ import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.block.model.Variant;
 import net.minecraft.client.renderer.block.model.VariantMutator;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -534,6 +535,81 @@ public class WoverBlockModelGenerators {
         delegateItemModel(slabBlock, locations.get(0));
     }
 
+    public void createLog(Block logBlock) {
+        var res = TextureMapping.getBlockTexture(logBlock);
+        createLog(
+                logBlock, false, new TextureMapping()
+                        .put(TextureSlot.SIDE, res.withSuffix("_side"))
+                        .put(TextureSlot.END, res.withSuffix("_top"))
+        );
+    }
+
+    public void createLog(
+            Block logBlock,
+            TextureMapping mapping
+    ) {
+        createLog(logBlock, false, mapping);
+    }
+
+    public void createLog(
+            Block logBlock,
+            boolean mirroredAlternative, TextureMapping mapping,
+            TextureMapping... alternatives
+    ) {
+        if (alternatives.length > 0 || mirroredAlternative) {
+            final var weightedList = WeightedList.<Variant>builder();
+            final var weightedListHorizontal = WeightedList.<Variant>builder();
+
+            BiConsumer<TextureMapping, Integer> addModels = (tex, idx) -> {
+                final var suffix = idx == 0 ? "" : "_" + idx;
+                weightedList.add(
+                        BlockModelGenerators.plainModel(
+                                ModelTemplates.CUBE_COLUMN.createWithSuffix(
+                                        logBlock, suffix, tex,
+                                        vanillaGenerator.modelOutput
+                                )), 1
+                );
+                weightedListHorizontal.add(
+                        BlockModelGenerators.plainModel(
+                                ModelTemplates.CUBE_COLUMN_HORIZONTAL.createWithSuffix(
+                                        logBlock, suffix, tex,
+                                        vanillaGenerator.modelOutput
+                                )), 1
+                );
+                if (mirroredAlternative) {
+                    final var m = BlockModelGenerators.plainModel(
+                            ModelTemplates.CUBE_COLUMN_MIRRORED.createWithSuffix(
+                                    logBlock, suffix, tex,
+                                    vanillaGenerator.modelOutput
+                            ));
+                    weightedList.add(m, 1);
+                    weightedListHorizontal.add(m, 1);
+                }
+            };
+
+            int count = 0;
+            addModels.accept(mapping, count++);
+            for (TextureMapping alt : alternatives) addModels.accept(alt, count++);
+
+            final var variantList = weightedList.build();
+            acceptBlockState(BlockModelGenerators.createRotatedPillarWithHorizontalVariant(
+                    logBlock,
+                    new MultiVariant(variantList),
+                    new MultiVariant(weightedListHorizontal.build())
+            ));
+            delegateItemModel(logBlock, variantList.unwrap().getFirst().value().modelLocation());
+        } else {
+            ResourceLocation first = ModelTemplates.CUBE_COLUMN.create(logBlock, mapping, vanillaGenerator.modelOutput);
+            acceptBlockState(BlockModelGenerators.createRotatedPillarWithHorizontalVariant(
+                    logBlock,
+                    BlockModelGenerators.plainVariant(first),
+                    BlockModelGenerators.plainVariant(ModelTemplates.CUBE_COLUMN_HORIZONTAL.create(
+                            logBlock, mapping, vanillaGenerator.modelOutput))
+            ));
+            delegateItemModel(logBlock, first);
+        }
+    }
+
     public void createRotatedPillar(Block pillarBlock) {
         var res = TextureMapping.getBlockTexture(pillarBlock);
         createRotatedPillar(
@@ -544,12 +620,54 @@ public class WoverBlockModelGenerators {
     }
 
     public void createRotatedPillar(Block pillarBlock, TextureMapping mapping) {
-        final var model = ModelTemplates.CUBE_COLUMN.create(pillarBlock, mapping, vanillaGenerator.modelOutput);
+        createRotatedPillar(pillarBlock, false, mapping);
+    }
 
-        acceptBlockState(BlockModelGenerators.createAxisAlignedPillarBlock(
-                pillarBlock,
-                BlockModelGenerators.plainVariant(model)
-        ));
+    public void createRotatedPillar(
+            Block pillarBlock,
+            boolean mirroredAlternative,
+            TextureMapping mapping,
+            TextureMapping... alternatives
+    ) {
+        if (alternatives.length > 0 || mirroredAlternative) {
+            final var weightedList = WeightedList.<Variant>builder();
+
+            BiConsumer<TextureMapping, Integer> addModels = (tex, idx) -> {
+                final var suffix = idx == 0 ? "" : "_" + idx;
+                weightedList.add(
+                        BlockModelGenerators.plainModel(
+                                ModelTemplates.CUBE_COLUMN.createWithSuffix(
+                                        pillarBlock, suffix, tex, vanillaGenerator.modelOutput
+                                )), 1
+                );
+                if (mirroredAlternative) {
+                    weightedList.add(
+                            BlockModelGenerators.plainModel(
+                                    ModelTemplates.CUBE_COLUMN_MIRRORED.createWithSuffix(
+                                            pillarBlock, suffix, tex, vanillaGenerator.modelOutput
+                                    )), 1
+                    );
+                }
+            };
+
+            int count = 0;
+            addModels.accept(mapping, count++);
+            for (TextureMapping alt : alternatives) addModels.accept(alt, count++);
+
+            final var variantList = weightedList.build();
+            acceptBlockState(BlockModelGenerators.createAxisAlignedPillarBlock(
+                    pillarBlock,
+                    new MultiVariant(variantList)
+            ));
+            delegateItemModel(pillarBlock, variantList.unwrap().getFirst().value().modelLocation());
+        } else {
+            final var model = ModelTemplates.CUBE_COLUMN.create(pillarBlock, mapping, vanillaGenerator.modelOutput);
+            acceptBlockState(BlockModelGenerators.createAxisAlignedPillarBlock(
+                    pillarBlock,
+                    BlockModelGenerators.plainVariant(model)
+            ));
+            delegateItemModel(pillarBlock, model);
+        }
     }
 
     private void createInventoryModel(Block wallBlock, ModelTemplate inventoryModel, TextureMapping mapping) {

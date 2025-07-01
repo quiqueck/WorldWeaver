@@ -2,6 +2,8 @@ package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
+import org.betterx.wover.block.api.client.trait.BlockModelTrait;
+import org.betterx.wover.block.api.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraits;
 import org.betterx.wover.recipe.api.RecipeMaterial;
@@ -12,13 +14,25 @@ import org.betterx.wover.sets.api.blocks.WoodenSlotDefinition;
 
 import net.minecraft.world.level.block.RotatedPillarBlock;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 public class Bark extends WoodenSlotDefinition {
+    protected final boolean mirroredTexture;
+    protected final String[] alternativeTextureSuffixe;
+
     public Bark() {
-        this(SlotType.BARK);
+        this(false);
     }
 
-    public Bark(SlotType slot) {
+    public Bark(boolean mirroredTexture, String... alternativeTextureSuffixe) {
+        this(SlotType.BARK, mirroredTexture, alternativeTextureSuffixe);
+    }
+
+    public Bark(SlotType slot, boolean mirroredTexture, String... alternativeTextureSuffixe) {
         super(slot);
+        this.mirroredTexture = mirroredTexture;
+        this.alternativeTextureSuffixe = alternativeTextureSuffixe;
     }
 
     @Override
@@ -35,6 +49,16 @@ public class Bark extends WoodenSlotDefinition {
                 ))
                 .addTags(set.logsBlocksTag)
                 .addItemTags(set.logsItemTag);
+    }
+
+    @Environment(EnvType.CLIENT)
+    @Override
+    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set) {
+        return ModelTraitLibrary.bark(
+                () -> set.getBlock(SlotType.LOG),
+                this.mirroredTexture,
+                this.alternativeTextureSuffixe
+        );
     }
 
     @Override

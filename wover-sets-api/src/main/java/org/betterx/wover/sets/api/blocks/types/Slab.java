@@ -1,6 +1,8 @@
 package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.block.api.BlockRegistry;
+import org.betterx.wover.block.api.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraits;
 import org.betterx.wover.recipe.api.RecipeMaterial;
@@ -8,6 +10,8 @@ import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
+
+import net.minecraft.world.level.block.SlabBlock;
 
 public class Slab extends SlotDefinition {
     public Slab() {
@@ -19,8 +23,14 @@ public class Slab extends SlotDefinition {
     }
 
     @Override
+    protected BlockDefinition<?, ?> startBlockDefinition(BlockRegistry registry, String name) {
+        return registry.defineDefaultBlockWithProps(name, SlabBlock::new);
+    }
+
+    @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
         def.addTrait(BlockTraits.SLAB_BLOCK.withDefault());
+        def.addTrait(ModelTraitLibrary.slab(set::getBaseBlock));
     }
 
     @Override

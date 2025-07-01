@@ -13,6 +13,9 @@ import org.betterx.wover.entrypoint.LibWoverSets;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import java.util.function.BiPredicate;
 
 public class BlockModelTraitBuilder extends AbstractBlockTraitBuilder<Block, BlockModelTrait> implements BlockModelTrait.Builder {
@@ -24,11 +27,12 @@ public class BlockModelTraitBuilder extends AbstractBlockTraitBuilder<Block, Blo
 
     @Override
     public BlockModelTrait with(BlockModelTrait.ModelFactory factory) {
-        if (!ModCore.isDatagen()) return null;
+        if (!ModCore.isDatagen() || !ModCore.isClient()) return null;
         return new Trait(factory);
     }
 
 
+    @Environment(EnvType.CLIENT)
     public static void bootstrapModels(
             ModCore modCore,
             WoverBlockModelGenerators generator,
@@ -49,6 +53,7 @@ public class BlockModelTraitBuilder extends AbstractBlockTraitBuilder<Block, Blo
                 });
     }
 
+    @Environment(EnvType.CLIENT)
     class Trait extends BlockTraitImpl<Block, BlockModelTrait> implements BlockModelTrait {
         private final ModelFactory modelFactory;
 
@@ -66,6 +71,11 @@ public class BlockModelTraitBuilder extends AbstractBlockTraitBuilder<Block, Blo
         @Override
         public ModelFactory modelFactory() {
             return this.modelFactory;
+        }
+
+        @Override
+        public BlockModelTrait forRuntime() {
+            return this;
         }
     }
 }
