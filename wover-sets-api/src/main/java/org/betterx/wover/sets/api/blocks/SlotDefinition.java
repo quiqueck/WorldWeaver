@@ -4,6 +4,7 @@ import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
+import org.betterx.wover.block.api.trait.TraitLookup;
 import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.EnvType;
@@ -23,13 +24,16 @@ public class SlotDefinition {
     }
 
     public void createBlockDefinition(BlockSet<?> set, Consumer<BlockDefinition<?, ?>> blockDefinitionConsumer) {
-        var definition = startBlockDefinition(BlockRegistry.forMod(set.C), this.getName(set));
+        BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition = startBlockDefinition(
+                BlockRegistry.forMod(set.C),
+                this.getName(set)
+        );
 
         this.addSlotSpecificDefinitions(set, definition);
         set.addCommonBlockDefinitions(this.slot, definition);
 
-        definition.addTrait(this.buildRecipe(set));
-        if (ModCore.isClient()) definition.addTrait(this.buildModel(set));
+        definition.addTrait(this.buildRecipe(set, definition));
+        if (ModCore.isClient()) definition.addTrait(this.buildModel(set, definition));
 
         blockDefinitionConsumer.accept(definition);
     }
@@ -42,11 +46,11 @@ public class SlotDefinition {
     }
 
     @Environment(EnvType.CLIENT)
-    protected BlockModelTrait buildModel(BlockSet<?> set) {
+    protected BlockModelTrait buildModel(BlockSet<?> set, TraitLookup traitLookup) {
         return null;
     }
 
-    protected BlockRecipeTrait buildRecipe(BlockSet<?> set) {
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, TraitLookup traitLookup) {
         return null;
     }
 }

@@ -6,6 +6,7 @@ import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraits;
+import org.betterx.wover.block.api.trait.TraitLookup;
 import org.betterx.wover.recipe.api.RecipeMaterial;
 import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.SlotType;
@@ -63,7 +64,7 @@ public class Bark extends WoodenSlotDefinition {
 
     @Environment(EnvType.CLIENT)
     @Override
-    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set) {
+    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set, TraitLookup traitLookup) {
         return ModelTraitLibrary.bark(
                 () -> set.getBlock(((this.flags & STRIPABLE_FLAG) != 0) ? SlotType.LOG : SlotType.STRIPPED_LOG),
                 (this.flags & MIRRORED_TEXTURE_FLAG) != 0,
@@ -72,7 +73,7 @@ public class Bark extends WoodenSlotDefinition {
     }
 
     @Override
-    protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set) {
+    protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set, TraitLookup traitLookup) {
         final var stripable = (this.flags & STRIPABLE_FLAG) != 0;
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
