@@ -2,6 +2,7 @@ package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
+import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraits;
@@ -31,7 +32,11 @@ public class Slab extends SlotDefinition {
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
         def.addTrait(BlockTraits.SLAB_BLOCK.withDefault());
-        def.addTrait(ModelTraitLibrary.slab(set::getBaseBlock));
+    }
+
+    @Override
+    protected BlockModelTrait buildModel(BlockSet<?> set) {
+        return ModelTraitLibrary.slab(set::getBaseBlock);
     }
 
     @Override

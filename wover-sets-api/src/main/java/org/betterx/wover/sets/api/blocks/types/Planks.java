@@ -1,6 +1,7 @@
 package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraits;
@@ -22,8 +23,12 @@ public class Planks extends WoodenSlotDefinition {
 
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
-        def.addTrait(BlockTraits.PLANK_BLOCK.withDefault());
-        def.addTrait(ModelTraitLibrary.planks());
+        def.addTrait(BlockTraits.PLANK_BLOCK);
+    }
+
+    @Override
+    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set) {
+        return ModelTraitLibrary.planks();
     }
 
     @Override
