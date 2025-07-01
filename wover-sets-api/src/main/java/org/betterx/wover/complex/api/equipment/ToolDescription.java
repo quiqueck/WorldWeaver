@@ -122,7 +122,7 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
                     return;
                 }
             }
-            builder.category(slot.category).group(location.getPath()).build(context);
+            builder.category(slot.category).group(slot.name).build(context);
         }
     }
 

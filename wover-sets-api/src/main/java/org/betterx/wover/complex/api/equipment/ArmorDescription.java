@@ -99,7 +99,7 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
             }
             builder
                     .category(slot.category)
-                    .group(location.getPath())
+                    .group(slot.name)
                     .build(context);
 
         }
