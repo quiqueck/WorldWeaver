@@ -10,6 +10,7 @@ import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
+import org.betterx.wover.sets.api.blocks.WoodenBlockSet;
 
 import net.minecraft.world.level.block.SlabBlock;
 
@@ -35,8 +36,12 @@ public class Slab extends SlotDefinition {
 
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set) {
+        final boolean wood = set instanceof WoodenBlockSet<?>;
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
-        return RecipeTraitLibrary.slab(RecipeMaterial.ofDeferredItemLike(set::getBaseBlock));
+        return RecipeTraitLibrary.slab(
+                RecipeMaterial.ofDeferredItemLike(set::getBaseBlock),
+                wood ? "wooden_slab" : "slab"
+        );
     }
 }

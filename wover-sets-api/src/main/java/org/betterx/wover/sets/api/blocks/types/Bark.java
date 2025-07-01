@@ -73,10 +73,13 @@ public class Bark extends WoodenSlotDefinition {
 
     @Override
     protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set) {
+        final var stripable = (this.flags & STRIPABLE_FLAG) != 0;
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
-        return RecipeTraitLibrary.bark(RecipeMaterial.ofDeferredItemLike(() -> set.getBlock(((this.flags & STRIPABLE_FLAG) != 0)
-                ? SlotType.LOG
-                : SlotType.STRIPPED_LOG)));
+        return RecipeTraitLibrary.bark(
+                RecipeMaterial.ofDeferredItemLike(() ->
+                        set.getBlock(stripable ? SlotType.LOG : SlotType.STRIPPED_LOG)
+                )
+        );
     }
 }

@@ -31,6 +31,10 @@ public class RecipeTraitLibrary {
     }
 
     public static BlockRecipeTrait slab(RecipeMaterial sourceMaterial) {
+        return slab(sourceMaterial, "slab");
+    }
+
+    public static BlockRecipeTrait slab(RecipeMaterial sourceMaterial, String group) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     if (!sourceMaterial.isValid()) {
@@ -46,7 +50,7 @@ public class RecipeTraitLibrary {
                             .outputCount(6)
                             .shape("###")
                             .addMaterial('#', sourceMaterial)
-                            .group("slab")
+                            .group(group)
                             .category(RecipeCategory.BUILDING_BLOCKS)
                             .build(context);
                 }
@@ -69,12 +73,12 @@ public class RecipeTraitLibrary {
                             .shape("##", "##")
                             .addMaterial('#', barkMaterial)
                             .outputCount(3)
+                            .group("log")
                             .category(RecipeCategory.BUILDING_BLOCKS)
                             .build(context);
                 }
         );
     }
-
 
     public static BlockRecipeTrait bark(RecipeMaterial logMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
@@ -93,6 +97,7 @@ public class RecipeTraitLibrary {
                             .addMaterial('#', logMaterial)
                             .outputCount(3)
                             .category(RecipeCategory.BUILDING_BLOCKS)
+                            .group("bark")
                             .build(context);
                 }
         );
