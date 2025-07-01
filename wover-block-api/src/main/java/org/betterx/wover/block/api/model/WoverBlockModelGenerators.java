@@ -18,6 +18,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
 import com.google.common.collect.Maps;
 
 import java.util.List;
@@ -27,6 +30,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 
+@Environment(EnvType.CLIENT)
 public class WoverBlockModelGenerators {
     public static final ResourceLocation CROSS = ResourceLocation.withDefaultNamespace("block/cross");
     public static final ResourceLocation CUBE = ResourceLocation.withDefaultNamespace("block/cube");
