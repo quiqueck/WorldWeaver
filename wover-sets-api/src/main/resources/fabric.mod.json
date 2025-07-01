@@ -25,7 +25,8 @@
   },
   "mixins": [
     "wover.sets.mixins.common.json",
-    "wover.sets.mixins.client.json"
+    "wover.sets.mixins.client.json",
+    "wover.traits.mixins.common.json"
   ],
   "depends": {
     "fabricloader": ">=0.16.0",

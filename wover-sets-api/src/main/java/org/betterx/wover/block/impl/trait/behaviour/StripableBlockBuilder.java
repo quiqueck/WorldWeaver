@@ -11,7 +11,8 @@ import org.betterx.wover.entrypoint.LibWoverSets;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, StripableBlockTrait> implements StripableBlockTrait.Builder {
     public static final StripableBlockTrait.Builder BUILDER = new StripableBlockBuilder();
@@ -20,31 +21,35 @@ public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, Stri
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "stripable"));
     }
 
-    public StripableBlockTrait with(Block strippedBlock) {
-        return new Trait(() -> strippedBlock.defaultBlockState());
+    public @Nullable StripableBlockTrait with(@Nullable Block strippedBlock) {
+        if (strippedBlock == null) return null;
+
+        return new Trait((oldState) -> strippedBlock.defaultBlockState());
     }
 
-    public StripableBlockTrait with(BlockState strippedBlock) {
-        return new Trait(() -> strippedBlock);
+    public @Nullable StripableBlockTrait with(@Nullable BlockState strippedBlock) {
+        if (strippedBlock == null) return null;
+        return new Trait((oldState) -> strippedBlock);
     }
 
-    public StripableBlockTrait with(Supplier<BlockState> strippedBlock) {
+    public @Nullable StripableBlockTrait with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlock) {
+        if (strippedBlock == null) return null;
         return new Trait(strippedBlock);
     }
 
-    public BlockState getStrippedBlockState(BlockState blockState) {
-        final Block block = blockState.getBlock();
+    public BlockState getStrippedBlockState(BlockState oldState) {
+        final Block block = oldState.getBlock();
         var traits = BUILDER.getRuntimeTraits(block);
         if (traits == null || traits.isEmpty()) {
-            return blockState;
+            return oldState;
         }
-        return traits.get(0).strippedBlock();
+        return traits.get(0).strippedBlock(oldState);
     }
 
     class Trait extends BlockTraitImpl<Block, StripableBlockTrait> implements StripableBlockTrait, RuntimeBlockTrait<Block, StripableBlockTrait> {
-        private final Supplier<BlockState> strippedBlock;
+        private final StripableBlockTrait.BlockStateFactory strippedBlock;
 
-        Trait(Supplier<BlockState> strippedBlock) {
+        Trait(StripableBlockTrait.BlockStateFactory strippedBlock) {
             this.strippedBlock = strippedBlock;
         }
 
@@ -59,8 +64,8 @@ public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, Stri
         }
 
         @Override
-        public BlockState strippedBlock() {
-            return this.strippedBlock.get();
+        public @NotNull BlockState strippedBlock(@Nullable BlockState oldState) {
+            return this.strippedBlock.create(oldState);
         }
     }
 }

@@ -18,20 +18,28 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 public class Log extends WoodenSlotDefinition {
-    protected final boolean mirroredTexture;
+    public static final byte STRIPABLE_FLAG = 0x01;
+    public static final byte MIRRORED_TEXTURE_FLAG = 0x02;
+    protected final byte flags;
+
     protected final String[] alternativeTextureSuffixe;
 
-    public Log() {
-        this(false);
+    public Log(boolean stripable) {
+        this(stripable, false);
     }
 
-    public Log(boolean mirroredTexture, String... alternativeTextureSuffixe) {
-        this(SlotType.LOG, mirroredTexture, alternativeTextureSuffixe);
+    public Log(boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
+        this(stripable ? SlotType.LOG : SlotType.STRIPPED_LOG, stripable, mirroredTexture, alternativeTextureSuffixe);
     }
 
-    public Log(SlotType slot, boolean mirroredTexture, String... alternativeTextureSuffixe) {
+    public Log(SlotType slot, boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
         super(slot);
-        this.mirroredTexture = mirroredTexture;
+
+        byte flags = 0;
+        if (stripable) flags |= STRIPABLE_FLAG; // Set the stripable flag
+        if (mirroredTexture) flags |= MIRRORED_TEXTURE_FLAG; // Set the mirrored texture flag
+        this.flags = flags;
+
         this.alternativeTextureSuffixe = alternativeTextureSuffixe;
     }
 
@@ -42,20 +50,23 @@ public class Log extends WoodenSlotDefinition {
 
     @Override
     protected void addWoodSlotSpecificDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
-        def
-                .addTrait(BlockTraits.LOG_BLOCK.with(() -> set
-                        .getBlockWithFallback(SlotType.STRIPPED_LOG, this.slot)
-                        .defaultBlockState()
-                ))
-                .addTags(set.logsBlocksTag)
-                .addItemTags(set.logsItemTag);
+        if ((this.flags & STRIPABLE_FLAG) != 0) { // Is Stripable?
+            def.addTrait(BlockTraits.LOG_BLOCK.with((oldState) -> set
+                    .getBlockWithFallback(SlotType.STRIPPED_LOG, this.slot)
+                    .defaultBlockState()
+            ));
+        } else {
+            def.addTrait(BlockTraits.LOG_BLOCK);
+        }
+        def.addTags(set.logsBlocksTag)
+           .addItemTags(set.logsItemTag);
     }
 
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set) {
         return ModelTraitLibrary.log(
-                this.mirroredTexture,
+                (this.flags & MIRRORED_TEXTURE_FLAG) != 0,
                 this.alternativeTextureSuffixe
         );
     }
@@ -64,6 +75,8 @@ public class Log extends WoodenSlotDefinition {
     protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set) {
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
-        return RecipeTraitLibrary.log(RecipeMaterial.ofDeferredItemLike(() -> set.getBlock(SlotType.BARK)));
+        return RecipeTraitLibrary.log(RecipeMaterial.ofDeferredItemLike(() -> set.getBlock(((this.flags & STRIPABLE_FLAG) != 0)
+                ? SlotType.BARK
+                : SlotType.STRIPPED_BARK)));
     }
 }

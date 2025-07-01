@@ -5,6 +5,7 @@ import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.BlockTraits;
+import org.betterx.wover.block.api.trait.behaviour.StripableBlockTrait;
 import org.betterx.wover.block.api.trait.type.BarkBlockTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
@@ -16,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
 public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implements BarkBlockTrait.Builder {
@@ -32,14 +32,21 @@ public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(Block strippedBlockState) {
-        return with(strippedBlockState::defaultBlockState);
+        if (strippedBlockState == null) return combine(withDefault());
+        return with((oldState) -> strippedBlockState.defaultBlockState());
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(BlockState strippedBlockState) {
-        return with(() -> strippedBlockState);
+        if (strippedBlockState == null) return combine(withDefault());
+        return with((oldState) -> strippedBlockState);
     }
 
-    public @Nullable List<BlockTrait<?, ?>> with(Supplier<BlockState> strippedBlockState) {
+    public @Nullable List<BlockTrait<?, ?>> with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlockState) {
+        if (strippedBlockState == null) return combine(withDefault());
+
+        //Make sure we copy the axis property if it exists
+        strippedBlockState = StripableBlockTrait.copyRotatedPillarBlockState(strippedBlockState);
+
         if (!ModCore.isDatagen()) return combine(BlockTraits.STRIPABLE.with(strippedBlockState));
         return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState));
     }

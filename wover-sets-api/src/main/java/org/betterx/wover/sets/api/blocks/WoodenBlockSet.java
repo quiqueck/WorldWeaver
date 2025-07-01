@@ -64,6 +64,13 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
 
     @Override
     protected SlotMap createDefaultSlots() {
-        return SlotMap.of(WoodSlots.BARK, WoodSlots.LOG, WoodSlots.PLANKS, WoodSlots.SLAB);
+        return SlotMap.of(
+                WoodSlots.BARK,
+                WoodSlots.LOG,
+                WoodSlots.PLANKS,
+                WoodSlots.SLAB,
+                WoodSlots.STRIPPED_BARK,
+                WoodSlots.STRIPPED_LOG
+        );
     }
 }
