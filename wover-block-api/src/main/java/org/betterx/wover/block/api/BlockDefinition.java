@@ -1,9 +1,7 @@
 package org.betterx.wover.block.api;
 
-import org.betterx.wover.block.api.trait.BlockTrait;
-import org.betterx.wover.block.api.trait.BlockTraitKey;
-import org.betterx.wover.block.api.trait.BlockWithTraits;
-import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
+import org.betterx.wover.block.api.trait.*;
+import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.item.api.BlockItemDefinition;
 import org.betterx.wover.item.api.VanillaBlockItemDefinition;
 
@@ -120,7 +118,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
                 if (runtimeTrait != null) {
                     // Collect runtime traits by their key
                     runtimeTraits.computeIfAbsent(
-                            runtimeTrait.traitID,
+                            runtimeTrait.key(),
                             k -> new ArrayList<>()
                     ).add(runtimeTrait);
                 }
@@ -199,7 +197,15 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return (D) this;
     }
 
-    public boolean hasTrait(BlockTrait<?, ?> trait) {
+    public D addTrait(@NotNull TraitBuilder.WithDefault<?, ?> traitBuilder) {
+        return this.addTrait(traitBuilder.withDefault());
+    }
+
+    public D addTrait(@NotNull TraitBuilder.WithDefaults<?, ?> traitBuilder) {
+        return this.addTrait(traitBuilder.withDefault());
+    }
+
+    public boolean hasTrait(BlockTraitImpl<?, ?> trait) {
         if (this.traits == null || this.traits.isEmpty()) {
             return false;
         }
@@ -211,6 +217,10 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
             return false;
         }
         return this.traits.stream().anyMatch(trait -> trait.is(traitKey));
+    }
+
+    public boolean hasTrait(TraitBuilder<?, ?> traitBuilder) {
+        return this.hasTrait(traitBuilder.key());
     }
 
     /**

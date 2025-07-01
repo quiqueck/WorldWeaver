@@ -165,7 +165,7 @@ public class ToolTier {
         return new ToolTier.Builder(name);
     }
 
-    //a Builder class
+    //a BuilderWithDefaults class
     public static class Builder {
         private ToolMaterial toolMaterial;
         private final ToolValues[] toolValues = new ToolValues[ToolSlot.values().length];

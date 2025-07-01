@@ -1,7 +1,7 @@
 package org.betterx.wover.block.api;
 
+import org.betterx.wover.block.impl.BlockRegistryImpl;
 import org.betterx.wover.block.impl.WoverBlockItemImpl;
-import org.betterx.wover.block.impl.api.BlockRegistryImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ItemRegistry;
 import org.betterx.wover.loot.api.BlockLootProvider;

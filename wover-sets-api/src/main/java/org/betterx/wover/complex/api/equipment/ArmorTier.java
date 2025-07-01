@@ -55,7 +55,7 @@ public class ArmorTier {
         return "ArmorTier - " + this.name;
     }
 
-    //a Builder class
+    //a BuilderWithDefaults class
     public static class Builder {
         private ArmorMaterial armorMaterial;
         private final ArmorValues[] armorValues = new ArmorValues[ArmorSlot.values().length];

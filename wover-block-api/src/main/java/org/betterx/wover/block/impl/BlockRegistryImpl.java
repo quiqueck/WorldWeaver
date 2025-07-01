@@ -1,4 +1,4 @@
-package org.betterx.wover.block.impl.api;
+package org.betterx.wover.block.impl;
 
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.core.api.ModCore;

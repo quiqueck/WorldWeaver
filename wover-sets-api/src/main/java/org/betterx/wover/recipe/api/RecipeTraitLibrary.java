@@ -1,13 +1,14 @@
 package org.betterx.wover.recipe.api;
 
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
+import org.betterx.wover.block.impl.trait.BlockRecipeTraitBuilder;
 import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.data.recipes.RecipeCategory;
 
 public class RecipeTraitLibrary {
     public static BlockRecipeTrait planks(RecipeMaterial sourceMaterial) {
-        return BlockRecipeTrait.BUILDER.with(
+        return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     if (!sourceMaterial.isValid()) {
                         LibWoverSets.C.LOG.warn(
@@ -30,7 +31,7 @@ public class RecipeTraitLibrary {
     }
 
     public static BlockRecipeTrait slab(RecipeMaterial sourceMaterial) {
-        return BlockRecipeTrait.BUILDER.with(
+        return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     if (!sourceMaterial.isValid()) {
                         LibWoverSets.C.LOG.warn(
@@ -53,7 +54,7 @@ public class RecipeTraitLibrary {
     }
 
     public static BlockRecipeTrait log(RecipeMaterial barkMaterial) {
-        return BlockRecipeTrait.BUILDER.with(
+        return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     if (!barkMaterial.isValid()) {
                         LibWoverSets.C.LOG.warn(

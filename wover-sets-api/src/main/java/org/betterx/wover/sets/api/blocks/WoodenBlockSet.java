@@ -52,7 +52,7 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
         super.addCommonBlockDefinitions(slot, blockDefinition);
 
         blockDefinition.addTrait(BlockTraits.WOOD_BLOCK.withDefault());
-        blockDefinition.addTrait(BlockTraits.FLAMMABLE.withDefault());
+        blockDefinition.addTrait(BlockTraits.FLAMMABLE);
 
         if (slot == SlotType.PLANKS) {
             blockDefinition.getProperties().mapColor(planksColor);

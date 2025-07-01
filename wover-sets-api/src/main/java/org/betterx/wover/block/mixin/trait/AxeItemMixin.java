@@ -1,6 +1,6 @@
 package org.betterx.wover.block.mixin.trait;
 
-import org.betterx.wover.block.api.trait.behaviour.StripableBlockTrait;
+import org.betterx.wover.block.api.trait.BlockTraits;
 
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,7 +16,7 @@ import java.util.Optional;
 public class AxeItemMixin {
     @Inject(method = "getStripped", at = @At("HEAD"), cancellable = true)
     void wover_getStripped(BlockState blockState, CallbackInfoReturnable<Optional<BlockState>> cir) {
-        var strippedState = StripableBlockTrait.BUILDER.getStrippedBlockState(blockState);
+        var strippedState = BlockTraits.STRIPABLE.getStrippedBlockState(blockState);
         if (strippedState != blockState) cir.setReturnValue(Optional.of(strippedState));
     }
 }
