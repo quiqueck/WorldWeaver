@@ -6,7 +6,7 @@ import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
 import org.betterx.wover.block.api.trait.behaviour.StripableBlockTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
-import org.betterx.wover.entrypoint.LibWoverBlock;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +17,7 @@ public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, Stri
     public static final StripableBlockTrait.Builder BUILDER = new StripableBlockBuilder();
 
     private StripableBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverBlock.C, "stripable"));
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "stripable"));
     }
 
     public StripableBlockTrait with(Block strippedBlock) {

@@ -4,7 +4,7 @@ import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.LibWoverBlock;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
@@ -17,7 +17,7 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
     private final GenericBlockTrait DEFAULT = new Trait();
 
     private WoodMaterialBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverBlock.C, "wood"));
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "wood"));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {

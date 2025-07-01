@@ -4,7 +4,7 @@ import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.LibWoverBlock;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
@@ -17,7 +17,7 @@ public class StoneMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
     private final GenericBlockTrait DEFAULT = new Trait();
 
     private StoneMaterialBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverBlock.C, "stone"));
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "stone"));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {

@@ -4,7 +4,7 @@ import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.LibWoverBlock;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -16,7 +16,7 @@ public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
     public static final GenericBlockTrait.BuilderWithDefault BUILDER = new SlabBlockBuilder();
 
     private SlabBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverBlock.C, "is_slab"));
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_slab"));
     }
 
     public @Nullable BlockTrait<?, ?> withDefault() {

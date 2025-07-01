@@ -5,7 +5,7 @@ import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.BlockTraits;
-import org.betterx.wover.block.api.trait.type.LogBlockTrait;
+import org.betterx.wover.block.api.trait.type.BarkBlockTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
-public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implements LogBlockTrait.Builder {
-    public static final LogBlockTrait.Builder BUILDER = new LogBlockBuilder();
+public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implements BarkBlockTrait.Builder {
+    public static final BarkBlockTrait.Builder BUILDER = new BarkBlockBuilder();
 
-    private LogBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_log"));
+    private BarkBlockBuilder() {
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_bark"));
     }
 
     public @Nullable BlockTrait<?, ?> withDefault() {
@@ -44,7 +44,7 @@ public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implement
         return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState));
     }
 
-    public class Trait extends BlockTraitImpl.Generic implements LogBlockTrait {
+    public class Trait extends BlockTraitImpl.Generic implements BarkBlockTrait {
         @Override
         public BlockTraitKey key() {
             return traitKey;

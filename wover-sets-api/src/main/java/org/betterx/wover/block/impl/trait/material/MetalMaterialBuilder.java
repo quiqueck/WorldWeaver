@@ -4,7 +4,7 @@ import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.LibWoverBlock;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -18,7 +18,7 @@ public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
     private final GenericBlockTrait DEFAULT = new Trait();
 
     private MetalMaterialBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverBlock.C, "metal"));
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "metal"));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {

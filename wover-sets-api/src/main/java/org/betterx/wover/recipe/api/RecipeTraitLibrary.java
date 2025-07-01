@@ -74,4 +74,27 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+
+    public static BlockRecipeTrait bark(RecipeMaterial logMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    if (!logMaterial.isValid()) {
+                        LibWoverSets.C.LOG.warn(
+                                "Skipping bark recipe for {}: log material is invalid",
+                                key.location()
+                        );
+                        return;
+                    }
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .shape("##", "##")
+                            .addMaterial('#', logMaterial)
+                            .outputCount(3)
+                            .category(RecipeCategory.BUILDING_BLOCKS)
+                            .build(context);
+                }
+        );
+    }
 }

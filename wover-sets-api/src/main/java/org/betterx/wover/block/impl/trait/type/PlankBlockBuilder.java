@@ -7,7 +7,7 @@ import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.GenericBlockTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
-import org.betterx.wover.entrypoint.LibWoverBlock;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -19,7 +19,7 @@ public class PlankBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
     public static final GenericBlockTrait.BuilderWithDefault BUILDER = new PlankBlockBuilder();
 
     private PlankBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverBlock.C, "is_plank"));
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_plank"));
     }
 
     public @Nullable BlockTrait<?, ?> withDefault() {
