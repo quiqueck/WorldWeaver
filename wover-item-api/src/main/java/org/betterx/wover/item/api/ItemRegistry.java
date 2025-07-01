@@ -2,7 +2,7 @@ package org.betterx.wover.item.api;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.smithing.SmithingTemplates;
-import org.betterx.wover.item.impl.api.ItemRegistryImpl;
+import org.betterx.wover.item.impl.ItemRegistryImpl;
 import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
 import net.minecraft.core.Registry;

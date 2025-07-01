@@ -4,36 +4,21 @@ import net.minecraft.world.item.Item;
 
 import org.jetbrains.annotations.Nullable;
 
-public class RuntimeItemTrait<I extends Item, R extends RuntimeItemTrait<I, R>> {
-    private final ItemTraitKey traitID;
+public interface RuntimeItemTrait<I extends Item, R extends RuntimeItemTrait<I, R>> {
+    ItemTraitKey key();
 
-
-    @SuppressWarnings("unchecked")
-    protected RuntimeItemTrait(ItemTraitKey traitID) {
-        this.traitID = traitID;
-    }
-
-    public boolean is(@Nullable ItemTraitKey traitID) {
+    default boolean is(@Nullable ItemTraitKey traitID) {
         if (traitID == null) return false;
-        return this.traitID.equals(traitID);
+        return traitID.equals(this.key());
     }
 
-    public boolean is(@Nullable ItemTrait<?, ?> trait) {
+    default boolean is(@Nullable RuntimeItemTrait<?, ?> trait) {
         if (trait == null) return false;
-        return this.is(trait.traitID);
+        return this.is(trait.key());
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj != null && getClass() == obj.getClass()) return true;
-        if (obj instanceof ItemTraitKey otherID) {
-            return this.is(otherID);
-        }
-        if (obj instanceof ItemTrait<?, ?> trait) {
-            return this.is(trait);
-        }
-
-        return super.equals(obj);
+    default boolean is(@Nullable ItemTraitBuilder<?, ?> traitBuilder) {
+        if (traitBuilder == null) return false;
+        return this.is(traitBuilder.key());
     }
 }

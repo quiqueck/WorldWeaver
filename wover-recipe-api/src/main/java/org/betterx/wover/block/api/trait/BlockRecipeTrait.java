@@ -15,7 +15,7 @@ public interface BlockRecipeTrait extends BlockTrait<Block, BlockRecipeTrait>, R
         void buildRecipe(ResourceKey<Block> key, Block block, RecipeBuilder.Context context);
     }
 
-    interface Builder extends TraitBuilder<Block, BlockRecipeTrait> {
+    interface Builder extends BlockTraitBuilder<Block, BlockRecipeTrait> {
         @Nullable BlockRecipeTrait with(BlockRecipeTrait.RecipeFactory recipeFactory);
     }
 

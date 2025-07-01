@@ -2,13 +2,13 @@ package org.betterx.wover.block.api.trait;
 
 import net.minecraft.world.level.block.Block;
 
-public interface GenericBlockTrait extends BlockTrait<Block, BlockTrait.VoidRuntime<Block>> {
-    interface BuilderWithDefaults extends TraitBuilder.WithDefaults<Block, BlockTrait.VoidRuntime<Block>> {
+public interface GenericBlockTrait extends BlockTrait<Block, GenericBlockTrait> {
+    interface BuilderWithDefaults extends BlockTraitBuilder.WithDefaults<Block, GenericBlockTrait> {
     }
 
-    interface BuilderWithDefault extends TraitBuilder.WithDefault<Block, BlockTrait.VoidRuntime<Block>> {
+    interface BuilderWithDefault extends BlockTraitBuilder.WithDefault<Block, GenericBlockTrait> {
     }
 
-    interface Builder extends TraitBuilder<Block, BlockTrait.VoidRuntime<Block>> {
+    interface Builder extends BlockTraitBuilder<Block, GenericBlockTrait> {
     }
 }

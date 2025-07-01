@@ -1,14 +1,9 @@
 package org.betterx.wover.block.impl.trait;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.trait.BlockTrait;
-import org.betterx.wover.block.api.trait.BlockTraitKey;
-import org.betterx.wover.block.api.trait.GenericBlockTrait;
-import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
+import org.betterx.wover.block.api.trait.*;
 
 import net.minecraft.world.level.block.Block;
-
-import org.jetbrains.annotations.Nullable;
 
 public abstract class BlockTraitImpl<B extends Block, R extends RuntimeBlockTrait<B, R>> implements BlockTrait<B, R> {
     protected BlockTraitImpl() {
@@ -22,24 +17,6 @@ public abstract class BlockTraitImpl<B extends Block, R extends RuntimeBlockTrai
     }
 
     @Override
-    public boolean is(@Nullable RuntimeBlockTrait<?, ?> trait) {
-        if (trait == null) return false;
-        return trait.is(this);
-    }
-
-    @Override
-    public boolean is(@Nullable BlockTraitKey traitKey) {
-        if (traitKey == null) return false;
-        return traitKey.equals(this.key());
-    }
-
-    @Override
-    public boolean is(@Nullable BlockTrait<?, ?> trait) {
-        if (trait == null) return false;
-        return this.is(trait.key());
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj != null && getClass() == obj.getClass()) return true;
@@ -49,8 +26,8 @@ public abstract class BlockTraitImpl<B extends Block, R extends RuntimeBlockTrai
         if (obj instanceof BlockTraitKey key) {
             return this.is(key);
         }
-        if (obj instanceof BlockTrait<?, ?> bt) {
-            return this.is(bt);
+        if (obj instanceof BlockTraitBuilder<?, ?> builder) {
+            return this.is(builder);
         }
 
         return super.equals(obj);
@@ -69,7 +46,7 @@ public abstract class BlockTraitImpl<B extends Block, R extends RuntimeBlockTrai
         // Default implementation does nothing
     }
 
-    public abstract static class Generic extends BlockTraitImpl<Block, BlockTraitImpl.VoidRuntime<Block>> implements GenericBlockTrait {
+    public abstract static class Generic extends BlockTraitImpl<Block, GenericBlockTrait> implements GenericBlockTrait {
 
     }
 }

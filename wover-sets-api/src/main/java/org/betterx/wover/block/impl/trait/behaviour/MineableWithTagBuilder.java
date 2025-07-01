@@ -1,9 +1,9 @@
 package org.betterx.wover.block.impl.trait.behaviour;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.trait.AbstractTraitBuilder;
-import org.betterx.wover.block.api.trait.BlockTrait;
+import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
+import org.betterx.wover.block.api.trait.GenericBlockTrait;
 import org.betterx.wover.block.api.trait.behaviour.MineableWithTagTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.Nullable;
 
-public class MineableWithTagBuilder extends AbstractTraitBuilder<Block, BlockTrait.VoidRuntime<Block>> implements MineableWithTagTrait.Builder {
+public class MineableWithTagBuilder extends AbstractBlockTraitBuilder<Block, GenericBlockTrait> implements MineableWithTagTrait.Builder {
     public static final MineableWithTagTrait.Builder BUILDER = new MineableWithTagBuilder();
 
     private MineableWithTagBuilder() {
@@ -72,7 +72,7 @@ public class MineableWithTagBuilder extends AbstractTraitBuilder<Block, BlockTra
         return new Trait(MineableTags.NEEDS_WOOD_TOOL);
     }
 
-    class Trait extends BlockTraitImpl<Block, BlockTrait.VoidRuntime<Block>> implements MineableWithTagTrait {
+    class Trait extends BlockTraitImpl<Block, GenericBlockTrait> implements MineableWithTagTrait {
         public final TagKey<Block> mineableTag;
 
         Trait(TagKey<Block> mineableTag) {

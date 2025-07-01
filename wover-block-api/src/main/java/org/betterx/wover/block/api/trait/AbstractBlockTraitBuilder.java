@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractTraitBuilder<B extends Block, R extends RuntimeBlockTrait<B, R>> implements TraitBuilder<B, R> {
+public abstract class AbstractBlockTraitBuilder<B extends Block, R extends RuntimeBlockTrait<B, R>> implements BlockTraitBuilder<B, R> {
     public final BlockTraitKey traitKey;
 
-    protected AbstractTraitBuilder(BlockTraitKey traitKey) {
+    protected AbstractBlockTraitBuilder(BlockTraitKey traitKey) {
         this.traitKey = traitKey;
     }
 
@@ -65,7 +65,7 @@ public abstract class AbstractTraitBuilder<B extends Block, R extends RuntimeBlo
         return result.isEmpty() ? EMPTY : result;
     }
 
-    public abstract static class Generic extends AbstractTraitBuilder<Block, BlockTrait.VoidRuntime<Block>> implements GenericBlockTrait.Builder {
+    public abstract static class Generic extends AbstractBlockTraitBuilder<Block, GenericBlockTrait> implements GenericBlockTrait.Builder {
         public Generic(BlockTraitKey traitKey) {
             super(traitKey);
         }

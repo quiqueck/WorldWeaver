@@ -1,7 +1,7 @@
 package org.betterx.wover.block.impl.trait.type;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.trait.AbstractTraitBuilder;
+import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.BlockTraits;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
-public class LogBlockBuilder extends AbstractTraitBuilder.Generic implements LogBlockTrait.Builder {
+public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implements LogBlockTrait.Builder {
     public static final LogBlockTrait.Builder BUILDER = new LogBlockBuilder();
 
     private LogBlockBuilder() {

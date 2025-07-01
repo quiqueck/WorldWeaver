@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class MetalMaterialBuilder extends AbstractTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
     public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new MetalMaterialBuilder();
     private final GenericBlockTrait DEFAULT = new Trait();
 

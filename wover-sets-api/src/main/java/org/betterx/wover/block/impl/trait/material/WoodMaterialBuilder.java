@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class WoodMaterialBuilder extends AbstractTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
     public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new WoodMaterialBuilder();
     private final GenericBlockTrait DEFAULT = new Trait();
 

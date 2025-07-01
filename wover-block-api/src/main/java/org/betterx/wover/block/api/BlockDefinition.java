@@ -197,11 +197,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return (D) this;
     }
 
-    public D addTrait(@NotNull TraitBuilder.WithDefault<?, ?> traitBuilder) {
+    public D addTrait(@NotNull BlockTraitBuilder.WithDefault<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
     }
 
-    public D addTrait(@NotNull TraitBuilder.WithDefaults<?, ?> traitBuilder) {
+    public D addTrait(@NotNull BlockTraitBuilder.WithDefaults<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
     }
 
@@ -219,7 +219,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return this.traits.stream().anyMatch(trait -> trait.is(traitKey));
     }
 
-    public boolean hasTrait(TraitBuilder<?, ?> traitBuilder) {
+    public boolean hasTrait(BlockTraitBuilder<?, ?> traitBuilder) {
         return this.hasTrait(traitBuilder.key());
     }
 

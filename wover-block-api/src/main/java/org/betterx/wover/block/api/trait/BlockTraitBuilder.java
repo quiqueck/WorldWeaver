@@ -6,12 +6,12 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface TraitBuilder<B extends Block, R extends RuntimeBlockTrait<B, R>> {
-    interface WithDefault<B extends Block, R extends RuntimeBlockTrait<B, R>> extends TraitBuilder<B, R> {
+public interface BlockTraitBuilder<B extends Block, R extends RuntimeBlockTrait<B, R>> {
+    interface WithDefault<B extends Block, R extends RuntimeBlockTrait<B, R>> extends BlockTraitBuilder<B, R> {
         @Nullable BlockTrait<?, ?> withDefault();
     }
 
-    interface WithDefaults<B extends Block, R extends RuntimeBlockTrait<B, R>> extends TraitBuilder<B, R> {
+    interface WithDefaults<B extends Block, R extends RuntimeBlockTrait<B, R>> extends BlockTraitBuilder<B, R> {
         @Nullable List<BlockTrait<?, ?>> withDefault();
     }
 

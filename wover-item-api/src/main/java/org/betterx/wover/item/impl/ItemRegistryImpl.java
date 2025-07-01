@@ -1,4 +1,4 @@
-package org.betterx.wover.item.impl.api;
+package org.betterx.wover.item.impl;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ItemRegistry;

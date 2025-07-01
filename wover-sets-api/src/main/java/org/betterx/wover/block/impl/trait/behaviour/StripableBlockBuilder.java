@@ -1,7 +1,7 @@
 package org.betterx.wover.block.impl.trait.behaviour;
 
 
-import org.betterx.wover.block.api.trait.AbstractTraitBuilder;
+import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.RuntimeBlockTrait;
 import org.betterx.wover.block.api.trait.behaviour.StripableBlockTrait;
@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.function.Supplier;
 
-public class StripableBlockBuilder extends AbstractTraitBuilder<Block, StripableBlockTrait> implements StripableBlockTrait.Builder {
+public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, StripableBlockTrait> implements StripableBlockTrait.Builder {
     public static final StripableBlockTrait.Builder BUILDER = new StripableBlockBuilder();
 
     private StripableBlockBuilder() {

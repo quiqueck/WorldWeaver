@@ -2,16 +2,16 @@ package org.betterx.wover.block.impl.trait.behaviour;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
-import org.betterx.wover.block.api.trait.AbstractTraitBuilder;
-import org.betterx.wover.block.api.trait.BlockTrait;
+import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
+import org.betterx.wover.block.api.trait.GenericBlockTrait;
 import org.betterx.wover.block.api.trait.behaviour.FlammableBlockTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.entrypoint.LibWoverBlock;
 
 import net.minecraft.world.level.block.Block;
 
-public class FlammableBlockBuilder extends AbstractTraitBuilder<Block, BlockTrait.VoidRuntime<Block>> implements FlammableBlockTrait.Builder {
+public class FlammableBlockBuilder extends AbstractBlockTraitBuilder<Block, GenericBlockTrait> implements FlammableBlockTrait.Builder {
     public static final FlammableBlockTrait.Builder BUILDER = new FlammableBlockBuilder();
     private final Trait DEFAULT = new Trait(5, 5);
 
@@ -31,7 +31,7 @@ public class FlammableBlockBuilder extends AbstractTraitBuilder<Block, BlockTrai
         return new Trait(burn, speed);
     }
 
-    private final class Trait extends BlockTraitImpl<Block, BlockTrait.VoidRuntime<Block>> implements FlammableBlockTrait {
+    private final class Trait extends BlockTraitImpl<Block, GenericBlockTrait> implements FlammableBlockTrait {
         private final int burn;
         private final int speed;
 

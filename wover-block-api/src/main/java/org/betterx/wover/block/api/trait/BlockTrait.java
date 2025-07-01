@@ -1,8 +1,6 @@
 package org.betterx.wover.block.api.trait;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.impl.trait.RuntimeBlockTraitImpl;
-import org.betterx.wover.entrypoint.LibWoverEvents;
 
 import net.minecraft.world.level.block.Block;
 
@@ -12,7 +10,7 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> {
+public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> extends RuntimeBlockTrait<B, R> {
     @SuppressWarnings("unchecked")
     static <B extends Block> @Nullable BlockWithTraits<B> asBlockWithTraits(
             @Nullable B block
@@ -22,6 +20,7 @@ public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> 
         }
         return null;
     }
+
     static <B extends Block> @NotNull BlockWithTraits<B> asBlockWithTraitsOrThrow(
             @Nullable B block
     ) {
@@ -31,6 +30,7 @@ public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> 
         }
         return blockWithTraits;
     }
+
     static @NotNull Stream<? extends RuntimeBlockTrait<?, ?>> runtimeTraits(
             @Nullable Block block
     ) {
@@ -44,12 +44,14 @@ public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> 
         // Flatten the map values into a single stream
         return traits.values().stream().flatMap(Collection::stream);
     }
+
     static boolean hasRuntimeTraits(Block block) {
         var blockWithTraits = asBlockWithTraits(block);
         if (blockWithTraits == null) return false;
         final var traits = blockWithTraits.wover_traits();
         return traits != null && !traits.isEmpty();
     }
+
     static boolean hasRuntimeTrait(@Nullable Block block, BlockTraitKey traitKey) {
         var blockWithTraits = asBlockWithTraits(block);
         if (blockWithTraits == null) return false;
@@ -57,6 +59,7 @@ public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> 
         final var traits = blockWithTraits.wover_traits();
         return traits != null && traits.get(traitKey) != null;
     }
+
     static <B extends Block, R extends RuntimeBlockTrait<B, R>> @Nullable List<R> getRuntimeTraits(
             B block,
             BlockTraitKey traitKey
@@ -73,24 +76,11 @@ public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> 
         if (result == null || result.isEmpty()) return null;
         return result;
     }
+
     R forRuntime();
-
-    BlockTraitKey key();
-    boolean is(@Nullable RuntimeBlockTrait<?, ?> trait);
-    boolean is(@Nullable BlockTraitKey traitKey);
-    boolean is(@Nullable BlockTrait<?, ?> trait);
-
     void configure(BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition);
     void afterBlockRegistration(
             B block,
             BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition
     );
-
-    final class VoidRuntime<B extends Block> extends RuntimeBlockTraitImpl<B, VoidRuntime<B>> {
-        private static final BlockTraitKey ID = BlockTraitKey.ofUnique(LibWoverEvents.C, "void_trait");
-
-        private VoidRuntime() {
-            super(ID);
-        }
-    }
 }

@@ -3,7 +3,7 @@ package org.betterx.wover.block.impl;
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ItemRegistry;
-import org.betterx.wover.item.impl.api.ItemRegistryImpl;
+import org.betterx.wover.item.impl.ItemRegistryImpl;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;

@@ -9,11 +9,10 @@ import org.betterx.wover.entrypoint.LibWoverBlock;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SlabBlock;
 
 import org.jetbrains.annotations.Nullable;
 
-public class SlabBlockBuilder extends AbstractTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
+public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
     public static final GenericBlockTrait.BuilderWithDefault BUILDER = new SlabBlockBuilder();
 
     private SlabBlockBuilder() {

@@ -1,7 +1,7 @@
 package org.betterx.wover.block.impl.trait.type;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.trait.AbstractTraitBuilder;
+import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.GenericBlockTrait;
@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.Nullable;
 
-public class PlankBlockBuilder extends AbstractTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
+public class PlankBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
     public static final GenericBlockTrait.BuilderWithDefault BUILDER = new PlankBlockBuilder();
 
     private PlankBlockBuilder() {

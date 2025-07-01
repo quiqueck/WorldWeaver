@@ -4,6 +4,7 @@ import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.item.api.ItemDefinition;
 import org.betterx.wover.item.api.trait.ItemTrait;
 import org.betterx.wover.item.api.trait.ItemTraitKey;
+import org.betterx.wover.item.impl.trait.ItemTraitImpl;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -19,14 +20,20 @@ public class ToolTier {
         ItemTrait<Item, ?> with(ToolSlot slot, ToolTier tier);
     }
 
-    static abstract class ConfigureToolItemTrait extends ItemTrait<Item, ItemTrait.VoidRuntime> {
+    static abstract class ConfigureToolItemTrait extends ItemTraitImpl<Item, ConfigureToolItemTrait> {
         protected final ToolSlot slot;
         protected final ToolTier tier;
+        private final ItemTraitKey traitKey;
 
         protected ConfigureToolItemTrait(ItemTraitKey traitKey, ToolSlot slot, ToolTier tier) {
-            super(traitKey);
+            this.traitKey = traitKey;
             this.slot = slot;
             this.tier = tier;
+        }
+
+        @Override
+        public ItemTraitKey key() {
+            return traitKey;
         }
 
         @Override

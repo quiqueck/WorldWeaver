@@ -1,7 +1,7 @@
 package org.betterx.wover.item.api;
 
-import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.trait.ItemTrait;
+import org.betterx.wover.item.api.trait.ItemTraitBuilder;
 import org.betterx.wover.item.api.trait.ItemWithTraits;
 import org.betterx.wover.item.api.trait.RuntimeItemTrait;
 import org.betterx.wover.util.GrowableArray;
@@ -191,28 +191,38 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public <T extends ItemTrait<? super I, ?>> D addTrait(
-            @Nullable T trait
+    public D addTrait(
+            @Nullable ItemTrait<?, ?> trait
     ) {
         if (trait == null) {
             // Skip null traits
             return (D) this;
         }
 
-        if (trait.clientOnly() && !ModCore.isClient()) {
-            // Skip traits that are only for the client side
-            return (D) this;
-        }
-        if (trait.datagenOnly() && !ModCore.isDatagen()) {
-            // Skip traits that are only for data generation
-            return (D) this;
-        }
-
-
         if (this.traits == null) this.traits = new LinkedList<>();
 
-        this.traits.add(trait);
+        this.traits.add((ItemTrait<? super I, ?>) trait);
         return (D) this;
+    }
+
+    public D addTrait(
+            @Nullable List<ItemTrait<?, ?>> traits
+    ) {
+        if (traits == null) {
+            return (D) this;
+        }
+
+        traits.forEach(this::addTrait);
+
+        return (D) this;
+    }
+
+    public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefault<?, ?> traitBuilder) {
+        return this.addTrait(traitBuilder.withDefault());
+    }
+
+    public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefaults<?, ?> traitBuilder) {
+        return this.addTrait(traitBuilder.withDefault());
     }
 
     // **********************************************************************

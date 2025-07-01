@@ -1,7 +1,7 @@
 package org.betterx.wover.block.impl.trait;
 
 import org.betterx.wover.block.api.BlockRegistry;
-import org.betterx.wover.block.api.trait.AbstractTraitBuilder;
+import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.core.api.ModCore;
@@ -15,7 +15,7 @@ import java.util.function.BiPredicate;
 import org.jetbrains.annotations.Nullable;
 
 
-public class BlockRecipeTraitBuilder extends AbstractTraitBuilder<Block, BlockRecipeTrait> implements BlockRecipeTrait.Builder {
+public class BlockRecipeTraitBuilder extends AbstractBlockTraitBuilder<Block, BlockRecipeTrait> implements BlockRecipeTrait.Builder {
     public static final BlockRecipeTrait.Builder BUILDER = new BlockRecipeTraitBuilder();
 
     private BlockRecipeTraitBuilder() {
