@@ -24,7 +24,7 @@ public class ButtonBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
         return new Trait();
     }
 
-    public class Trait extends BlockTraitImpl.Generic {
+    private class Trait extends BlockTraitImpl.Generic {
         @Override
         public BlockTraitKey key() {
             return traitKey;

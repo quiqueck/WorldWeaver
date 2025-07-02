@@ -228,4 +228,21 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait door(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "door", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(3)
+                            .shape("##", "##", "##")
+                            .addMaterial('#', planksMaterial)
+                            .group("door")
+                            .category(RecipeCategory.REDSTONE)
+                            .build(context);
+                }
+        );
+    }
 }

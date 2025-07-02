@@ -54,7 +54,7 @@ public class BlockModelTraitBuilder extends AbstractBlockTraitBuilder<Block, Blo
     }
 
     @Environment(EnvType.CLIENT)
-    class Trait extends BlockTraitImpl<Block, BlockModelTrait> implements BlockModelTrait {
+    private class Trait extends BlockTraitImpl<Block, BlockModelTrait> implements BlockModelTrait {
         private final ModelFactory modelFactory;
 
         public Trait(ModelFactory modelFactory) {

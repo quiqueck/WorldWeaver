@@ -27,7 +27,7 @@ public class CraftingTableBlockBuilder extends AbstractBlockTraitBuilder.Generic
         return new Trait();
     }
 
-    public class Trait extends BlockTraitImpl.Generic {
+    private class Trait extends BlockTraitImpl.Generic {
         @Override
         public BlockTraitKey key() {
             return traitKey;

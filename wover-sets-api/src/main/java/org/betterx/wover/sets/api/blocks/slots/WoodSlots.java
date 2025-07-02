@@ -13,9 +13,11 @@ public class WoodSlots {
     public static final SlotDefinition CHEST_BOAT = new Boat(true);
     public static final SlotDefinition COMPOSTER = new Composter();
     public static final SlotDefinition CRAFTING_TABLE = new CraftingTable();
+    public static final SlotDefinition DOOR = new Door();
     public static final SlotDefinition LOG = new Log(true);
     public static final SlotDefinition PLANKS = new Planks();
     public static final SlotDefinition SLAB = new Slab();
     public static final SlotDefinition STRIPPED_BARK = new Bark(false);
     public static final SlotDefinition STRIPPED_LOG = new Log(false);
+
 }

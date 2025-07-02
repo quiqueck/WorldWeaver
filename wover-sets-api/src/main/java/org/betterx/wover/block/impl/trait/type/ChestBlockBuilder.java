@@ -69,7 +69,7 @@ public class ChestBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
         return builder.withPool(pool);
     }
 
-    public class Trait extends BlockTraitImpl.Generic {
+    private class Trait extends BlockTraitImpl.Generic {
         @Override
         public BlockTraitKey key() {
             return traitKey;

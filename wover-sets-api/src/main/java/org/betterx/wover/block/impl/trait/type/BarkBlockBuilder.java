@@ -51,7 +51,7 @@ public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
         return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState));
     }
 
-    public class Trait extends BlockTraitImpl.Generic implements BarkBlockTrait {
+    private class Trait extends BlockTraitImpl.Generic implements BarkBlockTrait {
         @Override
         public BlockTraitKey key() {
             return traitKey;

@@ -52,7 +52,7 @@ public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implement
     }
 
 
-    public class Trait extends BlockTraitImpl.Generic implements LogBlockTrait {
+    private class Trait extends BlockTraitImpl.Generic implements LogBlockTrait {
         @Override
         public BlockTraitKey key() {
             return traitKey;

@@ -1,35 +1,36 @@
 package org.betterx.wover.block.impl.trait.type;
 
 import org.betterx.wover.block.api.BlockDefinition;
+import org.betterx.wover.block.api.client.trait.ClientBlockTraits;
+import org.betterx.wover.block.api.client.trait.RenderLayerTrait;
 import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
 import org.betterx.wover.loot.api.LootLookupProvider;
-import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.Items;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class BookshelfBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
-    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new BookshelfBlockBuilder();
+public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new DoorBlockBuilder();
 
-    private BookshelfBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_bookshelf"));
+    private DoorBlockBuilder() {
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_door"));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
-        if (!ModCore.isDatagen()) return null;
+        if (!ModCore.isDatagen()) return combine(ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT));
         return combine(
                 new Trait(),
-                BlockTraits.MAGIC_SOURCE.withDefault(),
-                BlockTraits.LOOT_TABLE.with(BookshelfBlockBuilder::drops)
+                BlockTraits.LOOT_TABLE.with(DoorBlockBuilder::drops),
+                ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT)
         );
     }
 
@@ -39,7 +40,7 @@ public class BookshelfBlockBuilder extends AbstractBlockTraitBuilder.Generic imp
             Block block,
             LootLookupProvider provider
     ) {
-        return provider.dropWithSilkTouch(block, Items.BOOK, ConstantValue.exactly(3));
+        return provider.dropDoor(block);
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -50,7 +51,13 @@ public class BookshelfBlockBuilder extends AbstractBlockTraitBuilder.Generic imp
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.addTags(CommonBlockTags.BOOKSHELVES);
+            definition.addTags(BlockTags.DOORS);
+            definition.addItemTags(ItemTags.DOORS);
+
+            if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
+                definition.addTags(BlockTags.WOODEN_DOORS);
+                definition.addItemTags(ItemTags.WOODEN_DOORS);
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 package org.betterx.wover.block.impl.client.trait;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.client.ChestRenderTrait;
+import org.betterx.wover.block.api.client.trait.ChestRenderTrait;
 import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
@@ -18,7 +18,7 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.Nullable;
 
 public class ChestRenderTraitBuilder extends AbstractBlockTraitBuilder<Block, ChestRenderTrait> implements ChestRenderTrait.Builder {
-    public static final ChestRenderTraitBuilder BUILDER = new ChestRenderTraitBuilder();
+    public static final ChestRenderTrait.Builder BUILDER = new ChestRenderTraitBuilder();
 
     protected ChestRenderTraitBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "chest_renderer"));
@@ -31,7 +31,7 @@ public class ChestRenderTraitBuilder extends AbstractBlockTraitBuilder<Block, Ch
     }
 
     @Environment(EnvType.CLIENT)
-    class Trait extends BlockTraitImpl<Block, ChestRenderTrait> implements ChestRenderTrait {
+    private class Trait extends BlockTraitImpl<Block, ChestRenderTrait> implements ChestRenderTrait {
         private ChestMaterialSet material;
 
         @Override

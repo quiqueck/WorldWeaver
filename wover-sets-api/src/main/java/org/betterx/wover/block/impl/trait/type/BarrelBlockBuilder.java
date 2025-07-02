@@ -26,7 +26,7 @@ public class BarrelBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
         return combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL));
     }
 
-    public class Trait extends BlockTraitImpl.Generic {
+    private class Trait extends BlockTraitImpl.Generic {
         @Override
         public BlockTraitKey key() {
             return traitKey;

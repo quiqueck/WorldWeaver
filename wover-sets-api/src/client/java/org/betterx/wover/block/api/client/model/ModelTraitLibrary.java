@@ -165,4 +165,10 @@ public class ModelTraitLibrary {
             generator.createComposter(block);
         });
     }
+
+    public static BlockModelTrait door() {
+        return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+            generator.vanillaGenerator.createDoor(block);
+        });
+    }
 }

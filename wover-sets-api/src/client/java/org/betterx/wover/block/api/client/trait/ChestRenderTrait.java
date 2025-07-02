@@ -1,4 +1,4 @@
-package org.betterx.wover.block.api.client;
+package org.betterx.wover.block.api.client.trait;
 
 import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitBuilder;

@@ -90,7 +90,8 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.CHEST,
                 WoodSlots.CHEST_BOAT,
                 WoodSlots.COMPOSTER,
-                WoodSlots.CRAFTING_TABLE
+                WoodSlots.CRAFTING_TABLE,
+                WoodSlots.DOOR
         );
     }
 }

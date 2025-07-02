@@ -20,10 +20,10 @@ public class ComposterBlockBuilder extends AbstractBlockTraitBuilder.Generic imp
 
     public @Nullable BlockTrait<?, ?> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return new ComposterBlockBuilder.Trait();
+        return new Trait();
     }
 
-    public class Trait extends BlockTraitImpl.Generic {
+    private class Trait extends BlockTraitImpl.Generic {
         @Override
         public BlockTraitKey key() {
             return traitKey;
