@@ -10,9 +10,11 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +24,7 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
 
     public final MapColor woodColor;
     private MapColor planksColor;
+    private WoodType woodType;
 
     public WoodenBlockSet(
             @NotNull ModCore modCore,
@@ -49,9 +52,15 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
     protected BlockSetType createSetType(BlockSetType setType) {
         if (setType == null) {
             var builder = BlockSetTypeBuilder.copyOf(BlockSetType.OAK);
-            return builder.register(this.C.id(this.baseName));
+            setType = builder.register(this.C.id(this.baseName));
         }
+
+        this.woodType = WoodTypeBuilder.copyOf(WoodType.OAK).register(this.C.id(this.baseName), setType);
         return setType;
+    }
+
+    public WoodType woodType() {
+        return this.woodType;
     }
 
     public S setPlanksColor(MapColor planksColor) {
@@ -92,7 +101,8 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.COMPOSTER,
                 WoodSlots.CRAFTING_TABLE,
                 WoodSlots.DOOR,
-                WoodSlots.FENCE
+                WoodSlots.FENCE,
+                WoodSlots.FENCE_GATE
         );
     }
 }

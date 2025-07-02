@@ -263,4 +263,21 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait gate(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "gate", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .shape("I#I", "I#I")
+                            .addMaterial('#', planksMaterial)
+                            .addMaterial('I', Items.STICK)
+                            .group("gate")
+                            .category(RecipeCategory.REDSTONE)
+                            .build(context);
+                }
+        );
+    }
 }
