@@ -33,7 +33,11 @@ public class StoneMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.getProperties().instrument(NoteBlockInstrument.BASEDRUM);
+            definition
+                    .getProperties()
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .requiresCorrectToolForDrops()
+                    .strength(2.0F, 6.0F);
         }
     }
 }

@@ -171,4 +171,10 @@ public class ModelTraitLibrary {
             generator.vanillaGenerator.createDoor(block);
         });
     }
+
+    public static BlockModelTrait fence(Supplier<Block> planksMaterial) {
+        return ClientBlockTraits.MODEL.with((key, fenceBlock, generator) -> {
+            generator.createFence(planksMaterial.get(), fenceBlock);
+        });
+    }
 }

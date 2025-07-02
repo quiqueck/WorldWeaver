@@ -12,7 +12,7 @@ import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
-import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.FenceBlock;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,12 +20,12 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Door extends SlotDefinition {
-    public Door() {
-        this(SlotType.DOOR);
+public class Fence extends SlotDefinition {
+    public Fence() {
+        this(SlotType.FENCE);
     }
 
-    public Door(SlotType slot) {
+    public Fence(SlotType slot) {
         super(slot);
     }
 
@@ -35,22 +35,22 @@ public class Door extends SlotDefinition {
             @NotNull BlockSet<?> set,
             @NotNull String name
     ) {
-        return registry.defineDefaultBlock(name, (def) -> new DoorBlock(set.setType(), def.getProperties()));
+        return registry.defineDefaultBlockWithProps(name, FenceBlock::new);
     }
 
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
-        def.addTrait(BlockTraits.DOOR_BLOCK);
+        def.addTrait(BlockTraits.FENCE_BLOCK);
     }
 
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.door();
+        return ModelTraitLibrary.fence(set::getBaseBlock);
     }
 
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
-        return RecipeTraitLibrary.door(set.recipeBaseMaterial());
+        return RecipeTraitLibrary.fence(set.recipeBaseMaterial());
     }
 }

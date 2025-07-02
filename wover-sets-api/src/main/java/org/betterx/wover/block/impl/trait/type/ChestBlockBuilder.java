@@ -77,6 +77,8 @@ public class ChestBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
+            definition.noOcclusion();
+            
             definition.addTags(CommonBlockTags.CHEST);
             definition.addItemTags(CommonItemTags.CHEST);
 

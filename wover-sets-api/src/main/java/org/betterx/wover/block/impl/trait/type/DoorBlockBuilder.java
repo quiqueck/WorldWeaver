@@ -51,6 +51,8 @@ public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
+            definition.strength(3F, 3F).noOcclusion();
+            
             definition.addTags(BlockTags.DOORS);
             definition.addItemTags(ItemTags.DOORS);
 

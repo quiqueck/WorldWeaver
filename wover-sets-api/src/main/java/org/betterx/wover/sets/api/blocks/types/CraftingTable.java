@@ -46,11 +46,11 @@ public class CraftingTable extends SlotDefinition {
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.craftingTable(() -> set.getBlock(SlotType.PLANKS));
+        return ModelTraitLibrary.craftingTable(set::getBaseBlock);
     }
 
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
-        return RecipeTraitLibrary.craftingTable(set.recipeMaterial(SlotType.PLANKS));
+        return RecipeTraitLibrary.craftingTable(set.recipeBaseMaterial());
     }
 }

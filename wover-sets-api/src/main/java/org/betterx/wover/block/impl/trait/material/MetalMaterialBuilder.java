@@ -34,7 +34,12 @@ public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.getProperties().instrument(NoteBlockInstrument.IRON_XYLOPHONE).sound(SoundType.IRON);
+            definition
+                    .getProperties()
+                    .instrument(NoteBlockInstrument.IRON_XYLOPHONE)
+                    .requiresCorrectToolForDrops()
+                    .strength(5.0F, 6.0F)
+                    .sound(SoundType.IRON);
         }
     }
 }

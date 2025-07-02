@@ -245,4 +245,22 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait fence(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "fence", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(3)
+                            .shape("#I#", "#I#")
+                            .addMaterial('#', planksMaterial)
+                            .addMaterial('I', Items.STICK)
+                            .group("fence")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
 }

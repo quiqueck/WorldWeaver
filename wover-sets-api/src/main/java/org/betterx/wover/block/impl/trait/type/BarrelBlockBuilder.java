@@ -34,6 +34,8 @@ public class BarrelBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
+            definition.noOcclusion();
+            
             definition.addTags(CommonBlockTags.BARREL);
             definition.addItemTags(CommonItemTags.BARREL);
 

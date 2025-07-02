@@ -7,6 +7,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 import java.util.List;
@@ -33,7 +34,11 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.getProperties().instrument(NoteBlockInstrument.BASS);
+            definition
+                    .getProperties()
+                    .instrument(NoteBlockInstrument.BASS)
+                    .strength(2.0F, 3.0F)
+                    .sound(SoundType.WOOD);
         }
     }
 }
