@@ -52,7 +52,7 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.add(CommonPoiTags.BUTCHER_WORKSTATION, Blocks.SMOKER);
         ctx.add(CommonPoiTags.CARTOGRAPHER_WORKSTATION, Blocks.CARTOGRAPHY_TABLE);
         ctx.add(CommonPoiTags.CLERIC_WORKSTATION, Blocks.BREWING_STAND);
-        ctx.add(CommonPoiTags.FARMER_WORKSTATION, Blocks.COMPOSTER);
+        ctx.add(CommonPoiTags.FARMER_WORKSTATION, CommonBlockTags.COMPOSTER, CommonBlockTags.WOODEN_COMPOSTER);
         ctx.add(CommonPoiTags.FISHERMAN_WORKSTATION, CommonBlockTags.BARREL, CommonBlockTags.WOODEN_BARREL);
         ctx.add(CommonPoiTags.FLETCHER_WORKSTATION, Blocks.FLETCHING_TABLE);
         ctx.add(CommonPoiTags.LEATHERWORKER_WORKSTATION, CommonBlockTags.CAULDRONS);
@@ -163,6 +163,8 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
 
         ctx.add(CommonBlockTags.BOOKSHELVES, Blocks.BOOKSHELF);
         ctx.add(CommonBlockTags.CHEST, Blocks.CHEST);
+        ctx.add(CommonBlockTags.COMPOSTER, Blocks.COMPOSTER);
+        ctx.add(CommonBlockTags.WOODEN_COMPOSTER, Blocks.COMPOSTER);
 
         ctx.add(
                 net.minecraft.tags.BlockTags.NETHER_CARVER_REPLACEABLES,
@@ -265,12 +267,6 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
 
         ctx.addOptional(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, MineableTags.NEEDS_NETHERITE_TOOL);
         ctx.addOptional(BlockTags.INCORRECT_FOR_WOODEN_TOOL, MineableTags.NEEDS_GOLD_TOOL);
-
-        ctx.addOptional(
-                WoverTagDatagen.VILLAGER_JOB_SITES,
-                CommonPoiTags.FARMER_WORKSTATION,
-                CommonPoiTags.FISHERMAN_WORKSTATION
-        );
 
         ctx.add(CommonBlockTags.CAULDRONS, Blocks.LAVA_CAULDRON, Blocks.WATER_CAULDRON, Blocks.POWDER_SNOW_CAULDRON);
         ctx.add(

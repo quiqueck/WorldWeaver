@@ -196,4 +196,20 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait composter(RecipeMaterial slabMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(slabMaterial, "composter", "slab");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .shape("# #", "# #", "###")
+                            .addMaterial('#', slabMaterial)
+                            .group("composter")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
 }

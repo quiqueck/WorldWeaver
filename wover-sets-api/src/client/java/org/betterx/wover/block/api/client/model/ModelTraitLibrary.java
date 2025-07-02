@@ -141,4 +141,10 @@ public class ModelTraitLibrary {
             generator.createCubeModel(block);
         });
     }
+
+    public static BlockModelTrait composter() {
+        return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+            generator.createComposter(block);
+        });
+    }
 }
