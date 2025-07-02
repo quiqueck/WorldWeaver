@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -33,6 +32,10 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         B createItem(D definition);
     }
 
+    public interface BlockItemDefinitionFactory<B extends Block, D extends BlockDefinition<B, D>> {
+        BlockItemDefinition<?, ?> get(D definition, B sourceBlock);
+    }
+
     public final BlockRegistry registry;
 
     public final ResourceKey<Block> blockKey;
@@ -46,6 +49,8 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     protected List<BlockTrait<? super B, ?>> traits;
 
     protected final BlockDefinition.BlockFactory<B, D> blockFactory;
+
+    protected @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier;
 
     private BlockDefinition(
             BlockRegistry registry,
@@ -92,14 +97,25 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     abstract protected B beforeRegister(B block);
 
+    public D setBlockItemDefinitionSupplier(
+            @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier
+    ) {
+        this.blockItemDefinitionSupplier = blockItemDefinitionSupplier;
+        return (D) this;
+    }
+
     /**
      * Used in {@link #buildAndRegister()} to generate the BlockItem.
      *
      * @param sourceBlock The block for which the BlockItemDefinition is created.
-     * @param <BI>
      * @return
      */
-    protected <BI extends BlockItem> @NotNull BlockItemDefinition<? super BI, ?> getBlockItemDefinition(Block sourceBlock) {
+    @SuppressWarnings("unchecked")
+    protected @NotNull BlockItemDefinition<?, ?> getBlockItemDefinition(B sourceBlock) {
+        if (blockItemDefinitionSupplier != null) {
+            // If a custom BlockItemDefinitionFactory is provided, use it
+            return blockItemDefinitionSupplier.get((D) this, sourceBlock);
+        }
         return new VanillaBlockItemDefinition(this, sourceBlock);
     }
 
