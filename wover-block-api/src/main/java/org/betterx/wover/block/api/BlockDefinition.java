@@ -9,6 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlag;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -51,6 +52,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     protected final BlockDefinition.BlockFactory<B, D> blockFactory;
 
     protected @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier;
+    protected BlockItem blockItem;
 
     private BlockDefinition(
             BlockRegistry registry,
@@ -97,10 +99,20 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     abstract protected B beforeRegister(B block);
 
-    public D setBlockItemDefinitionSupplier(
+    protected B afterRegister(B block) {
+        // Default implementation does nothing, can be overridden if needed
+        return block;
+    }
+
+    public D withBlockItem(
             @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier
     ) {
         this.blockItemDefinitionSupplier = blockItemDefinitionSupplier;
+        return (D) this;
+    }
+
+    public D noBlockItem() {
+        this.blockItemDefinitionSupplier = (d, b) -> null;
         return (D) this;
     }
 
@@ -111,7 +123,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return
      */
     @SuppressWarnings("unchecked")
-    protected @NotNull BlockItemDefinition<?, ?> getBlockItemDefinition(B sourceBlock) {
+    protected @Nullable BlockItemDefinition<?, ?> getBlockItemDefinition(B sourceBlock) {
         if (blockItemDefinitionSupplier != null) {
             // If a custom BlockItemDefinitionFactory is provided, use it
             return blockItemDefinitionSupplier.get((D) this, sourceBlock);
@@ -166,10 +178,16 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
             }
         }
 
+        block = this.afterRegister(block);
+
         // Register the block item for this block. At this point the Block is fully configured
         var blockitemDefinition = this.getBlockItemDefinition(block);
-        blockitemDefinition.addTags(itemTags);
-        var blockItem = blockitemDefinition.buildAndRegister();
+        if (blockitemDefinition != null) {
+            blockitemDefinition.addTags(itemTags);
+            this.blockItem = blockitemDefinition.buildAndRegister();
+        } else {
+            this.blockItem = null;
+        }
 
         return block;
     }

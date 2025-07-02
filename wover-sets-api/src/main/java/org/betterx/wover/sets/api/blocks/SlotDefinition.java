@@ -7,10 +7,12 @@ import org.betterx.wover.block.api.trait.BlockRecipeTrait;
 import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import org.betterx.wover.core.api.ModCore;
 
+import net.minecraft.world.level.block.Block;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +27,7 @@ public class SlotDefinition {
         return set.baseName + "_" + slot.suffix();
     }
 
-    public void createBlockDefinition(BlockSet<?> set, Consumer<BlockDefinition<?, ?>> blockDefinitionConsumer) {
+    public void createBlockDefinition(BlockSet<?> set, BiConsumer<SlotType, Block> blockDefinitionConsumer) {
         BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition = startBlockDefinition(
                 BlockRegistry.forMod(set.C),
                 set, this.getName(set)
@@ -39,7 +41,16 @@ public class SlotDefinition {
         definition.addTrait(this.buildRecipe(set, definition));
         if (ModCore.isClient()) definition.addTrait(this.buildModel(set, definition));
 
-        blockDefinitionConsumer.accept(definition);
+        this.finalizeBlockDefinitions(set, definition, blockDefinitionConsumer);
+    }
+
+    protected void finalizeBlockDefinitions(
+            BlockSet<?> set,
+            BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition,
+            BiConsumer<SlotType, Block> blockDefinitionConsumer
+    ) {
+        var block = definition.buildAndRegister();
+        blockDefinitionConsumer.accept(slot, block);
     }
 
     protected @Nullable BlockDefinition<?, ?> startBlockDefinition(

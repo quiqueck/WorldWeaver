@@ -39,6 +39,8 @@ public class BlockTraits {
     public static final GenericBlockTrait.BuilderWithDefaults DOOR_BLOCK = DoorBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefault FENCE_BLOCK = FenceBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefault FENCE_GATE_BLOCK = GateBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults HANGING_SIGN_BLOCK = HangingSignBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults SIGN_BLOCK = SignBlockBuilder.BUILDER;
 
     //Recipe Traits
     public static final BlockRecipeTrait.Builder RECIPE = BlockRecipeTraitBuilder.BUILDER;

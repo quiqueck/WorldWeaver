@@ -65,9 +65,8 @@ public class BlockSet<S extends BlockSet<S>> {
     }
 
     public S buildAndRegister() {
-        final BiConsumer<SlotDefinition, BlockDefinition<?, ?>> acceptDefinition = (slotDefinition, blockDefinition) -> {
-            Block block = blockDefinition.buildAndRegister();
-            slots.put(slotDefinition.slot, new SlotData(slotDefinition.slot, block));
+        final BiConsumer<SlotType, Block> acceptDefinition = (slot, block) -> {
+            slots.put(slot, new SlotData(slot, block));
         };
 
         final BiConsumer<ItemSlotDefinition, ItemDefinition<?, ?>> acceptItemDefinition = (slotDefinition, itemDefinition) -> {
@@ -81,7 +80,7 @@ public class BlockSet<S extends BlockSet<S>> {
         for (SlotDefinition slotDefinition : slotDefinitions) {
             slotDefinition.createBlockDefinition(
                     this,
-                    (blockDefinition) -> acceptDefinition.accept(slotDefinition, blockDefinition)
+                    acceptDefinition::accept
             );
             if (slotDefinition instanceof ItemSlotDefinition itemSlotDefinition) {
                 itemSlotDefinition.createItemDefinition(

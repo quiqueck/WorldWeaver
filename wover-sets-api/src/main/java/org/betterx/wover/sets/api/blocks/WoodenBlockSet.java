@@ -55,7 +55,10 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
             setType = builder.register(this.C.id(this.baseName));
         }
 
-        this.woodType = WoodTypeBuilder.copyOf(WoodType.OAK).register(this.C.id(this.baseName), setType);
+        this.woodType = WoodTypeBuilder
+                .copyOf(WoodType.OAK)
+                .register(this.C.id(this.baseName), setType);
+
         return setType;
     }
 
@@ -102,7 +105,9 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.CRAFTING_TABLE,
                 WoodSlots.DOOR,
                 WoodSlots.FENCE,
-                WoodSlots.FENCE_GATE
+                WoodSlots.FENCE_GATE,
+                WoodSlots.HANGING_SIGN,
+                WoodSlots.SIGN
         );
     }
 }

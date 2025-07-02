@@ -165,11 +165,17 @@ public class WoverBlockModelGenerators {
     public ResourceLocation particleOnlyModel(Block block) {
         var name = ModelLocationUtils.getModelLocation(block).withSuffix("_particles");
         if (name.getNamespace().equals("minecraft")) name = LibWoverBlock.C.mk(name.getPath());
+
+        var textureName = TextureMapping.getBlockTexture(block);
+        if (!name.getNamespace().equals("minecraft") && textureName.getPath().endsWith("_log"))
+            textureName = textureName.withSuffix("_side");
+
         ResourceLocation finalName = name;
+        ResourceLocation finalTextureName = textureName;
         return PARTICLE_ONLY_MODELS.computeIfAbsent(
                 name, (n) -> ModelTemplates.PARTICLE_ONLY.create(
                         finalName,
-                        new TextureMapping().put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block)),
+                        new TextureMapping().put(TextureSlot.PARTICLE, finalTextureName),
                         vanillaGenerator.modelOutput
                 )
         );

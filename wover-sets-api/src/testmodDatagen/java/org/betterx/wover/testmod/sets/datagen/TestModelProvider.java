@@ -16,6 +16,8 @@ public class TestModelProvider extends WoverModelProvider {
     @Override
     protected void bootstrapBlockStateModels(WoverBlockModelGenerators generator) {
         BlockModelTrait.bootstrapModels(modCore, generator);
+
+
     }
 
     @Override

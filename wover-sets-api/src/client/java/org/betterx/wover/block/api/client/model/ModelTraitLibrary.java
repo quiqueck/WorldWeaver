@@ -183,4 +183,16 @@ public class ModelTraitLibrary {
             generator.createFenceGate(planksMaterial.get(), fenceBlock);
         });
     }
+
+    public static BlockModelTrait hangingSign(Supplier<Block> logMaterial, Supplier<Block> wallSignBlock) {
+        return ClientBlockTraits.MODEL.with((key, signBlock, generator) -> {
+            generator.createHangingSign(logMaterial.get(), signBlock, wallSignBlock.get());
+        });
+    }
+
+    public static BlockModelTrait sign(Supplier<Block> logMaterial, Supplier<Block> wallSignBlock) {
+        return ClientBlockTraits.MODEL.with((key, signBlock, generator) -> {
+            generator.createSign(logMaterial.get(), signBlock, wallSignBlock.get());
+        });
+    }
 }

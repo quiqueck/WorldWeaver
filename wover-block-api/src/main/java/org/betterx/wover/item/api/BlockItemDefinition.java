@@ -14,7 +14,7 @@ public class BlockItemDefinition<BI extends BlockItem, D extends BlockItemDefini
      * @param sourceDefinition The block definition that this item is created for
      * @param itemFactory      The factory used to create the item instance
      */
-    protected BlockItemDefinition(
+    public BlockItemDefinition(
             BlockDefinition<?, ?> sourceDefinition,
             ItemFactory<BI, D> itemFactory
     ) {

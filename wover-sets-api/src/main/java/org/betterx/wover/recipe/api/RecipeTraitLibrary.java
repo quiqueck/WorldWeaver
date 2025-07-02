@@ -280,4 +280,40 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait hangingSign(RecipeMaterial strippedLogMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(strippedLogMaterial, "hangingSign", "stripped_log");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(3)
+                            .shape("I I", "###", "###")
+                            .addMaterial('#', strippedLogMaterial)
+                            .addMaterial('I', Items.CHAIN)
+                            .group("hanging_sign")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait sign(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "sign", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(3)
+                            .shape("###", "###", " I ")
+                            .addMaterial('#', planksMaterial)
+                            .addMaterial('I', Items.STICK)
+                            .group("sign")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
 }
