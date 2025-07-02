@@ -112,7 +112,11 @@ public class BlockSet<S extends BlockSet<S>> {
     }
 
     public RecipeMaterial recipeMaterial(@NotNull SlotType type) {
-        return RecipeMaterial.ofDeferredItemLike(() -> this.getBlock(type));
+        return RecipeMaterial.ofDeferredItemLike(() -> {
+            var blockMat = this.getBlock(type);
+            if (blockMat == null) return this.getItem(type);
+            return blockMat;
+        });
     }
 
     public RecipeMaterial recipeMaterialWithFallback(@NotNull SlotType... type) {

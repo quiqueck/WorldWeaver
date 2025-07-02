@@ -19,22 +19,36 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 
+import org.jetbrains.annotations.Nullable;
+
 
 public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem, BoatRendererTrait> implements BoatRendererTrait.Builder {
     public static final BoatRendererTrait.Builder BUILDER = new BoatRendererTraitBuilder();
 
     protected BoatRendererTraitBuilder() {
         super(ItemTraitKey.ofUnique(LibWoverItem.C, "boat_model"));
+
     }
 
     @Override
     public BoatRendererTrait withDefault() {
         if (!ModCore.isClient()) return null;
-        return new Trait();
+        return new Trait(false);
+    }
+
+
+    public @Nullable BoatRendererTrait with(boolean withChest) {
+        if (!ModCore.isClient()) return null;
+        return new Trait(withChest);
     }
 
     @Environment(EnvType.CLIENT)
     class Trait extends ItemTraitImpl<BoatItem, BoatRendererTrait> implements BoatRendererTrait {
+        private final boolean withChest;
+
+        Trait(boolean withChest) {
+            this.withChest = withChest;
+        }
 
         @Override
         public ItemTraitKey key() {
@@ -48,13 +62,16 @@ public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem,
         ) {
             if (definition instanceof BoatItemDefinition<?> boatDefinition) {
                 final var modelLocation = new ModelLayerLocation(
-                        definition.itemKey.location().withPrefix("boat/"),
+                        definition.itemKey.location()
+                                          .withPrefix(withChest ? "chest_boat/" : "boat/"),
                         "main"
                 );
 
                 EntityModelLayerRegistry.registerModelLayer(
                         modelLocation,
-                        () -> BoatModel.createBoatModel()
+                        withChest
+                                ? BoatModel::createChestBoatModel
+                                : BoatModel::createBoatModel
                 );
 
                 EntityRendererRegistry.register(
@@ -65,5 +82,11 @@ public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem,
                 throw new IllegalStateException("BoatRendererTrait can only be used with BoatItemDefinition");
             }
         }
+
+        @Override
+        public boolean withChest() {
+            return this.withChest;
+        }
     }
+
 }

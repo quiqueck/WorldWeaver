@@ -2,6 +2,7 @@ package org.betterx.wover.tag.api.predefined;
 
 import org.betterx.wover.tag.api.TagManager;
 
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
@@ -20,9 +21,9 @@ public class CommonItemTags {
      */
     public static final TagKey<Item> BARREL = TagManager.ITEMS.makeCommonTag("barrels");
     /**
-     * {@code c:barrels}
+     * {@code c:boats}
      */
-    public static final TagKey<Item> BOAT = TagManager.ITEMS.makeCommonTag("boats");
+    public static final TagKey<Item> BOAT = ItemTags.BOATS;
     /**
      * {@code c:chests}
      */

@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.vehicle.AbstractBoat;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.ChestBoat;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.level.Level;
 
@@ -27,17 +28,26 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
 
     private EntityType<? extends AbstractBoat> entityType;
     private BoatItem boatItem;
+    private final boolean withChest;
 
     protected BoatItemDefinition(
             ItemRegistry registry,
             String itemName,
-            ItemFactory<I> itemFactory
+            ItemFactory<I> itemFactory,
+            boolean withChest
     ) {
         super(registry, itemName, itemFactory);
+        this.withChest = withChest;
     }
 
-    Boat boatFactory(EntityType<Boat> entityType, Level level) {
-        return new Boat(entityType, level, () -> this.boatItem);
+    @SuppressWarnings("unchecked")
+    Boat boatFactory(EntityType<? extends AbstractBoat> entityType, Level level) {
+        return new Boat((EntityType<? extends Boat>) entityType, level, () -> this.boatItem);
+    }
+
+    @SuppressWarnings("unchecked")
+    ChestBoat chestBoatFactory(EntityType<? extends AbstractBoat> entityType, Level level) {
+        return new ChestBoat((EntityType<? extends ChestBoat>) entityType, level, () -> this.boatItem);
     }
 
     @Override
@@ -45,11 +55,15 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
         properties.stacksTo(1);
 
         final var entityKey = registry.entityKey(itemKey);
+        final EntityType.EntityFactory<? extends AbstractBoat> factory = withChest
+                ? this::chestBoatFactory
+                : this::boatFactory;
+
         this.entityType = Registry.register(
                 BuiltInRegistries.ENTITY_TYPE,
                 entityKey,
                 EntityType.Builder
-                        .of(this::boatFactory, MobCategory.MISC)
+                        .of(factory, MobCategory.MISC)
                         .noLootTable()
                         .sized(1.375F, 0.5625F)
                         .eyeHeight(0.5625F)

@@ -136,10 +136,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     }
 
 
+    @SuppressWarnings("unchecked")
     public final B buildAndRegister() {
         B block = this.beforeRegister(this.build());
 
-        final TagKey<Block>[] tags = this.tags == null ? null : this.tags.toArray(new TagKey[0]);
+        final TagKey<Block>[] tags = this.tags == null ? null : this.tags.toArray(TagKey[]::new);
         this.registry.register(this.blockKey, block, tags);
 
         // If traits are defined, call afterBlockRegistration for each trait
@@ -151,7 +152,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
         // Register the block item for this block. At this point the Block is fully configured
         var blockitemDefinition = this.getBlockItemDefinition(block);
-        blockitemDefinition.addTags(itemTags == null ? null : itemTags.toArray(new TagKey[0]));
+        blockitemDefinition.addTags(itemTags);
         var blockItem = blockitemDefinition.buildAndRegister();
 
         return block;
@@ -250,8 +251,9 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      *
      * @return Array of tags applied to this block, may be null
      */
+    @SuppressWarnings("unchecked")
     public TagKey<Block>[] tags() {
-        return this.tags.toArray(new TagKey[0]);
+        return this.tags.toArray(TagKey[]::new);
     }
 
     /**

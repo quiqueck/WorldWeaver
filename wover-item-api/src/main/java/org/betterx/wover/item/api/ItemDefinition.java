@@ -2,7 +2,6 @@ package org.betterx.wover.item.api;
 
 import org.betterx.wover.item.api.trait.*;
 import org.betterx.wover.item.impl.trait.ItemTraitImpl;
-import org.betterx.wover.util.GrowableArray;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
@@ -15,6 +14,8 @@ import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +65,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     /**
      * Optional tags to be applied to the item
      */
-    protected GrowableArray<TagKey<Item>> tags;
+    protected List<TagKey<Item>> tags;
 
     /**
      * List of traits applied to this item.
@@ -166,9 +167,11 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      *
      * @return The created and registered item instance
      */
+    @SuppressWarnings("unchecked")
     public final I buildAndRegister() {
         I item = this.beforeRegister(this.build());
-        this.registry.register(this.itemKey, item, tags == null ? null : tags.elements());
+        final TagKey<Item>[] tags = this.tags == null ? null : this.tags.toArray(TagKey[]::new);
+        this.registry.register(this.itemKey, item, tags);
 
         // If traits are defined, call afterItemRegistration for each trait
         if (this.traits != null) {
@@ -258,10 +261,27 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     @SuppressWarnings("unchecked")
     public final D addTags(TagKey<Item>... itemTags) {
         if (this.tags == null) {
-            this.tags = new GrowableArray<>(itemTags);
-        } else {
-            this.tags.add(itemTags);
+            this.tags = new ArrayList<>(itemTags.length);
         }
+
+        for (TagKey<Item> tag : itemTags) {
+            if (tag != null) {
+                this.tags.add(tag);
+            }
+        }
+        return (D) this;
+    }
+
+    public final D addTags(Collection<TagKey<Item>> itemTags) {
+        if (itemTags == null || itemTags.isEmpty()) {
+            return (D) this;
+        }
+        
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.addAll(itemTags);
+
         return (D) this;
     }
 
@@ -270,8 +290,9 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      *
      * @return Array of tags applied to this item, may be null
      */
+    @SuppressWarnings("unchecked")
     public TagKey<Item>[] tags() {
-        return this.tags.elements();
+        return this.tags.toArray(TagKey[]::new);
     }
 
 

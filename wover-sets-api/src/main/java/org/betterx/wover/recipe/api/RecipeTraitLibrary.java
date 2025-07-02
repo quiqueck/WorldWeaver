@@ -178,4 +178,22 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static ItemRecipeTrait chestBoat(RecipeMaterial boatMaterial, RecipeMaterial chestMaterial) {
+        return ItemRecipeTraitBuilder.BUILDER.with(
+                (key, item, context) -> {
+                    validOrThrow(boatMaterial, "chestBoat", "boat");
+                    validOrThrow(chestMaterial, "chestBoat", "chest");
+
+                    RecipeBuilder
+                            .crafting(key.location(), item)
+                            .shapeless()
+                            .addMaterial('C', chestMaterial)
+                            .addMaterial('#', boatMaterial)
+                            .group("chest_boat")
+                            .category(RecipeCategory.TRANSPORTATION)
+                            .build(context);
+                }
+        );
+    }
 }

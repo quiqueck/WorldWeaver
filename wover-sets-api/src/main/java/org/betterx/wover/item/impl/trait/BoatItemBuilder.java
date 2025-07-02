@@ -8,8 +8,8 @@ import org.betterx.wover.item.api.trait.AbstractItemTraitBuilder;
 import org.betterx.wover.item.api.trait.BoatItemTrait;
 import org.betterx.wover.item.api.trait.ItemTrait;
 import org.betterx.wover.item.api.trait.ItemTraitKey;
-import org.betterx.wover.tag.api.predefined.CommonItemTags;
 
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.BoatItem;
 
 import java.util.List;
@@ -24,10 +24,21 @@ public class BoatItemBuilder extends AbstractItemTraitBuilder<BoatItem, BoatItem
 
     public @Nullable List<ItemTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(ClientBlockTraits.BOAT_RENDERER.withDefault());
-        return combine(new BoatItemBuilder.Trait(), ClientBlockTraits.BOAT_RENDERER.withDefault());
+        return combine(new BoatItemBuilder.Trait(false), ClientBlockTraits.BOAT_RENDERER.with(false));
+    }
+
+    public @Nullable List<ItemTrait<?, ?>> with(boolean withChest) {
+        if (!ModCore.isDatagen()) return combine(ClientBlockTraits.BOAT_RENDERER.with(withChest));
+        return combine(new BoatItemBuilder.Trait(withChest), ClientBlockTraits.BOAT_RENDERER.with(withChest));
     }
 
     public class Trait extends ItemTraitImpl<BoatItem, BoatItemTrait> implements BoatItemTrait {
+        private final boolean withChest;
+
+        Trait(boolean withChest) {
+            this.withChest = withChest;
+        }
+
         @Override
         public ItemTraitKey key() {
             return traitKey;
@@ -35,7 +46,15 @@ public class BoatItemBuilder extends AbstractItemTraitBuilder<BoatItem, BoatItem
 
         @Override
         public void configure(ItemDefinition<BoatItem, ? extends ItemDefinition<BoatItem, ?>> definition) {
-            definition.addTags(CommonItemTags.BOAT);
+            definition.addTags(ItemTags.BOATS);
+            if (withChest) {
+                definition.addTags(ItemTags.CHEST_BOATS);
+            }
+        }
+
+        @Override
+        public boolean withChest() {
+            return withChest;
         }
     }
 }

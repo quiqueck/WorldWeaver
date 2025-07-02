@@ -325,9 +325,10 @@ public abstract class ItemRegistry {
      */
     public <I extends BoatItem> BoatItemDefinition<I> defineBoatItem(
             String boatName,
-            BoatItemDefinition.ItemFactory<I> itemFactory
+            BoatItemDefinition.ItemFactory<I> itemFactory,
+            boolean withChest
     ) {
-        return new BoatItemDefinition<>(this, boatName, itemFactory);
+        return new BoatItemDefinition<>(this, boatName, itemFactory, withChest);
     }
 
     /**
@@ -338,8 +339,13 @@ public abstract class ItemRegistry {
      * @param boatName The name identifier for the boat item
      * @return A new BoatItemDefinition instance for method chaining
      */
-    public BoatItemDefinition<BoatItem> defineBoatItem(String boatName) {
-        return new BoatItemDefinition<>(this, boatName, (def) -> new BoatItem(def.entityType(), def.getProperties()));
+    public BoatItemDefinition<BoatItem> defineBoatItem(String boatName, boolean withChest) {
+        return new BoatItemDefinition<>(
+                this,
+                boatName,
+                (def) -> new BoatItem(def.entityType(), def.getProperties()),
+                withChest
+        );
     }
 
     /**

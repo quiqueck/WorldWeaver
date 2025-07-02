@@ -15,4 +15,8 @@ public class ItemModelTraitLibrary {
             generator.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
         });
     }
+
+    public static ItemModelTrait chestBoat() {
+        return boat();
+    }
 }
