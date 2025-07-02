@@ -130,6 +130,24 @@ public class ModelTraitLibrary {
         });
     }
 
+    public static BlockModelTrait craftingTable(Supplier<Block> planksMaterial) {
+        return ClientBlockTraits.MODEL.with((key, carftingTableBlock, generator) -> {
+
+            generator.vanillaGenerator.createCraftingTableLike(
+                    carftingTableBlock,
+                    planksMaterial.get(),
+                    (block, mat) -> new TextureMapping()
+                            .put(TextureSlot.UP, TextureMapping.getBlockTexture(block, "_top"))
+                            .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block, "_front"))
+                            .put(TextureSlot.NORTH, TextureMapping.getBlockTexture(block, "_front"))
+                            .put(TextureSlot.WEST, TextureMapping.getBlockTexture(block, "_front"))
+                            .put(TextureSlot.EAST, TextureMapping.getBlockTexture(block, "_side"))
+                            .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_side"))
+                            .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_bottom"))
+            );
+        });
+    }
+
     public static BlockModelTrait slab(Supplier<Block> planksMaterial) {
         return ClientBlockTraits.MODEL.with((key, block, generator) -> {
             generator.createSlab(block, planksMaterial.get());

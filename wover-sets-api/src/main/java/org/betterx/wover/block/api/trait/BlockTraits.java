@@ -35,6 +35,7 @@ public class BlockTraits {
     public static final GenericBlockTrait.BuilderWithDefault BUTTON_BLOCK = ButtonBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults CHEST_BLOCK = ChestBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefault COMPOSTER_BLOCK = ComposterBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefault CRAFTING_TABLE_BLOCK = CraftingTableBlockBuilder.BUILDER;
 
     //Recipe Traits
     public static final BlockRecipeTrait.Builder RECIPE = BlockRecipeTraitBuilder.BUILDER;

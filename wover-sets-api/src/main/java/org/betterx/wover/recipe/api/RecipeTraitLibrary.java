@@ -212,4 +212,20 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait craftingTable(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "craftingTable", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .shape("##", "##")
+                            .addMaterial('#', planksMaterial)
+                            .group("crafting_table")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
 }
