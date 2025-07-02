@@ -4,6 +4,7 @@ import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.model.WoverBlockModelGenerators;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.datagen.api.provider.WoverModelProvider;
+import org.betterx.wover.item.api.client.trait.ItemModelTrait;
 
 import net.minecraft.client.data.models.ItemModelGenerators;
 
@@ -19,6 +20,6 @@ public class TestModelProvider extends WoverModelProvider {
 
     @Override
     protected void bootstrapItemModels(ItemModelGenerators itemModelGenerator) {
-
+        ItemModelTrait.bootstrapModels(modCore, itemModelGenerator);
     }
 }

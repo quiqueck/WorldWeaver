@@ -1,18 +1,20 @@
-package org.betterx.wover.block.api.model;
+package org.betterx.wover.block.api.client.model;
 
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.client.trait.ClientBlockTraits;
+import org.betterx.wover.entrypoint.LibWoverSets;
 
 import static net.minecraft.client.data.models.BlockModelGenerators.*;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
-import net.minecraft.client.data.models.model.TextureMapping;
-import net.minecraft.client.data.models.model.TextureSlot;
-import net.minecraft.client.data.models.model.TexturedModel;
+import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.block.model.VariantMutator;
+import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -76,6 +78,43 @@ public class ModelTraitLibrary {
         });
     }
 
+    public static BlockModelTrait bookshelf(Supplier<Block> planksMaterial) {
+        return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+            generator.createBookshelf(block, planksMaterial.get());
+        });
+    }
+
+
+    public static BlockModelTrait button(Supplier<Block> planksMaterial) {
+        return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+            generator.createButton(planksMaterial.get(), block);
+        });
+    }
+
+    public static ResourceLocation chestRendered = LibWoverSets.C.mk("wooden_chest");
+
+    public static BlockModelTrait chest(Supplier<Block> planksMaterial) {
+        return ClientBlockTraits.MODEL.with((key, chestBlock, generator) -> {
+            final var planks = planksMaterial.get();
+
+//            generator.vanillaGenerator.createParticleOnlyBlock(chestBlock, planks);
+//            generator.createItemModel(chestBlock, ModelTemplates.CHEST_INVENTORY, TextureMapping.particle(planks));
+
+            generator.vanillaGenerator.createParticleOnlyBlock(chestBlock, planks);
+            Item chestItem = chestBlock.asItem();
+            ResourceLocation itemModel = ModelTemplates.CHEST_INVENTORY.create(
+                    chestItem,
+                    TextureMapping.particle(planks),
+                    generator.modelOutput()
+            );
+            ItemModel.Unbaked itemModelUnbaked = ItemModelUtils.specialModel(
+                    itemModel,
+                    new ChestSpecialRenderer.Unbaked(key.location())
+            );
+            generator.vanillaGenerator.itemModelOutput.accept(chestItem, itemModelUnbaked);
+        });
+    }
+
     public static BlockModelTrait log(boolean mirroredTexture, String... alternativeTextureSuffixe) {
         return ClientBlockTraits.MODEL.with((key, block, generator) -> {
             final var textureResource = TextureMapping.getBlockTexture(block);
@@ -91,9 +130,9 @@ public class ModelTraitLibrary {
         });
     }
 
-    public static BlockModelTrait slab(Supplier<Block> sourceMaterial) {
+    public static BlockModelTrait slab(Supplier<Block> planksMaterial) {
         return ClientBlockTraits.MODEL.with((key, block, generator) -> {
-            generator.createSlab(block, sourceMaterial.get());
+            generator.createSlab(block, planksMaterial.get());
         });
     }
 

@@ -20,6 +20,10 @@ public class CommonItemTags {
      */
     public static final TagKey<Item> BARREL = TagManager.ITEMS.makeCommonTag("barrels");
     /**
+     * {@code c:barrels}
+     */
+    public static final TagKey<Item> BOAT = TagManager.ITEMS.makeCommonTag("boats");
+    /**
      * {@code c:chests}
      */
     public static final TagKey<Item> CHEST = TagManager.ITEMS.makeCommonTag("chests");

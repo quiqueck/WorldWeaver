@@ -2,13 +2,13 @@ package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
+import org.betterx.wover.block.api.client.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
-import org.betterx.wover.block.api.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
+import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import org.betterx.wover.block.api.trait.BlockTraits;
-import org.betterx.wover.block.api.trait.TraitLookup;
-import org.betterx.wover.recipe.api.RecipeMaterial;
 import org.betterx.wover.recipe.api.RecipeTraitLibrary;
+import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.sets.api.blocks.WoodenBlockSet;
 import org.betterx.wover.sets.api.blocks.WoodenSlotDefinition;
@@ -17,6 +17,8 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+
+import org.jetbrains.annotations.NotNull;
 
 public class Log extends WoodenSlotDefinition {
     public static final byte STRIPABLE_FLAG = 0x01;
@@ -45,7 +47,11 @@ public class Log extends WoodenSlotDefinition {
     }
 
     @Override
-    protected BlockDefinition<?, ?> startBlockDefinition(BlockRegistry registry, String name) {
+    protected BlockDefinition<?, ?> startBlockDefinition(
+            BlockRegistry registry,
+            @NotNull BlockSet<?> set,
+            String name
+    ) {
         return registry.defineDefaultBlockWithProps(name, RotatedPillarBlock::new);
     }
 
@@ -65,7 +71,7 @@ public class Log extends WoodenSlotDefinition {
 
     @Environment(EnvType.CLIENT)
     @Override
-    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         return ModelTraitLibrary.log(
                 (this.flags & MIRRORED_TEXTURE_FLAG) != 0,
                 this.alternativeTextureSuffixe
@@ -73,11 +79,11 @@ public class Log extends WoodenSlotDefinition {
     }
 
     @Override
-    protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
+        final var stripable = (this.flags & STRIPABLE_FLAG) != 0;
+
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
-        return RecipeTraitLibrary.log(RecipeMaterial.ofDeferredItemLike(() -> set.getBlock(((this.flags & STRIPABLE_FLAG) != 0)
-                ? SlotType.BARK
-                : SlotType.STRIPPED_BARK)));
+        return RecipeTraitLibrary.log(set.recipeMaterial(stripable ? SlotType.BARK : SlotType.STRIPPED_BARK));
     }
 }

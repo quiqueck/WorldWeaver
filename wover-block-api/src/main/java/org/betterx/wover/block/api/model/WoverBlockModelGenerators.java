@@ -686,7 +686,10 @@ public class WoverBlockModelGenerators {
     public final void createItemModel(Block block, ModelTemplate template, TextureMapping mapping) {
         Item item = block.asItem();
         if (item != Items.AIR) {
-            template.create(ModelLocationUtils.getModelLocation(item), mapping, vanillaGenerator.modelOutput);
+            vanillaGenerator.registerSimpleItemModel(
+                    block,
+                    template.create(ModelLocationUtils.getModelLocation(item), mapping, vanillaGenerator.modelOutput)
+            );
         }
     }
 

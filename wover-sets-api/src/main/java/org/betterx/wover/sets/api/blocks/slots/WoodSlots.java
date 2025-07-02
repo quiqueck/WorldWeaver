@@ -6,6 +6,10 @@ import org.betterx.wover.sets.api.blocks.types.*;
 public class WoodSlots {
     public static final SlotDefinition BARK = new Bark(true);
     public static final SlotDefinition BARREL = new Barrel();
+    public static final SlotDefinition BOAT = new Boat();
+    public static final SlotDefinition BOOKSHELF = new Bookshelf();
+    public static final SlotDefinition BUTTON = new Button();
+    public static final SlotDefinition CHEST = new Chest();
     public static final SlotDefinition LOG = new Log(true);
     public static final SlotDefinition PLANKS = new Planks();
     public static final SlotDefinition SLAB = new Slab();

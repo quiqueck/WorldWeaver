@@ -52,7 +52,7 @@ public class ToolTier {
     }
 
     static class ConfigureDiggerItemTrait extends ConfigureToolItemTrait {
-        public static final ItemTraitKey ID = ItemTraitKey.of(LibWoverRecipe.C, "configure_digger_item");
+        public static final ItemTraitKey ID = ItemTraitKey.ofUnique(LibWoverRecipe.C, "configure_digger_item");
 
         public ConfigureDiggerItemTrait(ToolSlot slot, ToolTier tier) {
             super(ID, slot, tier);
@@ -74,7 +74,7 @@ public class ToolTier {
     }
 
     static class ConfigureSwordItemTrait extends ConfigureToolItemTrait {
-        public static final ItemTraitKey ID = ItemTraitKey.of(LibWoverRecipe.C, "configure_sword_item");
+        public static final ItemTraitKey ID = ItemTraitKey.ofUnique(LibWoverRecipe.C, "configure_sword_item");
 
         public ConfigureSwordItemTrait(ToolSlot slot, ToolTier tier) {
             super(ID, slot, tier);

@@ -46,7 +46,7 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
     protected ToolItemDefinition(
             ItemRegistry registry,
             String toolName,
-            ItemDefinition.ItemFactory<I, ToolItemDefinition<I>> itemFactory
+            ItemFactory<I> itemFactory
     ) {
         super(registry, toolName, itemFactory);
     }

@@ -14,8 +14,8 @@ public class TestWoodSet extends WoodenBlockSet<TestWoodSet> {
     }
 
     @Override
-    protected SlotMap createDefaultSlots() {
-        SlotMap map = super.createDefaultSlots();
+    protected SlotMap createDefaultDefinitions() {
+        SlotMap map = super.createDefaultDefinitions();
         map.replace(new Log(true, true, "_mossy"));
         map.replace(new Bark(true, true, "_mossy"));
         return map;

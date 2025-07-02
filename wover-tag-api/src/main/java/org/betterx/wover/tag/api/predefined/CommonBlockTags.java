@@ -41,6 +41,10 @@ public class CommonBlockTags {
 
 
     /**
+     * {@code c:bookshelves}
+     */
+    public static final TagKey<Block> ENCHANTING_MAGIC_SOURCE = TagManager.BLOCKS.makeWorldWeaverTag("magic_source");
+    /**
      * {@code wover:surfaces/end/stones}
      */
     public static final TagKey<Block> END_STONES = TagManager.BLOCKS.makeWorldWeaverTag("surfaces/end/stones");

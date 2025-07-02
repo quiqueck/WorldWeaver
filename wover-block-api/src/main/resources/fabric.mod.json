@@ -25,6 +25,7 @@
   },
   "mixins": [
     "wover.block.mixins.common.json",
+    "wover.block.mixins.client.json",
     "wover.poi.mixins.common.json"
   ],
   "depends": {

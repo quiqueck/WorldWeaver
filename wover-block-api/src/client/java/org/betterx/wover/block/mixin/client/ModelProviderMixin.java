@@ -1,4 +1,4 @@
-package org.betterx.wover.block.mixin;
+package org.betterx.wover.block.mixin.client;
 
 import org.betterx.wover.block.impl.ModelProviderExclusions;
 

@@ -9,7 +9,10 @@ import org.betterx.wover.tag.api.TagManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
+
+import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +45,15 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
         this.logsItemTag = TagManager.ITEMS.makeTag(modCore, baseName + "_logs");
     }
 
+    @Override
+    protected BlockSetType createSetType(BlockSetType setType) {
+        if (setType == null) {
+            var builder = BlockSetTypeBuilder.copyOf(BlockSetType.OAK);
+            return builder.register(this.C.id(this.baseName));
+        }
+        return setType;
+    }
+
     public S setPlanksColor(MapColor planksColor) {
         this.planksColor = planksColor;
         return (S) this;
@@ -63,7 +75,7 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
     }
 
     @Override
-    protected SlotMap createDefaultSlots() {
+    protected SlotMap createDefaultDefinitions() {
         return SlotMap.of(
                 WoodSlots.BARK,
                 WoodSlots.BARREL,
@@ -71,7 +83,11 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.PLANKS,
                 WoodSlots.SLAB,
                 WoodSlots.STRIPPED_BARK,
-                WoodSlots.STRIPPED_LOG
+                WoodSlots.STRIPPED_LOG,
+                WoodSlots.BOAT,
+                WoodSlots.BOOKSHELF,
+                WoodSlots.BUTTON,
+                WoodSlots.CHEST
         );
     }
 }

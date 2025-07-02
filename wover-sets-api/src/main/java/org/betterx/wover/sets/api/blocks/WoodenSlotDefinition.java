@@ -3,7 +3,7 @@ package org.betterx.wover.sets.api.blocks;
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
-import org.betterx.wover.block.api.trait.TraitLookup;
+import org.betterx.wover.block.api.trait.BlockTraitLookup;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -28,29 +28,29 @@ public class WoodenSlotDefinition extends SlotDefinition {
 
     @Override
     @Environment(EnvType.CLIENT)
-    protected BlockModelTrait buildModel(BlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         if (set instanceof WoodenBlockSet<?> woodenSet) {
-            return buildWoodModel(woodenSet, traitLookup);
+            return buildWoodModel(woodenSet, blockTraitLookup);
         } else {
             throw new IllegalArgumentException("WoodenSlotDefinition can only be used with WoodenBlockSet");
         }
     }
 
     @Environment(EnvType.CLIENT)
-    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockModelTrait buildWoodModel(WoodenBlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         return null;
     }
 
     @Override
-    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         if (set instanceof WoodenBlockSet<?> woodenSet) {
-            return buildWoodRecipe(woodenSet, traitLookup);
+            return buildWoodRecipe(woodenSet, blockTraitLookup);
         } else {
             throw new IllegalArgumentException("WoodenSlotDefinition can only be used with WoodenBlockSet");
         }
     }
 
-    protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockRecipeTrait buildWoodRecipe(WoodenBlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         return null;
     }
 }

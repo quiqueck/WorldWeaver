@@ -4,13 +4,15 @@ import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
-import org.betterx.wover.block.api.trait.TraitLookup;
+import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import org.betterx.wover.core.api.ModCore;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import java.util.function.Consumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SlotDefinition {
     public final SlotType slot;
@@ -26,8 +28,10 @@ public class SlotDefinition {
     public void createBlockDefinition(BlockSet<?> set, Consumer<BlockDefinition<?, ?>> blockDefinitionConsumer) {
         BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition = startBlockDefinition(
                 BlockRegistry.forMod(set.C),
-                this.getName(set)
+                set, this.getName(set)
         );
+
+        if (definition == null) return;
 
         this.addSlotSpecificDefinitions(set, definition);
         set.addCommonBlockDefinitions(this.slot, definition);
@@ -38,7 +42,10 @@ public class SlotDefinition {
         blockDefinitionConsumer.accept(definition);
     }
 
-    protected BlockDefinition<?, ?> startBlockDefinition(BlockRegistry registry, String name) {
+    protected @Nullable BlockDefinition<?, ?> startBlockDefinition(
+            @NotNull BlockRegistry registry,
+            @NotNull BlockSet<?> set, @NotNull String name
+    ) {
         return registry.defineDefaultBlock(name);
     }
 
@@ -46,11 +53,11 @@ public class SlotDefinition {
     }
 
     @Environment(EnvType.CLIENT)
-    protected BlockModelTrait buildModel(BlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return null;
     }
 
-    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, TraitLookup traitLookup) {
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return null;
     }
 }

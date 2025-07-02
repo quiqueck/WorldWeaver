@@ -18,7 +18,7 @@ public class ItemRecipeTraitBuilder extends AbstractItemTraitBuilder<Item, ItemR
     public static final ItemRecipeTrait.Builder BUILDER = new ItemRecipeTraitBuilder();
 
     private ItemRecipeTraitBuilder() {
-        super(ItemTraitKey.of(LibWoverRecipe.C, "recipe"));
+        super(ItemTraitKey.ofUnique(LibWoverRecipe.C, "recipe"));
     }
 
     public @Nullable ItemRecipeTrait with(ItemRecipeTrait.RecipeFactory recipeFactory) {

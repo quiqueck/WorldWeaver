@@ -6,7 +6,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 import org.jetbrains.annotations.NotNull;
 
-
+@Deprecated(forRemoval = true)
 public interface BlockLootProvider {
     LootTable.Builder registerBlockLoot(
             @NotNull ResourceLocation location,

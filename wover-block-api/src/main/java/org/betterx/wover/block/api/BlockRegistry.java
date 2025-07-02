@@ -226,7 +226,7 @@ public abstract class BlockRegistry {
                 .stream()
                 .filter(b -> b.getValue() instanceof BlockLootProvider)
                 .forEach(b -> {
-                    var key = LootTableManager.getBlockLootTableKey(C, b.getKey().location());
+                    var key = LootTableManager.getBlockLootTableKey(b.getKey());
                     var builder = ((BlockLootProvider) b.getValue()).registerBlockLoot(
                             b.getKey().location(),
                             provider,

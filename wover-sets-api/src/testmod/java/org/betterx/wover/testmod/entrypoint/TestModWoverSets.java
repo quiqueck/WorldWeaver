@@ -16,10 +16,18 @@ public class TestModWoverSets implements ModInitializer {
     @Override
     public void onInitialize() {
         TestEquipmentSet.ensureStaticInit();
-        var woodBlockSet = new TestWoodSet().register();
+        var woodBlockSet = new TestWoodSet().buildAndRegister();
+
+
+//        var boat = ItemRegistry
+//                .forMod(C)
+//                .defineBoatItem("wooden_boat")
+//                .addTrait(ClientBlockTraits.BOAT_RENDERER.withDefault())
+//                .buildAndRegisterBoat();
 
         CreativeTabs.start(C)
-                    .createBlockOnlyTab(woodBlockSet.getBlock(SlotType.LOG))
+                    .createTab("all")
+                    .setIcon(woodBlockSet.getBlock(SlotType.LOG))
                     .buildAndAdd()
                     .processRegistries()
                     .registerAllTabs();

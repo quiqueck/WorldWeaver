@@ -2,7 +2,7 @@ package org.betterx.wover.block.api.trait;
 
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 
-public interface TraitLookup {
+public interface BlockTraitLookup {
     boolean hasTrait(BlockTraitImpl<?, ?> trait);
     boolean hasTrait(BlockTraitKey traitKey);
 

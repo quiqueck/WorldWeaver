@@ -1,9 +1,7 @@
 package org.betterx.wover.item.api;
 
-import org.betterx.wover.item.api.trait.ItemTrait;
-import org.betterx.wover.item.api.trait.ItemTraitBuilder;
-import org.betterx.wover.item.api.trait.ItemWithTraits;
-import org.betterx.wover.item.api.trait.RuntimeItemTrait;
+import org.betterx.wover.item.api.trait.*;
+import org.betterx.wover.item.impl.trait.ItemTraitImpl;
 import org.betterx.wover.util.GrowableArray;
 
 import net.minecraft.core.component.DataComponentType;
@@ -31,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Quiqueck
  * @since 21.6.0
  */
-public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I, D>> {
+public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I, D>> implements ItemTraitLookup {
     /**
      * Factory interface for creating items from configuration objects.
      *
@@ -223,6 +221,28 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
 
     public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefaults<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
+    }
+
+    public boolean hasTrait(ItemTraitImpl<?, ?> trait) {
+        if (trait == null) return false;
+        return hasTrait(trait.key());
+    }
+
+    public boolean hasTrait(ItemTraitBuilder<?, ?> traitBuilder) {
+        if (traitBuilder == null) return false;
+        return hasTrait(traitBuilder.key());
+    }
+
+    public boolean hasTrait(ItemTraitKey traitKey) {
+        if (this.traits == null || this.traits.isEmpty() || traitKey == null) {
+            return false;
+        }
+        for (ItemTrait<? super I, ?> trait : this.traits) {
+            if (trait.is(traitKey)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // **********************************************************************

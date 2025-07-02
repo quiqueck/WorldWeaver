@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
  * If an Item Object implements this interface and is registered with the ItemRegistry, #registerItemTags will be called
  * during the tag bootstrap datagen process.
  */
+@Deprecated(forRemoval = true)
 public interface ItemTagProvider {
     /**
      * Register item tags for the given location.

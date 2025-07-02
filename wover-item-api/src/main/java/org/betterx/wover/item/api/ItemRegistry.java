@@ -7,13 +7,12 @@ import org.betterx.wover.tag.api.event.context.ItemTagBootstrapContext;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SmithingTemplateItem;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.DispenserBlock;
 
 import java.util.HashMap;
@@ -145,6 +144,26 @@ public abstract class ItemRegistry {
      */
     public @NotNull ResourceKey<Item> key(@NotNull String itemName) {
         return ResourceKey.create(BuiltInRegistries.ITEM.key(), C.mk(itemName));
+    }
+
+    /**
+     * Creates a resource key for an item Entity with the given name.
+     *
+     * @param itemKey The key for the item
+     * @return A ResourceKey for the item in this mod's namespace
+     */
+    public @NotNull ResourceKey<EntityType<?>> entityKey(@NotNull ResourceKey<Item> itemKey) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, itemKey.location());
+    }
+
+    /**
+     * Creates a resource key for an item Entity with the given name.
+     *
+     * @param itemName The name identifier for the item
+     * @return A ResourceKey for the item in this mod's namespace
+     */
+    public @NotNull ResourceKey<EntityType<?>> entityKey(@NotNull String itemName) {
+        return ResourceKey.create(Registries.ENTITY_TYPE, C.mk(itemName));
     }
 
     /**
@@ -293,6 +312,34 @@ public abstract class ItemRegistry {
             SmithingTemplateDefinition.ItemFactory<I> itemFactory
     ) {
         return new SmithingTemplateDefinition<>(this, templateName, itemFactory);
+    }
+
+    /**
+     * Creates a configuration for a boat item.
+     * This allows for creating custom boat items with specific properties and behaviors.
+     *
+     * @param boatName    The name identifier for the boat item
+     * @param itemFactory The factory used to create the boat item instance
+     * @param <I>         The type of boat item to create
+     * @return A new BoatItemDefinition instance for method chaining
+     */
+    public <I extends BoatItem> BoatItemDefinition<I> defineBoatItem(
+            String boatName,
+            BoatItemDefinition.ItemFactory<I> itemFactory
+    ) {
+        return new BoatItemDefinition<>(this, boatName, itemFactory);
+    }
+
+    /**
+     * Creates a configuration for a boat item with default properties.
+     * This is a convenience method that uses the default boat item factory
+     * to create a boat item with standard properties.
+     *
+     * @param boatName The name identifier for the boat item
+     * @return A new BoatItemDefinition instance for method chaining
+     */
+    public BoatItemDefinition<BoatItem> defineBoatItem(String boatName) {
+        return new BoatItemDefinition<>(this, boatName, (def) -> new BoatItem(def.entityType(), def.getProperties()));
     }
 
     /**

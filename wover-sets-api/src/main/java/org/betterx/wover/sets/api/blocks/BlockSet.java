@@ -2,9 +2,16 @@ package org.betterx.wover.sets.api.blocks;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.core.api.ModCore;
+import org.betterx.wover.item.api.ItemDefinition;
+import org.betterx.wover.recipe.api.RecipeMaterial;
+import org.betterx.wover.sets.api.items.ItemSlotData;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
+
+import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -15,38 +22,73 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlockSet<S extends BlockSet<S>> {
     protected final HashMap<SlotType, SlotData> slots;
+    protected final HashMap<SlotType, ItemSlotData> itemSlots;
     public final ModCore C;
     public final String baseName;
     public final SlotType baseSlot;
 
+    protected final BlockSetType setType;
+
     public BlockSet(@NotNull ModCore modCore, @NotNull String baseName, @NotNull SlotType baseSlot) {
         this.slots = new HashMap<>();
+        itemSlots = new HashMap<>();
         this.C = modCore;
         this.baseName = baseName;
         this.baseSlot = baseSlot;
+
+        this.setType = createSetType(null);
     }
 
-    protected SlotMap createDefaultSlots() {
+    protected BlockSetType createSetType(BlockSetType setType) {
+        if (setType == null) {
+            var builder = BlockSetTypeBuilder.copyOf(BlockSetType.STONE);
+            return builder.register(this.C.id(this.baseName));
+        }
+        return setType;
+    }
+
+    protected SlotMap createDefaultDefinitions() {
         return SlotMap.of();
+    }
+
+    protected void initializeSlots() {
+        this.slots.clear();
+        this.itemSlots.clear();
     }
 
     protected void addCommonBlockDefinitions(SlotType slot, BlockDefinition<?, ?> blockDefinition) {
         // This method can be overridden to add common block definitions
     }
 
-    public S register() {
+    protected void addCommonItemDefinitions(SlotType slot, ItemDefinition<?, ?> itemDefinition) {
+        // This method can be overridden to add common block definitions
+    }
 
+    public S buildAndRegister() {
         final BiConsumer<SlotDefinition, BlockDefinition<?, ?>> acceptDefinition = (slotDefinition, blockDefinition) -> {
             Block block = blockDefinition.buildAndRegister();
             slots.put(slotDefinition.slot, new SlotData(slotDefinition.slot, block));
         };
 
-        final SlotMap slotDefinitions = createDefaultSlots();
+        final BiConsumer<ItemSlotDefinition, ItemDefinition<?, ?>> acceptItemDefinition = (slotDefinition, itemDefinition) -> {
+            Item item = itemDefinition.buildAndRegister();
+            itemSlots.put(slotDefinition.slot, new ItemSlotData(slotDefinition.slot, item));
+        };
+
+        this.initializeSlots();
+        final SlotMap slotDefinitions = createDefaultDefinitions();
+
         for (SlotDefinition slotDefinition : slotDefinitions) {
             slotDefinition.createBlockDefinition(
                     this,
                     (blockDefinition) -> acceptDefinition.accept(slotDefinition, blockDefinition)
             );
+            if (slotDefinition instanceof ItemSlotDefinition itemSlotDefinition) {
+                itemSlotDefinition.createItemDefinition(
+                        this,
+                        (itemDefinition) -> acceptItemDefinition.accept(itemSlotDefinition, itemDefinition)
+                );
+            }
         }
         return (S) this;
     }
@@ -63,6 +105,27 @@ public class BlockSet<S extends BlockSet<S>> {
         final Block block = this.getBlock(type);
         if (block != null) runIfPresent.accept(block);
         return block;
+    }
+
+    public RecipeMaterial recipeBaseMaterial() {
+        return RecipeMaterial.ofDeferredItemLike(this::getBaseBlock);
+    }
+
+    public RecipeMaterial recipeMaterial(@NotNull SlotType type) {
+        return RecipeMaterial.ofDeferredItemLike(() -> this.getBlock(type));
+    }
+
+    public RecipeMaterial recipeMaterialWithFallback(@NotNull SlotType... type) {
+        return RecipeMaterial.ofDeferredItemLike(() -> this.getBlockWithFallback(type));
+    }
+
+    public @Nullable Item getItem(@NotNull SlotType type) {
+        final ItemSlotData itemSlotData = itemSlots.get(type);
+        if (itemSlotData != null) {
+            return itemSlotData.item();
+        }
+
+        return null;
     }
 
     /**
@@ -110,5 +173,10 @@ public class BlockSet<S extends BlockSet<S>> {
     @NotNull
     public Block getBaseBlock() {
         return Objects.requireNonNull(this.getBlock(this.baseSlot));
+    }
+
+    @NotNull
+    public BlockSetType setType() {
+        return this.setType;
     }
 }
