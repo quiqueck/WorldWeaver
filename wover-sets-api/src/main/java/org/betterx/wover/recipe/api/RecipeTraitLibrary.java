@@ -333,4 +333,20 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait pressurePlate(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "plate", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .shape("##")
+                            .addMaterial('#', planksMaterial)
+                            .group("pressure_plate")
+                            .category(RecipeCategory.REDSTONE)
+                            .build(context);
+                }
+        );
+    }
 }
