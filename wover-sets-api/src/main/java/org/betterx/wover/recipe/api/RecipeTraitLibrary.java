@@ -316,4 +316,21 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait ladder(RecipeMaterial planksMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "sign", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(3).shape("I I", "I#I", "I I")
+                            .addMaterial('#', planksMaterial)
+                            .addMaterial('I', Items.STICK)
+                            .group("ladder")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
 }

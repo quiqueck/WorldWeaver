@@ -3,6 +3,7 @@ package org.betterx.wover.block.api.model;
 import org.betterx.wover.entrypoint.LibWoverBlock;
 
 import net.minecraft.client.data.models.BlockModelGenerators;
+import static net.minecraft.client.data.models.BlockModelGenerators.*;
 import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.BlockModelDefinitionGenerator;
 import net.minecraft.client.data.models.blockstates.MultiPartGenerator;
@@ -11,6 +12,7 @@ import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.block.model.Variant;
 import net.minecraft.client.renderer.block.model.VariantMutator;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.item.Item;
@@ -37,6 +39,7 @@ public class WoverBlockModelGenerators {
     public static final ResourceLocation CUBE = ResourceLocation.withDefaultNamespace("block/cube");
     public static final ResourceLocation CUBE_ALL = ResourceLocation.withDefaultNamespace("block/cube_all");
     public static final ResourceLocation COMPOSTER = LibWoverBlock.C.id("block/composter");
+    private static final ResourceLocation LADDER = ResourceLocation.withDefaultNamespace("block/ladder");
 
     public static final ModelTemplate COMPOSTER_MODEL = new ModelTemplate(
             Optional.of(COMPOSTER),
@@ -44,6 +47,12 @@ public class WoverBlockModelGenerators {
             TextureSlot.SIDE,
             TextureSlot.BOTTOM,
             TextureSlot.TOP
+    );
+    public static final ModelTemplate LADDER_MODEL = new ModelTemplate(
+            Optional.of(LADDER),
+            Optional.empty(),
+            TextureSlot.PARTICLE,
+            TextureSlot.TEXTURE
     );
     public final BlockModelGenerators vanillaGenerator;
 
@@ -58,9 +67,9 @@ public class WoverBlockModelGenerators {
         var template = model.getTemplate();
         var modelLocation = template.create(obsidianBlock, model.getMapping(), generators.vanillaGenerator.modelOutput);
         final VariantMutator[] rotations = {
-                BlockModelGenerators.NOP,
-                BlockModelGenerators.Y_ROT_90,
-                BlockModelGenerators.Y_ROT_180,
+                NOP,
+                Y_ROT_90,
+                Y_ROT_180,
                 BlockModelGenerators.Y_ROT_270
         };
 
@@ -69,10 +78,10 @@ public class WoverBlockModelGenerators {
         for (VariantMutator rotation : rotations) {
             for (VariantMutator rotationY : rotations) {
                 variants[idx] = BlockModelGenerators.plainModel(modelLocation);
-                if (rotation != BlockModelGenerators.NOP)
+                if (rotation != NOP)
                     variants[idx] = rotation.apply(variants[idx]);
 
-                if (rotationY != BlockModelGenerators.NOP)
+                if (rotationY != NOP)
                     variants[idx] = rotationY.apply(variants[idx]);
 
                 idx++;
@@ -155,8 +164,29 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    private static final PropertyDispatch<VariantMutator> ROTATION_HORIZONTAL_FACING = PropertyDispatch
+            .modify(BlockStateProperties.HORIZONTAL_FACING)
+            .select(Direction.EAST, Y_ROT_90)
+            .select(Direction.SOUTH, Y_ROT_180)
+            .select(Direction.WEST, Y_ROT_270)
+            .select(Direction.NORTH, NOP);
+
+
     public void createLadder(Block ladderBlock) {
-        vanillaGenerator.createNonTemplateHorizontalBlock(ladderBlock);
+        //vanillaGenerator.createNonTemplateHorizontalBlock(ladderBlock);
+        var mapping = new TextureMapping().put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(ladderBlock))
+                                          .put(TextureSlot.TEXTURE, TextureMapping.getBlockTexture(ladderBlock));
+        var ladderModel = LADDER_MODEL.create(
+                ladderBlock,
+                mapping,
+                vanillaGenerator.modelOutput
+        );
+
+        acceptBlockState(MultiVariantGenerator.dispatch(ladderBlock, BlockModelGenerators.plainVariant(ladderModel))
+                                              .with(ROTATION_HORIZONTAL_FACING));
+
+        //createInventoryModel(fenceBlock, ModelTemplates.FENCE_INVENTORY, mapping);
+
         vanillaGenerator.registerSimpleFlatItemModel(ladderBlock);
     }
 
@@ -732,9 +762,9 @@ public class WoverBlockModelGenerators {
                 .dispatch(
                         block,
                         BlockModelGenerators.variants(
-                                BlockModelGenerators.NOP.apply(BlockModelGenerators.plainModel(model)),
-                                BlockModelGenerators.Y_ROT_90.apply(BlockModelGenerators.plainModel(model)),
-                                BlockModelGenerators.Y_ROT_180.apply(BlockModelGenerators.plainModel(model)),
+                                NOP.apply(BlockModelGenerators.plainModel(model)),
+                                Y_ROT_90.apply(BlockModelGenerators.plainModel(model)),
+                                Y_ROT_180.apply(BlockModelGenerators.plainModel(model)),
                                 BlockModelGenerators.Y_ROT_270.apply(BlockModelGenerators.plainModel(model))
                         )
                 );

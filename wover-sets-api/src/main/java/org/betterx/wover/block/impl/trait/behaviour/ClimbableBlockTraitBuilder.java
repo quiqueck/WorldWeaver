@@ -1,4 +1,4 @@
-package org.betterx.wover.block.impl.trait.type;
+package org.betterx.wover.block.impl.trait.behaviour;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
@@ -10,26 +10,23 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.Nullable;
 
-public class GateBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
-    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new GateBlockBuilder();
+public class ClimbableBlockTraitBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
+    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new ClimbableBlockTraitBuilder();
 
-    private final Trait DEFAULT;
-
-    private GateBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_gate"));
-        DEFAULT = new Trait();
+    private ClimbableBlockTraitBuilder() {
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "climbable"));
     }
 
     public @Nullable BlockTrait<?, ?> withDefault() {
-        return DEFAULT;
+        if (!ModCore.isDatagen()) return null;
+        return new Trait();
     }
 
-    private class Trait extends BlockTraitImpl.Generic {
+    class Trait extends BlockTraitImpl.Generic {
         @Override
         public BlockTraitKey key() {
             return traitKey;
@@ -37,12 +34,7 @@ public class GateBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.noOcclusion();
-
-            if (ModCore.isDatagen()) {
-                definition.addTags(BlockTags.FENCE_GATES);
-                definition.addItemTags(ItemTags.FENCE_GATES);
-            }
+            definition.addTags(BlockTags.CLIMBABLE);
         }
     }
 }

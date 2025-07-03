@@ -195,4 +195,10 @@ public class ModelTraitLibrary {
             generator.createSign(logMaterial.get(), signBlock, wallSignBlock.get());
         });
     }
+
+    public static BlockModelTrait ladder() {
+        return ClientBlockTraits.MODEL.with((key, ladderBlock, generator) -> {
+            generator.createLadder(ladderBlock);
+        });
+    }
 }

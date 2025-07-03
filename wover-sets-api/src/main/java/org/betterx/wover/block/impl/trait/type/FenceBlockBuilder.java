@@ -15,13 +15,15 @@ import org.jetbrains.annotations.Nullable;
 public class FenceBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
     public static final GenericBlockTrait.BuilderWithDefault BUILDER = new FenceBlockBuilder();
 
+    private final Trait DEFAULT;
+
     private FenceBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_fence"));
+        DEFAULT = new Trait();
     }
 
     public @Nullable BlockTrait<?, ?> withDefault() {
-        if (!ModCore.isDatagen()) return null;
-        return new Trait();
+        return DEFAULT;
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -34,12 +36,14 @@ public class FenceBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
             definition.noOcclusion();
 
-            definition.addTags(BlockTags.FENCES);
-            definition.addItemTags(ItemTags.FENCES);
+            if (ModCore.isDatagen()) {
+                definition.addTags(BlockTags.FENCES);
+                definition.addItemTags(ItemTags.FENCES);
 
-            if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
-                definition.addTags(BlockTags.WOODEN_FENCES);
-                definition.addItemTags(ItemTags.WOODEN_FENCES);
+                if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
+                    definition.addTags(BlockTags.WOODEN_FENCES);
+                    definition.addItemTags(ItemTags.WOODEN_FENCES);
+                }
             }
         }
     }

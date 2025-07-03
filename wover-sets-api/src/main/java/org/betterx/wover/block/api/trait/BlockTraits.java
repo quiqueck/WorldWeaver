@@ -16,14 +16,16 @@ public class BlockTraits {
     public static final ValidForBlockEntityTypeTrait.Builder VALID_BLOCK_ENTITY = ValidForBlockEntityTypeBuilder.BUILDER;
     public static final LootTableTrait.Builder LOOT_TABLE = LootTableTraitBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefault MAGIC_SOURCE = MagicSourceTrait.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefault CLIMBABLE = ClimbableBlockTraitBuilder.BUILDER;
 
     // Material Traits
     public static final GenericBlockTrait.BuilderWithDefaults STONE_BLOCK = StoneMaterialBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults METAL_BLOCK = MetalMaterialBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults WOOD_BLOCK = WoodMaterialBuilder.BUILDER;
 
-    // Mineable traits
+    // Tab-Based traits
     public static final MineableWithTagTrait.Builder MINEABLE_WITH = MineableWithTagBuilder.BUILDER;
+    public static final BlockTagTrait.Builder BLOCK_TAG = BlockTagTraitBuilder.BUILDER;
 
     // Type traits
     public static final BarkBlockTrait.Builder BARK_BLOCK = BarkBlockBuilder.BUILDER;
@@ -41,6 +43,7 @@ public class BlockTraits {
     public static final GenericBlockTrait.BuilderWithDefault FENCE_GATE_BLOCK = GateBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults HANGING_SIGN_BLOCK = HangingSignBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults SIGN_BLOCK = SignBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults LADDER_BLOCK = LadderBlockBuilder.BUILDER;
 
     //Recipe Traits
     public static final BlockRecipeTrait.Builder RECIPE = BlockRecipeTraitBuilder.BUILDER;

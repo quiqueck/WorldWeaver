@@ -20,15 +20,18 @@ import org.jetbrains.annotations.Nullable;
 
 public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
     public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new DoorBlockBuilder();
+    private final Trait DEFAULT;
 
     private DoorBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_door"));
+        this.DEFAULT = new Trait();
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
-        if (!ModCore.isDatagen()) return combine(ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT));
+        if (!ModCore.isDatagen())
+            return combine(DEFAULT, ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT));
         return combine(
-                new Trait(),
+                DEFAULT,
                 BlockTraits.LOOT_TABLE.with(DoorBlockBuilder::drops),
                 ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT)
         );
@@ -51,14 +54,18 @@ public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.strength(3F, 3F).noOcclusion();
-            
-            definition.addTags(BlockTags.DOORS);
-            definition.addItemTags(ItemTags.DOORS);
+            definition
+                    .strength(3F, 3F)
+                    .noOcclusion();
 
-            if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
-                definition.addTags(BlockTags.WOODEN_DOORS);
-                definition.addItemTags(ItemTags.WOODEN_DOORS);
+            if (ModCore.isDatagen()) {
+                definition.addTags(BlockTags.DOORS);
+                definition.addItemTags(ItemTags.DOORS);
+
+                if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
+                    definition.addTags(BlockTags.WOODEN_DOORS);
+                    definition.addItemTags(ItemTags.WOODEN_DOORS);
+                }
             }
         }
     }

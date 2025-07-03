@@ -17,6 +17,7 @@ public class WoodSlots {
     public static final SlotDefinition FENCE = new Fence();
     public static final SlotDefinition FENCE_GATE = new Gate();
     public static final SlotDefinition HANGING_SIGN = new HangingSign();
+    public static final SlotDefinition LADDER = new Ladder();
     public static final SlotDefinition LOG = new Log(true);
     public static final SlotDefinition PLANKS = new Planks();
     public static final SlotDefinition SIGN = new Sign();

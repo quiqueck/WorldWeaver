@@ -16,14 +16,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class BarrelBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
     public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new BarrelBlockBuilder();
+    private final List<BlockTrait<?, ?>> DEFAULT;
 
     private BarrelBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_barrel"));
+        DEFAULT = combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
-        if (!ModCore.isDatagen()) return combine(BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL));
-        return combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL));
+        return DEFAULT;
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -35,13 +36,15 @@ public class BarrelBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
             definition.noOcclusion();
-            
-            definition.addTags(CommonBlockTags.BARREL);
-            definition.addItemTags(CommonItemTags.BARREL);
 
-            if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
-                definition.addTags(CommonBlockTags.WOODEN_BARREL);
-                definition.addItemTags(CommonItemTags.WOODEN_BARREL);
+            if (ModCore.isDatagen()) {
+                definition.addTags(CommonBlockTags.BARREL);
+                definition.addItemTags(CommonItemTags.BARREL);
+
+                if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
+                    definition.addTags(CommonBlockTags.WOODEN_BARREL);
+                    definition.addItemTags(CommonItemTags.WOODEN_BARREL);
+                }
             }
         }
     }

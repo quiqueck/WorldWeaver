@@ -26,21 +26,24 @@ import org.jetbrains.annotations.Nullable;
 
 public class ChestBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
     public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new ChestBlockBuilder();
+    private final Trait DEFAULT;
 
     private ChestBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_chest"));
+        this.DEFAULT = new Trait();
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (ModCore.isDatagen()) {
             return combine(
-                    new Trait(),
+                    DEFAULT,
                     BlockTraits.MAGIC_SOURCE.withDefault(),
                     BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.CHEST),
                     BlockTraits.LOOT_TABLE.with(ChestBlockBuilder::drops)
             );
         } else {
             return combine(
+                    DEFAULT,
                     BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.CHEST),
                     ClientBlockTraits.CHEST_RENDERER.withDefault()
             );
@@ -78,13 +81,15 @@ public class ChestBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
             definition.noOcclusion();
-            
-            definition.addTags(CommonBlockTags.CHEST);
-            definition.addItemTags(CommonItemTags.CHEST);
 
-            if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
-                definition.addTags(CommonBlockTags.WOODEN_CHEST);
-                definition.addItemTags(CommonItemTags.WOODEN_CHEST);
+            if (ModCore.isDatagen()) {
+                definition.addTags(CommonBlockTags.CHEST);
+                definition.addItemTags(CommonItemTags.CHEST);
+
+                if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
+                    definition.addTags(CommonBlockTags.WOODEN_CHEST);
+                    definition.addItemTags(CommonItemTags.WOODEN_CHEST);
+                }
             }
         }
     }

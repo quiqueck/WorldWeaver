@@ -16,14 +16,15 @@ import org.jetbrains.annotations.Nullable;
 
 public class SignBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
     public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new SignBlockBuilder();
+    private final List<BlockTrait<?, ?>> DEFAULT;
 
     private SignBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_sign"));
+        DEFAULT = combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SIGN));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
-        if (!ModCore.isDatagen()) return combine(BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SIGN));
-        return combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SIGN));
+        return DEFAULT;
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -34,10 +35,12 @@ public class SignBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            if ((Object) definition instanceof WallSignBlockDefinition wall) {
-                definition.addTags(BlockTags.WALL_SIGNS);
-            } else {
-                definition.addTags(BlockTags.SIGNS);
+            if (ModCore.isDatagen()) {
+                if ((Object) definition instanceof WallSignBlockDefinition wall) {
+                    definition.addTags(BlockTags.WALL_SIGNS);
+                } else {
+                    definition.addTags(BlockTags.SIGNS);
+                }
             }
 
             definition
