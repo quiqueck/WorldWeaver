@@ -9,6 +9,7 @@ public interface CookingRecipeBuilder extends BaseRecipeBuilder<CookingRecipeBui
     CookingRecipeBuilder input(TagKey<Item> input);
     CookingRecipeBuilder input(ItemLike input);
     CookingRecipeBuilder input(Ingredient in);
+    CookingRecipeBuilder input(RecipeMaterial in);
 
     CookingRecipeBuilder experience(float xp);
     CookingRecipeBuilder cookingTime(int time);

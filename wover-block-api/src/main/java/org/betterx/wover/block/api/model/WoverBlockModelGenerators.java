@@ -164,6 +164,22 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    public void createFullBlock(Block block) {
+        var textureMapping = new TextureMapping()
+                .put(TextureSlot.ALL, TextureMapping.getBlockTexture(block))
+                .put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(block));
+
+        ResourceLocation resourceLocation = ModelTemplates.CUBE_ALL.create(
+                block,
+                textureMapping,
+                vanillaGenerator.modelOutput
+        );
+        acceptBlockState(vanillaGenerator.createSimpleBlock(
+                block,
+                BlockModelGenerators.plainVariant(resourceLocation)
+        ));
+    }
+
     private static final PropertyDispatch<VariantMutator> ROTATION_HORIZONTAL_FACING = PropertyDispatch
             .modify(BlockStateProperties.HORIZONTAL_FACING)
             .select(Direction.EAST, Y_ROT_90)
@@ -911,6 +927,8 @@ public class WoverBlockModelGenerators {
         private void createInventoryModel(Block wallBlock, ModelTemplate inventoryModel, TextureMapping mapping) {
             delegateItemModel(wallBlock, inventoryModel.create(wallBlock, mapping, vanillaGenerator.modelOutput));
         }
+
+
     }
 
 

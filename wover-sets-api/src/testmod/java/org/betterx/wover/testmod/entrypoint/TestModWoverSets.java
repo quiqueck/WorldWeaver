@@ -5,10 +5,8 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.tabs.api.CreativeTabs;
 import org.betterx.wover.testmod.sets.TestEquipmentSet;
+import org.betterx.wover.testmod.sets.TestStoneSet;
 import org.betterx.wover.testmod.sets.TestWoodSet;
-
-import static net.minecraft.client.renderer.Sheets.HANGING_SIGN_MATERIALS;
-import net.minecraft.world.level.block.state.properties.WoodType;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -23,7 +21,8 @@ public class TestModWoverSets implements ModInitializer {
     public void onInitialize() {
         TestEquipmentSet.ensureStaticInit();
         woodBlockSet = new TestWoodSet().buildAndRegister();
-        System.out.println(HANGING_SIGN_MATERIALS + " " + WoodType.values().toList());
+        var stoneBlockSet = new TestStoneSet().buildAndRegister();
+
 //        sign = new SignBlockDefinition(
 //                BlockRegistry.forMod(C),
 //                "wooden_hanging_sign",

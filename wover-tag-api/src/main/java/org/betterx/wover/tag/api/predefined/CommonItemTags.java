@@ -46,6 +46,10 @@ public class CommonItemTags {
     public static final TagKey<Item> ORES = TagManager.ITEMS.makeCommonTag("ores");
 
     /**
+     * {@code wover:vegetation/vines}
+     */
+    public static final TagKey<Item> VINES = TagManager.ITEMS.makeWorldWeaverTag("vegetation/vines");
+    /**
      * {@code wover:vegetation/leaves}
      */
     public static final TagKey<Item> LEAVES = TagManager.ITEMS.makeWorldWeaverTag("vegetation/leaves");

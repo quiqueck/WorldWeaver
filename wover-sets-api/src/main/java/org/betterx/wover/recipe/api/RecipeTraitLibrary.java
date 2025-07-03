@@ -5,9 +5,11 @@ import org.betterx.wover.block.impl.trait.BlockRecipeTraitBuilder;
 import org.betterx.wover.entrypoint.LibWoverSets;
 import org.betterx.wover.item.api.trait.ItemRecipeTrait;
 import org.betterx.wover.item.impl.trait.ItemRecipeTraitBuilder;
+import org.betterx.wover.tag.api.predefined.CommonItemTags;
 
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 
 public class RecipeTraitLibrary {
     protected static void validOrThrow(RecipeMaterial sourceMaterial, String recipeType, String materialType) {
@@ -37,13 +39,25 @@ public class RecipeTraitLibrary {
     }
 
     public static BlockRecipeTrait slab(RecipeMaterial planksMaterial) {
-        return slab(planksMaterial, "slab");
+        return slab(planksMaterial, "slab", true);
     }
 
-    public static BlockRecipeTrait slab(RecipeMaterial planksMaterial, String group) {
+    public static BlockRecipeTrait slab(RecipeMaterial planksMaterial, String group, boolean withStonecutter) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     validOrThrow(planksMaterial, "slab", "planks");
+
+                    if (withStonecutter) {
+                        RecipeBuilder
+                                .stonecutting(
+                                        key.location().withPrefix("stonecutter_"),
+                                        block
+                                )
+                                .input(planksMaterial)
+                                .outputCount(2)
+                                .group(group)
+                                .build(context);
+                    }
 
                     RecipeBuilder
                             .crafting(key.location(), block)
@@ -351,13 +365,25 @@ public class RecipeTraitLibrary {
     }
 
     public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial) {
-        return stairs(planksMaterial, "stairs");
+        return stairs(planksMaterial, "stairs", true);
     }
 
-    public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial, String group) {
+    public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial, String group, boolean withStonecutter) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     validOrThrow(planksMaterial, "stairs", "planks");
+
+                    if (withStonecutter) {
+                        RecipeBuilder
+                                .stonecutting(
+                                        key.location().withPrefix("stonecutter_"),
+                                        block
+                                )
+                                .input(planksMaterial)
+                                .outputCount(1)
+                                .group(group)
+                                .build(context);
+                    }
 
                     RecipeBuilder
                             .crafting(key.location(), block)
@@ -395,7 +421,7 @@ public class RecipeTraitLibrary {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
                     validOrThrow(sourceMaterial, "wall", "source");
-                    
+
                     RecipeBuilder
                             .stonecutting(
                                     key.location().withPrefix("stonecutter_"),
@@ -430,6 +456,113 @@ public class RecipeTraitLibrary {
                             .addMaterial('*', planksMaterial)
                             .addMaterial('|', fenceMaterial)
                             .group("wooden_wall")
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait brickSource(RecipeMaterial sourceMaterial, boolean withStonecutter) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(sourceMaterial, "brickSource", "source");
+
+
+                    if (withStonecutter) {
+                        RecipeBuilder
+                                .stonecutting(
+                                        key.location().withPrefix("stonecutter_"),
+                                        block
+                                )
+                                .input(sourceMaterial)
+                                .outputCount(1)
+                                .group("brick")
+                                .build(context);
+                    }
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(4)
+                            .shape("**", "**")
+                            .addMaterial('*', sourceMaterial)
+                            .group("brick")
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait crackedSource(RecipeMaterial sourceMaterial, boolean withStonecutter) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(sourceMaterial, "crackedSource", "source");
+
+
+                    if (withStonecutter) {
+                        RecipeBuilder
+                                .stonecutting(
+                                        key.location().withPrefix("stonecutter_"),
+                                        block
+                                )
+                                .input(sourceMaterial)
+                                .outputCount(1)
+                                .group("cracked")
+                                .build(context);
+                    }
+
+                    RecipeBuilder
+                            .blasting(key.location(), block)
+                            .input(sourceMaterial)
+                            .experience(0.1f)
+                            .cookingTime(200)
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait stoneCutSource(RecipeMaterial sourceMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(sourceMaterial, "stoneCutSource", "source");
+
+                    RecipeBuilder
+                            .stonecutting(
+                                    key.location().withPrefix("stonecutter_"),
+                                    block
+                            )
+                            .input(sourceMaterial)
+                            .outputCount(1)
+                            .group("cracked")
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait mossySource(RecipeMaterial sourceMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(sourceMaterial, "chiseledSource", "source");
+
+                    RecipeBuilder
+                            .crafting(
+                                    key.location().withSuffix("_from_moss_block"),
+                                    block
+                            )
+                            .shapeless()
+                            .addMaterial('M', Blocks.MOSS_BLOCK)
+                            .addMaterial('#', sourceMaterial)
+                            .outputCount(1)
+                            .group("mossy")
+                            .build(context);
+
+                    RecipeBuilder
+                            .crafting(
+                                    key.location().withSuffix("_from_vine"),
+                                    block
+                            )
+                            .shapeless()
+                            .addMaterial('M', CommonItemTags.VINES)
+                            .addMaterial('#', sourceMaterial)
+                            .outputCount(1)
+                            .group("mossy")
                             .build(context);
                 }
         );

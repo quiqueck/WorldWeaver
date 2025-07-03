@@ -18,14 +18,18 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Stairs extends SlotDefinition {
+    protected final @Nullable SlotType baseBlockType;
+
     public Stairs() {
-        this(SlotType.STAIRS);
+        this(null, SlotType.STAIRS);
     }
 
-    public Stairs(SlotType slot) {
+    public Stairs(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
+        this.baseBlockType = baseBlockType;
     }
 
     @Override
@@ -42,13 +46,16 @@ public class Stairs extends SlotDefinition {
 
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
-        def.addTrait(BlockTraits.STAIR_BLOCK.withDefault());
+        def.addTrait(BlockTraits.STAIR_BLOCK);
     }
 
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.stairs(set::getBaseBlock);
+        return ModelTraitLibrary.stairs(baseBlockType == null
+                ? set::getBaseBlock
+                : () -> set.getBlockWithFallback(baseBlockType)
+        );
     }
 
     @Override
@@ -57,8 +64,11 @@ public class Stairs extends SlotDefinition {
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
         return RecipeTraitLibrary.stairs(
-                set.recipeBaseMaterial(),
-                wood ? "wooden_stairs" : "stairs"
+                baseBlockType == null
+                        ? set.recipeBaseMaterial()
+                        : set.recipeMaterialWithFallback(baseBlockType),
+                wood ? "wooden_stairs" : "stairs",
+                !wood
         );
     }
 }

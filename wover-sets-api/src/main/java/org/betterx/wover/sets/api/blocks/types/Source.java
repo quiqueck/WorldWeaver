@@ -1,7 +1,6 @@
 package org.betterx.wover.sets.api.blocks.types;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.block.api.client.model.ModelTraitLibrary;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.trait.BlockRecipeTrait;
@@ -12,44 +11,42 @@ import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
-import net.minecraft.world.level.block.WallBlock;
-
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Wall extends SlotDefinition {
+public class Source extends SlotDefinition {
     protected final @Nullable SlotType baseBlockType;
 
-    public Wall() {
-        this(null, SlotType.WALL);
+    public Source() {
+        this(null, SlotType.SOURCE);
     }
 
-    public Wall(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
+    public Source(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
         this.baseBlockType = baseBlockType;
     }
 
+
     @Override
-    protected BlockDefinition<?, ?> startBlockDefinition(
-            BlockRegistry registry,
-            @NotNull BlockSet<?> set,
-            @NotNull String name
-    ) {
-        return registry.defineDefaultBlockWithProps(name, WallBlock::new);
+    public String getName(BlockSet<?> set) {
+        if (slot == SlotType.SOURCE) {
+            return set.baseName;
+        }
+        return super.getName(set);
     }
 
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
-        def.addTrait(BlockTraits.WALL_BLOCK);
+        def.addTrait(BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.wall(baseBlockType == null
+        return ModelTraitLibrary.cube(baseBlockType == null
                 ? set::getBaseBlock
                 : () -> set.getBlockWithFallback(baseBlockType)
         );
@@ -57,15 +54,23 @@ public class Wall extends SlotDefinition {
 
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        final boolean wood = blockTraitLookup.hasTrait(BlockTraits.WOOD_BLOCK);
+        var sourceMaterial = baseBlockType == null
+                ? set.recipeBaseMaterial()
+                : set.recipeMaterialWithFallback(baseBlockType);
 
-        return wood ? RecipeTraitLibrary.woodWall(
-                set.recipeBaseMaterial(),
-                set.recipeMaterial(SlotType.FENCE)
-        ) : RecipeTraitLibrary.wall(
-                baseBlockType == null
-                        ? set.recipeBaseMaterial()
-                        : set.recipeMaterialWithFallback(baseBlockType));
+        if (slot == SlotType.BRICK) {
+            return RecipeTraitLibrary.brickSource(sourceMaterial, true);
+        } else if (slot == SlotType.CRACKED) {
+            return RecipeTraitLibrary.crackedSource(sourceMaterial, false);
+        } else if (slot == SlotType.CHISELED) {
+            return RecipeTraitLibrary.stoneCutSource(sourceMaterial);
+        } else if (slot == SlotType.POLISHED) {
+            return RecipeTraitLibrary.stoneCutSource(sourceMaterial);
+        } else if (slot == SlotType.WEATHERED) {
+            return RecipeTraitLibrary.mossySource(sourceMaterial);
+        }
 
+        // If the slot is the original source block, then there is no default recipe
+        return null;
     }
 }

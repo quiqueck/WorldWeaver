@@ -231,4 +231,10 @@ public class ModelTraitLibrary {
             generator.createWall(sourceMaterial.get(), wallBlock);
         });
     }
+
+    public static BlockModelTrait cube(Supplier<Block> sourceMaterial) {
+        return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+            generator.createFullBlock(block);
+        });
+    }
 }

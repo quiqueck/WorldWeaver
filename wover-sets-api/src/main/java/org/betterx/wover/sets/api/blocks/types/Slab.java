@@ -18,14 +18,18 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class Slab extends SlotDefinition {
+    protected final @Nullable SlotType baseBlockType;
+
     public Slab() {
-        this(SlotType.SLAB);
+        this(null, SlotType.SLAB);
     }
 
-    public Slab(SlotType slot) {
+    public Slab(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
+        this.baseBlockType = baseBlockType;
     }
 
     @Override
@@ -45,7 +49,10 @@ public class Slab extends SlotDefinition {
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.slab(set::getBaseBlock);
+        return ModelTraitLibrary.slab(baseBlockType == null
+                ? set::getBaseBlock
+                : () -> set.getBlockWithFallback(baseBlockType)
+        );
     }
 
     @Override
@@ -54,8 +61,11 @@ public class Slab extends SlotDefinition {
         // The Recipe is built before the block was created, so we need to defer the read
         // of the material until the recipe is actually created
         return RecipeTraitLibrary.slab(
-                set.recipeBaseMaterial(),
-                wood ? "wooden_slab" : "slab"
+                baseBlockType == null
+                        ? set.recipeBaseMaterial()
+                        : set.recipeMaterialWithFallback(baseBlockType),
+                wood ? "wooden_slab" : "slab",
+                !wood
         );
     }
 }

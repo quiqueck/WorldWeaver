@@ -19,7 +19,12 @@ public class ItemTagProvider extends WoverTagProvider.ForItems {
 
     public void prepareTags(ItemTagBootstrapContext ctx) {
         ctx.add(CommonItemTags.SOUL_GROUND, Blocks.SOUL_SAND.asItem(), Blocks.SOUL_SOIL.asItem());
-
+        ctx.add(
+                CommonItemTags.VINES,
+                Blocks.VINE.asItem(),
+                Blocks.TWISTING_VINES.asItem(),
+                Blocks.WEEPING_VINES.asItem()
+        );
         ctx.add(CommonItemTags.CHEST, Items.CHEST);
         ctx.add(CommonItemTags.IRON_INGOTS, Items.IRON_INGOT);
         ctx.add(CommonItemTags.FURNACES, Blocks.FURNACE.asItem());
