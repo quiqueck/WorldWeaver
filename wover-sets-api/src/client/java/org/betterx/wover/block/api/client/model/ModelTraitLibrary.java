@@ -203,8 +203,14 @@ public class ModelTraitLibrary {
     }
 
     public static BlockModelTrait pressurePlate(Supplier<Block> planksMaterial) {
-        return ClientBlockTraits.MODEL.with((key, ladderBlock, generator) -> {
-            generator.createPressurePlate(planksMaterial.get(), ladderBlock);
+        return ClientBlockTraits.MODEL.with((key, plateBlock, generator) -> {
+            generator.createPressurePlate(planksMaterial.get(), plateBlock);
+        });
+    }
+
+    public static BlockModelTrait stairs(Supplier<Block> planksMaterial) {
+        return ClientBlockTraits.MODEL.with((key, stairsBlock, generator) -> {
+            generator.createStairs(planksMaterial.get(), stairsBlock);
         });
     }
 }

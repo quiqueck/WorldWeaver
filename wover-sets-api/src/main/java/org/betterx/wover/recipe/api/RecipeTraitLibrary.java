@@ -349,4 +349,25 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial) {
+        return stairs(planksMaterial, "stairs");
+    }
+
+    public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial, String group) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "stairs", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(4)
+                            .shape("#  ", "## ", "###")
+                            .addMaterial('#', planksMaterial)
+                            .group("stairs")
+                            .category(RecipeCategory.BUILDING_BLOCKS)
+                            .build(context);
+                }
+        );
+    }
 }

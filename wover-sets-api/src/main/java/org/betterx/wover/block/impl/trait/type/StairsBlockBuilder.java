@@ -13,16 +13,16 @@ import net.minecraft.world.level.block.Block;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
-    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new SlabBlockBuilder();
+public class StairsBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new StairsBlockBuilder();
 
-    private SlabBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_slab"));
+    private StairsBlockBuilder() {
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_stairs"));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return combine(new Trait(), BlockTraits.LOOT_TABLE.dropSlab());
+        return combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -33,12 +33,12 @@ public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.addTags(BlockTags.SLABS);
-            definition.addItemTags(ItemTags.SLABS);
+            definition.addTags(BlockTags.STAIRS);
+            definition.addItemTags(ItemTags.STAIRS);
 
             if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
-                definition.addTags(BlockTags.WOODEN_SLABS);
-                definition.addItemTags(ItemTags.WOODEN_SLABS);
+                definition.addTags(BlockTags.WOODEN_STAIRS);
+                definition.addItemTags(ItemTags.WOODEN_STAIRS);
             }
         }
     }

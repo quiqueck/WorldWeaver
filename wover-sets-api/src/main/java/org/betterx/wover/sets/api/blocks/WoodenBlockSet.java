@@ -109,7 +109,8 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.HANGING_SIGN,
                 WoodSlots.SIGN,
                 WoodSlots.LADDER,
-                WoodSlots.PRESSURE_PLATE
+                WoodSlots.PRESSURE_PLATE,
+                WoodSlots.STAIRS
         );
     }
 }
