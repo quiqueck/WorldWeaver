@@ -47,6 +47,7 @@ public class BlockTraits {
     public static final GenericBlockTrait.BuilderWithDefaults PRESSURE_PLATE_BLOCK = PressurePlateBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults STAIR_BLOCK = StairsBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults TRAPDOOR_BLOCK = TrapdoorBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults WALL_BLOCK = WallBlockBuilder.BUILDER;
 
     //Recipe Traits
     public static final BlockRecipeTrait.Builder RECIPE = BlockRecipeTraitBuilder.BUILDER;

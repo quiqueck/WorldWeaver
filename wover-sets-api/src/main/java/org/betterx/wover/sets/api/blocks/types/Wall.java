@@ -12,19 +12,19 @@ import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
-import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.WallBlock;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
-public class Trapdoor extends SlotDefinition {
-    public Trapdoor() {
-        this(SlotType.TRAPDOOR);
+public class Wall extends SlotDefinition {
+    public Wall() {
+        this(SlotType.WALL);
     }
 
-    public Trapdoor(SlotType slot) {
+    public Wall(SlotType slot) {
         super(slot);
     }
 
@@ -34,31 +34,28 @@ public class Trapdoor extends SlotDefinition {
             @NotNull BlockSet<?> set,
             @NotNull String name
     ) {
-        return registry.defineDefaultBlockWithProps(
-                name,
-                (props) -> new TrapDoorBlock(set.setType(), props)
-        );
+        return registry.defineDefaultBlockWithProps(name, WallBlock::new);
     }
 
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
-        def.addTrait(BlockTraits.TRAPDOOR_BLOCK);
+        def.addTrait(BlockTraits.WALL_BLOCK);
     }
 
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.orientableTrapdoor();
+        return ModelTraitLibrary.wall(set::getBaseBlock);
     }
 
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         final boolean wood = blockTraitLookup.hasTrait(BlockTraits.WOOD_BLOCK);
-        // The Recipe is built before the block was created, so we need to defer the read
-        // of the material until the recipe is actually created
-        return RecipeTraitLibrary.trapdoor(
+
+        return wood ? RecipeTraitLibrary.woodWall(
                 set.recipeBaseMaterial(),
-                wood ? "wooden_trapdoor" : "trapdoor"
-        );
+                set.recipeMaterial(SlotType.PLANKS)
+        ) : RecipeTraitLibrary.wall(set.recipeBaseMaterial());
+
     }
 }

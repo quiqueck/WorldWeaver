@@ -390,4 +390,48 @@ public class RecipeTraitLibrary {
                 }
         );
     }
+
+    public static BlockRecipeTrait wall(RecipeMaterial sourceMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(sourceMaterial, "wall", "source");
+                    
+                    RecipeBuilder
+                            .stonecutting(
+                                    key.location().withPrefix("stonecutter_"),
+                                    block
+                            )
+                            .input(sourceMaterial)
+                            .outputCount(1)
+                            .group("wall")
+                            .build(context);
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(6)
+                            .shape("***", "***")
+                            .addMaterial('*', sourceMaterial)
+                            .group("wall")
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait woodWall(RecipeMaterial planksMaterial, RecipeMaterial fenceMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "wall", "planks");
+                    validOrThrow(fenceMaterial, "wall", "fence");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(6)
+                            .shape("* *", "|||")
+                            .addMaterial('*', planksMaterial)
+                            .addMaterial('|', fenceMaterial)
+                            .group("wooden_wall")
+                            .build(context);
+                }
+        );
+    }
 }

@@ -225,4 +225,10 @@ public class ModelTraitLibrary {
             generator.createOrientableTrapdoor(trapdoorBlock);
         });
     }
+
+    public static BlockModelTrait wall(Supplier<Block> sourceMaterial) {
+        return ClientBlockTraits.MODEL.with((key, wallBlock, generator) -> {
+            generator.createWall(sourceMaterial.get(), wallBlock);
+        });
+    }
 }

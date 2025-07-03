@@ -27,5 +27,6 @@ public class WoodSlots {
     public static final SlotDefinition STRIPPED_BARK = new Bark(false);
     public static final SlotDefinition STRIPPED_LOG = new Log(false);
     public static final SlotDefinition TRAPDOOR = new Trapdoor();
+    public static final SlotDefinition WALL = new Wall();
 
 }

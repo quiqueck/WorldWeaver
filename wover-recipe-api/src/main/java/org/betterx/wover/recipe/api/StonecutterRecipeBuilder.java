@@ -11,6 +11,7 @@ public interface StonecutterRecipeBuilder extends BaseRecipeBuilder<StonecutterR
     StonecutterRecipeBuilder input(TagKey<Item> input);
     StonecutterRecipeBuilder input(ItemLike input);
     StonecutterRecipeBuilder input(Ingredient in);
+    StonecutterRecipeBuilder input(RecipeMaterial in);
 
     StonecutterRecipeBuilder outputCount(int count);
     StonecutterRecipeBuilder group(@Nullable String group);
