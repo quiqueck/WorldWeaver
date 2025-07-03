@@ -480,6 +480,14 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    public void createOrientableTrapdoor(Block trapdoorBlock) {
+        vanillaGenerator.createOrientableTrapdoor(trapdoorBlock);
+    }
+
+    public void createTrapdoor(Block trapdoorBlock) {
+        vanillaGenerator.createTrapdoor(trapdoorBlock);
+    }
+
     public void createStairs(Block materialBlock, Block stairBlock) {
         createStairs(
                 stairBlock, this

@@ -213,4 +213,16 @@ public class ModelTraitLibrary {
             generator.createStairs(planksMaterial.get(), stairsBlock);
         });
     }
+
+    public static BlockModelTrait trapdoor() {
+        return ClientBlockTraits.MODEL.with((key, trapdoorBlock, generator) -> {
+            generator.createTrapdoor(trapdoorBlock);
+        });
+    }
+
+    public static BlockModelTrait orientableTrapdoor() {
+        return ClientBlockTraits.MODEL.with((key, trapdoorBlock, generator) -> {
+            generator.createOrientableTrapdoor(trapdoorBlock);
+        });
+    }
 }

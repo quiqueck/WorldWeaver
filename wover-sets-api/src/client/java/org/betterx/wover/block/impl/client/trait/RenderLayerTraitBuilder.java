@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class RenderLayerTraitBuilder extends AbstractBlockTraitBuilder<Block, RenderLayerTrait> implements RenderLayerTrait.Builder {
     public static final RenderLayerTrait.Builder BUILDER = new RenderLayerTraitBuilder();
-
+    
     protected RenderLayerTraitBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "render_layer"));
     }
@@ -30,6 +30,14 @@ public class RenderLayerTraitBuilder extends AbstractBlockTraitBuilder<Block, Re
     public @Nullable BlockTrait<?, ?> with(@NotNull RenderLayerTrait.Layer layer) {
         if (ModCore.isClient()) return new Trait(layer);
         return null;
+    }
+
+    public @Nullable BlockTrait<?, ?> cutout() {
+        return with(RenderLayerTrait.Layer.CUTOUT);
+    }
+
+    public @Nullable BlockTrait<?, ?> translucent() {
+        return with(RenderLayerTrait.Layer.TRANSLUCENT);
     }
 
     @Environment(EnvType.CLIENT)

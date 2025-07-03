@@ -15,6 +15,8 @@ public interface RenderLayerTrait extends BlockTrait<Block, RenderLayerTrait> {
 
     interface Builder extends BlockTraitBuilder<Block, RenderLayerTrait> {
         @Nullable BlockTrait<?, ?> with(@NotNull RenderLayerTrait.Layer layer);
+        @Nullable BlockTrait<?, ?> cutout();
+        @Nullable BlockTrait<?, ?> translucent();
     }
 
     @NotNull Layer layer();

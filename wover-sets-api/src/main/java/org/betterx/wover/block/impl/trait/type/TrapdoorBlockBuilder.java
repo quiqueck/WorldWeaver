@@ -6,43 +6,35 @@ import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
-import org.betterx.wover.loot.api.LootLookupProvider;
 
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
-    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new DoorBlockBuilder();
+public class TrapdoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new TrapdoorBlockBuilder();
     private final Trait DEFAULT;
 
-    private DoorBlockBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_door"));
+    private TrapdoorBlockBuilder() {
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_trapdoor"));
         this.DEFAULT = new Trait();
     }
 
+
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
-        if (!ModCore.isDatagen())
-            return combine(DEFAULT, ClientBlockTraits.RENDER_LAYER.cutout());
-        return combine(
+        if (!ModCore.isDatagen()) return combine(
                 DEFAULT,
-                BlockTraits.LOOT_TABLE.with(DoorBlockBuilder::drops),
                 ClientBlockTraits.RENDER_LAYER.cutout()
         );
-    }
-
-    private static LootTable.Builder drops(
-            ResourceKey<LootTable> tableKey,
-            ResourceKey<Block> blockKey,
-            Block block,
-            LootLookupProvider provider
-    ) {
-        return provider.dropDoor(block);
+        return combine(
+                DEFAULT,
+                BlockTraits.LOOT_TABLE.dropSelf(),
+                ClientBlockTraits.RENDER_LAYER.cutout()
+        );
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -54,16 +46,17 @@ public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
             definition
-                    .strength(3F, 3F)
-                    .noOcclusion();
+                    .strength(3.0F)
+                    .noOcclusion()
+                    .isValidSpawn(Blocks::never);
 
             if (ModCore.isDatagen()) {
-                definition.addTags(BlockTags.DOORS);
-                definition.addItemTags(ItemTags.DOORS);
+                definition.addTags(BlockTags.TRAPDOORS);
+                definition.addItemTags(ItemTags.TRAPDOORS);
 
                 if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
-                    definition.addTags(BlockTags.WOODEN_DOORS);
-                    definition.addItemTags(ItemTags.WOODEN_DOORS);
+                    definition.addTags(BlockTags.WOODEN_TRAPDOORS);
+                    definition.addItemTags(ItemTags.WOODEN_TRAPDOORS);
                 }
             }
         }

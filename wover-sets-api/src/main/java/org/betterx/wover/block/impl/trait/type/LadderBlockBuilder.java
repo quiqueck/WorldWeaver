@@ -2,7 +2,6 @@ package org.betterx.wover.block.impl.trait.type;
 
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.client.trait.ClientBlockTraits;
-import org.betterx.wover.block.api.client.trait.RenderLayerTrait;
 import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.entrypoint.LibWoverSets;
@@ -22,7 +21,7 @@ public class LadderBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_ladder"));
         DEFAULT = combine(
                 new Trait(),
-                ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT),
+                ClientBlockTraits.RENDER_LAYER.cutout(),
                 BlockTraits.CLIMBABLE.withDefault(),
                 BlockTraits.LOOT_TABLE.dropSelf()
         );

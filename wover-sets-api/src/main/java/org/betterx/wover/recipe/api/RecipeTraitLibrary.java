@@ -364,8 +364,28 @@ public class RecipeTraitLibrary {
                             .outputCount(4)
                             .shape("#  ", "## ", "###")
                             .addMaterial('#', planksMaterial)
-                            .group("stairs")
+                            .group(group)
                             .category(RecipeCategory.BUILDING_BLOCKS)
+                            .build(context);
+                }
+        );
+    }
+
+    public static BlockRecipeTrait trapdoor(RecipeMaterial planksMaterial) {
+        return trapdoor(planksMaterial, "trapdoor");
+    }
+
+    public static BlockRecipeTrait trapdoor(RecipeMaterial planksMaterial, String group) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "trapdoor", "planks");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .outputCount(2).shape("###", "###")
+                            .addMaterial('#', planksMaterial)
+                            .group(group)
+                            .category(RecipeCategory.REDSTONE)
                             .build(context);
                 }
         );

@@ -91,11 +91,6 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
         return SlotMap.of(
                 WoodSlots.BARK,
                 WoodSlots.BARREL,
-                WoodSlots.LOG,
-                WoodSlots.PLANKS,
-                WoodSlots.SLAB,
-                WoodSlots.STRIPPED_BARK,
-                WoodSlots.STRIPPED_LOG,
                 WoodSlots.BOAT,
                 WoodSlots.BOOKSHELF,
                 WoodSlots.BUTTON,
@@ -107,10 +102,16 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.FENCE,
                 WoodSlots.FENCE_GATE,
                 WoodSlots.HANGING_SIGN,
-                WoodSlots.SIGN,
                 WoodSlots.LADDER,
+                WoodSlots.LOG,
+                WoodSlots.PLANKS,
                 WoodSlots.PRESSURE_PLATE,
-                WoodSlots.STAIRS
+                WoodSlots.SIGN,
+                WoodSlots.SLAB,
+                WoodSlots.STAIRS,
+                WoodSlots.STRIPPED_BARK,
+                WoodSlots.STRIPPED_LOG,
+                WoodSlots.TRAPDOOR
         );
     }
 }
