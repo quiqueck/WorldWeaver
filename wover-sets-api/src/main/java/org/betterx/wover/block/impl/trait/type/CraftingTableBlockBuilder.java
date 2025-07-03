@@ -1,10 +1,7 @@
 package org.betterx.wover.block.impl.trait.type;
 
 import org.betterx.wover.block.api.BlockDefinition;
-import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
-import org.betterx.wover.block.api.trait.BlockTrait;
-import org.betterx.wover.block.api.trait.BlockTraitKey;
-import org.betterx.wover.block.api.trait.GenericBlockTrait;
+import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
@@ -13,18 +10,19 @@ import org.betterx.wover.tag.api.predefined.CommonItemTags;
 
 import net.minecraft.world.level.block.Block;
 
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class CraftingTableBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
-    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new CraftingTableBlockBuilder();
+public class CraftingTableBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new CraftingTableBlockBuilder();
 
     private CraftingTableBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_crafting_table"));
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return new Trait();
+        return combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     private class Trait extends BlockTraitImpl.Generic {

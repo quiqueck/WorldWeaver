@@ -20,7 +20,11 @@ public class HangingSignBlockBuilder extends AbstractBlockTraitBuilder.Generic i
 
     private HangingSignBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_hanging_sign"));
-        DEFAULT = combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.HANGING_SIGN));
+        DEFAULT = combine(
+                new Trait(),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.HANGING_SIGN),
+                BlockTraits.LOOT_TABLE.dropSelf()
+        );
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {

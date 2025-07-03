@@ -18,6 +18,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ComposterBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -513,5 +514,35 @@ public class LootLookupProvider {
         return vanillaBlockLoot.createDoublePlantWithSeedDrops(block, seed);
     }
 
+    public LootTable.Builder dropNamedBlockEntity(Block block) {
+        return vanillaBlockLoot.createNameableBlockEntityTable(block);
+    }
 
+    public LootTable.Builder dropSlab(Block block) {
+        return vanillaBlockLoot.createSlabItemTable(block);
+    }
+
+    public LootTable.Builder dropComposter(Block compsterBlock) {
+        return LootTable
+                .lootTable()
+                .withPool(LootPool.lootPool()
+                                  .add(vanillaBlockLoot.applyExplosionDecay(
+                                          compsterBlock,
+                                          LootItem.lootTableItem(compsterBlock.asItem())
+                                  )))
+                .withPool(
+                        LootPool.lootPool()
+                                .add(LootItem.lootTableItem(Items.BONE_MEAL))
+                                .when(
+                                        LootItemBlockStatePropertyCondition
+                                                .hasBlockStateProperties(compsterBlock)
+                                                .setProperties(
+                                                        StatePropertiesPredicate
+                                                                .Builder.
+                                                                properties()
+                                                                .hasProperty(ComposterBlock.LEVEL, 8)
+                                                )
+                                )
+                );
+    }
 }

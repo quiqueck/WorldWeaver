@@ -10,18 +10,20 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class ButtonBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
-    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new ButtonBlockBuilder();
-    private final Trait DEFAULT;
+public class ButtonBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new ButtonBlockBuilder();
+    private final List<BlockTrait<?, ?>> DEFAULT;
 
     private ButtonBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_button"));
-        DEFAULT = new Trait();
+        DEFAULT = combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    @Override
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         return DEFAULT;
     }
 

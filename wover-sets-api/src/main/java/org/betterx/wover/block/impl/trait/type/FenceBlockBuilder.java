@@ -10,19 +10,20 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class FenceBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
-    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new FenceBlockBuilder();
+public class FenceBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new FenceBlockBuilder();
 
-    private final Trait DEFAULT;
+    private final List<BlockTrait<?, ?>> DEFAULT;
 
     private FenceBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_fence"));
-        DEFAULT = new Trait();
+        DEFAULT = combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         return DEFAULT;
     }
 

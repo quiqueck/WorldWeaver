@@ -35,11 +35,7 @@ public class Ladder extends SlotDefinition {
             @NotNull BlockSet<?> set,
             @NotNull String name
     ) {
-        return registry.defineDefaultBlockWithProps(
-                name, prop -> {
-                    return new LadderBlock(prop);
-                }
-        );
+        return registry.defineDefaultBlockWithProps(name, LadderBlock::new);
     }
 
     @Override

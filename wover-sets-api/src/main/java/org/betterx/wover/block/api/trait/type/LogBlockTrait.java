@@ -11,7 +11,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 public interface LogBlockTrait extends GenericBlockTrait {
-    interface Builder extends GenericBlockTrait.BuilderWithDefault {
+    interface Builder extends GenericBlockTrait.BuilderWithDefaults {
         @Nullable List<BlockTrait<?, ?>> with(Block strippedBlockState);
         @Nullable List<BlockTrait<?, ?>> with(BlockState strippedBlockState);
         @Nullable List<BlockTrait<?, ?>> with(StripableBlockTrait.BlockStateFactory strippedBlockState);

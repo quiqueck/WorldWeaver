@@ -20,7 +20,11 @@ public class BarrelBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
 
     private BarrelBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_barrel"));
-        DEFAULT = combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL));
+        DEFAULT = combine(
+                new Trait(),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL),
+                BlockTraits.LOOT_TABLE.dropNamedEntity()
+        );
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {

@@ -11,7 +11,7 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 public interface BarkBlockTrait extends GenericBlockTrait {
-    interface Builder extends GenericBlockTrait.BuilderWithDefault {
+    interface Builder extends GenericBlockTrait.BuilderWithDefaults {
         @Nullable List<BlockTrait<?, ?>> with(@Nullable Block strippedBlockState);
         @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockState strippedBlockState);
         @Nullable List<BlockTrait<?, ?>> with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlockState);

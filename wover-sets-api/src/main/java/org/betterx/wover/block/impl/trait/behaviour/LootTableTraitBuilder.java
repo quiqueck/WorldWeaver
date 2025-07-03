@@ -2,6 +2,7 @@ package org.betterx.wover.block.impl.trait.behaviour;
 
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.block.api.trait.AbstractBlockTraitBuilder;
+import org.betterx.wover.block.api.trait.BlockTrait;
 import org.betterx.wover.block.api.trait.BlockTraitKey;
 import org.betterx.wover.block.api.trait.behaviour.LootTableTrait;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, LootTableTrait> implements LootTableTrait.Builder {
     public static final LootTableTrait.Builder BUILDER = new LootTableTraitBuilder();
@@ -27,11 +29,34 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     }
 
     @Override
+    public @Nullable BlockTrait<?, ?> withDefault() {
+        return dropSelf();
+    }
+
+    @Override
     public LootTableTrait with(LootTableTrait.@NotNull LootTableFactory lootTableFactory) {
         if (!ModCore.isDatagen()) return null;
         return new Trait(lootTableFactory);
     }
-    
+
+    @Override
+    public LootTableTrait dropNamedEntity() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider) -> provider.dropNamedBlockEntity(block));
+    }
+
+    @Override
+    public LootTableTrait dropSelf() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider) -> provider.drop(block));
+    }
+
+    @Override
+    public LootTableTrait dropSlab() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider) -> provider.dropSlab(block));
+    }
+
     public static void bootstrapLootTables(
             @NotNull ModCore modCore,
             @NotNull LootLookupProvider lookup,

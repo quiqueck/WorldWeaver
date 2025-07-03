@@ -39,7 +39,7 @@ public class ChestBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
                     DEFAULT,
                     BlockTraits.MAGIC_SOURCE.withDefault(),
                     BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.CHEST),
-                    BlockTraits.LOOT_TABLE.with(ChestBlockBuilder::drops)
+                    BlockTraits.LOOT_TABLE.dropNamedEntity()
             );
         } else {
             return combine(

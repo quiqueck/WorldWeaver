@@ -5,22 +5,35 @@ import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
+import org.betterx.wover.loot.api.LootLookupProvider;
 import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootTable;
 
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class ComposterBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
-    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new ComposterBlockBuilder();
+public class ComposterBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new ComposterBlockBuilder();
 
     private ComposterBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_composter"));
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return new Trait();
+        return combine(new Trait(), BlockTraits.LOOT_TABLE.with(ComposterBlockBuilder::drops));
+    }
+
+    private static LootTable.Builder drops(
+            ResourceKey<LootTable> tableKey,
+            ResourceKey<Block> blockKey,
+            Block block,
+            LootLookupProvider provider
+    ) {
+        return provider.dropComposter(block);
     }
 
     private class Trait extends BlockTraitImpl.Generic {

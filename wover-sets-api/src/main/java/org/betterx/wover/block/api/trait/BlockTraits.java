@@ -31,19 +31,20 @@ public class BlockTraits {
     public static final BarkBlockTrait.Builder BARK_BLOCK = BarkBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults BARREL_BLOCK = BarrelBlockBuilder.BUILDER;
     public static final LogBlockTrait.Builder LOG_BLOCK = LogBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault PLANK_BLOCK = PlankBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault SLAB_BLOCK = SlabBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults PLANK_BLOCK = PlankBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults SLAB_BLOCK = SlabBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults BOOK_SHELF = BookshelfBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault BUTTON_BLOCK = ButtonBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults BUTTON_BLOCK = ButtonBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults CHEST_BLOCK = ChestBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault COMPOSTER_BLOCK = ComposterBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault CRAFTING_TABLE_BLOCK = CraftingTableBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults COMPOSTER_BLOCK = ComposterBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults CRAFTING_TABLE_BLOCK = CraftingTableBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults DOOR_BLOCK = DoorBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault FENCE_BLOCK = FenceBlockBuilder.BUILDER;
-    public static final GenericBlockTrait.BuilderWithDefault FENCE_GATE_BLOCK = GateBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults FENCE_BLOCK = FenceBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults FENCE_GATE_BLOCK = GateBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults HANGING_SIGN_BLOCK = HangingSignBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults SIGN_BLOCK = SignBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults LADDER_BLOCK = LadderBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults PRESSURE_PLATE_BLOCK = PressurePlateBlockBuilder.BUILDER;
 
     //Recipe Traits
     public static final BlockRecipeTrait.Builder RECIPE = BlockRecipeTraitBuilder.BUILDER;

@@ -10,18 +10,19 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 
+import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefault {
-    public static final GenericBlockTrait.BuilderWithDefault BUILDER = new SlabBlockBuilder();
+public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new SlabBlockBuilder();
 
     private SlabBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_slab"));
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return new Trait();
+        return combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     private class Trait extends BlockTraitImpl.Generic {

@@ -3,6 +3,7 @@ package org.betterx.wover.block.api.trait;
 import org.betterx.wover.block.api.BlockDefinition;
 import org.betterx.wover.block.api.BlockRegistry;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
+import org.betterx.wover.block.api.trait.behaviour.LootTableTrait;
 import org.betterx.wover.item.api.BlockItemDefinition;
 
 import net.minecraft.world.item.BlockItem;
@@ -93,6 +94,9 @@ public class SignBlockDefinition extends BlockDefinition<SignBlock, SignBlockDef
         if (traits != null) {
             for (var trait : traits) {
                 if (trait instanceof BlockModelTrait) continue;
+                if (trait instanceof BlockRecipeTrait) continue;
+                if (trait instanceof LootTableTrait) continue;
+                
                 wallSignDefinition.addTrait(trait);
             }
         }

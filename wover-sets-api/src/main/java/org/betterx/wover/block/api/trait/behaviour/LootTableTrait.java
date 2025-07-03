@@ -13,6 +13,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
     interface LootTableFactory {
@@ -24,8 +25,11 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
         );
     }
 
-    interface Builder extends BlockTraitBuilder<Block, LootTableTrait> {
-        LootTableTrait with(@NotNull LootTableFactory lootTableFactory);
+    interface Builder extends BlockTraitBuilder.WithDefault<Block, LootTableTrait> {
+        @Nullable LootTableTrait with(@NotNull LootTableFactory lootTableFactory);
+        @Nullable LootTableTrait dropNamedEntity();
+        @Nullable LootTableTrait dropSelf();
+        @Nullable LootTableTrait dropSlab();
     }
 
     LootTableFactory lootTableFactory();

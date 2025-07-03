@@ -26,29 +26,28 @@ public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implement
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_log"));
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return new Trait();
+        return combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable Block strippedBlockState) {
-        if (strippedBlockState == null) return combine(withDefault());
+        if (strippedBlockState == null) return withDefault();
         return with((oldState) -> strippedBlockState.defaultBlockState());
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockState strippedBlockState) {
-        if (strippedBlockState == null) return combine(withDefault());
+        if (strippedBlockState == null) return withDefault();
         return with((oldState) -> strippedBlockState);
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlockState) {
-        if (strippedBlockState == null) return combine(withDefault());
-
+        if (strippedBlockState == null) return withDefault();
         //Make sure we copy the axis property if it exists
         strippedBlockState = StripableBlockTrait.copyRotatedPillarBlockState(strippedBlockState);
 
         if (!ModCore.isDatagen()) return combine(BlockTraits.STRIPABLE.with(strippedBlockState));
-        return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState));
+        return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
 

@@ -10,6 +10,7 @@ public class TestModWoverSetsDatagen extends WoverDataGenEntryPoint {
     protected void onInitializeProviders(PackBuilder globalPack) {
         globalPack.addProvider(TestSetProvider::new);
         globalPack.addProvider(TestModelProvider::new);
+        globalPack.addProvider(TestLootProvider::new);
     }
 
     @Override

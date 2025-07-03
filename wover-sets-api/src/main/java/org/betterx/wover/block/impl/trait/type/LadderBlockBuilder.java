@@ -23,7 +23,8 @@ public class LadderBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
         DEFAULT = combine(
                 new Trait(),
                 ClientBlockTraits.RENDER_LAYER.with(RenderLayerTrait.Layer.CUTOUT),
-                BlockTraits.CLIMBABLE.withDefault()
+                BlockTraits.CLIMBABLE.withDefault(),
+                BlockTraits.LOOT_TABLE.dropSelf()
         );
     }
 

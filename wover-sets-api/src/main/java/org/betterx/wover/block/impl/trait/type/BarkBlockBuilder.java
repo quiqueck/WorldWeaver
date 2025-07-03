@@ -26,29 +26,30 @@ public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_bark"));
     }
 
-    public @Nullable BlockTrait<?, ?> withDefault() {
+    public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return null;
-        return new Trait();
+        return combine(new Trait(), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(Block strippedBlockState) {
-        if (strippedBlockState == null) return combine(withDefault());
+        if (strippedBlockState == null) return withDefault();
         return with((oldState) -> strippedBlockState.defaultBlockState());
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(BlockState strippedBlockState) {
-        if (strippedBlockState == null) return combine(withDefault());
+        if (strippedBlockState == null) return withDefault();
         return with((oldState) -> strippedBlockState);
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlockState) {
-        if (strippedBlockState == null) return combine(withDefault());
+        if (strippedBlockState == null) return withDefault();
 
         //Make sure we copy the axis property if it exists
         strippedBlockState = StripableBlockTrait.copyRotatedPillarBlockState(strippedBlockState);
 
-        if (!ModCore.isDatagen()) return combine(BlockTraits.STRIPABLE.with(strippedBlockState));
-        return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState));
+        if (!ModCore.isDatagen())
+            return combine(BlockTraits.STRIPABLE.with(strippedBlockState));
+        return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
     private class Trait extends BlockTraitImpl.Generic implements BarkBlockTrait {

@@ -20,7 +20,11 @@ public class SignBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
     private SignBlockBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_sign"));
-        DEFAULT = combine(new Trait(), BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SIGN));
+        DEFAULT = combine(
+                new Trait(),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SIGN),
+                BlockTraits.LOOT_TABLE.dropSelf()
+        );
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
