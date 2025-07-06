@@ -12,7 +12,7 @@ import org.betterx.wover.item.api.trait.ItemTraits;
 import org.betterx.wover.recipe.api.RecipeMaterial;
 import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
-import org.betterx.wover.sets.api.blocks.ItemSlotDefinition;
+import org.betterx.wover.sets.api.blocks.ItemSlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.tag.api.predefined.CommonItemTags;
 
@@ -22,7 +22,7 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Boat extends ItemSlotDefinition {
+public class Boat extends ItemSlotFromDefinition {
     private final boolean withChest;
 
     public Boat(boolean withChest) {

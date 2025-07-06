@@ -54,7 +54,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     protected @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier;
     protected BlockItem blockItem;
 
-    private BlockDefinition(
+    protected BlockDefinition(
             BlockRegistry registry,
             String blockName,
             BlockDefinition.BlockFactory<B, D> blockFactory,
@@ -97,7 +97,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     abstract protected void beforeBuild();
 
-    abstract protected B beforeRegister(B block);
+    abstract protected @NotNull B beforeRegister(@NotNull B block);
 
     protected B afterRegister(B block) {
         // Default implementation does nothing, can be overridden if needed

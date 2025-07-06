@@ -11,12 +11,12 @@ import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.sets.api.blocks.WoodenBlockSet;
-import org.betterx.wover.sets.api.blocks.WoodenSlotDefinition;
+import org.betterx.wover.sets.api.blocks.WoodenSlotFromDefinition;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class Planks extends WoodenSlotDefinition {
+public class Planks extends WoodenSlotFromDefinition {
     public Planks() {
         this(SlotType.PLANKS);
     }

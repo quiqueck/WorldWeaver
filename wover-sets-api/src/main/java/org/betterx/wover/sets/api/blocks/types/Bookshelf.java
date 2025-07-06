@@ -8,13 +8,13 @@ import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import org.betterx.wover.block.api.trait.BlockTraits;
 import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
-import org.betterx.wover.sets.api.blocks.SlotDefinition;
+import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class Bookshelf extends SlotDefinition {
+public class Bookshelf extends SlotFromDefinition {
     public Bookshelf() {
         this(SlotType.BOOKSHELF);
     }

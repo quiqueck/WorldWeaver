@@ -11,7 +11,7 @@ import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.sets.api.blocks.WoodenBlockSet;
-import org.betterx.wover.sets.api.blocks.WoodenSlotDefinition;
+import org.betterx.wover.sets.api.blocks.WoodenSlotFromDefinition;
 
 import net.minecraft.world.level.block.RotatedPillarBlock;
 
@@ -20,7 +20,7 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
-public class Bark extends WoodenSlotDefinition {
+public class Bark extends WoodenSlotFromDefinition {
     public static final byte STRIPABLE_FLAG = 0x01;
     public static final byte MIRRORED_TEXTURE_FLAG = 0x02;
     protected final byte flags;

@@ -16,10 +16,10 @@ import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SlotDefinition {
+public class SlotFromDefinition implements SlotFactory {
     public final SlotType slot;
 
-    protected SlotDefinition(SlotType slot) {
+    protected SlotFromDefinition(SlotType slot) {
         this.slot = slot;
     }
 
@@ -27,6 +27,11 @@ public class SlotDefinition {
         return set.baseName + "_" + slot.suffix();
     }
 
+    public SlotType slot() {
+        return this.slot;
+    }
+
+    @Override
     public void createBlockDefinition(BlockSet<?> set, BiConsumer<SlotType, Block> blockDefinitionConsumer) {
         BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition = startBlockDefinition(
                 BlockRegistry.forMod(set.C),

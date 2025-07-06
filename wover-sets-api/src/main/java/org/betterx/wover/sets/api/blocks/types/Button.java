@@ -9,7 +9,7 @@ import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import org.betterx.wover.block.api.trait.BlockTraits;
 import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
-import org.betterx.wover.sets.api.blocks.SlotDefinition;
+import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
 import net.minecraft.world.level.block.ButtonBlock;
@@ -20,7 +20,7 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Button extends SlotDefinition {
+public class Button extends SlotFromDefinition {
     public Button() {
         this(SlotType.BUTTON);
     }

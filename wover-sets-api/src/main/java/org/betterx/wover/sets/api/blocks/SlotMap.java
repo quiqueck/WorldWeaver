@@ -5,32 +5,32 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
-public class SlotMap implements Iterable<SlotDefinition> {
-    private final Map<SlotType, SlotDefinition> map;
+public class SlotMap implements Iterable<SlotFactory> {
+    private final Map<SlotType, SlotFactory> map;
 
     protected SlotMap() {
         this.map = new LinkedHashMap<>();
     }
 
-    public static SlotMap of(SlotDefinition... slots) {
+    public static SlotMap of(SlotFactory... slots) {
         final SlotMap map = new SlotMap();
-        for (SlotDefinition slot : slots) {
+        for (SlotFactory slot : slots) {
             map.add(slot);
         }
         return map;
     }
 
-    public SlotMap replace(SlotDefinition definition) {
+    public SlotMap replace(SlotFactory definition) {
         return add(definition);
     }
 
-    public SlotMap add(SlotDefinition definition) {
-        map.put(definition.slot, definition);
+    public SlotMap add(SlotFactory definition) {
+        map.put(definition.slot(), definition);
         return this;
     }
 
-    public SlotMap remove(SlotDefinition definition) {
-        return this.remove(definition.slot);
+    public SlotMap remove(SlotFactory definition) {
+        return this.remove(definition.slot());
     }
 
     public SlotMap remove(SlotType slot) {
@@ -40,7 +40,7 @@ public class SlotMap implements Iterable<SlotDefinition> {
 
     @NotNull
     @Override
-    public Iterator<SlotDefinition> iterator() {
+    public Iterator<SlotFactory> iterator() {
         return map.values().iterator();
     }
 }

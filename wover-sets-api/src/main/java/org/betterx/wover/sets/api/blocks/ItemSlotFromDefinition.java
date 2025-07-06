@@ -14,8 +14,8 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemSlotDefinition extends SlotDefinition {
-    protected ItemSlotDefinition(SlotType slot) {
+public class ItemSlotFromDefinition extends SlotFromDefinition {
+    protected ItemSlotFromDefinition(SlotType slot) {
         super(slot);
     }
 

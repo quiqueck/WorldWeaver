@@ -11,7 +11,7 @@ import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.sets.api.blocks.WoodenBlockSet;
-import org.betterx.wover.sets.api.blocks.WoodenSlotDefinition;
+import org.betterx.wover.sets.api.blocks.WoodenSlotFromDefinition;
 
 import net.minecraft.world.level.block.FenceGateBlock;
 
@@ -21,7 +21,7 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Gate extends WoodenSlotDefinition {
+public class Gate extends WoodenSlotFromDefinition {
     public Gate() {
         this(SlotType.GATE);
     }

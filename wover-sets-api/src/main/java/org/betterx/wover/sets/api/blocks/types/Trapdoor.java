@@ -9,7 +9,7 @@ import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import org.betterx.wover.block.api.trait.BlockTraits;
 import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
-import org.betterx.wover.sets.api.blocks.SlotDefinition;
+import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
 import net.minecraft.world.level.block.TrapDoorBlock;
@@ -19,7 +19,7 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
-public class Trapdoor extends SlotDefinition {
+public class Trapdoor extends SlotFromDefinition {
     public Trapdoor() {
         this(SlotType.TRAPDOOR);
     }

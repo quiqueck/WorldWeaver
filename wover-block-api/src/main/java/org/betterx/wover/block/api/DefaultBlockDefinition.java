@@ -2,6 +2,8 @@ package org.betterx.wover.block.api;
 
 import net.minecraft.world.level.block.Block;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Quiqueck
  * @since 21.6.0
@@ -21,7 +23,7 @@ public class DefaultBlockDefinition<B extends Block> extends BlockDefinition<B, 
     }
 
     @Override
-    protected B beforeRegister(B block) {
+    protected @NotNull B beforeRegister(@NotNull B block) {
         return block;
     }
 

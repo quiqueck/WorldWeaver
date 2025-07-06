@@ -8,8 +8,8 @@ import org.betterx.wover.block.api.trait.BlockTraitLookup;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-public class WoodenSlotDefinition extends SlotDefinition {
-    protected WoodenSlotDefinition(SlotType slot) {
+public class WoodenSlotFromDefinition extends SlotFromDefinition {
+    protected WoodenSlotFromDefinition(SlotType slot) {
         super(slot);
     }
 
@@ -18,7 +18,7 @@ public class WoodenSlotDefinition extends SlotDefinition {
         if (set instanceof WoodenBlockSet<?> woodenSet) {
             addWoodSlotSpecificDefinitions(woodenSet, def);
         } else {
-            throw new IllegalArgumentException("WoodenSlotDefinition can only be used with WoodenBlockSet");
+            throw new IllegalArgumentException("WoodenSlotFromDefinition can only be used with WoodenBlockSet");
         }
     }
 
@@ -32,7 +32,7 @@ public class WoodenSlotDefinition extends SlotDefinition {
         if (set instanceof WoodenBlockSet<?> woodenSet) {
             return buildWoodModel(woodenSet, blockTraitLookup);
         } else {
-            throw new IllegalArgumentException("WoodenSlotDefinition can only be used with WoodenBlockSet");
+            throw new IllegalArgumentException("WoodenSlotFromDefinition can only be used with WoodenBlockSet");
         }
     }
 
@@ -46,7 +46,7 @@ public class WoodenSlotDefinition extends SlotDefinition {
         if (set instanceof WoodenBlockSet<?> woodenSet) {
             return buildWoodRecipe(woodenSet, blockTraitLookup);
         } else {
-            throw new IllegalArgumentException("WoodenSlotDefinition can only be used with WoodenBlockSet");
+            throw new IllegalArgumentException("WoodenSlotFromDefinition can only be used with WoodenBlockSet");
         }
     }
 

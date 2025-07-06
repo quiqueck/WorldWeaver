@@ -215,7 +215,7 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
             String suffix,
             SimpleCookingRecipeBuilder builder
     ) {
-        ResourceLocation loc = id.withSuffix("_" + suffix);
+        ResourceLocation loc = key.location().withSuffix("_" + suffix);
 
         for (var item : unlocks.entrySet()) {
             builder.unlockedBy(item.getKey(), item.getValue().createCriterion(context));

@@ -122,7 +122,6 @@ public class WelcomeScreen extends WoverLayoutScreen {
 
             ClientWorldLifecycleImpl.AFTER_WELCOME_SCREEN.emit(c -> c.didPresent());
 
-            //TODO: VersionChecker needs to be started here
             VersionChecker.startCheck(true);
             onClose();
         }).alignRight();

@@ -34,14 +34,14 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     protected String group;
     protected boolean shouldUnlockAdvancements;
     protected final @NotNull ItemStack output;
-    protected final @NotNull ResourceLocation id;
+    protected final @NotNull ResourceKey<Recipe<?>> key;
 
-    protected BaseRecipeBuilderImpl(@NotNull ResourceLocation id, @NotNull ItemLike output) {
-        this(id, new ItemStack(output, 1));
+    protected BaseRecipeBuilderImpl(@NotNull ResourceLocation key, @NotNull ItemLike output) {
+        this(key, new ItemStack(output, 1));
     }
 
-    protected BaseRecipeBuilderImpl(@NotNull ResourceLocation id, @NotNull ItemStack output) {
-        this.id = id;
+    protected BaseRecipeBuilderImpl(@NotNull ResourceLocation key, @NotNull ItemStack output) {
+        this.key = ResourceKey.create(Registries.RECIPE, key);
         this.category = RecipeCategory.MISC;
         this.output = output;
         this.unlocks = new HashMap<>();
@@ -49,7 +49,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     }
 
     public ResourceKey<Recipe<?>> key() {
-        return ResourceKey.create(Registries.RECIPE, id);
+        return key;
     }
 
     public I shouldUnlockAdvancements(boolean shouldUnlockAdvancements) {
@@ -169,7 +169,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
 
     // Validation and Building
     protected void throwIllegalStateException(String message) {
-        throw new IllegalStateException(message + "(" + this.id + ")");
+        throw new IllegalStateException(message + "(" + this.key + ")");
     }
 
     protected void validate() {

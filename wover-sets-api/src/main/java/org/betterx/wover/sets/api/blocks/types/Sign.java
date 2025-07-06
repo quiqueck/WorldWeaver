@@ -12,7 +12,7 @@ import org.betterx.wover.recipe.api.RecipeTraitLibrary;
 import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.sets.api.blocks.WoodenBlockSet;
-import org.betterx.wover.sets.api.blocks.WoodenSlotDefinition;
+import org.betterx.wover.sets.api.blocks.WoodenSlotFromDefinition;
 
 import net.minecraft.world.item.SignItem;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Sign extends WoodenSlotDefinition {
+public class Sign extends WoodenSlotFromDefinition {
     public static final SlotType WALL_SIGN = new SlotType("wall_sign");
 
     public Sign() {

@@ -206,6 +206,74 @@ public class WoverBlockModelGenerators {
         vanillaGenerator.registerSimpleFlatItemModel(ladderBlock);
     }
 
+    public void createBars(
+            Block barsBlock
+    ) {
+        final var barsModel = ModelLocationUtils.getModelLocation(barsBlock);
+
+        MultiVariant postVariant = plainVariant(barsModel.withSuffix("_post"));
+        MultiVariant postEndsVariant = plainVariant(barsModel.withSuffix("_post_ends"));
+
+        MultiVariant capVariant = plainVariant(barsModel.withSuffix("_cap"));
+        MultiVariant sideVariant = plainVariant(barsModel.withSuffix("_side"));
+
+        MultiVariant altCapVariant = plainVariant(barsModel.withSuffix("_cap_alt"));
+        MultiVariant altSideVariant = plainVariant(barsModel.withSuffix("_side_alt"));
+
+        this.acceptBlockState(
+                MultiPartGenerator.multiPart(barsBlock)
+                                  .with(postEndsVariant)
+                                  .with(
+                                          condition()
+                                                  .term(BlockStateProperties.NORTH, false)
+                                                  .term(BlockStateProperties.EAST, false)
+                                                  .term(BlockStateProperties.SOUTH, false)
+                                                  .term(BlockStateProperties.WEST, false),
+                                          postVariant
+                                  )
+                                  .with(
+                                          condition()
+                                                  .term(BlockStateProperties.NORTH, true)
+                                                  .term(BlockStateProperties.EAST, false)
+                                                  .term(BlockStateProperties.SOUTH, false)
+                                                  .term(BlockStateProperties.WEST, false),
+                                          capVariant
+                                  )
+                                  .with(
+                                          condition()
+                                                  .term(BlockStateProperties.NORTH, false)
+                                                  .term(BlockStateProperties.EAST, true)
+                                                  .term(BlockStateProperties.SOUTH, false)
+                                                  .term(BlockStateProperties.WEST, false),
+                                          capVariant.with(Y_ROT_90)
+                                  )
+                                  .with(
+                                          condition()
+                                                  .term(BlockStateProperties.NORTH, false)
+                                                  .term(BlockStateProperties.EAST, false)
+                                                  .term(BlockStateProperties.SOUTH, true)
+                                                  .term(BlockStateProperties.WEST, false),
+                                          altCapVariant
+                                  )
+                                  .with(
+                                          condition()
+                                                  .term(BlockStateProperties.NORTH, false)
+                                                  .term(BlockStateProperties.EAST, false)
+                                                  .term(BlockStateProperties.SOUTH, false)
+                                                  .term(BlockStateProperties.WEST, true),
+                                          altCapVariant.with(Y_ROT_90)
+                                  )
+                                  .with(condition().term(BlockStateProperties.NORTH, true), sideVariant)
+                                  .with(condition().term(BlockStateProperties.EAST, true), sideVariant.with(Y_ROT_90))
+                                  .with(condition().term(BlockStateProperties.SOUTH, true), altSideVariant)
+                                  .with(
+                                          condition().term(BlockStateProperties.WEST, true),
+                                          altSideVariant.with(Y_ROT_90)
+                                  )
+        );
+        this.createFlatItem(barsBlock);
+    }
+
     private final Map<ResourceLocation, ResourceLocation> PARTICLE_ONLY_MODELS = Maps.newHashMap();
 
     public ResourceLocation particleOnlyModel(Block block) {
