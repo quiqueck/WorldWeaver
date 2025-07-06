@@ -148,6 +148,16 @@ public class BlockSet<S extends BlockSet<S>> {
         return null;
     }
 
+    @Nullable
+    public Block getBlock(@NotNull SlotFactory type) {
+        final SlotData slotData = slots.get(type.slot());
+        if (slotData != null) {
+            return slotData.block();
+        }
+
+        return null;
+    }
+
 
     /**
      * Get the {@link Block} for the given {@link SlotType} from this set of blocks.
