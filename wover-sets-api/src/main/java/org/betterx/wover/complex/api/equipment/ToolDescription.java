@@ -7,6 +7,7 @@ import org.betterx.wover.item.api.ToolItemDefinition;
 import org.betterx.wover.item.impl.trait.ItemRecipeTraitBuilder;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.tag.api.predefined.CommonItemTags;
+import org.betterx.wover.tag.api.predefined.ToolTags;
 
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.resources.ResourceKey;
@@ -23,12 +24,12 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
     @SuppressWarnings("unchecked")
     private static TagKey<Item>[] getTagKey(ToolSlot slot) {
         return switch (slot) {
-            case PICKAXE_SLOT -> new TagKey[]{ItemTags.PICKAXES};
-            case AXE_SLOT -> new TagKey[]{ItemTags.AXES};
-            case SHOVEL_SLOT -> new TagKey[]{ItemTags.SHOVELS};
-            case HOE_SLOT -> new TagKey[]{ItemTags.HOES};
-            case SWORD_SLOT -> new TagKey[]{ItemTags.SWORDS};
-            case SHEARS_SLOT -> new TagKey[]{CommonItemTags.SHEARS};
+            case PICKAXE_SLOT -> new TagKey[]{ItemTags.PICKAXES, ToolTags.FABRIC_PICKAXES};
+            case AXE_SLOT -> new TagKey[]{ItemTags.AXES, ToolTags.FABRIC_AXES};
+            case SHOVEL_SLOT -> new TagKey[]{ItemTags.SHOVELS, ToolTags.FABRIC_SHOVELS};
+            case HOE_SLOT -> new TagKey[]{ItemTags.HOES, ToolTags.FABRIC_HOES};
+            case SWORD_SLOT -> new TagKey[]{ItemTags.SWORDS, ToolTags.FABRIC_SWORDS};
+            case SHEARS_SLOT -> new TagKey[]{CommonItemTags.SHEARS, ToolTags.FABRIC_SHEARS};
             case HAMMER_SLOT -> new TagKey[]{CommonItemTags.HAMMERS};
             default -> new TagKey[0];
         };
