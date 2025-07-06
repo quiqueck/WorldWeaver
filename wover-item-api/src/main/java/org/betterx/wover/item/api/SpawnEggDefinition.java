@@ -11,9 +11,6 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,8 +34,6 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.21.6
  */
 public class SpawnEggDefinition<I extends SpawnEggItem> extends ItemDefinition<I, SpawnEggDefinition<I>> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpawnEggDefinition.class);
-
     /**
      * Factory interface for creating spawn egg items from configuration objects.
      * Extends the base ItemFactory to work specifically with SpawnEggDefinition.
