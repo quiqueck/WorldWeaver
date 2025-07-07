@@ -1,4 +1,1 @@
 accessWidener   v1  named
-# Fields
-accessible field net/minecraft/data/recipes/RecipeProvider recipePathProvider Lnet/minecraft/data/PackOutput$PathProvider;
-accessible field net/minecraft/data/recipes/RecipeProvider advancementPathProvider Lnet/minecraft/data/PackOutput$PathProvider;

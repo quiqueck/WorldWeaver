@@ -29,10 +29,10 @@
     "minecraft": ["1.21.6", "1.21.7"],
     "java": ">=21",
     "fabric-api": ">=0.100.0",
-    "wunderlib": "21.6.x"
+    "wunderlib": "21.7.x"
   },
   "breaks": {
-    "wunderlib": "<21.0.8"
+    "wunderlib": "<21.7.0"
   },
   "custom": {
     "wover": {

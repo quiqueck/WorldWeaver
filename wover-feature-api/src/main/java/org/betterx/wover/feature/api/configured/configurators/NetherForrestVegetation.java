@@ -37,7 +37,7 @@ public interface NetherForrestVegetation extends BaseWeightedBlock<NetherForestV
      * <p>
      * You can not use this method if you did already add BlockStates manually using one of
      * the "add"-methods. "Add"-Methods will create automatically create
-     * a {@link WeightedStateProvider} from a {@link net.minecraft.util.random.SimpleWeightedRandomList}
+     * a {@link WeightedStateProvider} from a {@link net.minecraft.util.random.WeightedList}
      * of {@link BlockState}s for you.
      *
      * @param provider The provider to use
