@@ -3,6 +3,7 @@ package org.betterx.wover.complex.api.equipment;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ArmorItemDefinition;
 import org.betterx.wover.item.api.ToolItemDefinition;
+import org.betterx.wover.item.api.trait.ItemRecipeTrait;
 
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
@@ -56,40 +57,70 @@ public abstract class EquipmentSet {
         SETS.add(this);
     }
 
+    public @NotNull Item.Properties commonToolProperties(@NotNull Item.Properties properties) {
+        return properties;
+    }
+
+    public @NotNull Item.Properties commonArmorProperties(@NotNull Item.Properties properties) {
+        return commonToolProperties(properties);
+    }
+
     public <I extends Item> void add(ToolSlot slot) {
+        add(slot, (ItemRecipeTrait) null);
+    }
+
+    public <I extends Item> void add(ToolSlot slot, ItemRecipeTrait recipeOverride) {
         if (slot == ToolSlot.AXE_SLOT) {
             add(
                     slot, (definition, values) -> new AxeItem(
                             this.toolTier.toolMaterial,
                             values.attackDamage(), values.attackSpeed(),
-                            definition.getProperties()
-                    )
+                            commonToolProperties(definition.getProperties())
+                    ),
+                    recipeOverride
             );
         } else if (slot == ToolSlot.HOE_SLOT) {
             add(
                     slot, (definition, values) -> new HoeItem(
                             this.toolTier.toolMaterial,
                             values.attackDamage(), values.attackSpeed(),
-                            definition.getProperties()
-                    )
+                            commonToolProperties(definition.getProperties())
+                    ),
+                    recipeOverride
             );
         } else if (slot == ToolSlot.SHOVEL_SLOT) {
             add(
                     slot, (definition, values) -> new ShovelItem(
                             this.toolTier.toolMaterial,
                             values.attackDamage(), values.attackSpeed(),
-                            definition.getProperties()
-                    )
+                            commonToolProperties(definition.getProperties())
+                    ),
+                    recipeOverride
             );
         } else if (slot == ToolSlot.SHEARS_SLOT) {
-            add(slot, (definition, values) -> new ShearsItem(definition.getProperties()));
-        } else add(slot, (definition, values) -> new Item(definition.getProperties()));
+            add(
+                    slot, (definition, values) -> new ShearsItem(
+                            commonToolProperties(definition.getProperties())),
+                    recipeOverride
+            );
+        } else add(
+                slot, (definition, values) -> new Item(
+                        commonToolProperties(definition.getProperties())),
+                recipeOverride
+        );
     }
-
 
     public <I extends Item> void add(
             ToolSlot slot,
             ToolFactory<I> toolFactory
+    ) {
+        add(slot, toolFactory, null);
+    }
+
+    public <I extends Item> void add(
+            ToolSlot slot,
+            ToolFactory<I> toolFactory,
+            ItemRecipeTrait recipeOverride
     ) {
         tools.put(
                 slot,
@@ -98,13 +129,14 @@ public abstract class EquipmentSet {
                         slot,
                         nameForSlot(slot),
                         toolFactory,
-                        this
+                        this,
+                        recipeOverride
                 )
         );
     }
 
     public void add(ArmorSlot slot) {
-        add(slot, (definition) -> new Item(definition.getProperties()));
+        add(slot, (definition) -> new Item(commonArmorProperties(definition.getProperties())));
     }
 
     public <I extends Item> void add(

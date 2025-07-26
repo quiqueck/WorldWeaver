@@ -101,6 +101,8 @@ public class ToolTier {
             SmithingTemplateItem smithingTemplate,
             TagKey<Block> minableWithTag
     ) {
+        public static ToolValues NO_OFFSET = new ToolValues(0, 0);
+
         public ToolValues(float attackDamage, float attackSpeed) {
             this(attackDamage, attackSpeed, 0, null, null);
         }
@@ -140,7 +142,7 @@ public class ToolTier {
                     attackDamage + offset.attackDamage,
                     attackSpeed + offset.attackSpeed,
                     disableBlockingForSeconds + offset.disableBlockingForSeconds,
-                    offset.smithingTemplate,
+                    offset.smithingTemplate != null ? offset.smithingTemplate : smithingTemplate,
                     offset.minableWithTag != null ? offset.minableWithTag : this.minableWithTag
             );
         }

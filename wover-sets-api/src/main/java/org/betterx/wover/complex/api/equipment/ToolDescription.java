@@ -4,6 +4,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.item.api.ItemRegistry;
 import org.betterx.wover.item.api.ToolItemDefinition;
+import org.betterx.wover.item.api.trait.ItemRecipeTrait;
 import org.betterx.wover.item.impl.trait.ItemRecipeTraitBuilder;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 import org.betterx.wover.tag.api.predefined.CommonItemTags;
@@ -40,7 +41,8 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
             ToolSlot slot,
             String path,
             EquipmentSet.ToolFactory<I> creator,
-            EquipmentSet equipmentSet
+            EquipmentSet equipmentSet,
+            ItemRecipeTrait recipeOverride
     ) {
         var itemDefinition = ItemRegistry
                 .forMod(modCore)
@@ -60,7 +62,7 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
 
         slot.addToolConfigTrait(itemDefinition, equipmentSet.toolTier);
         itemDefinition.addTrait(
-                ItemRecipeTraitBuilder
+                recipeOverride != null ? recipeOverride : ItemRecipeTraitBuilder
                         .BUILDER
                         .with((key, item, context) -> addRecipe(
                                 context,

@@ -28,7 +28,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.PICKAXE_SLOT, new ToolValues(1, -2.8f, BlockTags.MINEABLE_WITH_PICKAXE))
             .toolValues(ToolSlot.AXE_SLOT, new ToolValues(7, -3.2f, 5, BlockTags.MINEABLE_WITH_AXE))
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(-1, -2.0f, BlockTags.MINEABLE_WITH_HOE))
-            .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-1, -2.5f))
+            .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-1, -2.5f, MineableTags.SHEARS))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(9, -5.0f, MineableTags.HAMMER))
             .build();
 
@@ -41,7 +41,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.PICKAXE_SLOT, new ToolValues(1, -2.8f, BlockTags.MINEABLE_WITH_PICKAXE))
             .toolValues(ToolSlot.AXE_SLOT, new ToolValues(6, -3.0f, 5, BlockTags.MINEABLE_WITH_AXE))
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(0, -3.0f, BlockTags.MINEABLE_WITH_HOE))
-            .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(0, -3.5f)).
+            .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(0, -3.5f, MineableTags.SHEARS)).
             toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -4.0f, MineableTags.HAMMER))
             .build();
 
@@ -80,6 +80,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.PICKAXE_SLOT, new ToolValues(1, -2.8f, BlockTags.MINEABLE_WITH_PICKAXE))
             .toolValues(ToolSlot.AXE_SLOT, new ToolValues(5, -3.0f, 5, BlockTags.MINEABLE_WITH_AXE))
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(-4, -0.5f, BlockTags.MINEABLE_WITH_HOE))
+            .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-4, 0f, MineableTags.SHEARS))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -3.2f, MineableTags.HAMMER))
             .build();
 

@@ -22,7 +22,6 @@ public interface CraftingRecipeBuilder extends BaseRecipeBuilder<CraftingRecipeB
 
     @Deprecated(forRemoval = true)
     CraftingRecipeBuilder addMaterial(char key, Ingredient ingredient);
-    @Deprecated(forRemoval = true)
     CraftingRecipeBuilder addMaterial(char key, ItemStack... values);
 
 }
