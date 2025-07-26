@@ -3,6 +3,8 @@ package org.betterx.wover.block.api.client.model;
 import org.betterx.wover.block.api.client.trait.BlockModelTrait;
 import org.betterx.wover.block.api.client.trait.ClientBlockTraits;
 import org.betterx.wover.entrypoint.LibWoverSets;
+import org.betterx.wover.item.api.client.trait.ClientItemTraits;
+import org.betterx.wover.item.api.client.trait.ItemModelTrait;
 
 import static net.minecraft.client.data.models.BlockModelGenerators.*;
 import net.minecraft.client.data.models.MultiVariant;
@@ -11,6 +13,7 @@ import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.block.model.VariantMutator;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.item.properties.conditional.Broken;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -235,6 +238,35 @@ public class ModelTraitLibrary {
     public static BlockModelTrait cube(Supplier<Block> sourceMaterial) {
         return ClientBlockTraits.MODEL.with((key, block, generator) -> {
             generator.createFullBlock(block);
+        });
+    }
+
+    public static ItemModelTrait itemModel() {
+        return ClientItemTraits.MODEL.with((key, item, generator) -> {
+            generator.createFlatItemModel(item, ModelTemplates.FLAT_ITEM);
+        });
+    }
+
+    public static ItemModelTrait itemModel(Supplier<Item> material) {
+        return ClientItemTraits.MODEL.with((key, item, generator) -> {
+            generator.createFlatItemModel(material.get(), ModelTemplates.FLAT_ITEM);
+        });
+    }
+
+    public static ItemModelTrait elytra() {
+        return ClientItemTraits.MODEL.with((key, elytra, generator) -> {
+
+            ItemModel.Unbaked unbaked = ItemModelUtils.plainModel(generator.createFlatItemModel(
+                    elytra,
+                    ModelTemplates.FLAT_ITEM
+            ));
+            ItemModel.Unbaked unbaked2 = ItemModelUtils.plainModel(generator.createFlatItemModel(
+                    elytra,
+                    "_broken",
+                    ModelTemplates.FLAT_ITEM
+            ));
+            generator.generateBooleanDispatch(elytra, new Broken(), unbaked2, unbaked);
+
         });
     }
 }

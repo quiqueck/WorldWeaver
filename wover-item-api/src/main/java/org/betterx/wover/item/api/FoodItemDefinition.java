@@ -235,7 +235,7 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      * @param foodProps The built food properties
      * @return This configuration instance for method chaining
      */
-    protected FoodItemDefinition<I> food(FoodProperties foodProps) {
+    public FoodItemDefinition<I> food(FoodProperties foodProps) {
         this.properties.food(foodProps);
         return this;
     }
@@ -248,7 +248,7 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      * @param consumableBehavior The built consumable behavior
      * @return This configuration instance for method chaining
      */
-    protected FoodItemDefinition<I> food(FoodProperties foodProps, Consumable consumableBehavior) {
+    public FoodItemDefinition<I> food(FoodProperties foodProps, Consumable consumableBehavior) {
         this.properties.food(foodProps, consumableBehavior);
         return this;
     }

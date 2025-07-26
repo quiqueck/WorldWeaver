@@ -15,7 +15,7 @@ public class SlotMap implements Iterable<SlotFactory> {
     public static SlotMap of(SlotFactory... slots) {
         final SlotMap map = new SlotMap();
         for (SlotFactory slot : slots) {
-            map.add(slot);
+            if (slot != null) map.add(slot);
         }
         return map;
     }

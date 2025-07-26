@@ -150,19 +150,23 @@ public class ToolTier {
 
     public final String name;
     public final ToolMaterial toolMaterial;
+    public final int level;
     public final TagKey<Block> blockTag;
     private final ToolValues[] toolValues;
+
 
     private ToolTier(
             String name,
             ToolMaterial toolMaterial,
             ToolValues[] toolValues,
-            TagKey<Block> blockTag
+            TagKey<Block> blockTag,
+            int level
     ) {
         this.toolMaterial = toolMaterial;
         this.toolValues = toolValues;
         this.name = name;
         this.blockTag = blockTag;
+        this.level = level;
     }
 
     @Nullable
@@ -176,6 +180,7 @@ public class ToolTier {
 
     //a BuilderWithDefaults class
     public static class Builder {
+        private int level;
         private ToolMaterial toolMaterial;
         private final ToolValues[] toolValues = new ToolValues[ToolSlot.values().length];
         private final String name;
@@ -183,6 +188,11 @@ public class ToolTier {
 
         Builder(String name) {
             this.name = name;
+        }
+
+        public Builder level(int level) {
+            this.level = level;
+            return this;
         }
 
         public Builder blockTag(TagKey<Block> blockTag) {
@@ -210,7 +220,7 @@ public class ToolTier {
         }
 
         public ToolTier build() {
-            return new ToolTier(name, toolMaterial, toolValues, blockTag);
+            return new ToolTier(name, toolMaterial, toolValues, blockTag, level);
         }
     }
 
@@ -238,6 +248,6 @@ public class ToolTier {
             if (toolValues[i] != null)
                 newValues[i] = toolValues[i].copyWithOffset(offset);
         }
-        return new ToolTier(newName, newTier == null ? this.toolMaterial : newTier, newValues, blockTag);
+        return new ToolTier(newName, newTier == null ? this.toolMaterial : newTier, newValues, blockTag, level);
     }
 }

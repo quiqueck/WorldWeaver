@@ -3,16 +3,22 @@ package org.betterx.wover.item.api;
 import org.betterx.wover.item.api.trait.*;
 import org.betterx.wover.item.impl.trait.ItemTraitImpl;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.flag.FeatureFlag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+
+import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -150,6 +156,10 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
             }
         } else runtimeTraits = null;
 
+        if (this.attributes != null) {
+            this.properties.attributes(new ItemAttributeModifiers(this.attributes.build()));
+        }
+
         I item = itemFactory.createItem((D) this);
 
         // If runtime traits were collected, set them on the item
@@ -276,12 +286,26 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
         if (itemTags == null || itemTags.isEmpty()) {
             return (D) this;
         }
-        
+
         if (this.tags == null) {
             this.tags = new ArrayList<>();
         }
         this.tags.addAll(itemTags);
 
+        return (D) this;
+    }
+
+    private ImmutableList.Builder<ItemAttributeModifiers.Entry> attributes;
+
+    public D addAttribute(
+            Holder<Attribute> holder,
+            AttributeModifier attributeModifier,
+            EquipmentSlotGroup equipmentSlotGroup
+    ) {
+        if (attributes == null) {
+            attributes = ImmutableList.builder();
+        }
+        attributes.add(new ItemAttributeModifiers.Entry(holder, attributeModifier, equipmentSlotGroup));
         return (D) this;
     }
 

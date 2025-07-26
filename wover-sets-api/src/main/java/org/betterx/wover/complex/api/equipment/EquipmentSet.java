@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class EquipmentSet {
     private static final List<EquipmentSet> SETS = new LinkedList<>();
@@ -105,7 +106,11 @@ public abstract class EquipmentSet {
             );
         } else add(
                 slot, (definition, values) -> new Item(
-                        commonToolProperties(definition.getProperties())),
+                        commonToolProperties(definition.getProperties()).tool(
+                                this.toolTier.toolMaterial,
+                                this.toolTier.blockTag,
+                                values.attackDamage(), values.attackSpeed(), values.disableBlockingForSeconds()
+                        )),
                 recipeOverride
         );
     }
@@ -136,12 +141,23 @@ public abstract class EquipmentSet {
     }
 
     public void add(ArmorSlot slot) {
-        add(slot, (definition) -> new Item(commonArmorProperties(definition.getProperties())));
+        add(slot, (ItemRecipeTrait) null);
+    }
+
+    public void add(ArmorSlot slot, ItemRecipeTrait recipeOverride) {
+        add(slot, (definition) -> new Item(commonArmorProperties(definition.getProperties())), recipeOverride);
     }
 
     public <I extends Item> void add(
             ArmorSlot slot,
             ArmorFactory<I> armorFactory
+    ) {
+    }
+
+    public <I extends Item> void add(
+            ArmorSlot slot,
+            ArmorFactory<I> armorFactory,
+            @Nullable ItemRecipeTrait recipeOverride
     ) {
         armors.put(
                 slot,
@@ -150,7 +166,8 @@ public abstract class EquipmentSet {
                         slot,
                         nameForSlot(slot),
                         armorFactory,
-                        this
+                        this,
+                        recipeOverride
                 )
         );
     }

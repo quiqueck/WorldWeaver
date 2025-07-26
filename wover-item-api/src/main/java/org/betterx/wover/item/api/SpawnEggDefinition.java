@@ -164,6 +164,10 @@ public class SpawnEggDefinition<I extends SpawnEggItem> extends ItemDefinition<I
         return this;
     }
 
+    public EntityType<? extends Mob> entityType() {
+        return this.entityType;
+    }
+
     /**
      * Sets the primary color of the spawn egg.
      * This is typically the base color of the egg's texture.

@@ -179,6 +179,16 @@ public abstract class ItemRegistry {
     }
 
     /**
+     * Creates a vanilla-style item and registers it immediately.
+     *
+     * @param itemName The name identifier for the vanilla item
+     * @return The registered Item instance
+     */
+    public Item registerDefaultItem(String itemName) {
+        return new VanillaItemDefinition(this, itemName).buildAndRegister();
+    }
+
+    /**
      * Creates a configuration for a default item with a custom factory.
      * This allows for creating custom item types while still using the default
      * configuration pattern.
@@ -205,11 +215,28 @@ public abstract class ItemRegistry {
      * @param <I>         The type of item to create
      * @return A new DefaultItemDefinition instance for method chaining
      */
-    public <I extends Item> DefaultItemDefinition<I> defineDefaultItem(
+    public <I extends Item> DefaultItemDefinition<I> defineDefaultItemWithProps(
             String itemName,
             Function<Item.Properties, I> itemFactory
     ) {
         return new DefaultItemDefinition<>(this, itemName, (def) -> itemFactory.apply(def.getProperties()));
+    }
+
+    /**
+     * Creates a configuration for a tool item.
+     * This allows for creating various types of tools including pickaxes, axes,
+     * shovels, hoes, swords, and custom tools with specific block effectiveness.
+     *
+     * @param toolName The name identifier for the tool item
+     * @return A new ToolItemDefinition instance for method chaining
+     */
+    public ToolItemDefinition<Item> defineToolItem(
+            String toolName
+    ) {
+        return defineToolItem(
+                toolName,
+                (def) -> new Item(def.getProperties())
+        );
     }
 
     /**
@@ -247,6 +274,23 @@ public abstract class ItemRegistry {
     }
 
     /**
+     * Creates a configuration for an armor item.
+     * This allows for creating various types of armor including humanoid armor,
+     * wolf armor, horse armor, and custom armor with trim support.
+     *
+     * @param armorName The name identifier for the armor item
+     * @return A new ArmorItemDefinition instance for method chaining
+     */
+    public ArmorItemDefinition<Item> defineArmorItem(
+            String armorName
+    ) {
+        return defineArmorItem(
+                armorName,
+                (def) -> new Item(def.getProperties())
+        );
+    }
+
+    /**
      * Creates a configuration for a food item.
      * This allows for creating consumable food items with nutrition values,
      * saturation, status effects, consumption animations, and sounds.
@@ -261,6 +305,23 @@ public abstract class ItemRegistry {
             FoodItemDefinition.ItemFactory<I> itemFactory
     ) {
         return new FoodItemDefinition<>(this, foodName, itemFactory);
+    }
+
+    /**
+     * Creates a configuration for a food item.
+     * This allows for creating consumable food items with nutrition values,
+     * saturation, status effects, consumption animations, and sounds.
+     *
+     * @param foodName The name identifier for the food item
+     * @return A new FoodItemDefinition instance for method chaining
+     */
+    public FoodItemDefinition<Item> defineFoodItem(
+            String foodName
+    ) {
+        return defineFoodItem(
+                foodName,
+                (def) -> new Item(def.getProperties())
+        );
     }
 
     /**
@@ -281,6 +342,23 @@ public abstract class ItemRegistry {
     }
 
     /**
+     * Creates a configuration for a drink item.
+     * This is a specialized food item that uses drink-specific animations,
+     * sounds, and consumption behavior instead of eating behavior.
+     *
+     * @param drinkName The name identifier for the drink item
+     * @return A new DrinkItemDefinition instance for method chaining
+     */
+    public DrinkItemDefinition<Item> defineDrinkItem(
+            String drinkName
+    ) {
+        return defineDrinkItem(
+                drinkName,
+                (def) -> new Item(def.getProperties())
+        );
+    }
+
+    /**
      * Creates a configuration for a spawn egg item.
      * This allows for creating spawn eggs with custom entity types, colors,
      * and automatic dispenser behavior registration.
@@ -295,6 +373,23 @@ public abstract class ItemRegistry {
             SpawnEggDefinition.ItemFactory<I> itemFactory
     ) {
         return new SpawnEggDefinition<>(this, eggName, itemFactory);
+    }
+
+    /**
+     * Creates a configuration for a spawn egg item.
+     * This allows for creating spawn eggs with custom entity types, colors,
+     * and automatic dispenser behavior registration.
+     *
+     * @param eggName The name identifier for the spawn egg
+     * @return A new SpawnEggDefinition instance for method chaining
+     */
+    public SpawnEggDefinition<SpawnEggItem> defineSpawnEgg(
+            String eggName
+    ) {
+        return defineSpawnEgg(
+                eggName,
+                (def) -> new SpawnEggItem(def.entityType(), def.getProperties())
+        );
     }
 
     /**

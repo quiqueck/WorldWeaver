@@ -6,6 +6,8 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Specialized configuration class for creating armor items with armor-specific properties.
  * This class extends {@link ItemDefinition} to provide additional methods for configuring
@@ -16,6 +18,9 @@ import net.minecraft.world.item.equipment.trim.TrimMaterial;
  * @since 21.6.0
  */
 public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, ArmorItemDefinition<I>> {
+    private @Nullable ArmorMaterial material;
+    private @Nullable ArmorType type;
+
     /**
      * Factory interface for creating armor items from configuration objects.
      * Extends the base ItemFactory to work specifically with ArmorItemDefinition.
@@ -38,6 +43,14 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
             ItemDefinition.ItemFactory<I, ArmorItemDefinition<I>> itemFactory
     ) {
         super(registry, armorName, itemFactory);
+    }
+
+    public @Nullable ArmorType armorType() {
+        return this.type;
+    }
+
+    public @Nullable ArmorMaterial material() {
+        return this.material;
     }
 
     /**
@@ -71,6 +84,8 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
      * @return This configuration instance for method chaining
      */
     public ArmorItemDefinition<I> humanoidArmor(ArmorMaterial material, ArmorType type) {
+        this.material = material;
+        this.type = type;
         this.properties.humanoidArmor(material, type);
         return this;
     }
@@ -83,6 +98,9 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
      * @return This configuration instance for method chaining
      */
     public ArmorItemDefinition<I> wolfArmor(ArmorMaterial material) {
+        this.material = material;
+        this.type = ArmorType.BODY;
+
         this.properties.wolfArmor(material);
         return this;
     }
@@ -95,6 +113,9 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
      * @return This configuration instance for method chaining
      */
     public ArmorItemDefinition<I> horseArmor(ArmorMaterial material) {
+        this.material = material;
+        this.type = ArmorType.BODY;
+
         this.properties.horseArmor(material);
         return this;
     }

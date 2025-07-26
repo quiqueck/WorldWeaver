@@ -4,6 +4,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.item.api.ArmorItemDefinition;
 import org.betterx.wover.item.api.ItemRegistry;
+import org.betterx.wover.item.api.trait.ItemRecipeTrait;
 import org.betterx.wover.item.impl.trait.ItemRecipeTraitBuilder;
 import org.betterx.wover.recipe.api.RecipeBuilder;
 
@@ -33,7 +34,8 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
             ArmorSlot slot,
             String path,
             ArmorItemDefinition.ItemFactory<I> creator,
-            EquipmentSet equipmentSet
+            EquipmentSet equipmentSet,
+            @Nullable ItemRecipeTrait recipeOverride
     ) {
         var itemDefinition = ItemRegistry
                 .forMod(modCore)
@@ -42,7 +44,7 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
                 .humanoidArmor(equipmentSet.armorTier.armorMaterial, slot.armorType);
 
         itemDefinition.addTrait(
-                ItemRecipeTraitBuilder
+                recipeOverride != null ? recipeOverride : ItemRecipeTraitBuilder
                         .BUILDER
                         .with((key, item, context) -> addRecipe(
                                 context,

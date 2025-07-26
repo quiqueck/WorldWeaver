@@ -1,5 +1,7 @@
 package org.betterx.wover.item.api.armor;
 
+import org.betterx.wover.tag.api.TagManager;
+
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -199,6 +201,19 @@ public class CustomArmorMaterial {
          */
         public Builder repairIngredient(TagKey<Item> repairIngredientTag) {
             this.repairIngredient = repairIngredientTag;
+            return this;
+        }
+
+        /**
+         * Creates a repair ingredient tag for this armor material.
+         *
+         * <p>This method automatically creates a tag with the suffix "repair/" based on the material location.
+         * It is useful for ensuring consistent repair ingredients across different armor pieces.
+         *
+         * @return This builder instance for chaining
+         */
+        public Builder createRepairIngredient() {
+            TagManager.ITEMS.makeTag(location.withSuffix("repair/"));
             return this;
         }
 
