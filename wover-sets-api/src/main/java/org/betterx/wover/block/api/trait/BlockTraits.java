@@ -6,6 +6,7 @@ import org.betterx.wover.block.api.trait.type.LogBlockTrait;
 import org.betterx.wover.block.impl.trait.BlockRecipeTraitBuilder;
 import org.betterx.wover.block.impl.trait.behaviour.*;
 import org.betterx.wover.block.impl.trait.material.MetalMaterialBuilder;
+import org.betterx.wover.block.impl.trait.material.ObsidianMaterialBuilder;
 import org.betterx.wover.block.impl.trait.material.StoneMaterialBuilder;
 import org.betterx.wover.block.impl.trait.material.WoodMaterialBuilder;
 import org.betterx.wover.block.impl.trait.type.*;
@@ -22,6 +23,7 @@ public class BlockTraits {
     public static final GenericBlockTrait.BuilderWithDefaults STONE_BLOCK = StoneMaterialBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults METAL_BLOCK = MetalMaterialBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults WOOD_BLOCK = WoodMaterialBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults OBSIDIAN_BLOCK = ObsidianMaterialBuilder.BUILDER;
 
     // Tab-Based traits
     public static final MineableWithTagTrait.Builder MINEABLE_WITH = MineableWithTagBuilder.BUILDER;
@@ -48,6 +50,7 @@ public class BlockTraits {
     public static final GenericBlockTrait.BuilderWithDefaults STAIR_BLOCK = StairsBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults TRAPDOOR_BLOCK = TrapdoorBlockBuilder.BUILDER;
     public static final GenericBlockTrait.BuilderWithDefaults WALL_BLOCK = WallBlockBuilder.BUILDER;
+    public static final GenericBlockTrait.BuilderWithDefaults PILLAR_BLOCK = PillarBlockBuilder.BUILDER;
 
     //Recipe Traits
     public static final BlockRecipeTrait.Builder RECIPE = BlockRecipeTraitBuilder.BUILDER;

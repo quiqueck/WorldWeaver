@@ -79,9 +79,9 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
         blockDefinition.addTrait(BlockTraits.FLAMMABLE);
 
         if (slot == SlotType.PLANKS) {
-            blockDefinition.getProperties().mapColor(planksColor);
+            blockDefinition.mapColor(planksColor);
         } else {
-            blockDefinition.getProperties().mapColor(woodColor);
+            blockDefinition.mapColor(woodColor);
         }
 
     }

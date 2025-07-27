@@ -2,6 +2,7 @@ package org.betterx.wover.complex.api.equipment;
 
 import org.betterx.wover.entrypoint.LibWoverRecipe;
 import org.betterx.wover.item.api.ItemDefinition;
+import org.betterx.wover.item.api.ToolItemDefinition;
 import org.betterx.wover.item.api.trait.ItemTrait;
 import org.betterx.wover.item.api.trait.ItemTraitKey;
 import org.betterx.wover.item.impl.trait.ItemTraitImpl;
@@ -63,13 +64,17 @@ public class ToolTier {
                 ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
                 ToolTier.ToolValues values
         ) {
-            definition.getProperties().tool(
-                    this.tier.toolMaterial,
-                    values.minableWithTag,
-                    values.attackDamage,
-                    values.attackSpeed,
-                    values.disableBlockingForSeconds
-            );
+            if (definition instanceof ToolItemDefinition toolDef) {
+                toolDef.tool(
+                        this.tier.toolMaterial,
+                        values.minableWithTag,
+                        values.attackDamage,
+                        values.attackSpeed,
+                        values.disableBlockingForSeconds
+                );
+            } else {
+                throw new IllegalArgumentException("Definition must be a ToolItemDefinition");
+            }
         }
     }
 
@@ -85,11 +90,15 @@ public class ToolTier {
                 ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
                 ToolTier.ToolValues values
         ) {
-            definition.getProperties().sword(
-                    tier.toolMaterial,
-                    (int) values.attackDamage,
-                    values.attackSpeed
-            );
+            if (definition instanceof ToolItemDefinition toolDef) {
+                toolDef.sword(
+                        tier.toolMaterial,
+                        (int) values.attackDamage,
+                        values.attackSpeed
+                );
+            } else {
+                throw new IllegalArgumentException("Definition must be a ToolItemDefinition");
+            }
         }
     }
 

@@ -2,16 +2,22 @@ package org.betterx.wover.sets.api.blocks.slots;
 
 import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
-import org.betterx.wover.sets.api.blocks.types.Slab;
-import org.betterx.wover.sets.api.blocks.types.Source;
-import org.betterx.wover.sets.api.blocks.types.Stairs;
-import org.betterx.wover.sets.api.blocks.types.Wall;
+import org.betterx.wover.sets.api.blocks.types.*;
 
 public class StoneSlots {
     public static final SlotFromDefinition SOURCE = new Source();
     public static final SlotFromDefinition SLAB = new Slab();
     public static final SlotFromDefinition STAIRS = new Stairs();
     public static final SlotFromDefinition WALL = new Wall();
+    public static final SlotFromDefinition PILLAR = new Pillar();
+
+    public static final SlotFromDefinition BUTTON = new Button();
+    public static final SlotFromDefinition PRESSURE_PLATE = new PressurePlate();
+
+    public static final SlotFromDefinition TILES_SOURCE = new Source(SlotType.SOURCE, SlotType.TILES);
+    public static final SlotFromDefinition TILES_SLAB = new Slab(SlotType.TILES, SlotType.TILES_SLAB);
+    public static final SlotFromDefinition TILES_STAIRS = new Stairs(SlotType.TILES, SlotType.TILES_STAIRS);
+    public static final SlotFromDefinition TILES_WALL = new Wall(SlotType.TILES, SlotType.TILES_WALL);
 
     public static final SlotFromDefinition BRICK_SOURCE = new Source(SlotType.SOURCE, SlotType.BRICK);
     public static final SlotFromDefinition BRICK_SLAB = new Slab(SlotType.BRICK, SlotType.BRICK_SLAB);

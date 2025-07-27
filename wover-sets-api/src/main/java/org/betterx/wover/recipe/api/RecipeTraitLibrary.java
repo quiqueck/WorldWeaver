@@ -11,6 +11,8 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
+import org.jetbrains.annotations.Nullable;
+
 public class RecipeTraitLibrary {
     protected static void validOrThrow(RecipeMaterial sourceMaterial, String recipeType, String materialType) {
         if (!sourceMaterial.isValid()) {
@@ -153,6 +155,30 @@ public class RecipeTraitLibrary {
                             .group("bookshelf")
                             .category(RecipeCategory.BUILDING_BLOCKS)
                             .build(context);
+                }
+        );
+    }
+
+
+    public static BlockRecipeTrait pillar(RecipeMaterial slabMaterial, @Nullable RecipeMaterial stoneMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(slabMaterial, "pillar", "slab");
+
+                    if (stoneMaterial != null) {
+                        validOrThrow(stoneMaterial, "pillar", "stone");
+
+                        RecipeBuilder
+                                .stonecutting(key.location().withPrefix("_stonecutting"), block)
+                                .input(stoneMaterial)
+                                .build(context);
+                    }
+
+                    RecipeBuilder.crafting(key.location(), block)
+                                 .shape("#", "#")
+                                 .addMaterial('#', slabMaterial)
+                                 .group("end_pillar")
+                                 .build(context);
                 }
         );
     }

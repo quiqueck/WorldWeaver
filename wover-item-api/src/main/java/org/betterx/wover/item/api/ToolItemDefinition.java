@@ -92,7 +92,13 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
             float attackSpeed,
             float blockingDisableTime
     ) {
-        this.properties.tool(material, effectiveBlocks, baseDamage, attackSpeed, blockingDisableTime);
+        propertySetters.add((properties) -> properties.tool(
+                material,
+                effectiveBlocks,
+                baseDamage,
+                attackSpeed,
+                blockingDisableTime
+        ));
         return this;
     }
 
@@ -106,7 +112,7 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
      * @return This configuration instance for method chaining
      */
     public ToolItemDefinition<I> pickaxe(ToolMaterial material, float baseDamage, float attackSpeed) {
-        this.properties.pickaxe(material, baseDamage, attackSpeed);
+        propertySetters.add((properties) -> properties.pickaxe(material, baseDamage, attackSpeed));
         return this;
     }
 
@@ -120,7 +126,7 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
      * @return This configuration instance for method chaining
      */
     public ToolItemDefinition<I> axe(ToolMaterial material, float baseDamage, float attackSpeed) {
-        this.properties.axe(material, baseDamage, attackSpeed);
+        propertySetters.add((properties) -> properties.axe(material, baseDamage, attackSpeed));
         return this;
     }
 
@@ -134,7 +140,7 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
      * @return This configuration instance for method chaining
      */
     public ToolItemDefinition<I> hoe(ToolMaterial material, float baseDamage, float attackSpeed) {
-        this.properties.hoe(material, baseDamage, attackSpeed);
+        propertySetters.add((properties) -> properties.hoe(material, baseDamage, attackSpeed));
         return this;
     }
 
@@ -148,7 +154,7 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
      * @return This configuration instance for method chaining
      */
     public ToolItemDefinition<I> shovel(ToolMaterial material, float baseDamage, float attackSpeed) {
-        this.properties.shovel(material, baseDamage, attackSpeed);
+        propertySetters.add((properties) -> properties.shovel(material, baseDamage, attackSpeed));
         return this;
     }
 
@@ -162,7 +168,7 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
      * @return This configuration instance for method chaining
      */
     public ToolItemDefinition<I> sword(ToolMaterial material, float baseDamage, float attackSpeed) {
-        this.properties.sword(material, baseDamage, attackSpeed);
+        propertySetters.add((properties) -> properties.sword(material, baseDamage, attackSpeed));
         return this;
     }
 }

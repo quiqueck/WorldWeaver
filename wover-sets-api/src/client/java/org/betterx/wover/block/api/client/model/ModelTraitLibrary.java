@@ -88,6 +88,13 @@ public class ModelTraitLibrary {
     }
 
 
+    public static BlockModelTrait pillar() {
+        return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+            generator.createRotatedPillar(block);
+        });
+    }
+
+
     public static BlockModelTrait button(Supplier<Block> planksMaterial) {
         return ClientBlockTraits.MODEL.with((key, block, generator) -> {
             generator.createButton(planksMaterial.get(), block);

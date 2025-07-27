@@ -47,7 +47,7 @@ public class FlammableBlockBuilder extends AbstractBlockTraitBuilder<Block, Gene
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.getProperties().ignitedByLava();
+            definition.ignitedByLava();
         }
 
         @Override

@@ -7,8 +7,10 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.loot.api.LootLookupProvider;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -30,6 +32,8 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
         @Nullable LootTableTrait dropNamedEntity();
         @Nullable LootTableTrait dropSelf();
         @Nullable LootTableTrait dropSlab();
+        @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise);
+        @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, NumberProvider amount);
     }
 
     LootTableFactory lootTableFactory();

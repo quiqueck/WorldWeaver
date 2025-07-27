@@ -5,20 +5,22 @@ import org.betterx.wover.block.api.trait.*;
 import org.betterx.wover.block.impl.trait.BlockTraitImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
+import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
-    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new WoodMaterialBuilder();
+public class ObsidianMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
+    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new ObsidianMaterialBuilder();
     private final GenericBlockTrait DEFAULT = new Trait();
 
-    private WoodMaterialBuilder() {
-        super(BlockTraitKey.ofUnique(LibWoverSets.C, "wood"));
+    private ObsidianMaterialBuilder() {
+        super(BlockTraitKey.ofUnique(LibWoverSets.C, "obsidian"));
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
@@ -34,10 +36,13 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
+            definition.addTags(CommonBlockTags.IMMOBILE, BlockTags.DRAGON_IMMUNE);
+
             definition
-                    .instrument(NoteBlockInstrument.BASS)
-                    .strength(2.0F, 3.0F)
-                    .sound(SoundType.WOOD);
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .requiresCorrectToolForDrops()
+                    .strength(50.0F, 1200.0F);
         }
     }
 }

@@ -11,6 +11,9 @@ import org.betterx.wover.sets.api.blocks.BlockSet;
 import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -40,6 +43,10 @@ public class Source extends SlotFromDefinition {
 
     @Override
     protected void addSlotSpecificDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        if (slot == SlotType.BRICK) {
+            def.addTags(BlockTags.STONE_BRICKS);
+            def.addItemTags(ItemTags.STONE_BRICKS);
+        }
         def.addTrait(BlockTraits.LOOT_TABLE.dropSelf());
     }
 
@@ -65,6 +72,8 @@ public class Source extends SlotFromDefinition {
         } else if (slot == SlotType.CHISELED) {
             return RecipeTraitLibrary.stoneCutSource(sourceMaterial);
         } else if (slot == SlotType.POLISHED) {
+            return RecipeTraitLibrary.stoneCutSource(sourceMaterial);
+        } else if (slot == SlotType.TILES) {
             return RecipeTraitLibrary.stoneCutSource(sourceMaterial);
         } else if (slot == SlotType.WEATHERED) {
             return RecipeTraitLibrary.mossySource(sourceMaterial);

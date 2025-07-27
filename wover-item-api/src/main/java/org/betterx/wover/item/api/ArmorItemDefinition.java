@@ -86,7 +86,7 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
     public ArmorItemDefinition<I> humanoidArmor(ArmorMaterial material, ArmorType type) {
         this.material = material;
         this.type = type;
-        this.properties.humanoidArmor(material, type);
+        propertySetters.add((properties) -> properties.humanoidArmor(material, type));
         return this;
     }
 
@@ -101,7 +101,7 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
         this.material = material;
         this.type = ArmorType.BODY;
 
-        this.properties.wolfArmor(material);
+        propertySetters.add((properties) -> properties.wolfArmor(material));
         return this;
     }
 
@@ -116,7 +116,7 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
         this.material = material;
         this.type = ArmorType.BODY;
 
-        this.properties.horseArmor(material);
+        propertySetters.add((properties) -> properties.horseArmor(material));
         return this;
     }
 
@@ -128,7 +128,7 @@ public class ArmorItemDefinition<I extends Item> extends ItemDefinition<I, Armor
      * @return This configuration instance for method chaining
      */
     public ArmorItemDefinition<I> trimMaterial(ResourceKey<TrimMaterial> trimMaterialKey) {
-        this.properties.trimMaterial(trimMaterialKey);
+        propertySetters.add((properties) -> properties.trimMaterial(trimMaterialKey));
         return this;
     }
 }

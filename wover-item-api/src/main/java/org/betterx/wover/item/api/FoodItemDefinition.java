@@ -236,7 +236,7 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      * @return This configuration instance for method chaining
      */
     public FoodItemDefinition<I> food(FoodProperties foodProps) {
-        this.properties.food(foodProps);
+        propertySetters.add((properties) -> properties.food(foodProps));
         return this;
     }
 
@@ -249,7 +249,7 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      * @return This configuration instance for method chaining
      */
     public FoodItemDefinition<I> food(FoodProperties foodProps, Consumable consumableBehavior) {
-        this.properties.food(foodProps, consumableBehavior);
+        propertySetters.add((properties) -> properties.food(foodProps, consumableBehavior));
         return this;
     }
 }

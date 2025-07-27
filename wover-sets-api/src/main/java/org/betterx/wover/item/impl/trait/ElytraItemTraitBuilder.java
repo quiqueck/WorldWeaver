@@ -57,7 +57,7 @@ public class ElytraItemTraitBuilder extends AbstractItemTraitBuilder<Item, Elytr
         public void configure(ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition) {
             definition.addTags(ItemTags.DURABILITY_ENCHANTABLE, ItemTags.EQUIPPABLE_ENCHANTABLE);
 
-            definition.getProperties().component(DataComponents.GLIDER, Unit.INSTANCE)
+            definition.component(DataComponents.GLIDER, Unit.INSTANCE)
                       .component(
                               DataComponents.EQUIPPABLE,
                               Equippable.builder(EquipmentSlot.CHEST)

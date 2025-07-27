@@ -22,6 +22,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     public final ResourceKey<Block> blockKey;
     protected final @NotNull ResourceKey<Item> itemKey;
 
-    protected final BlockBehaviour.Properties properties;
+    protected BlockBehaviour.Properties properties;
 
     protected List<TagKey<Block>> tags;
     protected List<TagKey<Item>> itemTags;
@@ -152,6 +153,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
                 }
             }
         } else runtimeTraits = null;
+
+        // Apply all property setters to the properties
+        for (Consumer<BlockBehaviour.Properties> propertySetter : this.propertySetters) {
+            propertySetter.accept(this.properties);
+        }
 
         B block = blockFactory.createItem((D) this);
 
@@ -321,457 +327,6 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return this.itemTags.toArray(new TagKey[0]);
     }
 
-    // **********************************************************************
-    // Redirect all BlockTrait.Properties methods (except setId) to this.properties
-
-    /**
-     * Sets the map color for this block using a dye color.
-     *
-     * @param dyeColor The dye color to use for the map color
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D mapColor(DyeColor dyeColor) {
-        this.properties.mapColor(dyeColor);
-        return (D) this;
-    }
-
-    /**
-     * Sets the map color for this block.
-     *
-     * @param mapColor The map color to use
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D mapColor(MapColor mapColor) {
-        this.properties.mapColor(mapColor);
-        return (D) this;
-    }
-
-    /**
-     * Sets the map color for this block using a function that determines the color based on block state.
-     *
-     * @param function Function that returns the map color for a given block state
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D mapColor(Function<BlockState, MapColor> function) {
-        this.properties.mapColor(function);
-        return (D) this;
-    }
-
-    /**
-     * Makes this block non-collidable (entities can pass through it).
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D noCollission() {
-        this.properties.noCollission();
-        return (D) this;
-    }
-
-    /**
-     * Prevents this block from occluding adjacent blocks (doesn't block light or rendering).
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D noOcclusion() {
-        this.properties.noOcclusion();
-        return (D) this;
-    }
-
-    /**
-     * Sets the friction coefficient for this block surface.
-     *
-     * @param friction The friction value (0.0 = no friction, 1.0 = normal friction)
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D friction(float friction) {
-        this.properties.friction(friction);
-        return (D) this;
-    }
-
-    /**
-     * Sets the speed factor for entities walking on this block.
-     *
-     * @param speedFactor The speed multiplier (1.0 = normal speed, higher = faster, lower = slower)
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D speedFactor(float speedFactor) {
-        this.properties.speedFactor(speedFactor);
-        return (D) this;
-    }
-
-    /**
-     * Sets the jump factor for entities jumping on this block.
-     *
-     * @param jumpFactor The jump multiplier (1.0 = normal jump, higher = higher jumps)
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D jumpFactor(float jumpFactor) {
-        this.properties.jumpFactor(jumpFactor);
-        return (D) this;
-    }
-
-    /**
-     * Sets the sound type for this block (affects break, place, step, etc. sounds).
-     *
-     * @param soundType The sound type to use
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D sound(SoundType soundType) {
-        this.properties.sound(soundType);
-        return (D) this;
-    }
-
-    /**
-     * Sets the light level emitted by this block.
-     *
-     * @param lightLevel Function that returns the light level (0-15) for a given block state
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D lightLevel(ToIntFunction<BlockState> lightLevel) {
-        this.properties.lightLevel(lightLevel);
-        return (D) this;
-    }
-
-    /**
-     * Sets both the destroy time and explosion resistance of this block.
-     *
-     * @param destroyTime         The time it takes to break the block
-     * @param explosionResistance The resistance to explosions
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D strength(float destroyTime, float explosionResistance) {
-        this.properties.strength(destroyTime, explosionResistance);
-        return (D) this;
-    }
-
-    /**
-     * Makes this block break instantly (0 break time).
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D instabreak() {
-        this.properties.instabreak();
-        return (D) this;
-    }
-
-    /**
-     * Sets both the destroy time and explosion resistance to the same value.
-     *
-     * @param strength The strength value for both destroy time and explosion resistance
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D strength(float strength) {
-        this.properties.strength(strength);
-        return (D) this;
-    }
-
-    /**
-     * Makes this block receive random ticks (for growth, decay, etc.).
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D randomTicks() {
-        this.properties.randomTicks();
-        return (D) this;
-    }
-
-    /**
-     * Marks this block as having a dynamic shape (shape can change based on state).
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D dynamicShape() {
-        this.properties.dynamicShape();
-        return (D) this;
-    }
-
-    /**
-     * Prevents this block from dropping any loot when broken.
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D noLootTable() {
-        this.properties.noLootTable();
-        return (D) this;
-    }
-
-    /**
-     * Overrides the loot table for this block.
-     *
-     * @param lootTable Optional loot table resource key
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D overrideLootTable(Optional<ResourceKey<LootTable>> lootTable) {
-        this.properties.overrideLootTable(lootTable);
-        return (D) this;
-    }
-
-    /**
-     * Makes this block ignitable by lava. You should add the
-     * FlammableBlockTrait to register it properly.
-     *
-     * @return This configuration instance for method chaining
-     * @deprecated Use FlammableBlockTrait instead, as this method is
-     * deprecated and will be removed in future versions.
-     */
-    @Deprecated(forRemoval = true)
-    @SuppressWarnings("unchecked")
-    protected D ignitedByLava() {
-        this.properties.ignitedByLava();
-        return (D) this;
-    }
-
-    /**
-     * Marks this block as a liquid.
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D liquid() {
-        this.properties.liquid();
-        return (D) this;
-    }
-
-    /**
-     * Forces this block to be considered solid for rendering and collision purposes.
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D forceSolidOn() {
-        this.properties.forceSolidOn();
-        return (D) this;
-    }
-
-    /**
-     * Forces this block to not be considered solid for rendering and collision purposes.
-     *
-     * @return This configuration instance for method chaining
-     * @deprecated Use other methods to control solidity
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public D forceSolidOff() {
-        this.properties.forceSolidOff();
-        return (D) this;
-    }
-
-    /**
-     * Sets how this block reacts to pistons.
-     *
-     * @param pushReaction The piston push reaction (NORMAL, DESTROY, BLOCK, IGNORE, PUSH_ONLY)
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D pushReaction(PushReaction pushReaction) {
-        this.properties.pushReaction(pushReaction);
-        return (D) this;
-    }
-
-    /**
-     * Marks this block as air (invisible, non-solid, etc.).
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D air() {
-        this.properties.air();
-        return (D) this;
-    }
-
-    /**
-     * Sets a predicate to determine if entities can spawn on this block.
-     *
-     * @param predicate Predicate that tests if spawning is valid for a given entity type
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> predicate) {
-        this.properties.isValidSpawn(predicate);
-        return (D) this;
-    }
-
-    /**
-     * Sets a predicate to determine if this block conducts redstone signals.
-     *
-     * @param predicate Predicate that tests if the block conducts redstone
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D isRedstoneConductor(BlockBehaviour.StatePredicate predicate) {
-        this.properties.isRedstoneConductor(predicate);
-        return (D) this;
-    }
-
-    /**
-     * Sets a predicate to determine if this block suffocates entities inside it.
-     *
-     * @param predicate Predicate that tests if the block is suffocating
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D isSuffocating(BlockBehaviour.StatePredicate predicate) {
-        this.properties.isSuffocating(predicate);
-        return (D) this;
-    }
-
-    /**
-     * Sets a predicate to determine if this block blocks view (for rendering optimizations).
-     *
-     * @param predicate Predicate that tests if the block blocks view
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D isViewBlocking(BlockBehaviour.StatePredicate predicate) {
-        this.properties.isViewBlocking(predicate);
-        return (D) this;
-    }
-
-    /**
-     * Sets a predicate to determine if this block requires post-processing during rendering.
-     *
-     * @param predicate Predicate that tests if post-processing is needed
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D hasPostProcess(BlockBehaviour.StatePredicate predicate) {
-        this.properties.hasPostProcess(predicate);
-        return (D) this;
-    }
-
-    /**
-     * Sets a predicate to determine if this block should use emissive rendering.
-     *
-     * @param predicate Predicate that tests if emissive rendering should be used
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D emissiveRendering(BlockBehaviour.StatePredicate predicate) {
-        this.properties.emissiveRendering(predicate);
-        return (D) this;
-    }
-
-    /**
-     * Makes this block require the correct tool to drop items when broken.
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D requiresCorrectToolForDrops() {
-        this.properties.requiresCorrectToolForDrops();
-        return (D) this;
-    }
-
-    /**
-     * Sets the time it takes to destroy this block.
-     *
-     * @param destroyTime The destroy time in seconds
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D destroyTime(float destroyTime) {
-        this.properties.destroyTime(destroyTime);
-        return (D) this;
-    }
-
-    /**
-     * Sets the explosion resistance of this block.
-     *
-     * @param explosionResistance The resistance to explosions
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D explosionResistance(float explosionResistance) {
-        this.properties.explosionResistance(explosionResistance);
-        return (D) this;
-    }
-
-    /**
-     * Sets the offset type for this block (how it's positioned within its block space).
-     *
-     * @param offsetType The offset type (NONE, XZ, XYZ)
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D offsetType(BlockBehaviour.OffsetType offsetType) {
-        this.properties.offsetType(offsetType);
-        return (D) this;
-    }
-
-    /**
-     * Prevents this block from spawning terrain particles when walked on.
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D noTerrainParticles() {
-        this.properties.noTerrainParticles();
-        return (D) this;
-    }
-
-    /**
-     * Sets the required feature flags for this block to be available.
-     *
-     * @param featureFlags The feature flags required for this block
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D requiredFeatures(FeatureFlag... featureFlags) {
-        this.properties.requiredFeatures(featureFlags);
-        return (D) this;
-    }
-
-    /**
-     * Sets the noteblock instrument this block produces when used as a noteblock base.
-     *
-     * @param instrument The noteblock instrument to use
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D instrument(NoteBlockInstrument instrument) {
-        this.properties.instrument(instrument);
-        return (D) this;
-    }
-
-    /**
-     * Makes this block replaceable by other blocks during world generation and placement.
-     *
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D replaceable() {
-        this.properties.replaceable();
-        return (D) this;
-    }
-
-    /**
-     * Overrides the description key for this block.
-     *
-     * @param descriptionKey The custom description key
-     * @return This configuration instance for method chaining
-     */
-    @SuppressWarnings("unchecked")
-    public D overrideDescription(String descriptionKey) {
-        this.properties.overrideDescription(descriptionKey);
-        return (D) this;
-    }
 
     /**
      * Gets the underlying BlockTrait.Properties object used by this configuration.
@@ -806,5 +361,471 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     ) {
         // Cast is safe because the trait can work with B (since B extends the super type)
         ((BlockTrait<B, ?>) trait).afterBlockRegistration(block, (D) this);
+    }
+
+    // **********************************************************************
+    // Redirect all BlockTrait.Properties methods (except setId) to this.properties
+    protected List<Consumer<BlockBehaviour.Properties>> propertySetters = new LinkedList<>();
+
+    /**
+     * Sets the map color for this block using a dye color.
+     *
+     * @param dyeColor The dye color to use for the map color
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D mapColor(DyeColor dyeColor) {
+        propertySetters.add((properties) -> properties.mapColor(dyeColor));
+        return (D) this;
+    }
+
+    /**
+     * Sets the map color for this block.
+     *
+     * @param mapColor The map color to use
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D mapColor(MapColor mapColor) {
+        propertySetters.add((properties) -> properties.mapColor(mapColor));
+        return (D) this;
+    }
+
+    /**
+     * Sets the map color for this block using a function that determines the color based on block state.
+     *
+     * @param function Function that returns the map color for a given block state
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D mapColor(Function<BlockState, MapColor> function) {
+        propertySetters.add((properties) -> properties.mapColor(function));
+        return (D) this;
+    }
+
+    /**
+     * Makes this block non-collidable (entities can pass through it).
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D noCollission() {
+        propertySetters.add((properties) -> properties.noCollission());
+        return (D) this;
+    }
+
+    /**
+     * Prevents this block from occluding adjacent blocks (doesn't block light or rendering).
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D noOcclusion() {
+        propertySetters.add((properties) -> properties.noOcclusion());
+        return (D) this;
+    }
+
+    /**
+     * Sets the friction coefficient for this block surface.
+     *
+     * @param friction The friction value (0.0 = no friction, 1.0 = normal friction)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D friction(float friction) {
+        propertySetters.add((properties) -> properties.friction(friction));
+        return (D) this;
+    }
+
+    /**
+     * Sets the speed factor for entities walking on this block.
+     *
+     * @param speedFactor The speed multiplier (1.0 = normal speed, higher = faster, lower = slower)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D speedFactor(float speedFactor) {
+        propertySetters.add((properties) -> properties.speedFactor(speedFactor));
+        return (D) this;
+    }
+
+    /**
+     * Sets the jump factor for entities jumping on this block.
+     *
+     * @param jumpFactor The jump multiplier (1.0 = normal jump, higher = higher jumps)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D jumpFactor(float jumpFactor) {
+        propertySetters.add((properties) -> properties.jumpFactor(jumpFactor));
+        return (D) this;
+    }
+
+    /**
+     * Sets the sound type for this block (affects break, place, step, etc. sounds).
+     *
+     * @param soundType The sound type to use
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D sound(SoundType soundType) {
+        propertySetters.add((properties) -> properties.sound(soundType));
+        return (D) this;
+    }
+
+    /**
+     * Sets the light level emitted by this block.
+     *
+     * @param lightLevel Function that returns the light level (0-15) for a given block state
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D lightLevel(ToIntFunction<BlockState> lightLevel) {
+        propertySetters.add((properties) -> properties.lightLevel(lightLevel));
+        return (D) this;
+    }
+
+    /**
+     * Sets both the destroy time and explosion resistance of this block.
+     *
+     * @param destroyTime         The time it takes to break the block
+     * @param explosionResistance The resistance to explosions
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D strength(float destroyTime, float explosionResistance) {
+        propertySetters.add((properties) -> properties.strength(destroyTime, explosionResistance));
+        return (D) this;
+    }
+
+    /**
+     * Makes this block break instantly (0 break time).
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D instabreak() {
+        propertySetters.add((properties) -> properties.instabreak());
+        return (D) this;
+    }
+
+    /**
+     * Sets both the destroy time and explosion resistance to the same value.
+     *
+     * @param strength The strength value for both destroy time and explosion resistance
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D strength(float strength) {
+        propertySetters.add((properties) -> properties.strength(strength));
+        return (D) this;
+    }
+
+    /**
+     * Makes this block receive random ticks (for growth, decay, etc.).
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D randomTicks() {
+        propertySetters.add((properties) -> properties.randomTicks());
+        return (D) this;
+    }
+
+    /**
+     * Marks this block as having a dynamic shape (shape can change based on state).
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D dynamicShape() {
+        propertySetters.add((properties) -> properties.dynamicShape());
+        return (D) this;
+    }
+
+    /**
+     * Prevents this block from dropping any loot when broken.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D noLootTable() {
+        propertySetters.add((properties) -> properties.noLootTable());
+        return (D) this;
+    }
+
+    /**
+     * Overrides the loot table for this block.
+     *
+     * @param lootTable Optional loot table resource key
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D overrideLootTable(Optional<ResourceKey<LootTable>> lootTable) {
+        propertySetters.add((properties) -> properties.overrideLootTable(lootTable));
+        return (D) this;
+    }
+
+    /**
+     * Makes this block ignitable by lava. You should add the
+     * FlammableBlockTrait to register it properly.
+     *
+     * @return This configuration instance for method chaining
+     * @deprecated Use FlammableBlockTrait instead, as this method is
+     * deprecated and will be removed in future versions.
+     */
+    @Deprecated(forRemoval = true)
+    @SuppressWarnings("unchecked")
+    public D ignitedByLava() {
+        propertySetters.add((properties) -> properties.ignitedByLava());
+        return (D) this;
+    }
+
+    /**
+     * Marks this block as a liquid.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D liquid() {
+        propertySetters.add((properties) -> properties.liquid());
+        return (D) this;
+    }
+
+    /**
+     * Forces this block to be considered solid for rendering and collision purposes.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D forceSolidOn() {
+        propertySetters.add((properties) -> properties.forceSolidOn());
+        return (D) this;
+    }
+
+    /**
+     * Forces this block to not be considered solid for rendering and collision purposes.
+     *
+     * @return This configuration instance for method chaining
+     * @deprecated Use other methods to control solidity
+     */
+    @Deprecated
+    @SuppressWarnings("unchecked")
+    public D forceSolidOff() {
+        propertySetters.add((properties) -> properties.forceSolidOff());
+        return (D) this;
+    }
+
+    /**
+     * Sets how this block reacts to pistons.
+     *
+     * @param pushReaction The piston push reaction (NORMAL, DESTROY, BLOCK, IGNORE, PUSH_ONLY)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D pushReaction(PushReaction pushReaction) {
+        propertySetters.add((properties) -> properties.pushReaction(pushReaction));
+        return (D) this;
+    }
+
+    /**
+     * Marks this block as air (invisible, non-solid, etc.).
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D air() {
+        propertySetters.add((properties) -> properties.air());
+        return (D) this;
+    }
+
+    /**
+     * Sets a predicate to determine if entities can spawn on this block.
+     *
+     * @param predicate Predicate that tests if spawning is valid for a given entity type
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> predicate) {
+        propertySetters.add((properties) -> properties.isValidSpawn(predicate));
+        return (D) this;
+    }
+
+    /**
+     * Sets a predicate to determine if this block conducts redstone signals.
+     *
+     * @param predicate Predicate that tests if the block conducts redstone
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D isRedstoneConductor(BlockBehaviour.StatePredicate predicate) {
+        propertySetters.add((properties) -> properties.isRedstoneConductor(predicate));
+        return (D) this;
+    }
+
+    /**
+     * Sets a predicate to determine if this block suffocates entities inside it.
+     *
+     * @param predicate Predicate that tests if the block is suffocating
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D isSuffocating(BlockBehaviour.StatePredicate predicate) {
+        propertySetters.add((properties) -> properties.isSuffocating(predicate));
+        return (D) this;
+    }
+
+    /**
+     * Sets a predicate to determine if this block blocks view (for rendering optimizations).
+     *
+     * @param predicate Predicate that tests if the block blocks view
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D isViewBlocking(BlockBehaviour.StatePredicate predicate) {
+        propertySetters.add((properties) -> properties.isViewBlocking(predicate));
+        return (D) this;
+    }
+
+    /**
+     * Sets a predicate to determine if this block requires post-processing during rendering.
+     *
+     * @param predicate Predicate that tests if post-processing is needed
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D hasPostProcess(BlockBehaviour.StatePredicate predicate) {
+        propertySetters.add((properties) -> properties.hasPostProcess(predicate));
+        return (D) this;
+    }
+
+    /**
+     * Sets a predicate to determine if this block should use emissive rendering.
+     *
+     * @param predicate Predicate that tests if emissive rendering should be used
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D emissiveRendering(BlockBehaviour.StatePredicate predicate) {
+        propertySetters.add((properties) -> properties.emissiveRendering(predicate));
+        return (D) this;
+    }
+
+    /**
+     * Makes this block require the correct tool to drop items when broken.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D requiresCorrectToolForDrops() {
+        propertySetters.add((properties) -> properties.requiresCorrectToolForDrops());
+        return (D) this;
+    }
+
+    /**
+     * Sets the time it takes to destroy this block.
+     *
+     * @param destroyTime The destroy time in seconds
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D destroyTime(float destroyTime) {
+        propertySetters.add((properties) -> properties.destroyTime(destroyTime));
+        return (D) this;
+    }
+
+    /**
+     * Sets the explosion resistance of this block.
+     *
+     * @param explosionResistance The resistance to explosions
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D explosionResistance(float explosionResistance) {
+        propertySetters.add((properties) -> properties.explosionResistance(explosionResistance));
+        return (D) this;
+    }
+
+    /**
+     * Sets the offset type for this block (how it's positioned within its block space).
+     *
+     * @param offsetType The offset type (NONE, XZ, XYZ)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D offsetType(BlockBehaviour.OffsetType offsetType) {
+        propertySetters.add((properties) -> properties.offsetType(offsetType));
+        return (D) this;
+    }
+
+    /**
+     * Prevents this block from spawning terrain particles when walked on.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D noTerrainParticles() {
+        propertySetters.add((properties) -> properties.noTerrainParticles());
+        return (D) this;
+    }
+
+    /**
+     * Sets the required feature flags for this block to be available.
+     *
+     * @param featureFlags The feature flags required for this block
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D requiredFeatures(FeatureFlag... featureFlags) {
+        propertySetters.add((properties) -> properties.requiredFeatures(featureFlags));
+        return (D) this;
+    }
+
+    /**
+     * Sets the noteblock instrument this block produces when used as a noteblock base.
+     *
+     * @param instrument The noteblock instrument to use
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D instrument(NoteBlockInstrument instrument) {
+        propertySetters.add((properties) -> properties.instrument(instrument));
+        return (D) this;
+    }
+
+    /**
+     * Makes this block replaceable by other blocks during world generation and placement.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D replaceable() {
+        propertySetters.add((properties) -> properties.replaceable());
+        return (D) this;
+    }
+
+    /**
+     * Overrides the description key for this block.
+     *
+     * @param descriptionKey The custom description key
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D overrideDescription(String descriptionKey) {
+        propertySetters.add((properties) -> properties.overrideDescription(descriptionKey));
+        return (D) this;
+    }
+
+    /**
+     * Replaces the current properties with a copy of the provided block's properties.
+     * This is useful for copying properties from an existing block. This will
+     * overwrite any existing properties set on this configuration.
+     *
+     * @param block The block whose properties should be copied
+     * @return This configuration instance for method chaining
+     */
+    public D replacePropertiesWithCopy(BlockBehaviour block) {
+        this.properties = BlockBehaviour.Properties.ofFullCopy(block);
+        return (D) this;
     }
 }

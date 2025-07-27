@@ -13,8 +13,11 @@ import org.betterx.wover.loot.api.LootLookupProvider;
 import org.betterx.wover.loot.api.LootTableManager;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -55,6 +58,17 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     public LootTableTrait dropSlab() {
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider) -> provider.dropSlab(block));
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise) {
+        return dropWithSilktouch(otherwise, ConstantValue.exactly(1.0F));
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, NumberProvider amount) {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider) -> provider.dropWithSilkTouch(block, otherwise, amount));
     }
 
     public static void bootstrapLootTables(

@@ -9,6 +9,8 @@ public record SlotType(String suffix) {
     public static final SlotType WALL = new SlotType("wall");
 
     // Stone Specific Slot Types
+    public static final SlotType PILLAR = new SlotType("pillar");
+
     public static final SlotType CRACKED = new SlotType("cracked");
     public static final SlotType CRACKED_SLAB = new SlotType("cracked_slab");
     public static final SlotType CRACKED_STAIRS = new SlotType("cracked_stairs");
@@ -18,6 +20,11 @@ public record SlotType(String suffix) {
     public static final SlotType WEATHERED_SLAB = new SlotType("weathered_slab");
     public static final SlotType WEATHERED_STAIRS = new SlotType("weathered_stairs");
     public static final SlotType WEATHERED_WALL = new SlotType("weathered_wall");
+
+    public static final SlotType TILES = new SlotType("tiles");
+    public static final SlotType TILES_SLAB = new SlotType("tiles_slab");
+    public static final SlotType TILES_STAIRS = new SlotType("tiles_stairs");
+    public static final SlotType TILES_WALL = new SlotType("tiles_wall");
 
     public static final SlotType BRICK = new SlotType("brick");
     public static final SlotType BRICK_SLAB = new SlotType("brick_slab");

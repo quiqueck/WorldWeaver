@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -157,7 +158,12 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
         } else runtimeTraits = null;
 
         if (this.attributes != null) {
-            this.properties.attributes(new ItemAttributeModifiers(this.attributes.build()));
+            propertySetters.add((properties) -> properties.attributes(new ItemAttributeModifiers(this.attributes.build())));
+        }
+
+        // Apply all property setters to the properties
+        for (Consumer<Item.Properties> propertySetter : this.propertySetters) {
+            propertySetter.accept(this.properties);
         }
 
         I item = itemFactory.createItem((D) this);
@@ -322,6 +328,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
 
     // **********************************************************************
     // Redirect all (but setId) Item.Properties methods to this.properties
+    protected List<Consumer<Item.Properties>> propertySetters = new LinkedList<>();
 
     /**
      * Sets the item that this item converts to when used in crafting.
@@ -331,7 +338,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D usingConvertsTo(Item convertToItem) {
-        this.properties.usingConvertsTo(convertToItem);
+        propertySetters.add((properties) -> properties.usingConvertsTo(convertToItem));
         return (D) this;
     }
 
@@ -343,7 +350,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D useCooldown(float cooldownSeconds) {
-        this.properties.useCooldown(cooldownSeconds);
+        propertySetters.add((properties) -> properties.useCooldown(cooldownSeconds));
         return (D) this;
     }
 
@@ -355,7 +362,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D stacksTo(int maxStackSize) {
-        this.properties.stacksTo(maxStackSize);
+        propertySetters.add((properties) -> properties.stacksTo(maxStackSize));
         return (D) this;
     }
 
@@ -368,7 +375,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D durability(int maxDurability) {
-        this.properties.durability(maxDurability);
+        propertySetters.add((properties) -> properties.durability(maxDurability));
         return (D) this;
     }
 
@@ -380,7 +387,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D craftRemainder(Item remainderItem) {
-        this.properties.craftRemainder(remainderItem);
+        propertySetters.add((properties) -> properties.craftRemainder(remainderItem));
         return (D) this;
     }
 
@@ -392,7 +399,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D rarity(Rarity itemRarity) {
-        this.properties.rarity(itemRarity);
+        propertySetters.add((properties) -> properties.rarity(itemRarity));
         return (D) this;
     }
 
@@ -403,7 +410,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D fireResistant() {
-        this.properties.fireResistant();
+        propertySetters.add((properties) -> properties.fireResistant());
         return (D) this;
     }
 
@@ -415,7 +422,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D jukeboxPlayable(ResourceKey<JukeboxSong> songKey) {
-        this.properties.jukeboxPlayable(songKey);
+        propertySetters.add((properties) -> properties.jukeboxPlayable(songKey));
         return (D) this;
     }
 
@@ -428,7 +435,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D enchantable(int enchantability) {
-        this.properties.enchantable(enchantability);
+        propertySetters.add((properties) -> properties.enchantable(enchantability));
         return (D) this;
     }
 
@@ -440,7 +447,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D repairable(Item repairItem) {
-        this.properties.repairable(repairItem);
+        propertySetters.add((properties) -> properties.repairable(repairItem));
         return (D) this;
     }
 
@@ -452,7 +459,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D repairable(TagKey<Item> repairTag) {
-        this.properties.repairable(repairTag);
+        propertySetters.add((properties) -> properties.repairable(repairTag));
         return (D) this;
     }
 
@@ -464,7 +471,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D equippable(EquipmentSlot slot) {
-        this.properties.equippable(slot);
+        propertySetters.add((properties) -> properties.equippable(slot));
         return (D) this;
     }
 
@@ -476,7 +483,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D equippableUnswappable(EquipmentSlot slot) {
-        this.properties.equippableUnswappable(slot);
+        propertySetters.add((properties) -> properties.equippableUnswappable(slot));
         return (D) this;
     }
 
@@ -488,7 +495,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D requiredFeatures(FeatureFlag... requiredFlags) {
-        this.properties.requiredFeatures(requiredFlags);
+        propertySetters.add((properties) -> properties.requiredFeatures(requiredFlags));
         return (D) this;
     }
 
@@ -500,7 +507,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D overrideDescription(String descriptionKey) {
-        this.properties.overrideDescription(descriptionKey);
+        propertySetters.add((properties) -> properties.overrideDescription(descriptionKey));
         return (D) this;
     }
 
@@ -511,7 +518,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D useBlockDescriptionPrefix() {
-        this.properties.useBlockDescriptionPrefix();
+        propertySetters.add((properties) -> properties.useBlockDescriptionPrefix());
         return (D) this;
     }
 
@@ -522,7 +529,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D useItemDescriptionPrefix() {
-        this.properties.useItemDescriptionPrefix();
+        propertySetters.add((properties) -> properties.useItemDescriptionPrefix());
         return (D) this;
     }
 
@@ -545,7 +552,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public <T> D component(DataComponentType<T> componentType, T componentData) {
-        this.properties.component(componentType, componentData);
+        propertySetters.add((properties) -> properties.component(componentType, componentData));
         return (D) this;
     }
 
@@ -557,7 +564,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D attributes(ItemAttributeModifiers attributeModifiers) {
-        this.properties.attributes(attributeModifiers);
+        propertySetters.add((properties) -> properties.attributes(attributeModifiers));
         return (D) this;
     }
 

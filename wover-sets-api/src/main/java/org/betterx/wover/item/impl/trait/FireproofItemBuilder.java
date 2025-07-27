@@ -35,7 +35,7 @@ public class FireproofItemBuilder extends AbstractItemTraitBuilder.Generic imple
 
         @Override
         public void configure(ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition) {
-            definition.getProperties().fireResistant();
+            definition.fireResistant();
         }
     }
 }
