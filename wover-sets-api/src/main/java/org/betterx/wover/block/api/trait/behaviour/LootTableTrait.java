@@ -32,6 +32,7 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
         @Nullable LootTableTrait dropNamedEntity();
         @Nullable LootTableTrait dropSelf();
         @Nullable LootTableTrait dropSlab();
+        @Nullable LootTableTrait dropWithSilktouch();
         @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise);
         @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, NumberProvider amount);
     }

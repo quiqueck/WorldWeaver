@@ -60,6 +60,7 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
         return new Trait((tableKey, blockKey, block, provider) -> provider.dropSlab(block));
     }
 
+
     @Override
     public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise) {
         return dropWithSilktouch(otherwise, ConstantValue.exactly(1.0F));
@@ -70,6 +71,13 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider) -> provider.dropWithSilkTouch(block, otherwise, amount));
     }
+
+    @Override
+    public @Nullable LootTableTrait dropWithSilktouch() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider) -> provider.dropWithSilkTouch(block));
+    }
+
 
     public static void bootstrapLootTables(
             @NotNull ModCore modCore,
