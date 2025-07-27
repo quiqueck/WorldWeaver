@@ -53,9 +53,7 @@ public class Source extends SlotFromDefinition {
     @Environment(EnvType.CLIENT)
     @Override
     protected BlockModelTrait buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
-        return ModelTraitLibrary.cube(baseBlockType == null
-                ? set::getBaseBlock
-                : () -> set.getBlockWithFallback(baseBlockType)
+        return ModelTraitLibrary.cube(
         );
     }
 
