@@ -9,6 +9,7 @@ import org.betterx.wover.entrypoint.LibWoverSets;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -22,6 +23,11 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
     }
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
+        if (!ModCore.isDatagen()) return combine(DEFAULT, BlockTraits.FLAMMABLE.withDefault());
+        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe(), BlockTraits.FLAMMABLE.withDefault());
+    }
+
+    public @Nullable List<BlockTrait<?, ?>> withFireResistance() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
         return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe());
     }
@@ -35,6 +41,7 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
             definition
+                    .mapColor(MapColor.WOOD)
                     .instrument(NoteBlockInstrument.BASS)
                     .strength(2.0F, 3.0F)
                     .sound(SoundType.WOOD);

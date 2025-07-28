@@ -83,4 +83,15 @@ public interface BlockTrait<B extends Block, R extends RuntimeBlockTrait<B, R>> 
             B block,
             BlockDefinition<B, ? extends BlockDefinition<B, ?>> definition
     );
+
+    /**
+     * Indicates whether this trait should only be available once in a block definition.
+     * If true, only the latest instance of this trait will be kept in the block definition.
+     * If false, multiple instances of this trait can exist in the block definition.
+     *
+     * @return
+     */
+    default boolean keepLatestOnly() {
+        return false;
+    }
 }

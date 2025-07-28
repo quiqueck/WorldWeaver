@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class RenderLayerTraitBuilder extends AbstractBlockTraitBuilder<Block, RenderLayerTrait> implements RenderLayerTrait.Builder {
     public static final RenderLayerTrait.Builder BUILDER = new RenderLayerTraitBuilder();
-    
+
     protected RenderLayerTraitBuilder() {
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "render_layer"));
     }
@@ -65,6 +65,11 @@ public class RenderLayerTraitBuilder extends AbstractBlockTraitBuilder<Block, Re
         ) {
             if (layer == Layer.CUTOUT) BlockRenderLayerMap.putBlock(block, ChunkSectionLayer.CUTOUT);
             else if (layer == Layer.TRANSLUCENT) BlockRenderLayerMap.putBlock(block, ChunkSectionLayer.TRANSLUCENT);
+        }
+
+        @Override
+        public boolean keepLatestOnly() {
+            return true;
         }
     }
 }

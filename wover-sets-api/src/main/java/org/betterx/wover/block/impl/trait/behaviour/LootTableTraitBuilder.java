@@ -60,6 +60,13 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
         return new Trait((tableKey, blockKey, block, provider) -> provider.dropSlab(block));
     }
 
+    @Override
+    public @Nullable LootTableTrait dropWithSilktouchOrHoeOrShears() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropWithSilkTouchOrHoeOrShears(block)
+        );
+    }
 
     @Override
     public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise) {
@@ -69,13 +76,46 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     @Override
     public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, NumberProvider amount) {
         if (!ModCore.isDatagen()) return null;
-        return new Trait((tableKey, blockKey, block, provider) -> provider.dropWithSilkTouch(block, otherwise, amount));
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropWithSilkTouch(block, otherwise, amount)
+        );
     }
 
     @Override
     public @Nullable LootTableTrait dropWithSilktouch() {
         if (!ModCore.isDatagen()) return null;
-        return new Trait((tableKey, blockKey, block, provider) -> provider.dropWithSilkTouch(block));
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropWithSilkTouch(block)
+        );
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropLeaves(@Nullable Block saplingBlock) {
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropLeaves(block, saplingBlock == null ? block : saplingBlock)
+        );
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropLeaves(float dropChance, @Nullable Block saplingBlock) {
+        if (!ModCore.isDatagen()) return null;
+        final float[] LEAVES_SAPLING_CHANCES = new float[]{
+                0.8f * dropChance,
+                dropChance,
+                1.333f * dropChance,
+                1.666f * dropChance
+        };
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropLeaves(block, saplingBlock == null ? block : saplingBlock, LEAVES_SAPLING_CHANCES)
+        );
+    }
+
+    public static void bootstrapLootTables(
+            @NotNull ModCore modCore,
+            @NotNull LootLookupProvider lookup,
+            @NotNull BiConsumer<ResourceKey<LootTable>, LootTable.Builder> tableConsumer
+    ) {
+        bootstrapLootTables(modCore, lookup, tableConsumer, (b, block) -> true);
     }
 
 

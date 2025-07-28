@@ -7,9 +7,7 @@ import net.minecraft.world.level.block.Block;
 
 public abstract class BlockTraitImpl<B extends Block, R extends RuntimeBlockTrait<B, R>> implements BlockTrait<B, R> {
     protected BlockTraitImpl() {
-
     }
-
 
     @Override
     public R forRuntime() {

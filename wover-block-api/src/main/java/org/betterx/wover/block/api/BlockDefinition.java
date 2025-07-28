@@ -234,6 +234,9 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
         if (this.traits == null) this.traits = new LinkedList<>();
 
+        if (trait.keepLatestOnly()) {
+            this.traits = this.traits.stream().filter(t -> !t.is(trait.key())).toList();
+        }
         this.traits.add((BlockTrait<? super B, ?>) trait);
         return (D) this;
     }
