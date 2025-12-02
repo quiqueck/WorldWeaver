@@ -1,0 +1,13 @@
+{
+  "modmenu.descriptionTranslation.betterxlib": "A unified library mod for BetterEnd and BetterNether ports to NeoForge",
+  "betterxlib.config.title": "BetterXLib Configuration",
+  "betterxlib.config.rendering": "Rendering Settings",
+  "betterxlib.config.enableEmissiveTextures": "Enable Emissive Textures",
+  "betterxlib.config.enableCustomFog": "Enable Custom Fog",
+  "betterxlib.config.debug": "Debug Settings",
+  "betterxlib.config.debugMode": "Debug Mode",
+  "betterxlib.config.logBiomeRegistration": "Log Biome Registration",
+  "betterxlib.config.logFeatureRegistration": "Log Feature Registration",
+  "betterxlib.config.performance": "Performance Settings",
+  "betterxlib.config.biomeCacheSize": "Biome Cache Size"
+}
