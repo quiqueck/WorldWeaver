@@ -94,6 +94,17 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
         return getHolder(access.lookupOrThrow(Registries.CONFIGURED_FEATURE));
     }
 
+    /**
+     * Places the {@link ConfiguredFeature} referenced by this key in the world.
+     * <p>
+     * The {@link RegistryAccess} used to resolve the {@link Holder} is taken from the given {@code level}.
+     *
+     * @param level  the level to place the feature in
+     * @param pos    the position to place the feature at
+     * @param random the random source to use
+     * @return {@code true} if the feature was placed, {@code false} otherwise (for example if this key is
+     * not registered)
+     */
     public boolean placeInWorld(
             @NotNull WorldGenLevel level,
             @NotNull BlockPos pos,
@@ -103,6 +114,19 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
         return placeInWorld(level.registryAccess(), level, pos, random, null);
     }
 
+    /**
+     * Places the {@link ConfiguredFeature} referenced by this key in the world.
+     * <p>
+     * The {@link RegistryAccess} used to resolve the {@link Holder} is taken from the given {@code level}.
+     *
+     * @param level     the level to place the feature in
+     * @param pos       the position to place the feature at
+     * @param random    the random source to use
+     * @param generator the {@link ChunkGenerator} to use for the placement, or {@code null} to resolve
+     *                  it automatically from the level
+     * @return {@code true} if the feature was placed, {@code false} otherwise (for example if this key is
+     * not registered)
+     */
     public boolean placeInWorld(
             @NotNull WorldGenLevel level,
             @NotNull BlockPos pos,
@@ -112,6 +136,17 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
         return placeInWorld(level.registryAccess(), level, pos, random, generator);
     }
 
+    /**
+     * Places the {@link ConfiguredFeature} referenced by this key in the world.
+     *
+     * @param access the {@link RegistryAccess} to resolve the {@link Holder} from, or {@code null} to
+     *               fail immediately
+     * @param level  the level to place the feature in
+     * @param pos    the position to place the feature at
+     * @param random the random source to use
+     * @return {@code true} if the feature was placed, {@code false} otherwise (for example if {@code access}
+     * is {@code null} or this key is not registered)
+     */
     public boolean placeInWorld(
             @Nullable RegistryAccess access,
             @NotNull WorldGenLevel level,
@@ -126,6 +161,19 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
         return false;
     }
 
+    /**
+     * Places the {@link ConfiguredFeature} referenced by this key in the world.
+     *
+     * @param access    the {@link RegistryAccess} to resolve the {@link Holder} from, or {@code null} to
+     *                  fail immediately
+     * @param level     the level to place the feature in
+     * @param pos       the position to place the feature at
+     * @param random    the random source to use
+     * @param generator the {@link ChunkGenerator} to use for the placement, or {@code null} to resolve
+     *                  it automatically from the level
+     * @return {@code true} if the feature was placed, {@code false} otherwise (for example if {@code access}
+     * is {@code null} or this key is not registered)
+     */
     public boolean placeInWorld(
             @Nullable RegistryAccess access,
             @NotNull WorldGenLevel level,

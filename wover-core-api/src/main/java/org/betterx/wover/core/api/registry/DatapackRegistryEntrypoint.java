@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  * bootstrap (using  {@link DatapackRegistryBuilder#addBootstrap(ResourceKey, Consumer, int)} or
  * {@link DatapackRegistryBuilder#addReadOnlyBootstrap(ResourceKey, Consumer, int)}
  * </p>
- * This si not intended to be used with vanilla registries!
+ * This is not intended to be used with vanilla registries!
  */
 public interface DatapackRegistryEntrypoint {
     /**

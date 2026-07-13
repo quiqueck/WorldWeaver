@@ -20,11 +20,22 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a pressure plate slot: a {@link PressurePlateBlock} using the set's {@link BlockSet#setType()}, carrying
+ * {@link BlockTraits#PRESSURE_PLATE_BLOCK}, with a vanilla-style pressure plate model and an auto-generated
+ * recipe from the set's base block.
+ */
 public class PressurePlate extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#PRESSURE_PLATE} slot.
+     */
     public PressurePlate() {
         this(SlotType.PRESSURE_PLATE);
     }
 
+    /**
+     * @param slot the slot to register this pressure plate under
+     */
     public PressurePlate(SlotType slot) {
         super(slot);
     }

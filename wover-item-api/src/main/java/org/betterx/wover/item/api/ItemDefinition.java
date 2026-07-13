@@ -222,6 +222,13 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
         return (D) this;
     }
 
+    /**
+     * Adds a list of traits to this item definition.
+     * Traits are used to add additional behaviors or properties to the item.
+     *
+     * @param traits The traits to add, may be {@code null} or contain {@code null} elements (both are ignored)
+     * @return This configuration instance for method chaining
+     */
     public D addTrait(
             @Nullable List<ItemTrait<?, ?>> traits
     ) {
@@ -234,24 +241,57 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
         return (D) this;
     }
 
+    /**
+     * Adds the default trait produced by a {@link ItemTraitBuilder.WithDefault} to this item definition.
+     *
+     * @param <T>          The runtime trait type produced by the builder
+     * @param traitBuilder The trait builder whose {@link ItemTraitBuilder.WithDefault#withDefault()} result is added
+     * @return This configuration instance for method chaining
+     */
     public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefault<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
     }
 
+    /**
+     * Adds the default traits produced by a {@link ItemTraitBuilder.WithDefaults} to this item definition.
+     *
+     * @param <T>          The runtime trait type produced by the builder
+     * @param traitBuilder The trait builder whose {@link ItemTraitBuilder.WithDefaults#withDefault()} result is added
+     * @return This configuration instance for method chaining
+     */
     public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefaults<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
     }
 
+    /**
+     * Checks whether this item definition already has a trait with the same {@link ItemTraitKey} as the given trait.
+     *
+     * @param trait The trait to check for, may be {@code null}
+     * @return {@code true} if a trait with the same key was already added, {@code false} otherwise
+     */
     public boolean hasTrait(ItemTraitImpl<?, ?> trait) {
         if (trait == null) return false;
         return hasTrait(trait.key());
     }
 
+    /**
+     * Checks whether this item definition already has a trait with the same {@link ItemTraitKey} as the given
+     * trait builder.
+     *
+     * @param traitBuilder The trait builder to check for, may be {@code null}
+     * @return {@code true} if a trait with the same key was already added, {@code false} otherwise
+     */
     public boolean hasTrait(ItemTraitBuilder<?, ?> traitBuilder) {
         if (traitBuilder == null) return false;
         return hasTrait(traitBuilder.key());
     }
 
+    /**
+     * Checks whether this item definition already has a trait with the given {@link ItemTraitKey}.
+     *
+     * @param traitKey The trait key to check for, may be {@code null}
+     * @return {@code true} if a trait with the given key was already added, {@code false} otherwise
+     */
     public boolean hasTrait(ItemTraitKey traitKey) {
         if (this.traits == null || this.traits.isEmpty() || traitKey == null) {
             return false;
@@ -301,8 +341,21 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
         return (D) this;
     }
 
+    /**
+     * Accumulates attribute modifier entries added through {@link #addAttribute(Holder, AttributeModifier, EquipmentSlotGroup)}.
+     * Built into an {@link ItemAttributeModifiers} property setter in {@link #build()} when non-null.
+     */
     private ImmutableList.Builder<ItemAttributeModifiers.Entry> attributes;
 
+    /**
+     * Adds an attribute modifier that is applied while this item is equipped in the given equipment slot group.
+     * Multiple calls accumulate entries into a single {@link ItemAttributeModifiers} property.
+     *
+     * @param holder              The attribute the modifier applies to
+     * @param attributeModifier   The modifier (amount, operation, and id) to apply
+     * @param equipmentSlotGroup  The equipment slot group in which the modifier is active
+     * @return This configuration instance for method chaining
+     */
     public D addAttribute(
             Holder<Attribute> holder,
             AttributeModifier attributeModifier,
@@ -318,7 +371,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     /**
      * Gets the currently configured tags for this item.
      *
-     * @return Array of tags applied to this item, may be null
+     * @return Array of tags applied to this item, or an empty array if none were set
      */
     @SuppressWarnings("unchecked")
     public TagKey<Item>[] tags() {

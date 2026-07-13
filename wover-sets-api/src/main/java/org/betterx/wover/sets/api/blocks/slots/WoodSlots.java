@@ -3,6 +3,18 @@ package org.betterx.wover.sets.api.blocks.slots;
 import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.types.*;
 
+/**
+ * Every slot {@link org.betterx.wover.sets.api.blocks.WoodenBlockSet#createDefaultDefinitions()} builds by
+ * default: planks, log/stripped log, bark/stripped bark, and the usual wood-family blocks (slab, stairs, fence,
+ * fence gate, door, trapdoor, button, pressure plate, ladder, sign, hanging sign, chest, barrel, bookshelf,
+ * composter, crafting table). Pass individual constants to
+ * {@link org.betterx.wover.sets.api.blocks.SlotMap#of}/{@link org.betterx.wover.sets.api.blocks.SlotMap#add} to
+ * build a custom subset, or {@link org.betterx.wover.sets.api.blocks.SlotMap#replace} to override one of them
+ * (e.g. with a different {@link org.betterx.wover.sets.api.blocks.SlotType}). Note there is no {@code WALL}
+ * constant here (vanilla has no wooden walls); add
+ * {@code org.betterx.wover.sets.api.blocks.types.Wall} explicitly if the mod wants one (it will use
+ * {@link org.betterx.wover.recipe.api.RecipeTraitLibrary#woodWall}).
+ */
 public class WoodSlots {
     public static final SlotFromDefinition BARK = new Bark(true);
     public static final SlotFromDefinition BARREL = new Barrel();

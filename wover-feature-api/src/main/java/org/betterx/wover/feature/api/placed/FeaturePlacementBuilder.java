@@ -603,6 +603,13 @@ public interface FeaturePlacementBuilder {
      * @return this builder
      */
     FeaturePlacementBuilder extendZigZagXYZ(int xzSpread, int ySpread);
+
+    /**
+     * Will only accept positions if the block at the input position is air. Otherwise, the position is
+     * rejected.
+     *
+     * @return this builder
+     */
     FeaturePlacementBuilder isEmpty();
 
     /**
@@ -640,9 +647,9 @@ public interface FeaturePlacementBuilder {
      * surrounded by gravel, you would call
      * {@code isNextTo(BlockPredicate.matchesBlocks(Blocks.GRAVEL), new Vec3i(0, 2, 0));}
      *
-     * @param predicate
-     * @param offset
-     * @return
+     * @param predicate the predicate to test
+     * @param offset    the offset relative to the input position whose horizontal neighbors are tested
+     * @return this builder
      */
     FeaturePlacementBuilder isNextTo(BlockPredicate predicate, Vec3i offset);
 

@@ -43,9 +43,16 @@ public final class ModCore implements Version.ModVersionProvider {
      * The mod id is used to identify your mod.
      */
     public final String modId;
+    /**
+     * The namespace that is used to create {@link ResourceLocation}s in {@link #id(String)} and {@link #mk(String)}.
+     * Usually identical to {@link #modId}.
+     */
     public final String namespace;
     private final Version modVersion;
 
+    /**
+     * The Fabric {@link ModContainer} for this mod, or {@code null} if the mod is not loaded.
+     */
     public final ModContainer modContainer;
 
     private ModCore(String modID, String namespace) {
@@ -61,7 +68,6 @@ public final class ModCore implements Version.ModVersionProvider {
         } else {
             this.modContainer = null;
             modVersion = new Version(0, 0, 0);
-            ;
         }
     }
 

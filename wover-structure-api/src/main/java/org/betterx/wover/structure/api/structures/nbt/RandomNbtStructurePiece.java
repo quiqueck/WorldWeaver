@@ -26,9 +26,24 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
+/**
+ * The {@link TemplateStructurePiece} placed by {@link org.betterx.wover.structure.api.structures.nbt.RandomNbtStructure}.
+ * It behaves like a normal template piece, but additionally marks its four bounding-box corners and its
+ * pivot with oxidized copper/amethyst/netherite debug blocks during {@link #postProcess} (useful while
+ * tuning a {@link org.betterx.wover.structure.api.structures.StructurePlacement}).
+ */
 public class RandomNbtStructurePiece extends TemplateStructurePiece {
     private final boolean keepAir;
 
+    /**
+     * Creates a new piece that places the {@code .nbt} template at {@code nbtLocation}.
+     *
+     * @param manager          The {@link StructureTemplateManager} used to resolve the template
+     * @param nbtLocation      The location of the {@code .nbt} template
+     * @param placeSettings    The place settings (rotation, mirror, pivot, processors) to use
+     * @param templatePosition The position to place the template's origin at
+     * @param keepAir          Whether air blocks in the template are preserved during placement
+     */
     public RandomNbtStructurePiece(
             StructureTemplateManager manager,
             ResourceLocation nbtLocation,
@@ -44,6 +59,12 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
         this.keepAir = keepAir;
     }
 
+    /**
+     * Deserializes a piece previously saved with {@link #addAdditionalSaveData}.
+     *
+     * @param context     The serialization context
+     * @param compoundTag The saved NBT data
+     */
     public RandomNbtStructurePiece(StructurePieceSerializationContext context, CompoundTag compoundTag) {
         this(
                 context, compoundTag,
@@ -52,6 +73,14 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
 
     }
 
+    /**
+     * Deserializes a piece previously saved with {@link #addAdditionalSaveData}, using an explicit
+     * {@code keepAir} value instead of reading it from {@code compoundTag}.
+     *
+     * @param context     The serialization context
+     * @param compoundTag The saved NBT data
+     * @param keepAir     Whether air blocks in the template are preserved during placement
+     */
     public RandomNbtStructurePiece(
             StructurePieceSerializationContext context,
             CompoundTag compoundTag,
@@ -81,6 +110,19 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
 
     }
 
+    /**
+     * Builds the {@link StructurePlaceSettings} used to place a {@link RandomNbtStructurePiece}: applies
+     * the given rotation/mirror around {@code halfSize}, and adds a
+     * {@link BlockIgnoreProcessor#STRUCTURE_AND_AIR}/{@link BlockIgnoreProcessor#STRUCTURE_BLOCK}
+     * processor depending on {@code keepAir}.
+     *
+     * @param rotation The rotation to apply
+     * @param mirror   The mirror to apply
+     * @param halfSize The pivot to rotate/mirror around (typically the template's center, see
+     *                 {@link org.betterx.wover.structure.api.structures.StructurePlacement#getCenter})
+     * @param keepAir  Whether air blocks in the template are preserved during placement
+     * @return The built place settings
+     */
     public static StructurePlaceSettings settings(
             Rotation rotation,
             Mirror mirror,

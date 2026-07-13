@@ -10,7 +10,24 @@ import net.minecraft.world.entity.vehicle.ChestBoat;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.level.Level;
 
+/**
+ * Specialized configuration class for creating boat items with an associated boat entity type.
+ * This class extends {@link ItemDefinition} to provide boat-specific setup: it automatically
+ * registers the {@link EntityType} used by the boat (optionally with a chest) and links it back
+ * to the built {@link BoatItem} instance.
+ *
+ * @param <I> The type of boat item being created, must extend {@link BoatItem}
+ * @author Quiqueck
+ * @since 21.6.0
+ */
 public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, BoatItemDefinition<I>> {
+    /**
+     * Pairs the registered boat entity type with the built boat item.
+     * Returned by {@link #buildAndRegisterBoat()} as a convenience result of the build/register process.
+     *
+     * @param entityType The entity type registered for this boat
+     * @param item       The registered boat item
+     */
     public record BoatType(
             EntityType<? extends AbstractBoat> entityType,
             BoatItem item
@@ -26,10 +43,27 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
     public interface ItemFactory<I extends BoatItem> extends ItemDefinition.ItemFactory<I, BoatItemDefinition<I>> {
     }
 
+    /**
+     * The entity type registered for this boat during {@link #beforeBuild()}
+     */
     private EntityType<? extends AbstractBoat> entityType;
+    /**
+     * The built boat item, set in {@link #beforeRegister(BoatItem)} and referenced by the entity factory
+     */
     private BoatItem boatItem;
+    /**
+     * Whether this boat has a chest (spawns a {@link ChestBoat} instead of a plain {@link Boat})
+     */
     private final boolean withChest;
 
+    /**
+     * Creates a new boat item configuration.
+     *
+     * @param registry    The item registry to use for registration
+     * @param itemName    The name identifier for the boat item
+     * @param itemFactory The factory used to create the boat item instance
+     * @param withChest   Whether this boat should spawn as a chest boat
+     */
     protected BoatItemDefinition(
             ItemRegistry registry,
             String itemName,
@@ -40,16 +74,34 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
         this.withChest = withChest;
     }
 
+    /**
+     * Entity factory used to spawn a plain {@link Boat} for the registered entity type.
+     *
+     * @param entityType The entity type being spawned
+     * @param level      The level the boat is spawned in
+     * @return A new {@link Boat} instance backed by this definition's boat item
+     */
     @SuppressWarnings("unchecked")
     Boat boatFactory(EntityType<? extends AbstractBoat> entityType, Level level) {
         return new Boat((EntityType<? extends Boat>) entityType, level, () -> this.boatItem);
     }
 
+    /**
+     * Entity factory used to spawn a {@link ChestBoat} for the registered entity type.
+     *
+     * @param entityType The entity type being spawned
+     * @param level      The level the boat is spawned in
+     * @return A new {@link ChestBoat} instance backed by this definition's boat item
+     */
     @SuppressWarnings("unchecked")
     ChestBoat chestBoatFactory(EntityType<? extends AbstractBoat> entityType, Level level) {
         return new ChestBoat((EntityType<? extends ChestBoat>) entityType, level, () -> this.boatItem);
     }
 
+    /**
+     * Registers the entity type for this boat before the item is built.
+     * Uses a chest boat or plain boat entity factory depending on {@link #withChest}.
+     */
     @Override
     protected void beforeBuild() {
         properties.stacksTo(1);
@@ -72,17 +124,35 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
         );
     }
 
+    /**
+     * Stores the built item so the boat entity factory can reference it, then returns it unchanged.
+     *
+     * @param item The built boat item instance
+     * @return The boat item instance, unchanged
+     */
     @Override
     protected I beforeRegister(I item) {
         this.boatItem = item;
         return item;
     }
 
+    /**
+     * Gets the entity type registered for this boat.
+     * Only valid after {@link #build()} (or {@link #buildAndRegister()}/{@link #buildAndRegisterBoat()}) has run.
+     *
+     * @return The registered boat entity type, or {@code null} if the boat has not been built yet
+     */
     public EntityType<? extends AbstractBoat> entityType() {
         return this.entityType;
     }
 
-
+    /**
+     * Builds and registers the boat item, returning both the item and its associated entity type.
+     * This is a convenience method equivalent to calling {@link #buildAndRegister()} and pairing the
+     * result with {@link #entityType()}.
+     *
+     * @return A {@link BoatType} containing the registered entity type and boat item
+     */
     public BoatType buildAndRegisterBoat() {
         var item = super.buildAndRegister();
         return new BoatType(this.entityType, item);

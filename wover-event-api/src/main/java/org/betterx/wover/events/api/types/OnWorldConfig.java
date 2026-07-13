@@ -12,6 +12,9 @@ import net.minecraft.nbt.CompoundTag;
  */
 @FunctionalInterface
 public interface OnWorldConfig extends Subscriber {
+    /**
+     * Indicates why the event for a given {@link org.betterx.wover.core.api.ModCore}'s world config was fired.
+     */
     enum State {
         /**
          * The WorldConfig is being created.

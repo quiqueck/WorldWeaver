@@ -39,6 +39,17 @@ import java.util.function.Supplier;
  * {@link org.betterx.bclib.trait.block.PathBlockTrait} for the same pattern applied to a single trait.
  */
 public class ModelTraitLibrary {
+    /**
+     * A bark/stripped-bark model: a rotated pillar with matching side textures on every face, optionally
+     * mirrored and with alternative texture-suffix variants. Returns {@code null} outside of a datagen
+     * environment (see the class Javadoc).
+     *
+     * @param logBlock                  supplies the matching log block, whose texture is reused with a
+     *                                  {@code "_side"} suffix
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait bark(
             Supplier<Block> logBlock,
             boolean mirroredTexture,
@@ -47,104 +58,251 @@ public class ModelTraitLibrary {
         return ModCore.isDatagen() ? Impl.bark(logBlock, mirroredTexture, alternativeTextureSuffixe) : null;
     }
 
+    /**
+     * A vanilla-style barrel model (closed/open top variants, rotated by facing).
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait barrel() {
         return ModCore.isDatagen() ? Impl.barrel() : null;
     }
 
+    /**
+     * A vanilla-style bookshelf model.
+     *
+     * @param planksMaterial supplies the planks block whose texture is used for the shelf's frame
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait bookshelf(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.bookshelf(planksMaterial) : null;
     }
 
+    /**
+     * A vanilla-style rotated pillar model.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait pillar() {
         return ModCore.isDatagen() ? Impl.pillar() : null;
     }
 
+    /**
+     * A vanilla-style button model.
+     *
+     * @param planksMaterial supplies the block whose texture is used for the button
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait button(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.button(planksMaterial) : null;
     }
 
+    /** The chest-special-renderer id used for chests built through {@link #chest}. */
     public static ResourceLocation chestRendered = LibWoverSets.C.mk("wooden_chest");
 
+    /**
+     * A vanilla-style chest model: a particle-only block model plus an inventory item model wired to a
+     * {@link net.minecraft.client.renderer.special.ChestSpecialRenderer}.
+     *
+     * @param planksMaterial supplies the block whose texture is used for the chest's particles
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait chest(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.chest(planksMaterial) : null;
     }
 
+    /**
+     * A log model: a rotated pillar with the block's own side/top textures, optionally mirrored and with
+     * alternative texture-suffix variants.
+     *
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait log(boolean mirroredTexture, String... alternativeTextureSuffixe) {
         return ModCore.isDatagen() ? Impl.log(mirroredTexture, alternativeTextureSuffixe) : null;
     }
 
+    /**
+     * A vanilla-style crafting-table-like model (distinct top/front/side/bottom textures).
+     *
+     * @param planksMaterial supplies the block whose texture is used for the bottom face
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait craftingTable(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.craftingTable(planksMaterial) : null;
     }
 
+    /**
+     * A vanilla-style slab model (bottom/top/double variants).
+     *
+     * @param planksMaterial supplies the block whose texture is used for the slab
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait slab(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.slab(planksMaterial) : null;
     }
 
+    /**
+     * A plain full-cube model using the block's own texture.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait planks() {
         return ModCore.isDatagen() ? Impl.planks() : null;
     }
 
+    /**
+     * A vanilla-style composter model.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait composter() {
         return ModCore.isDatagen() ? Impl.composter() : null;
     }
 
+    /**
+     * A vanilla-style door model.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait door() {
         return ModCore.isDatagen() ? Impl.door() : null;
     }
 
+    /**
+     * A vanilla-style fence model.
+     *
+     * @param planksMaterial supplies the block whose texture is used for the fence
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait fence(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.fence(planksMaterial) : null;
     }
 
+    /**
+     * A vanilla-style fence gate model.
+     *
+     * @param planksMaterial supplies the block whose texture is used for the gate
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait gate(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.gate(planksMaterial) : null;
     }
 
+    /**
+     * A vanilla-style hanging sign model.
+     *
+     * @param logMaterial   supplies the block whose texture is used for the sign's chain/log parts
+     * @param wallSignBlock supplies this sign's wall variant
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait hangingSign(Supplier<Block> logMaterial, Supplier<Block> wallSignBlock) {
         return ModCore.isDatagen() ? Impl.hangingSign(logMaterial, wallSignBlock) : null;
     }
 
+    /**
+     * A vanilla-style (standing/wall) sign model.
+     *
+     * @param logMaterial   supplies the block whose texture is used for the sign's post
+     * @param wallSignBlock supplies this sign's wall variant
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait sign(Supplier<Block> logMaterial, Supplier<Block> wallSignBlock) {
         return ModCore.isDatagen() ? Impl.sign(logMaterial, wallSignBlock) : null;
     }
 
+    /**
+     * A vanilla-style ladder model.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait ladder() {
         return ModCore.isDatagen() ? Impl.ladder() : null;
     }
 
+    /**
+     * A vanilla-style pressure plate model.
+     *
+     * @param planksMaterial supplies the block whose texture is used for the plate
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait pressurePlate(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.pressurePlate(planksMaterial) : null;
     }
 
+    /**
+     * A vanilla-style stairs model.
+     *
+     * @param planksMaterial supplies the block whose texture is used for the stairs
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait stairs(Supplier<Block> planksMaterial) {
         return ModCore.isDatagen() ? Impl.stairs(planksMaterial) : null;
     }
 
+    /**
+     * A vanilla-style (non-orientable) trapdoor model.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait trapdoor() {
         return ModCore.isDatagen() ? Impl.trapdoor() : null;
     }
 
+    /**
+     * A vanilla-style orientable trapdoor model (can be placed on the floor or ceiling).
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait orientableTrapdoor() {
         return ModCore.isDatagen() ? Impl.orientableTrapdoor() : null;
     }
 
+    /**
+     * A vanilla-style wall model (post/side variants).
+     *
+     * @param sourceMaterial supplies the block whose texture is used for the wall
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait wall(Supplier<Block> sourceMaterial) {
         return ModCore.isDatagen() ? Impl.wall(sourceMaterial) : null;
     }
 
+    /**
+     * A plain full-cube model using the block's own texture (alias of {@link #planks()}, kept as a separate,
+     * more general-purpose name).
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static BlockModelTrait cube() {
         return ModCore.isDatagen() ? Impl.cube() : null;
     }
 
+    /**
+     * A plain flat item model using the item's own texture.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static ItemModelTrait itemModel() {
         return ModCore.isDatagen() ? Impl.itemModel() : null;
     }
 
+    /**
+     * A plain flat item model, reusing another item's texture as the model's layer.
+     *
+     * @param material supplies the item whose texture should be used
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static ItemModelTrait itemModel(Supplier<Item> material) {
         return ModCore.isDatagen() ? Impl.itemModel(material) : null;
     }
 
+    /**
+     * A vanilla-style elytra item model, dispatching between the normal and broken texture based on the item's
+     * durability.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
     public static ItemModelTrait elytra() {
         return ModCore.isDatagen() ? Impl.elytra() : null;
     }
@@ -239,6 +397,7 @@ public class ModelTraitLibrary {
                         new ChestSpecialRenderer.Unbaked(key.location())
                 );
                 generator.vanillaGenerator.itemModelOutput.accept(chestItem, itemModelUnbaked);
+                generator.markItemModelProvided(chestBlock);
             });
         }
 
@@ -296,6 +455,7 @@ public class ModelTraitLibrary {
         private static BlockModelTrait door() {
             return ClientBlockTraits.MODEL.with((key, block, generator) -> {
                 generator.vanillaGenerator.createDoor(block);
+                generator.markItemModelProvided(block);
             });
         }
 

@@ -7,20 +7,36 @@ import org.betterx.wover.events.impl.WorldLifecycleImpl;
  * Provides some useful lifecycle events for the world creation/loading process.
  *
  * <p>
- * The below events get fired during world creation/loading. In General the order is:
+ * All events are fired on the logical server (which, for a single-player game, is the integrated server running
+ * inside the client process). The below events get fired during world creation/loading. On a dedicated server the
+ * order is:
  * <ol>
  *     <li>{@link #WORLD_FOLDER_READY}</li>
- *     <li>{@link #WORLD_REGISTRY_READY}</li>
- *     <li>{@link #CREATED_NEW_WORLD_FOLDER} (only if the world is first created)</li>
+ *     <li>{@link #WORLD_REGISTRY_READY} (fired multiple times, see below)</li>
+ *     <li>{@link #BEFORE_LOADING_RESOURCES}</li>
+ *     <li>{@link #RESOURCES_LOADED}</li>
  *     <li>{@link #ON_DIMENSION_LOAD}</li>
  *     <li>{@link #MINECRAFT_SERVER_READY}</li>
  *     <li>{@link #BEFORE_CREATING_LEVELS}</li>
+ *     <li>{@link #SERVER_LEVEL_READY} (fired once for every {@link net.minecraft.server.level.ServerLevel})</li>
  * </ol>
+ * When a new world is created from the client (as opposed to loading an existing one), {@link #CREATED_NEW_WORLD_FOLDER}
+ * is additionally fired once, right after {@link #WORLD_FOLDER_READY}, and {@link #WORLD_REGISTRY_READY} is fired
+ * more often (once for every {@link org.betterx.wover.events.api.types.OnRegistryReady.Stage}). Since
+ * {@link #WORLD_FOLDER_READY} and {@link #WORLD_REGISTRY_READY} can each fire multiple times (and their relative
+ * order can differ between client and server), do not rely on a strict ordering between those two events -
+ * everything from {@link #BEFORE_LOADING_RESOURCES} to {@link #BEFORE_CREATING_LEVELS} is fired exactly once, in
+ * the order listed above, followed by one {@link #SERVER_LEVEL_READY} event for every level/dimension that is
+ * loaded.
  */
 public class WorldLifecycle {
     /**
      * Gets fired when access to the world folder was first created. At this point it
      * will be possible to read data from the world folder.
+     * <p>
+     * The event is only emitted when the {@link net.minecraft.world.level.storage.LevelStorageSource.LevelStorageAccess}
+     * actually changes, so it will not fire repeatedly for the same world folder even though the game internally
+     * captures it at several points during startup.
      * <p>
      * You can subscribe to this Event with methods that adhere to {@link OnFolderReady}.
      */
@@ -62,8 +78,8 @@ public class WorldLifecycle {
      * event to modify/amend the world Dimensions before they are actually loaded.
      * <p>
      * You can subscribe to this Event with methods that adhere to {@link OnDimensionLoad}. The
-     * subscribers are called in sequence. Each call will recieves the DimensionsRegistry that was
-     * returned by the previous subscriber. The first subscriber will recieve the original list of
+     * subscribers are called in sequence. Each call will receive the DimensionsRegistry that was
+     * returned by the previous subscriber. The first subscriber will receive the original list of
      * Dimensions the game intended to load. The Final result will be used by the WorldStem.
      */
     public static final Event<OnDimensionLoad> ON_DIMENSION_LOAD = WorldLifecycleImpl.ON_DIMENSION_LOAD;
@@ -92,7 +108,13 @@ public class WorldLifecycle {
 
 
     /**
-     * Called when the {@link net.minecraft.server.packs.resources.ResourceManager} is available
+     * Called when the {@link net.minecraft.server.packs.resources.ResourceManager} is available.
+     * <p>
+     * Besides being fired once during the initial world creation/loading sequence (right after
+     * {@link #WORLD_REGISTRY_READY} was fired with {@link org.betterx.wover.events.api.types.OnRegistryReady.Stage#FINAL}),
+     * this event is fired again every time the game reloads its resources later on (for example after a
+     * {@code /reload} command or a datapack change), so subscribers should be prepared to be called multiple
+     * times over the lifetime of a world.
      * <p>
      * You can subscribe to this Event with methods that adhere to {@link OnResourceLoad}.
      */

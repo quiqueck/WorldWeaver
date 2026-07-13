@@ -14,11 +14,22 @@ import org.betterx.wover.sets.api.blocks.SlotType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * Builds a bookshelf slot: a plain block carrying {@link BlockTraits#BOOK_SHELF}, with a vanilla-style bookshelf
+ * model (using the set's base block as the plank texture source) and an auto-generated recipe from the set's
+ * base block.
+ */
 public class Bookshelf extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#BOOKSHELF} slot.
+     */
     public Bookshelf() {
         this(SlotType.BOOKSHELF);
     }
 
+    /**
+     * @param slot the slot to register this bookshelf under
+     */
     public Bookshelf(SlotType slot) {
         super(slot);
     }

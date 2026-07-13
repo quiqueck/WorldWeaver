@@ -229,7 +229,7 @@ public class ExtendXYZ extends PlacementModifier {
      * @param radius        the radius to extend the input position by
      * @param centerDensity the density at the input position
      * @param borderDensity the density at the border of the radius
-     * @return
+     * @return a new instance
      */
     public static ExtendXYZ square(IntProvider radius, FloatProvider centerDensity, FloatProvider borderDensity) {
         return new ExtendXYZ(radius, centerDensity, borderDensity, true);

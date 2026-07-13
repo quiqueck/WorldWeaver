@@ -73,7 +73,7 @@ public class WorldPresetManager {
     }
 
     /**
-     * Creates a new {@link WorldPreset} with thedimensions from the given registry.
+     * Creates a new {@link WorldPreset} with the dimensions from the given registry.
      *
      * @param dimensions The dimensions registry.
      * @return The {@link WorldPreset}.

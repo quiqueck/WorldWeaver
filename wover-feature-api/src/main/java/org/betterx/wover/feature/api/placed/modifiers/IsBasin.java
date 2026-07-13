@@ -71,6 +71,7 @@ public class IsBasin extends PlacementFilter {
      * but will not perform a test against the top block.
      *
      * @param predicate The predicate to test the basin blocks with
+     * @return a new instance
      */
     public static PlacementFilter simple(BlockPredicate predicate) {
         return new IsBasin(predicate, (BlockPredicate) null);

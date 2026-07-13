@@ -13,6 +13,13 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Base class for datagen providers that generate recipe JSON files with {@link RecipeBuilder}.
+ * <p>
+ * Subclass this, implement {@link #bootstrap(RecipeBuilder.Context)} to build and write the desired recipes,
+ * and register the subclass with a {@link org.betterx.wover.datagen.api.PackBuilder} (typically from
+ * {@code onInitializeProviders} in a {@link org.betterx.wover.datagen.api.WoverDataGenEntryPoint}).
+ */
 public abstract class WoverRecipeProvider implements WoverDataProvider<FabricRecipeProvider> {
     /**
      * The title of the provider. Mainly used for logging.
@@ -24,6 +31,12 @@ public abstract class WoverRecipeProvider implements WoverDataProvider<FabricRec
      */
     public final ModCore modCore;
 
+    /**
+     * Creates a new provider.
+     *
+     * @param modCore The mod this provider generates recipes for.
+     * @param title   The title of the provider, mainly used for logging.
+     */
     public WoverRecipeProvider(
             ModCore modCore,
             String title

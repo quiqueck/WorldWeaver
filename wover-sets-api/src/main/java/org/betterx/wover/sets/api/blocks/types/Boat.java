@@ -22,9 +22,19 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds the {@link SlotType#BOAT}/{@link SlotType#CHEST_BOAT} slot: an item-only slot (no block) registering a
+ * boat item via {@link org.betterx.wover.item.api.ItemRegistry#defineBoatItem}, carrying
+ * {@link org.betterx.wover.item.api.trait.ItemTraits#BOAT_ITEM}, with a boat/chest-boat item model and an
+ * auto-generated recipe (planks for a plain boat; a boat plus a chest for the chest variant).
+ */
 public class Boat extends ItemSlotFromDefinition {
     private final boolean withChest;
 
+    /**
+     * @param withChest whether this is the chest-boat variant ({@link SlotType#CHEST_BOAT}) rather than a plain
+     *                  boat ({@link SlotType#BOAT})
+     */
     public Boat(boolean withChest) {
         super(withChest ? SlotType.CHEST_BOAT : SlotType.BOAT);
         this.withChest = withChest;

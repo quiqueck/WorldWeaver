@@ -10,6 +10,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Entry point for registering custom points of interest (POI) - the vanilla mechanism villagers/other AI
+ * use to find and claim work stations, homes, beds, etc.
+ * <p>
+ * POI types are registered directly in code (there is no datapack format for them); use
+ * {@link WoverPoiType#setTag(net.minecraft.tags.TagKey)} (or the {@code tag} parameter here) to also let
+ * datapacks add matching block states to the type via a block tag.
+ */
 public class PoiManager {
     /**
      * Register a new PoiType

@@ -20,11 +20,22 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a crafting table slot: a {@link CraftingTableBlock} carrying
+ * {@link BlockTraits#CRAFTING_TABLE_BLOCK}, with a vanilla-style crafting-table-like model (using the set's base
+ * block for the top/side/bottom textures) and an auto-generated recipe from the set's base block.
+ */
 public class CraftingTable extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#CRAFTING_TABLE} slot.
+     */
     public CraftingTable() {
         this(SlotType.CRAFTING_TABLE);
     }
 
+    /**
+     * @param slot the slot to register this crafting table under
+     */
     public CraftingTable(SlotType slot) {
         super(slot);
     }

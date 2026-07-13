@@ -26,9 +26,20 @@ import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds the {@link SlotType#SIGN} slot (plus its {@link #WALL_SIGN} companion): a
+ * {@link org.betterx.wover.block.api.trait.SignBlockDefinition} pairing a {@link StandingSignBlock} with a
+ * {@link WallSignBlock}, both using the set's {@link WoodenBlockSet#woodType()}, carrying
+ * {@link BlockTraits#SIGN_BLOCK}, with a vanilla-style sign model and an auto-generated recipe from the set's
+ * base block. Only usable on a {@link WoodenBlockSet}.
+ */
 public class Sign extends WoodenSlotFromDefinition {
+    /** The slot the wall variant of this sign is registered under. */
     public static final SlotType WALL_SIGN = new SlotType("wall_sign");
 
+    /**
+     * Creates a factory for the {@link SlotType#SIGN} slot.
+     */
     public Sign() {
         super(SlotType.SIGN);
     }
@@ -49,7 +60,7 @@ public class Sign extends WoodenSlotFromDefinition {
                     SignItem::new
             );
         } else {
-            throw new IllegalArgumentException("Gate slot can only be used with WoodenBlockSet.");
+            throw new IllegalArgumentException("Sign slot can only be used with WoodenBlockSet.");
         }
     }
 
@@ -64,7 +75,7 @@ public class Sign extends WoodenSlotFromDefinition {
             blockDefinitionConsumer.accept(slot, signType.signBlock());
             blockDefinitionConsumer.accept(WALL_SIGN, signType.wallSignBlock());
         } else {
-            throw new IllegalArgumentException("HangingSign can only be used with SignBlockDefinition.");
+            throw new IllegalArgumentException("Sign can only be used with SignBlockDefinition.");
         }
     }
 

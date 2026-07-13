@@ -20,20 +20,43 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Builds the "bark"/"stripped bark" slot of a {@link org.betterx.wover.sets.api.blocks.WoodenBlockSet}: a
+ * {@link RotatedPillarBlock} carrying {@link BlockTraits#BARK_BLOCK}, with a matching bark model (rotated pillar
+ * with side/end textures) and an auto-generated recipe converting to/from the set's log block.
+ */
 public class Bark extends WoodenSlotFromDefinition {
+    /** Flag bit marking this bark as strippable (see {@link BlockTraits#STRIPABLE}). */
     public static final byte STRIPABLE_FLAG = 0x01;
+    /** Flag bit requesting a mirrored side texture on alternate faces. */
     public static final byte MIRRORED_TEXTURE_FLAG = 0x02;
     protected final byte flags;
     protected final String[] alternativeTextureSuffixe;
 
+    /**
+     * @param stripable whether this bark can be stripped into {@link SlotType#STRIPPED_BARK}; also selects
+     *                  {@link SlotType#BARK} vs. {@link SlotType#STRIPPED_BARK} as the slot
+     */
     public Bark(boolean stripable) {
         this(stripable, false);
     }
 
+    /**
+     * @param stripable                 whether this bark can be stripped; also selects
+     *                                  {@link SlotType#BARK} vs. {@link SlotType#STRIPPED_BARK} as the slot
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     */
     public Bark(boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
         this(stripable ? SlotType.BARK : SlotType.STRIPPED_BARK, stripable, mirroredTexture, alternativeTextureSuffixe);
     }
 
+    /**
+     * @param slot                      the slot to register this bark under
+     * @param stripable                 whether this bark can be stripped
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     */
     public Bark(SlotType slot, boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
         super(slot);
 

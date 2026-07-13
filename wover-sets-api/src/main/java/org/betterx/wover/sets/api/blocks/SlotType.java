@@ -1,6 +1,19 @@
 package org.betterx.wover.sets.api.blocks;
 
+/**
+ * Identifies a single "role" a block can play within a {@link BlockSet} (e.g. slab, stairs, log, chest), used as
+ * the key for {@link BlockSet#getBlock(SlotType)}/{@link SlotMap} and to derive the block's registration name
+ * (see {@link SlotFromDefinition#getName}).
+ * <p>
+ * Custom sets that need a role not covered by the predefined constants here (or in
+ * {@code org.betterx.wover.sets.api.blocks.slots.WoodSlots}/{@code StoneSlots}) can simply construct a new
+ * {@code SlotType} with an arbitrary suffix, as done by e.g.
+ * {@code org.betterx.wover.sets.api.blocks.types.HangingSign#HANGING_WALL_SIGN}.
+ *
+ * @param suffix the naming suffix appended to a set's base name for blocks in this slot (e.g. {@code "slab"})
+ */
 public record SlotType(String suffix) {
+    /** The primary/base block of a set (e.g. plain stone, or planks for a wood set). */
     public static final SlotType SOURCE = new SlotType("source");
 
     // Common Slot Types

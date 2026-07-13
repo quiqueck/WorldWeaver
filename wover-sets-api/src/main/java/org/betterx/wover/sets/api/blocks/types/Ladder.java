@@ -20,11 +20,21 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a ladder slot: a {@link LadderBlock} carrying {@link BlockTraits#LADDER_BLOCK}, with a vanilla-style
+ * ladder model and an auto-generated recipe from the set's base block.
+ */
 public class Ladder extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#LADDER} slot.
+     */
     public Ladder() {
         this(SlotType.LADDER);
     }
 
+    /**
+     * @param slot the slot to register this ladder under
+     */
     public Ladder(SlotType slot) {
         super(slot);
     }

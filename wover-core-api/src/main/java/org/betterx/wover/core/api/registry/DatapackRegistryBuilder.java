@@ -286,6 +286,14 @@ public class DatapackRegistryBuilder {
         return ResourceKey.createRegistryKey(location);
     }
 
+    /**
+     * Registers a watcher that is notified whenever an element of the given registry was loaded from a
+     * Datapack.
+     *
+     * @param registryKey The ResourceKey of the Registry
+     * @param watcher     The watcher that is notified when an element was loaded
+     * @param <E>         The type of the Registry-Elements
+     */
     public static <E> void onElementLoad(
             ResourceKey<Registry<E>> registryKey,
             OnElementLoad<E> watcher
@@ -293,6 +301,15 @@ public class DatapackRegistryBuilder {
         DatapackLoadElementImpl.register(registryKey, watcher);
     }
 
+    /**
+     * Registers a watcher that is notified whenever an element of the given registry was loaded from a
+     * Datapack.
+     *
+     * @param registryKey The ResourceKey of the Registry
+     * @param watcher     The watcher that is notified when an element was loaded
+     * @param priority    The priority of the watcher. The higher the priority, the earlier the watcher is notified
+     * @param <E>         The type of the Registry-Elements
+     */
     public static <E> void onElementLoad(
             ResourceKey<Registry<E>> registryKey,
             OnElementLoad<E> watcher,

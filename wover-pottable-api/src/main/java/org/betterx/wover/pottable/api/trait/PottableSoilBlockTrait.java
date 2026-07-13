@@ -26,7 +26,14 @@ import java.util.function.BiPredicate;
  * no custom datagen code is needed.
  */
 public class PottableSoilBlockTrait extends BlockTraitImpl<Block, GenericBlockTrait> implements GenericBlockTrait {
+    /**
+     * The unique key identifying this trait.
+     */
     public static final BlockTraitKey KEY = BlockTraitKey.ofUnique(LibWoverPottable.C, "pottable_soil");
+    /**
+     * The single, shared instance of this trait. There is only ever one variant, so this constant is the only
+     * instance you need.
+     */
     public static final PottableSoilBlockTrait DEFAULT = new PottableSoilBlockTrait();
 
     private PottableSoilBlockTrait() {

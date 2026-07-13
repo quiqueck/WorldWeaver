@@ -19,7 +19,14 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Builds the {@link SlotType#BARREL} slot: a {@link BarrelBlock} carrying {@link BlockTraits#BARREL_BLOCK}, with
+ * a vanilla-style barrel model and an auto-generated recipe from the set's planks and slab.
+ */
 public class Barrel extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#BARREL} slot.
+     */
     public Barrel() {
         super(SlotType.BARREL);
     }

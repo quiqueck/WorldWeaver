@@ -13,7 +13,26 @@ import net.minecraft.world.level.block.Blocks;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Ready-made {@link BlockRecipeTrait}/{@link ItemRecipeTrait} factories for every block/item type in
+ * {@code org.betterx.wover.sets.api.blocks.types}, matching vanilla's own crafting/stonecutting recipes for the
+ * corresponding wood/stone family member (plank-to-slab, planks-to-stairs, log-to-bark, ...).
+ * <p>
+ * Every method returns a trait built with {@code BlockRecipeTraitBuilder}/{@code ItemRecipeTraitBuilder}, so it
+ * can be passed directly to {@code BlockDefinition#addTrait}/{@code ItemDefinition#addTrait} — the recipe is then
+ * generated automatically during recipe datagen (see the {@code recipe-api} wiki page's "Recipe traits" section).
+ * A {@link RecipeMaterial} argument that turns out {@link RecipeMaterial#isValid() invalid} once the recipe is
+ * actually built (e.g. a deferred slot that was never registered) causes that recipe to be skipped with a
+ * warning, rather than failing datagen.
+ */
 public class RecipeTraitLibrary {
+    /**
+     * Logs a warning and lets the caller skip building a recipe if {@code sourceMaterial} turns out invalid.
+     *
+     * @param sourceMaterial the material to validate
+     * @param recipeType     the kind of recipe being built, for the warning message
+     * @param materialType   the role of {@code sourceMaterial} in the recipe, for the warning message
+     */
     protected static void validOrThrow(RecipeMaterial sourceMaterial, String recipeType, String materialType) {
         if (!sourceMaterial.isValid()) {
             LibWoverSets.C.LOG.warn(
@@ -23,6 +42,12 @@ public class RecipeTraitLibrary {
         }
     }
 
+    /**
+     * A vanilla-style planks recipe: 4 planks, shapeless, from one source (log/bark/stem) material.
+     *
+     * @param sourceMaterial the log/bark/stem material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait planks(RecipeMaterial sourceMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -40,10 +65,24 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style slab recipe (with a matching stonecutting recipe) in the {@code "slab"} group.
+     *
+     * @param planksMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait slab(RecipeMaterial planksMaterial) {
         return slab(planksMaterial, "slab", true);
     }
 
+    /**
+     * A vanilla-style slab recipe: 6 slabs, 3-across shaped, plus an optional stonecutting recipe.
+     *
+     * @param planksMaterial  the base material this recipe consumes
+     * @param group           the recipe group to use
+     * @param withStonecutter whether a matching stonecutting recipe should also be generated
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait slab(RecipeMaterial planksMaterial, String group, boolean withStonecutter) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -73,6 +112,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A recipe turning 4 bark blocks into 3 logs (2x2 shaped).
+     *
+     * @param barkMaterial the bark material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait log(RecipeMaterial barkMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -90,6 +135,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A recipe turning 4 log blocks into 3 bark blocks (2x2 shaped) - the inverse of {@link #log}.
+     *
+     * @param logMaterial the log material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait bark(RecipeMaterial logMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -108,6 +159,13 @@ public class RecipeTraitLibrary {
     }
 
 
+    /**
+     * A vanilla-style barrel recipe: planks around the sides, slabs top and bottom center.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @param slabMaterial   the slab material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait barrel(RecipeMaterial planksMaterial, RecipeMaterial slabMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -126,6 +184,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style boat recipe: 5 planks, shaped.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static ItemRecipeTrait boat(RecipeMaterial planksMaterial) {
         return ItemRecipeTraitBuilder.BUILDER.with(
                 (key, item, context) -> {
@@ -142,6 +206,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style bookshelf recipe: planks around 3 books in the middle row.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait bookshelf(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -160,6 +230,14 @@ public class RecipeTraitLibrary {
     }
 
 
+    /**
+     * A recipe stacking 2 slabs into a rotated pillar block, plus an optional stonecutting recipe from a source
+     * stone material.
+     *
+     * @param slabMaterial  the slab material this recipe consumes
+     * @param stoneMaterial the source stone material for a stonecutting recipe, or {@code null} to skip it
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait pillar(RecipeMaterial slabMaterial, @Nullable RecipeMaterial stoneMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -183,10 +261,23 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style button recipe (shapeless, single source item) in the {@code "button"} group.
+     *
+     * @param planksMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait button(RecipeMaterial planksMaterial) {
         return button(planksMaterial, "button");
     }
 
+    /**
+     * A vanilla-style button recipe: shapeless, single source item.
+     *
+     * @param planksMaterial the base material this recipe consumes
+     * @param group          the recipe group to use (e.g. {@code "wooden_button"}/{@code "stone_button"})
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait button(RecipeMaterial planksMaterial, String group) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -203,6 +294,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style chest recipe: a ring of 8 planks.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait chest(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -219,6 +316,13 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style chest boat recipe: shapeless, one boat plus one chest.
+     *
+     * @param boatMaterial  the boat material this recipe consumes
+     * @param chestMaterial the chest material this recipe consumes
+     * @return the recipe trait
+     */
     public static ItemRecipeTrait chestBoat(RecipeMaterial boatMaterial, RecipeMaterial chestMaterial) {
         return ItemRecipeTraitBuilder.BUILDER.with(
                 (key, item, context) -> {
@@ -237,6 +341,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style composter recipe: 7 slabs, sides and bottom open at the top.
+     *
+     * @param slabMaterial the slab material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait composter(RecipeMaterial slabMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -253,6 +363,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style crafting table recipe: 4 planks, 2x2 shaped.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait craftingTable(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -269,6 +385,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style door recipe: 6 planks, 2-wide/3-tall shaped, yields 3 doors.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait door(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -286,6 +408,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style fence recipe: planks and sticks, yields 3 fences.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait fence(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -304,6 +432,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style fence gate recipe: planks and sticks.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait gate(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -321,6 +455,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style hanging sign recipe: stripped logs plus 2 chains, yields 3 hanging signs.
+     *
+     * @param strippedLogMaterial the stripped log material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait hangingSign(RecipeMaterial strippedLogMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -339,6 +479,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style sign recipe: 6 planks plus a stick, yields 3 signs.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait sign(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -357,10 +503,16 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style ladder recipe: planks and sticks, yields 3 ladders.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait ladder(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
-                    validOrThrow(planksMaterial, "sign", "planks");
+                    validOrThrow(planksMaterial, "ladder", "planks");
 
                     RecipeBuilder
                             .crafting(key.location(), block)
@@ -374,6 +526,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style pressure plate recipe: 2 planks side by side, in the {@code "pressure_plate"} group.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait pressurePlate(RecipeMaterial planksMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -390,10 +548,24 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style stairs recipe (with a matching stonecutting recipe) in the {@code "stairs"} group.
+     *
+     * @param planksMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial) {
         return stairs(planksMaterial, "stairs", true);
     }
 
+    /**
+     * A vanilla-style stairs recipe: staircase-shaped, yields 4 stairs, plus an optional stonecutting recipe.
+     *
+     * @param planksMaterial  the base material this recipe consumes
+     * @param group           the recipe group to use
+     * @param withStonecutter whether a matching stonecutting recipe should also be generated
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait stairs(RecipeMaterial planksMaterial, String group, boolean withStonecutter) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -423,10 +595,23 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style trapdoor recipe in the {@code "trapdoor"} group.
+     *
+     * @param planksMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait trapdoor(RecipeMaterial planksMaterial) {
         return trapdoor(planksMaterial, "trapdoor");
     }
 
+    /**
+     * A vanilla-style trapdoor recipe: 6 planks, 2 rows of 3, yields 2 trapdoors.
+     *
+     * @param planksMaterial the base material this recipe consumes
+     * @param group          the recipe group to use (e.g. {@code "wooden_trapdoor"})
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait trapdoor(RecipeMaterial planksMaterial, String group) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -443,6 +628,12 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style stone wall recipe: 6 source blocks, 2 rows of 3, plus a matching stonecutting recipe.
+     *
+     * @param sourceMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait wall(RecipeMaterial sourceMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -469,6 +660,14 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A WoVer-specific "wooden wall" recipe (vanilla has no wooden walls): planks over a row of fences, yields 6
+     * walls, in the {@code "wooden_wall"} group. No stonecutting recipe is generated.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @param fenceMaterial  the fence material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait woodWall(RecipeMaterial planksMaterial, RecipeMaterial fenceMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -487,6 +686,13 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style "bricks" recipe: 4 source blocks, 2x2 shaped, plus an optional stonecutting recipe.
+     *
+     * @param sourceMaterial  the base material this recipe consumes
+     * @param withStonecutter whether a matching stonecutting recipe should also be generated
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait brickSource(RecipeMaterial sourceMaterial, boolean withStonecutter) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -516,6 +722,13 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style "cracked" recipe: blasting the source material, plus an optional stonecutting recipe.
+     *
+     * @param sourceMaterial  the base material this recipe consumes
+     * @param withStonecutter whether a matching stonecutting recipe should also be generated
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait crackedSource(RecipeMaterial sourceMaterial, boolean withStonecutter) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -544,6 +757,13 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A single stonecutting recipe from the source material (used for chiseled/polished/tiled variants that have
+     * no crafting recipe, only a stonecutting one).
+     *
+     * @param sourceMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait stoneCutSource(RecipeMaterial sourceMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {
@@ -562,6 +782,14 @@ public class RecipeTraitLibrary {
         );
     }
 
+    /**
+     * A vanilla-style "mossy" recipe: two shapeless variants, one from a moss block and one from vines
+     * ({@link org.betterx.wover.tag.api.predefined.CommonItemTags#VINES}), each combined with the source
+     * material.
+     *
+     * @param sourceMaterial the base material this recipe consumes
+     * @return the recipe trait
+     */
     public static BlockRecipeTrait mossySource(RecipeMaterial sourceMaterial) {
         return BlockRecipeTraitBuilder.BUILDER.with(
                 (key, block, context) -> {

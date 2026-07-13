@@ -222,14 +222,14 @@ public class PillarFeatureConfig implements FeatureConfiguration {
             .apply(instance, PillarFeatureConfig::new));
 
     /**
-     * The minimum height of the pillar.
-     */
-    public final IntProvider maxHeight;
-    /**
      * The maximum height of the pillar. The actual maximum height is calculated by
      * checking every possible height in the range [minHeight, maxHeight] and
      * checking if {@link #allowedPlacement} predicate returns true. The first non-true
      * height is the maximum height.
+     */
+    public final IntProvider maxHeight;
+    /**
+     * The minimum height of the pillar.
      */
     public final IntProvider minHeight;
     /**

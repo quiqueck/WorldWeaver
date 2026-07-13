@@ -19,11 +19,22 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Builds a trapdoor slot: a {@link TrapDoorBlock} using the set's {@link BlockSet#setType()}, carrying
+ * {@link BlockTraits#TRAPDOOR_BLOCK}, with a vanilla-style orientable trapdoor model and an auto-generated
+ * recipe from the set's base block, in the matching {@code wooden_trapdoor}/{@code trapdoor} recipe group.
+ */
 public class Trapdoor extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#TRAPDOOR} slot.
+     */
     public Trapdoor() {
         this(SlotType.TRAPDOOR);
     }
 
+    /**
+     * @param slot the slot to register this trapdoor under
+     */
     public Trapdoor(SlotType slot) {
         super(slot);
     }

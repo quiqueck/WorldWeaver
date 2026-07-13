@@ -25,7 +25,7 @@ public interface AsOre extends FeatureConfigurator<OreConfiguration, OreFeature>
      *
      * @param containedIn The block that should surround the ore
      * @param ore         The {@link BlockState} ore block
-     * @return
+     * @return the same instance
      */
     AsOre add(Block containedIn, BlockState ore);
     /**

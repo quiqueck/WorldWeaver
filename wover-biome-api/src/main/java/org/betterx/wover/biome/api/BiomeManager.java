@@ -26,16 +26,63 @@ import net.minecraft.world.level.chunk.PalettedContainerRO;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Main entry point to create and query {@link Biome}s.
+ * <p>
+ * Use {@link #vanilla(ResourceLocation)} to define a completely new Biome, or
+ * {@link #wrapped(ResourceKey)} to attach additional {@link BiomeData} (fog density, climate parameters,
+ * intended placement tag) to a Biome that already exists (for example a vanilla one). Both return a
+ * {@link BiomeKey} whose {@link BiomeKey#bootstrap(org.betterx.wover.biome.api.builder.BiomeBootstrapContext)}
+ * method creates the fluent {@link BiomeBuilder} that fills in the Biome's content.
+ * <p>
+ * Once the world is loaded, {@link #biomeData(ResourceLocation)} and {@link #biomeDataForHolder(Holder)}
+ * can be used to look up the {@link BiomeData} that was registered for a Biome.
+ */
 public class BiomeManager {
+    /**
+     * Fired while the vanilla {@link Registries#BIOME} registry is bootstrapped, before any
+     * {@link BiomeBuilder} was applied. Use this event if you need to register a {@link Biome} directly,
+     * without going through the {@link BiomeBuilder} API.
+     */
     public static final Event<OnBootstrapRegistry<Biome>> BOOTSTRAP_BIOME_REGISTRY
             = BiomeManagerImpl.BOOTSTRAP_BIOME_REGISTRY;
+
+    /**
+     * Fired whenever the internal {@link org.betterx.wover.biome.api.builder.BiomeBootstrapContext} used to
+     * gather all {@link BiomeBuilder}s is (re-)created. This is used internally to collect the builders
+     * created by {@link BiomeKey#bootstrap(org.betterx.wover.biome.api.builder.BiomeBootstrapContext)} and
+     * feed them into the Biome, {@link BiomeData} and Biome-tag registries.
+     */
     public static final Event<OnBootstrapBiomes> BOOTSTRAP_BIOMES_WITH_DATA
             = BiomeManagerImpl.BOOTSTRAP_BIOMES_WITH_DATA;
 
+    /**
+     * Creates a {@link BiomeKey} for a completely new, vanilla-style Biome.
+     * <p>
+     * Call {@link BiomeKey#bootstrap(org.betterx.wover.biome.api.builder.BiomeBootstrapContext)} on the
+     * returned key (usually from a {@link org.betterx.wover.biome.api.builder.event.OnBootstrapBiomes}
+     * subscriber or a {@link org.betterx.wover.datagen.api.provider.multi.WoverBiomeProvider}) to obtain a
+     * {@link BiomeBuilder.Vanilla} that fills in the Biome's terrain, climate, effects and mob spawns.
+     *
+     * @param location The location of the new Biome.
+     * @return The key for the new Biome.
+     */
     public static BiomeKey<BiomeBuilder.Vanilla> vanilla(ResourceLocation location) {
         return BiomeManagerImpl.vanilla(location);
     }
 
+    /**
+     * Creates a {@link BiomeKey} that attaches {@link BiomeData} to an already existing Biome (for example a
+     * vanilla one, or one registered by another mod), instead of defining a new one.
+     * <p>
+     * Call {@link BiomeKey#bootstrap(org.betterx.wover.biome.api.builder.BiomeBootstrapContext)} on the
+     * returned key to obtain a {@link BiomeBuilder.Wrapped} that only lets you set the fog density, climate
+     * parameters and biome tags that make up the {@link BiomeData} — the underlying Biome itself is left
+     * untouched.
+     *
+     * @param key The key of the already existing Biome.
+     * @return The key wrapping the existing Biome.
+     */
     public static BiomeKey<BiomeBuilder.Wrapped> wrapped(@NotNull ResourceKey<Biome> key) {
         return BiomeManagerImpl.wrapped(key);
     }

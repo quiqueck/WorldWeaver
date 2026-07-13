@@ -12,6 +12,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
+/**
+ * Provides a Datapack backed registry for {@link BiomeData}.
+ * <p>
+ * Every {@link BiomeData} entry uses the same location as the {@link net.minecraft.world.level.biome.Biome}
+ * it belongs to — use {@link #createKey(ResourceKey)}/{@link #createKey(ResourceLocation)} to derive the
+ * matching {@link BiomeData} key from a Biome key/location, or {@link #createBiomeKey(ResourceKey)} for the
+ * reverse direction.
+ */
 public class BiomeDataRegistry {
     private BiomeDataRegistry() {
 

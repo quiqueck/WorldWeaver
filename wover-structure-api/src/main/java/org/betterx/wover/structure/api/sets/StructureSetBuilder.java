@@ -26,6 +26,17 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A builder for {@link StructureSet}s. Created by calling
+ * {@link StructureSetKey#bootstrap(BootstrapContext)} (or the {@link StructureSetManager#bootstrap}
+ * shorthand, which also adds the structure).
+ * <p>
+ * A set needs at least one structure (added via {@link #addStructure}) and a placement (either
+ * {@link #randomPlacement()}/{@link #randomPlacement(int, int)} for a
+ * {@link RandomSpreadStructurePlacement}, {@link #concentricPlacement()} for a
+ * {@link ConcentricRingsStructurePlacement}, or {@link #setPlacement(StructurePlacement)} for a
+ * custom one) before it can be {@link #register() registered}.
+ */
 public class StructureSetBuilder {
     @NotNull
     private final ResourceKey<StructureSet> key;
@@ -41,15 +52,40 @@ public class StructureSetBuilder {
         this.context = context;
     }
 
+    /**
+     * Adds a {@link Structure} to this set with the given relative weight.
+     *
+     * @param structure The key of the structure to add
+     * @param weight    The relative weight used when the game randomly picks which structure of the set
+     *                  to generate at a given location
+     * @return This builder instance, for chaining
+     */
     public StructureSetBuilder addStructure(ResourceKey<Structure> structure, int weight) {
         structures.add(new Pair<>(structure, weight));
         return this;
     }
 
+    /**
+     * Adds a {@link Structure} to this set with a relative weight of {@code 1}.
+     *
+     * @param structure The key of the structure to add
+     * @return This builder instance, for chaining
+     */
     public StructureSetBuilder addStructure(ResourceKey<Structure> structure) {
         return addStructure(structure, 1);
     }
 
+    /**
+     * Alias for {@link #addStructure(ResourceKey, int)} that accepts a {@link StructureKey}.
+     *
+     * @param structure The structure to add
+     * @param weight    The relative weight used when the game randomly picks which structure of the set
+     *                  to generate at a given location
+     * @param <S>       The {@link Structure} type
+     * @param <T>       The Builder type
+     * @param <K>       The {@link StructureKey} type
+     * @return This builder instance, for chaining
+     */
     public <S extends Structure, T extends BaseStructureBuilder<S, T>, K extends StructureKey<S, T, K>> StructureSetBuilder addStructure(
             K structure,
             int weight
@@ -57,24 +93,61 @@ public class StructureSetBuilder {
         return addStructure(structure.key(), weight);
     }
 
+    /**
+     * Alias for {@link #addStructure(ResourceKey)} that accepts a {@link StructureKey}.
+     *
+     * @param structure The structure to add
+     * @param <S>       The {@link Structure} type
+     * @param <T>       The Builder type
+     * @param <K>       The {@link StructureKey} type
+     * @return This builder instance, for chaining
+     */
     public <S extends Structure, T extends BaseStructureBuilder<S, T>, K extends StructureKey<S, T, K>> StructureSetBuilder addStructure(
             K structure
     ) {
         return addStructure(structure, 1);
     }
 
+    /**
+     * Shorthand that creates and immediately finishes a {@link RandomSpreadStructurePlacementBuilder}
+     * with the given spacing/separation. Equivalent to
+     * {@code randomPlacement().spacing(spacing).separation(separation).finishPlacement()}.
+     *
+     * @param spacing    The average distance (in chunks) between two structures of this set
+     * @param seperation The minimum distance (in chunks) between two structures of this set
+     * @return This builder instance, for chaining
+     */
     public StructureSetBuilder randomPlacement(int spacing, int seperation) {
         return randomPlacement().spacing(spacing).separation(seperation).finishPlacement();
     }
 
+    /**
+     * Starts building a {@link RandomSpreadStructurePlacement} for this set. Call
+     * {@link RandomSpreadStructurePlacementBuilder#finishPlacement()} to apply it.
+     *
+     * @return A builder for the placement
+     */
     public RandomSpreadStructurePlacementBuilder randomPlacement() {
         return new RandomSpreadStructurePlacementBuilder(key);
     }
 
+    /**
+     * Starts building a {@link ConcentricRingsStructurePlacement} for this set. Call
+     * {@link ConcentricRingsStructurePlacementBuilder#finishPlacement()} to apply it.
+     *
+     * @return A builder for the placement
+     */
     public ConcentricRingsStructurePlacementBuilder concentricPlacement() {
         return new ConcentricRingsStructurePlacementBuilder(context, key);
     }
 
+    /**
+     * Directly sets a pre-built {@link StructurePlacement} for this set, bypassing
+     * {@link #randomPlacement()}/{@link #concentricPlacement()}.
+     *
+     * @param p The placement to use
+     * @return This builder instance, for chaining
+     */
     public StructureSetBuilder setPlacement(StructurePlacement p) {
         this.placement = p;
         return this;
@@ -111,7 +184,7 @@ public class StructureSetBuilder {
             throw new IllegalStateException("StructureSet " + key.location() + " must contain at least one structure");
         }
         if (placement == null) {
-            throw new IllegalStateException("StructureSet " + key.location() + " define a placement");
+            throw new IllegalStateException("StructureSet " + key.location() + " must define a placement");
         }
 
         final HolderGetter<Structure> structureRegistry = context.lookup(Registries.STRUCTURE);
@@ -131,6 +204,13 @@ public class StructureSetBuilder {
 
     }
 
+    /**
+     * Base builder for a {@link StructurePlacement}, shared by {@link RandomSpreadStructurePlacementBuilder}
+     * and {@link ConcentricRingsStructurePlacementBuilder}. Holds the settings common to every
+     * {@link StructurePlacement} subclass.
+     *
+     * @param <R> The concrete builder type, for chaining
+     */
     public abstract class StructurePlacementBuilder<R extends StructurePlacementBuilder<R>> {
         protected Vec3i locateOffset;
         protected StructurePlacement.FrequencyReductionMethod frequencyReductionMethod;
@@ -138,32 +218,73 @@ public class StructureSetBuilder {
         protected int salt;
         protected Optional<StructurePlacement.ExclusionZone> exclusionZone;
 
+        /**
+         * Builds the {@link StructurePlacement} and applies it to the owning {@link StructureSetBuilder}
+         * via {@link StructureSetBuilder#setPlacement(StructurePlacement)}.
+         *
+         * @return The owning {@link StructureSetBuilder}, for chaining
+         */
         public abstract StructureSetBuilder finishPlacement();
 
+        /**
+         * Sets an offset applied to the located position. Defaults to {@link Vec3i#ZERO}.
+         *
+         * @param offset The offset to apply
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public R locateOffset(Vec3i offset) {
             this.locateOffset = offset;
             return (R) this;
         }
 
+        /**
+         * Sets the {@link StructurePlacement.FrequencyReductionMethod} used together with
+         * {@link #frequency(float)}. Defaults to {@link StructurePlacement.FrequencyReductionMethod#DEFAULT}.
+         *
+         * @param method The frequency reduction method to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public R frequencyReductionMethod(@NotNull StructurePlacement.FrequencyReductionMethod method) {
             this.frequencyReductionMethod = method;
             return (R) this;
         }
 
+        /**
+         * Sets the fraction (0..1) of eligible locations that actually generate a structure. Defaults to
+         * {@code 1.0} (every eligible location).
+         *
+         * @param frequency The frequency to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public R frequency(float frequency) {
             this.frequency = frequency;
             return (R) this;
         }
 
+        /**
+         * Sets the salt used to seed the placement's random number generator, so that different structure
+         * sets don't generate at correlated positions. Defaults to the (absolute value of the) hash code
+         * of the set's {@link ResourceKey#location()}.
+         *
+         * @param salt The salt to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public R salt(int salt) {
             this.salt = salt;
             return (R) this;
         }
 
+        /**
+         * Sets an {@link StructurePlacement.ExclusionZone} that prevents this set from generating too
+         * close to another {@link StructureSet}. Unset ({@code null}) by default.
+         *
+         * @param exclusionZone The exclusion zone to use, or {@code null} to clear it
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public R exclusionZone(@Nullable StructurePlacement.ExclusionZone exclusionZone) {
             this.exclusionZone = exclusionZone == null ? Optional.empty() : Optional.of(exclusionZone);
@@ -180,6 +301,10 @@ public class StructureSetBuilder {
         }
     }
 
+    /**
+     * A builder for a {@link RandomSpreadStructurePlacement} — structures are spread out randomly across
+     * a grid of cells. Created via {@link StructureSetBuilder#randomPlacement()}.
+     */
     public class RandomSpreadStructurePlacementBuilder extends StructurePlacementBuilder<RandomSpreadStructurePlacementBuilder> {
         protected int spacing;
         protected int separation;
@@ -192,18 +317,38 @@ public class StructureSetBuilder {
             spreadType = RandomSpreadType.LINEAR;
         }
 
+        /**
+         * Sets the average distance (in chunks) between two structures of this set. Defaults to {@code 32}.
+         *
+         * @param spacing The spacing to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public RandomSpreadStructurePlacementBuilder spacing(int spacing) {
             this.spacing = spacing;
             return this;
         }
 
+        /**
+         * Sets the minimum distance (in chunks) between two structures of this set. Must be smaller than
+         * {@link #spacing(int)}. Defaults to {@code 8}.
+         *
+         * @param separation The separation to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public RandomSpreadStructurePlacementBuilder separation(int separation) {
             this.separation = separation;
             return this;
         }
 
+        /**
+         * Sets the {@link RandomSpreadType} used to pick a position within a grid cell. Defaults to
+         * {@link RandomSpreadType#LINEAR}.
+         *
+         * @param spreadType The spread type to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public RandomSpreadStructurePlacementBuilder spreadType(@NotNull RandomSpreadType spreadType) {
             this.spreadType = spreadType;
@@ -225,6 +370,11 @@ public class StructureSetBuilder {
         }
     }
 
+    /**
+     * A builder for a {@link ConcentricRingsStructurePlacement} — structures are placed on concentric
+     * rings around the world origin, biased towards {@link #preferredBiomes(TagKey)} (vanilla uses this
+     * for strongholds). Created via {@link StructureSetBuilder#concentricPlacement()}.
+     */
     public class ConcentricRingsStructurePlacementBuilder extends StructurePlacementBuilder<ConcentricRingsStructurePlacementBuilder> {
         protected int distance;
         protected int spread;
@@ -246,24 +396,50 @@ public class StructureSetBuilder {
             preferredBiomes = BiomeTags.STRONGHOLD_BIASED_TO;
         }
 
+        /**
+         * Sets the distance (in chunks) between each ring. Defaults to {@code 32}.
+         *
+         * @param distance The distance to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public ConcentricRingsStructurePlacementBuilder distance(int distance) {
             this.distance = distance;
             return this;
         }
 
+        /**
+         * Sets how much (in chunks) the location of a structure on a ring may randomly deviate from the
+         * ring. Defaults to {@code 3}.
+         *
+         * @param spread The spread to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public ConcentricRingsStructurePlacementBuilder spread(int spread) {
             this.spread = spread;
             return this;
         }
 
+        /**
+         * Sets the total number of structures placed across all rings. Defaults to {@code 128}.
+         *
+         * @param count The count to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public ConcentricRingsStructurePlacementBuilder count(int count) {
             this.count = count;
             return this;
         }
 
+        /**
+         * Sets the biome tag rings are biased towards, resolved from the biome registry of the active
+         * {@link BootstrapContext}. Defaults to {@link BiomeTags#STRONGHOLD_BIASED_TO}.
+         *
+         * @param preferredBiomes The preferred biome tag to use
+         * @return This builder instance, for chaining
+         */
         @NotNull
         public ConcentricRingsStructurePlacementBuilder preferredBiomes(@NotNull TagKey<Biome> preferredBiomes) {
             this.preferredBiomes = preferredBiomes;

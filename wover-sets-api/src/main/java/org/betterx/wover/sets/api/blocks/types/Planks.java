@@ -16,11 +16,22 @@ import org.betterx.wover.sets.api.blocks.WoodenSlotFromDefinition;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * Builds the planks slot of a {@link WoodenBlockSet}: a plain block carrying {@link BlockTraits#PLANK_BLOCK},
+ * with a plain cube model and an auto-generated recipe from the set's shared logs item tag
+ * ({@link WoodenBlockSet#logsItemTag}), so planks can be crafted from any log/stem variant.
+ */
 public class Planks extends WoodenSlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#PLANKS} slot.
+     */
     public Planks() {
         this(SlotType.PLANKS);
     }
 
+    /**
+     * @param slot the slot to register these planks under
+     */
     public Planks(SlotType slot) {
         super(slot);
     }

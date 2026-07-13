@@ -17,6 +17,15 @@ import net.minecraft.world.item.Item;
 
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The built and registered result of registering a single {@link ArmorSlot} on an {@link EquipmentSet}, created
+ * by {@link #registerArmor}.
+ *
+ * @param item    the built and registered item
+ * @param itemKey the registry key the item was registered under
+ * @param slot    the armor slot this item was registered for
+ * @param <I>     the item type
+ */
 public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey, ArmorSlot slot) {
     @SuppressWarnings("unchecked")
     private static TagKey<Item>[] getTagKey(ArmorSlot slot) {
@@ -29,6 +38,20 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
         };
     }
 
+    /**
+     * Builds and registers a single armor item for {@code equipmentSet}, with an auto-generated crafting/smithing
+     * recipe unless {@code recipeOverride} is given.
+     *
+     * @param modCore        the mod to register the item under
+     * @param slot           the armor slot being registered
+     * @param path           the item's registration name
+     * @param creator        creates the item from its definition
+     * @param equipmentSet   the set the item belongs to (for its tier, template base set, and recipe material)
+     * @param recipeOverride the recipe trait to use instead of the auto-generated recipe, or {@code null} to
+     *                       keep the default
+     * @param <I>            the item type being registered
+     * @return the registered item description
+     */
     public static <I extends Item> ArmorDescription<I> registerArmor(
             ModCore modCore,
             ArmorSlot slot,

@@ -4,6 +4,15 @@ import org.betterx.wover.sets.api.blocks.SlotFromDefinition;
 import org.betterx.wover.sets.api.blocks.SlotType;
 import org.betterx.wover.sets.api.blocks.types.*;
 
+/**
+ * Ready-made slots for a stone-like material family: the base {@code SOURCE}/{@code SLAB}/{@code STAIRS}/
+ * {@code WALL}/{@code PILLAR}/{@code BUTTON}/{@code PRESSURE_PLATE} set, plus source/slab/stairs/wall variants
+ * for the {@code TILES}, {@code BRICK}, {@code WEATHERED}, {@code CRACKED}, {@code CHISELED}, and
+ * {@code POLISHED} sub-families (each named {@code <FAMILY>_<ROLE>}, e.g. {@link #BRICK_STAIRS}). Unlike
+ * {@link WoodSlots}, {@link org.betterx.wover.sets.api.blocks.BlockSet} does not build any of these by default -
+ * a stone-like set picks the constants it wants and combines them with
+ * {@link org.betterx.wover.sets.api.blocks.SlotMap#of} (see {@code TestStoneSet} in this module's test mod).
+ */
 public class StoneSlots {
     public static final SlotFromDefinition SOURCE = new Source();
     public static final SlotFromDefinition SLAB = new Slab();

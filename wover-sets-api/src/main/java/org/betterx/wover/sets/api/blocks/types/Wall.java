@@ -20,13 +20,27 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a wall slot: a {@link WallBlock} carrying {@link BlockTraits#WALL_BLOCK}, with a vanilla-style wall
+ * model. For a wood-family set the recipe is a WoVer-specific "wooden wall" (planks over fences, see
+ * {@link org.betterx.wover.recipe.api.RecipeTraitLibrary#woodWall}); for stone-like sets it is a vanilla-style
+ * wall recipe from a source block plus a matching stonecutting recipe.
+ */
 public class Wall extends SlotFromDefinition {
     protected final @Nullable SlotType baseBlockType;
 
+    /**
+     * Creates a factory for the {@link SlotType#WALL} slot, cut from the set's base block.
+     */
     public Wall() {
         this(null, SlotType.WALL);
     }
 
+    /**
+     * @param baseBlockType the slot (with fallback to the set's base slot, then vanilla stone) this wall is cut
+     *                      from, or {@code null} to always use the set's base block
+     * @param slot          the slot to register this wall under
+     */
     public Wall(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
         this.baseBlockType = baseBlockType;

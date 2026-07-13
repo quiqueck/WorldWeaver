@@ -481,6 +481,13 @@ public interface BiomeModification {
             return this.addFeature(feature.getDecoration(), feature.getHolder(bootstrapContext));
         }
 
+        /**
+         * Adds the Biome tag associated with the passed {@link StructureKey} to the {@link #tags} that
+         * matching Biomes will be added to, so the structure can generate in them.
+         *
+         * @param structure The structure that should be able to generate in the matching Biomes.
+         * @return This builder.
+         */
         public Builder addStructureSet(
                 StructureKey<?, ?, ?> structure
         ) {
@@ -492,6 +499,14 @@ public interface BiomeModification {
             return this.addToTag(structure.biomeTag());
         }
 
+        /**
+         * Adds the passed Biome tag to the {@link #tags} that matching Biomes will be added to. Intended to
+         * be used with a structure set's Biome tag, so the matching structure can generate in them.
+         *
+         * @param structureSet The Biome tag of the structure that should be able to generate in the matching
+         *                     Biomes.
+         * @return This builder.
+         */
         public Builder addStructureSet(
                 TagKey<Biome> structureSet
         ) {
@@ -541,7 +556,7 @@ public interface BiomeModification {
         /**
          * Adds the Biome into a given Tag.
          *
-         * @param tag
+         * @param tag The tag to add the matching Biomes to.
          * @return This builder.
          */
         public Builder addToTag(TagKey<Biome> tag) {

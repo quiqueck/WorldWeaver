@@ -20,7 +20,15 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Builds the {@link SlotType#CHEST} slot: a {@link ChestBlock} using the vanilla chest block entity, carrying
+ * {@link BlockTraits#CHEST_BLOCK}, with a vanilla-style chest model and an auto-generated recipe from the set's
+ * base block.
+ */
 public class Chest extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#CHEST} slot.
+     */
     public Chest() {
         super(SlotType.CHEST);
     }

@@ -5,6 +5,15 @@ import org.betterx.wover.block.api.BlockDefinition;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 
+/**
+ * {@link org.betterx.wover.item.api.ItemDefinition} specialization for {@link BlockItem}s created from a
+ * {@link BlockDefinition}. Instances are usually not created directly - {@link BlockDefinition#buildAndRegister()}
+ * uses {@link VanillaBlockItemDefinition} by default, unless the definition was configured with a custom
+ * {@link BlockDefinition.BlockItemDefinitionFactory} via {@link BlockDefinition#withBlockItem}.
+ *
+ * @param <BI> The type of {@link BlockItem} being created
+ * @param <D>  The concrete configuration class type for method chaining
+ */
 public class BlockItemDefinition<BI extends BlockItem, D extends BlockItemDefinition<BI, D>> extends ItemDefinition<BI, D> {
     /**
      * Creates a new block-item configuration.

@@ -15,7 +15,22 @@ import net.minecraft.util.StringRepresentable;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The {@link BiomeSourceConfig} of {@link WoverEndBiomeSource}, matching the {@code config} field of the
+ * {@code wover:end_biome_source} {@code biome_source} type.
+ * <p>
+ * Controls the {@link EndBiomeMapType map algorithm} and {@link EndBiomeGeneratorType placement algorithm}
+ * used, and the size of the four biome "rings" the End biome source places: center island, land (highlands
+ * and midlands), void (small islands) and barrens. A handful of presets matching the behavior of past
+ * BCLib/WoVer versions are provided as constants ({@link #VANILLA}, {@link #MINECRAFT_17}, ...,
+ * {@link #DEFAULT}) — use {@link #WoverEndConfig(EndBiomeMapType, EndBiomeGeneratorType, boolean, int, int,
+ * int, int, int) the constructor} to build a fully custom configuration.
+ */
 public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
+    /**
+     * The behavior of vanilla's End (before WoVer/BCLib biome placement existed): a {@link HexBiomeMap} with
+     * void biomes enabled and a small inner void radius.
+     */
     public static final WoverEndConfig VANILLA = new WoverEndConfig(
             EndBiomeMapType.VANILLA,
             EndBiomeGeneratorType.VANILLA,
@@ -26,6 +41,10 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             128,
             128
     );
+    /**
+     * The behavior of BCLib 1.17: a {@link EndBiomeMapType#SQUARE} map with the {@link EndBiomeGeneratorType#PAULEVS}
+     * placement algorithm and larger biome rings than {@link #VANILLA}.
+     */
     public static final WoverEndConfig MINECRAFT_17 = new WoverEndConfig(
             EndBiomeMapType.SQUARE,
             EndBiomeGeneratorType.PAULEVS,
@@ -36,6 +55,11 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             256,
             256
     );
+    /**
+     * The behavior of BCLib 1.18: a {@link EndBiomeMapType#HEX} map, otherwise matching {@link #MINECRAFT_17}
+     * (or, if running alongside Nullscape, the {@link EndBiomeGeneratorType#VANILLA} algorithm without void
+     * biomes).
+     */
     public static final WoverEndConfig MINECRAFT_18 = new WoverEndConfig(
             EndBiomeMapType.HEX,
             IntegrationCore.RUNS_NULLSCAPE ? EndBiomeGeneratorType.VANILLA : EndBiomeGeneratorType.PAULEVS,
@@ -47,6 +71,9 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             MINECRAFT_17.barrensBiomesSize
     );
 
+    /**
+     * A larger-biomes variant of {@link #MINECRAFT_18}.
+     */
     public static final WoverEndConfig MINECRAFT_18_LARGE = new WoverEndConfig(
             EndBiomeMapType.HEX,
             IntegrationCore.RUNS_NULLSCAPE ? EndBiomeGeneratorType.VANILLA : EndBiomeGeneratorType.PAULEVS,
@@ -58,6 +85,10 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             MINECRAFT_18.barrensBiomesSize * 2
     );
 
+    /**
+     * A variant of {@link #MINECRAFT_18} that always uses the {@link EndBiomeGeneratorType#PAULEVS}
+     * placement algorithm with void biomes enabled, for the amplified world preset.
+     */
     public static final WoverEndConfig MINECRAFT_18_AMPLIFIED = new WoverEndConfig(
             EndBiomeMapType.HEX,
             EndBiomeGeneratorType.PAULEVS,
@@ -69,6 +100,11 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             MINECRAFT_18.barrensBiomesSize
     );
 
+    /**
+     * The current default behavior: a {@link EndBiomeMapType#HEX} map with the vanilla
+     * ({@link EndBiomeGeneratorType#VANILLA}) placement algorithm and {@link #MINECRAFT_17}'s biome ring
+     * sizes.
+     */
     public static final WoverEndConfig MINECRAFT_20 = new WoverEndConfig(
             EndBiomeMapType.HEX,
             EndBiomeGeneratorType.VANILLA,
@@ -80,6 +116,9 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             MINECRAFT_17.barrensBiomesSize
     );
 
+    /**
+     * A larger-biomes variant of {@link #MINECRAFT_20}.
+     */
     public static final WoverEndConfig MINECRAFT_20_LARGE = new WoverEndConfig(
             EndBiomeMapType.HEX,
             EndBiomeGeneratorType.VANILLA,
@@ -91,6 +130,9 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             MINECRAFT_18.barrensBiomesSize * 2
     );
 
+    /**
+     * A variant of {@link #MINECRAFT_20} that always enables void biomes, for the amplified world preset.
+     */
     public static final WoverEndConfig MINECRAFT_20_AMPLIFIED = new WoverEndConfig(
             EndBiomeMapType.HEX,
             EndBiomeGeneratorType.VANILLA,
@@ -101,8 +143,16 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             MINECRAFT_18.landBiomesSize,
             MINECRAFT_18.barrensBiomesSize
     );
+    /**
+     * The configuration used by {@link org.betterx.wover.generator.api.preset.WorldPresets#WOVER_WORLD}.
+     */
     public static final WoverEndConfig DEFAULT = MINECRAFT_20;
 
+    /**
+     * The {@link Codec} for this class, matching the {@code config} field of the
+     * {@code wover:end_biome_source} {@code biome_source} type. Every field is optional and falls back to
+     * {@link #DEFAULT}.
+     */
     public static final Codec<WoverEndConfig> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
                     EndBiomeMapType.CODEC
@@ -140,6 +190,20 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
             )
             .apply(instance, WoverEndConfig::new));
 
+    /**
+     * Creates a new instance.
+     * <p>
+     * The four biome ring sizes are clamped to {@code [1, 8192]}.
+     *
+     * @param mapVersion             The map algorithm used to distribute biomes within each ring.
+     * @param generatorVersion       The algorithm used to decide which ring a position belongs to.
+     * @param withVoidBiomes         Whether small End islands (void biomes) generate at all.
+     * @param innerVoidRadiusSquared The squared radius (in blocks) of the center island ring.
+     * @param centerBiomesSize       The biome size of the center island ring.
+     * @param voidBiomesSize         The biome size of the small-island (void) ring.
+     * @param landBiomesSize         The biome size of the highlands/midlands ring.
+     * @param barrensBiomesSize      The biome size of the barrens ring.
+     */
     public WoverEndConfig(
             @NotNull EndBiomeMapType mapVersion,
             @NotNull EndBiomeGeneratorType generatorVersion,
@@ -160,13 +224,36 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
         this.landBiomesSize = Mth.clamp(landBiomesSize, 1, 8192);
     }
 
+    /**
+     * The algorithm used to distribute biomes spatially within a single biome ring, matching the
+     * {@code map_type} field of the {@link #CODEC}.
+     */
     public enum EndBiomeMapType implements StringRepresentable {
+        /**
+         * A hex-grid based map, matching vanilla's own End biome distribution.
+         */
         VANILLA("vanilla", (seed, biomeSize, picker) -> new HexBiomeMap(seed, biomeSize, picker)),
+        /**
+         * A square-grid based map (BCLib 1.17 behavior).
+         */
         SQUARE("square", (seed, biomeSize, picker) -> new SquareBiomeMap(seed, biomeSize, picker)),
+        /**
+         * A hex-grid based map (BCLib 1.18+ behavior).
+         */
         HEX("hex", (seed, biomeSize, picker) -> new HexBiomeMap(seed, biomeSize, picker));
 
+        /**
+         * The {@link Codec} for this enum.
+         */
         public static final Codec<EndBiomeMapType> CODEC = StringRepresentable.fromEnum(EndBiomeMapType::values);
+        /**
+         * The serialized name of this value.
+         */
         public final String name;
+        /**
+         * The factory used to build the {@link org.betterx.wover.generator.api.map.BiomeMap BiomeMap} for
+         * this map type.
+         */
         public final @NotNull MapBuilderFunction mapBuilder;
 
         EndBiomeMapType(String name, @NotNull MapBuilderFunction mapBuilder) {
@@ -185,11 +272,27 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
         }
     }
 
+    /**
+     * The algorithm used to decide which biome ring (center/highland/midland/void/barrens) a position
+     * belongs to, matching the {@code generator_version} field of the {@link #CODEC}.
+     */
     public enum EndBiomeGeneratorType implements StringRepresentable {
+        /**
+         * Vanilla's own erosion-based ring placement (see {@code WoverEndBiomeSource#getNoiseBiome}).
+         */
         VANILLA("vanilla"),
+        /**
+         * BCLib's PaulEvs placement algorithm.
+         */
         PAULEVS("paulevs");
 
+        /**
+         * The {@link Codec} for this enum.
+         */
         public static final Codec<EndBiomeGeneratorType> CODEC = StringRepresentable.fromEnum(EndBiomeGeneratorType::values);
+        /**
+         * The serialized name of this value.
+         */
         public final String name;
 
         EndBiomeGeneratorType(String name) {
@@ -208,14 +311,38 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
     }
 
 
+    /**
+     * The map algorithm used to distribute biomes within each ring.
+     */
     public final @NotNull EndBiomeMapType mapVersion;
+    /**
+     * The algorithm used to decide which ring a position belongs to.
+     */
     public final @NotNull EndBiomeGeneratorType generatorVersion;
+    /**
+     * Whether small End islands (void biomes) generate at all.
+     */
     public final boolean withVoidBiomes;
+    /**
+     * The squared radius (in blocks) of the center island ring.
+     */
     public final int innerVoidRadiusSquared;
 
+    /**
+     * The biome size of the small-island (void) ring.
+     */
     public final int voidBiomesSize;
+    /**
+     * The biome size of the center island ring.
+     */
     public final int centerBiomesSize;
+    /**
+     * The biome size of the highlands/midlands ring.
+     */
     public final int landBiomesSize;
+    /**
+     * The biome size of the barrens ring.
+     */
     public final int barrensBiomesSize;
 
     @Override
@@ -232,6 +359,13 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
                 '}';
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns {@code true} if {@code input} is also a {@link WoverEndConfig} using the same
+     * {@link #mapVersion}, {@link #generatorVersion} and {@link #withVoidBiomes} setting — the biome ring
+     * sizes may differ without requiring a chunk repair.
+     */
     @Override
     public boolean couldSetWithoutRepair(BiomeSourceConfig<?> input) {
         if (input instanceof WoverEndConfig cfg) {

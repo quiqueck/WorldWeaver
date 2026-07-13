@@ -20,13 +20,26 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a stairs slot: a {@link StairBlock} using the base state of a source block, carrying
+ * {@link BlockTraits#STAIR_BLOCK}, with a vanilla-style stairs model and an auto-generated recipe from a source
+ * block (with a matching stonecutting recipe for non-wood materials).
+ */
 public class Stairs extends SlotFromDefinition {
     protected final @Nullable SlotType baseBlockType;
 
+    /**
+     * Creates a factory for the {@link SlotType#STAIRS} slot, cut from the set's base block.
+     */
     public Stairs() {
         this(null, SlotType.STAIRS);
     }
 
+    /**
+     * @param baseBlockType the slot (with fallback to the set's base slot, then vanilla stone) these stairs are
+     *                      cut from, or {@code null} to always use the set's base block
+     * @param slot          the slot to register these stairs under
+     */
     public Stairs(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
         this.baseBlockType = baseBlockType;

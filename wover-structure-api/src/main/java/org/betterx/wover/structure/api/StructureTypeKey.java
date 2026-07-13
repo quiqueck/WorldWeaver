@@ -8,17 +8,42 @@ import net.minecraft.world.level.levelgen.structure.StructureType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Wraps a registered {@link StructureType} for a custom {@link Structure} subclass together with the
+ * {@link StructureFactory} used to instantiate it.
+ * <p>
+ * Instances are created with {@link StructureManager#registerType(ResourceLocation, StructureFactory)} or
+ * {@link StructureManager#registerType(ResourceLocation, StructureFactory, MapCodec)}, or implicitly by
+ * {@link StructureManager#structure(ResourceLocation, StructureFactory)}.
+ *
+ * @param <S> The {@link Structure} type
+ */
 public class StructureTypeKey<S extends Structure> {
+    /**
+     * The registered {@link StructureType} for {@link S}.
+     */
     @NotNull
     public final StructureType<S> type;
 
+    /**
+     * Creates a new instance of a custom {@link Structure} subclass from its {@link Structure.StructureSettings}.
+     * This is typically a method reference to the {@link Structure} subclass's constructor.
+     *
+     * @param <S> The {@link Structure} type
+     */
     public interface StructureFactory<S extends Structure> {
+        /**
+         * Creates a new {@link Structure} instance.
+         *
+         * @param structureSettings The base {@link Structure.StructureSettings} for the new instance
+         * @return The new {@link Structure} instance
+         */
         S create(Structure.StructureSettings structureSettings);
     }
 
     /**
      * For internal use only. Use {@link StructureManager#registerType(ResourceLocation, StructureFactory, MapCodec)}
-     * to explicitly register am create key. Or {@link StructureManager#structure(ResourceLocation, StructureFactory, MapCodec)}
+     * to explicitly register and create a key. Or {@link StructureManager#structure(ResourceLocation, StructureFactory, MapCodec)}
      * to implicitly register and create a key that will be used by a structure.
      *
      * @param type             the structure type
@@ -33,6 +58,9 @@ public class StructureTypeKey<S extends Structure> {
         this.structureFactory = structureFactory;
     }
 
+    /**
+     * The {@link StructureFactory} used to create new instances of {@link S}.
+     */
     @NotNull
     public final StructureFactory<S> structureFactory;
 }

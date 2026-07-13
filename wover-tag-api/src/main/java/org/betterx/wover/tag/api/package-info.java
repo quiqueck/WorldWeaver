@@ -15,11 +15,11 @@
  * <h3>Using a {@code WoverTagProvider}</h3>
  * Adding an Element to the previously generated Tag could look like this:
  * <pre class="java"> public class BlockTagProvider extends WoverTagProvider.ForBlocks {
- *      public BlockTagProvider(FabricDataOutput output, CompletableFuture&lt;HolderLookup.Provider&gt; registriesFuture) {
- *          super(output, registriesFuture);
+ *      public BlockTagProvider(ModCore modCore) {
+ *          super(modCore);
  *      }
  *
- *      protected void prepareTags(TagBootstrapContext&lt;Block&gt; ctx) {
+ *      public void prepareTags(TagBootstrapContext&lt;Block&gt; ctx) {
  *         ctx.add(myTag, Blocks.DIRT);
  *      }
  * } </pre>

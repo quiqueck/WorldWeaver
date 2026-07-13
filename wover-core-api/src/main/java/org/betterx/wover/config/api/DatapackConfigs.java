@@ -14,24 +14,62 @@ import java.util.List;
 import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Loads JSON config files that mods and datapacks place under a {@code config/} folder in their resources.
+ * <p>
+ * Unlike {@link Configs}/{@link de.ambertation.wunderlib.configs.AbstractConfig}, which stores locally editable
+ * config values, this class is meant for reading configuration data that was shipped inside a datapack or resource
+ * pack, so it can react to reloads and merge values contributed by several packs. Use {@link #instance()} to get
+ * the singleton instance and then call {@link #runForConfigPaths} (or {@link #runForResource}) whenever you need to
+ * (re-)load such files, for example from a resource reload listener.
+ */
 public class DatapackConfigs {
+    /**
+     * Called once for every resource that was found while loading a config file.
+     */
     @FunctionalInterface
     public interface DatapackConfigReloadHandler {
+        /**
+         * Called for every loaded resource.
+         *
+         * @param id   The id of the resource. The namespace of the id identifies the mod or datapack that provided
+         *             the resource.
+         * @param root The root {@link JsonObject} of the loaded file.
+         */
         void onLoad(ResourceLocation id, JsonObject root);
     }
 
+    /**
+     * Called once after all matching resources were processed by a {@link DatapackConfigReloadHandler}.
+     */
     @FunctionalInterface
     public interface DatapackConfigFinished {
+        /**
+         * Called after all matching resources were processed.
+         */
         void whenFinished();
     }
 
     private static DatapackConfigs INSTANCE = new DatapackConfigs();
 
+    /**
+     * Returns the singleton instance of this class.
+     *
+     * @return The singleton instance.
+     */
     public static DatapackConfigs instance() {
         return INSTANCE;
     }
 
 
+    /**
+     * Loads all resources from the {@code config} folder of any mod or datapack whose path matches
+     * {@code config/<path of fileLocation>} in the same namespace as {@code fileLocation}.
+     *
+     * @param manager      The {@link ResourceManager} to use.
+     * @param fileLocation The location whose namespace and path identify the config file to load.
+     * @param handler      A function that is called for each found resource.
+     */
     public void runForResource(
             ResourceManager manager,
             ResourceLocation fileLocation,

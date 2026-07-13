@@ -6,7 +6,13 @@ import org.betterx.wover.tag.api.predefined.MineableTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ToolMaterial;
 
+/**
+ * Ready-made {@link ToolTier}s matching every vanilla {@link ToolMaterial}, including hammer values (a
+ * WoVer/BetterX addition, not part of vanilla). For use with {@link EquipmentSet} or as a base for
+ * {@link ToolTier#copyWithOffset}.
+ */
 public class ToolTiers {
+    /** The vanilla wooden tool tier. */
     public static ToolTier WOOD_TOOL = ToolTier
             .builder("wooden")
             .level(0)
@@ -20,6 +26,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(7, -3.0f, 7, MineableTags.HAMMER))
             .build();
 
+    /** The vanilla stone tool tier. */
     public static ToolTier STONE_TOOL = ToolTier
             .builder("stone")
             .level(1)
@@ -34,6 +41,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(9, -5.0f, 8, MineableTags.HAMMER))
             .build();
 
+    /** The vanilla golden tool tier. */
     public static ToolTier GOLD_TOOL = ToolTier
             .builder("golden")
             .level(2)
@@ -48,6 +56,7 @@ public class ToolTiers {
             toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -4.0f, 6, MineableTags.HAMMER))
             .build();
 
+    /** The vanilla iron tool tier. */
     public static ToolTier IRON_TOOL = ToolTier
             .builder("iron")
             .level(2)
@@ -62,6 +71,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -4.3f, 7, MineableTags.HAMMER))
             .build();
 
+    /** The vanilla diamond tool tier. */
     public static ToolTier DIAMOND_TOOL = ToolTier
             .builder("diamond")
             .level(3)
@@ -76,6 +86,7 @@ public class ToolTiers {
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(7, -4.0f, 6, MineableTags.HAMMER))
             .build();
 
+    /** The vanilla netherite tool tier. */
     public static ToolTier NETHERITE_TOOL = ToolTier
             .builder("netherite")
             .level(4)

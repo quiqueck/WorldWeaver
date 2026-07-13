@@ -22,6 +22,13 @@ import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Base class for client-side model datagen providers. Subclasses implement
+ * {@link #bootstrapBlockStateModels(WoverBlockModelGenerators)} and {@link #bootstrapItemModels(ItemModelGenerators)}
+ * to emit blockstate/model files, and can use {@link #addFromRegistry} to automatically call
+ * {@link org.betterx.wover.block.api.model.BlockModelProvider#provideBlockModels} for every block in a
+ * {@link BlockRegistry} that implements it.
+ */
 public abstract class WoverModelProvider implements WoverDataProvider<FabricModelProvider> {
     /**
      * The title of the provider. Mainly used for logging.
@@ -33,15 +40,35 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
      */
     protected final ModCore modCore;
 
+    /**
+     * Creates a new provider, using the mod's namespace as the title.
+     *
+     * @param modCore The mod this provider generates models for
+     */
     public WoverModelProvider(ModCore modCore) {
         this(modCore, modCore.namespace);
     }
 
+    /**
+     * Creates a new provider with an explicit title.
+     *
+     * @param modCore The mod this provider generates models for
+     * @param title   The title of the provider, mainly used for logging
+     */
     public WoverModelProvider(ModCore modCore, String title) {
         this.modCore = modCore;
         this.title = title;
     }
 
+    /**
+     * Calls {@link org.betterx.wover.block.api.model.BlockModelProvider#provideBlockModels} for every block
+     * in {@code registry} that implements it, without any overrides.
+     *
+     * @param generator The generator to emit models through
+     * @param registry  The registry whose blocks should be processed
+     * @param validate  If {@code true}, blocks that don't provide models are excluded from model
+     *                  validation instead of failing it
+     */
     protected void addFromRegistry(
             WoverBlockModelGenerators generator,
             BlockRegistry registry,
@@ -50,8 +77,21 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
         addFromRegistry(generator, registry, validate, ModelOverides.create());
     }
 
+    /**
+     * A set of per-block overrides that can replace, skip, or share a block's model generation when
+     * iterating a {@link BlockRegistry} with {@link #addFromRegistry}.
+     */
     public static class ModelOverides {
+        /**
+         * A callback that generates the models for a single block, used to override the default
+         * {@link org.betterx.wover.block.api.model.BlockModelProvider} behavior.
+         */
         public interface BlockModelProvider {
+            /**
+             * Generates the models for the given block.
+             *
+             * @param block The block to generate models for
+             */
             void provideModels(Block block);
         }
 
@@ -59,10 +99,23 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
         private static final BlockModelProvider IGNORE = (block) -> {
         };
 
+        /**
+         * Creates a new, empty set of overrides.
+         *
+         * @return A new overrides instance
+         */
         public static ModelOverides create() {
             return new ModelOverides();
         }
 
+        /**
+         * Registers a custom model provider for {@code block}, replacing whatever it would otherwise use.
+         *
+         * @param block    The block to override, ignored if {@code null} or {@link Blocks#AIR}
+         * @param provider The provider that generates the block's models
+         * @return This instance, for chaining
+         * @throws IllegalStateException if {@code block} already has an override
+         */
         public ModelOverides override(@Nullable Block block, @NotNull BlockModelProvider provider) {
             if (block == Blocks.AIR || block == null) return this;
 
@@ -73,16 +126,35 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
             return this;
         }
 
+        /**
+         * Registers {@code block} to reuse the override already registered for {@code copyFromBlock}.
+         *
+         * @param block          The block to override, ignored if {@code null} or {@link Blocks#AIR}
+         * @param copyFromBlock  The block whose override should be reused
+         * @return This instance, for chaining
+         */
         public ModelOverides overrideLike(@Nullable Block block, @NotNull Block copyFromBlock) {
             if (block == Blocks.AIR || block == null) return this;
             return this.override(block, OVERRIDES.get(copyFromBlock));
         }
 
+        /**
+         * Excludes {@code block} from model generation entirely (no models are generated for it).
+         *
+         * @param block The block to ignore, ignored itself if {@code null} or {@link Blocks#AIR}
+         * @return This instance, for chaining
+         */
         public ModelOverides ignore(@Nullable Block block) {
             if (block == Blocks.AIR || block == null) return this;
             return this.override(block, IGNORE);
         }
 
+        /**
+         * Checks whether {@code block} has an override registered.
+         *
+         * @param block The block to check
+         * @return {@code true} if the block has an override
+         */
         public boolean contain(Block block) {
             return OVERRIDES.containsKey(block);
         }
@@ -101,6 +173,17 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
     }
 
 
+    /**
+     * Calls {@link org.betterx.wover.block.api.model.BlockModelProvider#provideBlockModels} for every block
+     * in {@code registry}, unless it has an override in {@code overrides} (which is called instead), or it
+     * doesn't implement {@link org.betterx.wover.block.api.model.BlockModelProvider} at all.
+     *
+     * @param generator      The generator to emit models through
+     * @param registry       The registry whose blocks should be processed
+     * @param validateMissing If {@code true}, blocks without models are excluded from model validation
+     *                        instead of failing it
+     * @param overrides      Per-block overrides that replace or skip the default model generation
+     */
     protected void addFromRegistry(
             WoverBlockModelGenerators generator,
             BlockRegistry registry,
@@ -124,7 +207,18 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
                 });
     }
 
+    /**
+     * Generates every blockstate and block model this provider is responsible for.
+     *
+     * @param generator The generator to emit blockstate/model files through
+     */
     protected abstract void bootstrapBlockStateModels(WoverBlockModelGenerators generator);
+
+    /**
+     * Generates every item model this provider is responsible for.
+     *
+     * @param itemModelGenerator The vanilla generator to emit item model files through
+     */
     protected abstract void bootstrapItemModels(ItemModelGenerators itemModelGenerator);
 
     @Override

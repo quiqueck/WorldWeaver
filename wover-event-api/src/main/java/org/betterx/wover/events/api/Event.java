@@ -42,8 +42,33 @@ public interface Event<T extends Subscriber> {
      */
     boolean subscribe(T subscriber, int priority);
 
+    /**
+     * Subscribe to this event as a read-only subscriber.
+     * <p>
+     * Will call {@link #subscribeReadOnly(Subscriber, int)} with {@link #DEFAULT_PRIORITY}. Note that the
+     * priority passed to {@link #subscribeReadOnly(Subscriber, int)} is always relative to
+     * {@link #MAX_READONLY_PRIORITY}, so read-only subscribers are always called after every subscriber that
+     * was added with {@link #subscribe(Subscriber)} or {@link #subscribe(Subscriber, int)}.
+     *
+     * @param subscriber The subscriber to add.
+     * @return {@code true} if the subscriber was added, {@code false} if the subscriber was already subscribed.
+     */
     default boolean subscribeReadOnly(T subscriber) {
         return subscribeReadOnly(subscriber, DEFAULT_PRIORITY);
     }
+
+    /**
+     * Subscribe to this event as a read-only subscriber.
+     * <p>
+     * A read-only subscriber should not modify any event related data. Read-only subscribers are always called
+     * after every subscriber that was added with {@link #subscribe(Subscriber)} or
+     * {@link #subscribe(Subscriber, int)}, since their effective priority is offset by
+     * {@link #MAX_READONLY_PRIORITY}. Among themselves, read-only subscribers are still ordered by the passed
+     * {@code priority}, with higher priority subscribers being called first.
+     *
+     * @param subscriber The subscriber to add.
+     * @param priority   The priority of the subscriber, relative to the other read-only subscribers.
+     * @return {@code true} if the subscriber was added, {@code false} if the subscriber was already subscribed.
+     */
     boolean subscribeReadOnly(T subscriber, int priority);
 }

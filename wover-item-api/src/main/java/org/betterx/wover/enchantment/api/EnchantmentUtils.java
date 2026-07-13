@@ -12,6 +12,15 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 
+/**
+ * Static utility methods for looking up enchantment holders and applying/querying enchantments on items and
+ * entities, without needing direct access to a {@link net.minecraft.core.HolderLookup.Provider}.
+ *
+ * <p>Most methods here mirror {@link net.minecraft.world.item.enchantment.EnchantmentHelper} but resolve the
+ * {@link net.minecraft.core.Holder} for a {@link ResourceKey} from a {@link Level}, a
+ * {@link net.minecraft.core.HolderLookup.RegistryLookup}, or (via {@link WorldState}) the current world, and
+ * return safe defaults (e.g. {@code 0} or {@code false}) instead of throwing when the registry isn't available.
+ */
 public class EnchantmentUtils {
     private EnchantmentUtils() {
     }

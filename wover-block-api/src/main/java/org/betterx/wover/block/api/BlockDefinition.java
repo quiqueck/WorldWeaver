@@ -30,32 +30,116 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
+/**
+ * Fluent builder base class for defining, configuring and registering a {@link Block}.
+ * <p>
+ * A {@link BlockDefinition} wraps a {@link BlockBehaviour.Properties} instance together with an optional
+ * set of {@link BlockTrait}s, block/item tags and a {@link BlockItemDefinitionFactory}. Calling
+ * {@link #buildAndRegister()} creates the block, registers it with the owning {@link #registry}, applies
+ * all configured traits and (unless {@link #noBlockItem()} was called) creates and registers the matching
+ * {@link BlockItem}.
+ * <p>
+ * Instances are usually not created directly, but obtained from one of the {@code defineDefaultBlock(...)}
+ * factory methods on {@link BlockRegistry}.
+ *
+ * @param <B> The type of {@link Block} this definition creates
+ * @param <D> The concrete subclass type, used for fluent method chaining
+ */
 public abstract class BlockDefinition<B extends Block, D extends BlockDefinition<B, D>> implements BlockTraitLookup {
+    /**
+     * Factory used to create the {@link Block} instance from a fully configured definition.
+     *
+     * @param <B> The type of {@link Block} to create
+     * @param <D> The configuration type used to create the block
+     */
     public interface BlockFactory<B extends Block, D extends BlockDefinition<B, D>> {
+        /**
+         * Creates a block instance from the given configuration.
+         *
+         * @param definition The configuration object containing all block settings
+         * @return The created block instance
+         */
         B createItem(D definition);
     }
 
+    /**
+     * Factory used to create the {@link BlockItemDefinition} for a block created by this definition.
+     *
+     * @param <B> The type of {@link Block} the item is created for
+     * @param <D> The configuration type used to create the block
+     */
     public interface BlockItemDefinitionFactory<B extends Block, D extends BlockDefinition<B, D>> {
+        /**
+         * Creates the {@link BlockItemDefinition} that will be built and registered for {@code sourceBlock}.
+         *
+         * @param definition  The block definition the item is created for
+         * @param sourceBlock The already built block instance
+         * @return The item definition to build and register, or {@code null} to skip item creation
+         */
         BlockItemDefinition<?, ?> get(D definition, B sourceBlock);
     }
 
+    /**
+     * The registry this definition will register the block (and its item) with.
+     */
     public final BlockRegistry registry;
 
+    /**
+     * The resource key identifying the block.
+     */
     public final ResourceKey<Block> blockKey;
+
+    /**
+     * The resource key identifying the block's item.
+     */
     protected final @NotNull ResourceKey<Item> itemKey;
 
+    /**
+     * The properties configuration for the block.
+     */
     protected BlockBehaviour.Properties properties;
 
+    /**
+     * Optional tags to be applied to the block.
+     */
     protected List<TagKey<Block>> tags;
+
+    /**
+     * Optional tags to be applied to the block's item.
+     */
     protected List<TagKey<Item>> itemTags;
 
+    /**
+     * List of traits applied to this block.
+     * Each trait is configured with its own configuration object.
+     */
     protected List<BlockTrait<? super B, ?>> traits;
 
+    /**
+     * Factory instance used to create the block.
+     */
     protected final BlockDefinition.BlockFactory<B, D> blockFactory;
 
+    /**
+     * Optional factory used to create the {@link BlockItemDefinition} for the built block. If {@code null},
+     * a {@link VanillaBlockItemDefinition} is used instead.
+     */
     protected @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier;
+
+    /**
+     * The {@link BlockItem} that was built for this definition, populated after {@link #buildAndRegister()}
+     * was called. May be {@code null} if {@link #noBlockItem()} was configured.
+     */
     protected BlockItem blockItem;
 
+    /**
+     * Creates a new block configuration with explicit properties.
+     *
+     * @param registry     The block registry to use for registration
+     * @param blockName    The name identifier for the block
+     * @param blockFactory The factory used to create the block instance
+     * @param properties   The properties to use for the block
+     */
     protected BlockDefinition(
             BlockRegistry registry,
             String blockName,
@@ -70,6 +154,13 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         this.registry = registry;
     }
 
+    /**
+     * Creates a new block configuration with default properties ({@link BlockBehaviour.Properties#of()}).
+     *
+     * @param registry     The block registry to use for registration
+     * @param blockName    The name identifier for the block
+     * @param blockFactory The factory used to create the block instance
+     */
     protected BlockDefinition(
             BlockRegistry registry,
             String blockName,
@@ -83,6 +174,14 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         );
     }
 
+    /**
+     * Creates a new block configuration, copying its initial properties from an existing block.
+     *
+     * @param registry     The block registry to use for registration
+     * @param blockName    The name identifier for the block
+     * @param blockFactory The factory used to create the block instance
+     * @param templateBlock The block whose properties should be copied as a starting point
+     */
     protected BlockDefinition(
             BlockRegistry registry,
             String blockName,
@@ -97,15 +196,43 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         );
     }
 
+    /**
+     * Called before the block is built to allow subclasses to perform any final configuration.
+     * This method is called automatically by {@link #build()}.
+     */
     abstract protected void beforeBuild();
 
+    /**
+     * Called before the block is registered to allow subclasses to perform any final modifications.
+     * This method is called automatically by {@link #buildAndRegister()} after the block is built
+     * but before it is registered with the registry.
+     *
+     * @param block The built block instance that will be registered
+     * @return The block instance (potentially modified) that should be registered
+     */
     abstract protected @NotNull B beforeRegister(@NotNull B block);
 
+    /**
+     * Called after the block was registered, and after all traits' {@code afterBlockRegistration} hooks
+     * ran, but before the block's item is built and registered. The default implementation does nothing
+     * and simply returns {@code block}; subclasses may override it to perform additional setup.
+     *
+     * @param block The already registered block instance
+     * @return The block instance (potentially modified) to continue with
+     */
     protected B afterRegister(B block) {
         // Default implementation does nothing, can be overridden if needed
         return block;
     }
 
+    /**
+     * Overrides how the {@link BlockItem} for this block is created.
+     *
+     * @param blockItemDefinitionSupplier The factory that creates the {@link BlockItemDefinition} for the
+     *                                    built block, or {@code null} to fall back to the default
+     *                                    {@link VanillaBlockItemDefinition}
+     * @return This configuration instance for method chaining
+     */
     public D withBlockItem(
             @Nullable BlockItemDefinitionFactory<B, D> blockItemDefinitionSupplier
     ) {
@@ -113,6 +240,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return (D) this;
     }
 
+    /**
+     * Prevents any {@link BlockItem} from being created and registered for this block.
+     *
+     * @return This configuration instance for method chaining
+     */
     public D noBlockItem() {
         this.blockItemDefinitionSupplier = (d, b) -> null;
         return (D) this;
@@ -133,6 +265,14 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return new VanillaBlockItemDefinition(this, sourceBlock);
     }
 
+    /**
+     * Builds the block instance using the configured properties and traits.
+     * This method calls {@link #beforeBuild()} before creating the block, then configures every added
+     * {@link BlockTrait} and collects their {@link RuntimeBlockTrait}s onto the block (if it implements
+     * {@link BlockWithTraits}).
+     *
+     * @return The created block instance
+     */
     @SuppressWarnings("unchecked")
     public final B build() {
         this.beforeBuild();
@@ -171,6 +311,16 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     }
 
 
+    /**
+     * Builds the block and automatically registers it (and, unless {@link #noBlockItem()} was called, its
+     * {@link BlockItem}) with {@link #registry}.
+     * <p>
+     * The process is: {@link #build()} → {@link #beforeRegister(Block)} → register block → run each
+     * trait's {@code afterBlockRegistration} hook → {@link #afterRegister(Block)} → build and register
+     * the block item.
+     *
+     * @return The created and registered block instance
+     */
     @SuppressWarnings("unchecked")
     public final B buildAndRegister() {
         B block = this.beforeRegister(this.build());
@@ -199,10 +349,21 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return block;
     }
 
+    /**
+     * Gets the resource key that identifies this block's item.
+     *
+     * @return The item resource key
+     */
     public final ResourceKey<Item> itemKey() {
         return this.itemKey;
     }
 
+    /**
+     * Adds every trait in the given list to this block definition. {@code null} or empty lists are ignored.
+     *
+     * @param traits The traits to add
+     * @return This configuration instance for method chaining
+     */
     @SuppressWarnings("unchecked")
     public D addTrait(
             @Nullable List<BlockTrait<?, ?>> traits
@@ -245,14 +406,34 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return (D) this;
     }
 
+    /**
+     * Adds the default trait produced by the given builder to this block definition.
+     *
+     * @param traitBuilder The trait builder whose {@link BlockTraitBuilder.WithDefault#withDefault()} trait
+     *                     should be added
+     * @return This configuration instance for method chaining
+     */
     public D addTrait(@NotNull BlockTraitBuilder.WithDefault<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
     }
 
+    /**
+     * Adds the default traits produced by the given builder to this block definition.
+     *
+     * @param traitBuilder The trait builder whose {@link BlockTraitBuilder.WithDefaults#withDefault()} traits
+     *                     should be added
+     * @return This configuration instance for method chaining
+     */
     public D addTrait(@NotNull BlockTraitBuilder.WithDefaults<?, ?> traitBuilder) {
         return this.addTrait(traitBuilder.withDefault());
     }
 
+    /**
+     * Checks whether this definition already has a trait matching the given trait instance.
+     *
+     * @param trait The trait to check for
+     * @return {@code true} if a matching trait was already added
+     */
     public boolean hasTrait(BlockTraitImpl<?, ?> trait) {
         if (this.traits == null || this.traits.isEmpty()) {
             return false;
@@ -260,6 +441,12 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return this.traits.stream().anyMatch(t -> t.is(trait));
     }
 
+    /**
+     * Checks whether this definition already has a trait with the given key.
+     *
+     * @param traitKey The trait key to check for
+     * @return {@code true} if a matching trait was already added
+     */
     public boolean hasTrait(BlockTraitKey traitKey) {
         if (this.traits == null || this.traits.isEmpty()) {
             return false;
@@ -267,6 +454,12 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         return this.traits.stream().anyMatch(trait -> trait.is(traitKey));
     }
 
+    /**
+     * Checks whether this definition already has a trait matching the given builder's key.
+     *
+     * @param traitBuilder The trait builder whose key should be checked for
+     * @return {@code true} if a matching trait was already added
+     */
     public boolean hasTrait(BlockTraitBuilder<?, ?> traitBuilder) {
         return this.hasTrait(traitBuilder.key());
     }

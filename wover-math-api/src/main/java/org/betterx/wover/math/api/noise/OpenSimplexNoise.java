@@ -16,6 +16,23 @@ package org.betterx.wover.math.api.noise;
  *   will be the same when ported to other languages.
  */
 
+/**
+ * A smooth, coherent gradient noise generator (OpenSimplex Noise), available in 2D, 3D and 4D.
+ * <p>
+ * Compared to classic Perlin/simplex noise, OpenSimplex noise avoids visually obvious directional
+ * artifacts and has a well-behaved computational cost across dimensions. It is deterministic: the
+ * same seed and input coordinates always produce the same output, which makes it suitable for
+ * world generation (e.g. terrain shaping, biome blending) where results need to be reproducible
+ * for a given world seed.
+ * <p>
+ * Each {@link #eval(double, double)}/{@link #eval(double, double, double)}/
+ * {@link #eval(double, double, double, double)} call returns a smoothly varying value that is
+ * normalized to fall roughly within {@code [-1, 1]}; the exact bound is not strictly enforced by
+ * the algorithm, but values noticeably outside that range are rare in practice.
+ * <p>
+ * Instances are immutable and safe to reuse (and share) across many {@code eval} calls with a
+ * fixed seed/permutation table.
+ */
 public class OpenSimplexNoise {
     private static final double STRETCH_CONSTANT_2D = -0.211324865405187; // (1/Math.sqrt(2+1)-1)/2;
     private static final double SQUISH_CONSTANT_2D = 0.366025403784439; // (Math.sqrt(2+1)-1)/2;
@@ -33,10 +50,21 @@ public class OpenSimplexNoise {
     private final short[] perm;
     private final short[] permGradIndex3D;
 
+    /**
+     * Creates a new noise generator using a fixed default seed ({@code 0}).
+     */
     public OpenSimplexNoise() {
         this(DEFAULT_SEED);
     }
 
+    /**
+     * Creates a new noise generator from a pre-built permutation table, bypassing the normal
+     * seed-based initialization.
+     *
+     * @param perm a permutation of the values {@code 0..255}, i.e. an array of length 256 in
+     *             which every value from 0 to 255 occurs exactly once. Determines the gradient
+     *             lookup used by {@code eval}.
+     */
     public OpenSimplexNoise(short[] perm) {
         this.perm = perm;
         permGradIndex3D = new short[256];
@@ -53,6 +81,15 @@ public class OpenSimplexNoise {
     // Generates a proper permutation (i.e. doesn't merely perform N successive
     // pair swaps on a base array)
     // Uses a simple 64-bit LCG.
+    /**
+     * Creates a new noise generator, deriving its internal permutation table from a 64-bit seed.
+     * <p>
+     * The same seed always produces the same permutation table (and thus the same noise field),
+     * independent of any external randomization library, so results are reproducible across runs
+     * and platforms.
+     *
+     * @param seed the seed used to build the internal permutation table
+     */
     public OpenSimplexNoise(long seed) {
         perm = new short[256];
         permGradIndex3D = new short[256];
@@ -73,6 +110,13 @@ public class OpenSimplexNoise {
         }
     }
 
+    /**
+     * Samples 2D OpenSimplex noise.
+     *
+     * @param x the x coordinate to sample
+     * @param y the y coordinate to sample
+     * @return a smoothly varying noise value, normalized to roughly {@code [-1, 1]}
+     */
     // 2D OpenSimplex Noise.
     public double eval(double x, double y) {
 
@@ -194,6 +238,14 @@ public class OpenSimplexNoise {
         return value / NORM_CONSTANT_2D;
     }
 
+    /**
+     * Samples 3D OpenSimplex noise.
+     *
+     * @param x the x coordinate to sample
+     * @param y the y coordinate to sample
+     * @param z the z coordinate to sample
+     * @return a smoothly varying noise value, normalized to roughly {@code [-1, 1]}
+     */
     // 3D OpenSimplex Noise.
     public double eval(double x, double y, double z) {
 
@@ -785,6 +837,15 @@ public class OpenSimplexNoise {
         return value / NORM_CONSTANT_3D;
     }
 
+    /**
+     * Samples 4D OpenSimplex noise.
+     *
+     * @param x the x coordinate to sample
+     * @param y the y coordinate to sample
+     * @param z the z coordinate to sample
+     * @param w the w coordinate to sample
+     * @return a smoothly varying noise value, normalized to roughly {@code [-1, 1]}
+     */
     // 4D OpenSimplex Noise.
     public double eval(double x, double y, double z, double w) {
 

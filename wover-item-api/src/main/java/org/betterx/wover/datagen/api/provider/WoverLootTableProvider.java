@@ -23,6 +23,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Base class for datagen providers that generate {@link LootTable}s for a single loot context type (e.g. block
+ * drops, entity drops, chest loot), written to {@code data/<namespace>/loot_table/<path>.json}.
+ *
+ * <p>This is modeled after Fabric's {@code SimpleLootTableProvider}, but exposes a
+ * {@link HolderLookup.Provider} to {@link #boostrap(HolderLookup.Provider, BiConsumer)} so subclasses can look up
+ * enchantments and other registry-backed content while building loot tables.
+ *
+ * <p>Subclass this, implement {@link #boostrap(HolderLookup.Provider, BiConsumer)} to register loot table
+ * builders, and add the provider to a {@code PackBuilder} from a {@code WoverDataGenEntryPoint}.
+ */
 public abstract class WoverLootTableProvider implements WoverDataProvider<DataProvider> {
     /**
      * The title of the provider. Mainly used for logging.
@@ -34,8 +45,17 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
      */
     protected final ModCore modCore;
 
+    /**
+     * The loot context type (parameter set) every loot table produced by this provider is validated against.
+     */
     protected final ContextKeySet lootContextType;
 
+    /**
+     * Creates a new loot table provider, using the mod's namespace as the provider title.
+     *
+     * @param modCore         The ModCore instance of the Mod that is providing this instance
+     * @param lootContextType The loot context type every loot table produced by this provider is validated against
+     */
     public WoverLootTableProvider(
             ModCore modCore,
             ContextKeySet lootContextType
@@ -43,6 +63,13 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
         this(modCore, modCore.namespace, lootContextType);
     }
 
+    /**
+     * Creates a new loot table provider with a custom title.
+     *
+     * @param modCore         The ModCore instance of the Mod that is providing this instance
+     * @param title           The title of the provider. Mainly used for logging
+     * @param lootContextType The loot context type every loot table produced by this provider is validated against
+     */
     public WoverLootTableProvider(
             ModCore modCore,
             String title,
@@ -53,11 +80,23 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
         this.lootContextType = lootContextType;
     }
 
+    /**
+     * Registers this provider's loot tables by calling the given consumer with a resource key and builder for
+     * each table. Called once per datagen run, with a registry lookup that becomes available once all registries
+     * have finished bootstrapping.
+     *
+     * @param lookup     The registry lookup, usable to reference enchantments and other registry content
+     * @param biConsumer Consumer to register a loot table builder under a resource key; throws if called twice
+     *                   for the same key
+     */
     protected abstract void boostrap(
             @NotNull HolderLookup.Provider lookup,
             @NotNull BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer
     );
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DataProvider getProvider(
             FabricDataOutput output,

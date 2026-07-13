@@ -21,11 +21,22 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a fence gate slot: a {@link FenceGateBlock} using the set's {@link WoodenBlockSet#woodType()}, carrying
+ * {@link BlockTraits#FENCE_GATE_BLOCK}, with a vanilla-style gate model and an auto-generated recipe from the
+ * set's base block. Only usable on a {@link WoodenBlockSet}.
+ */
 public class Gate extends WoodenSlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#GATE} slot.
+     */
     public Gate() {
         this(SlotType.GATE);
     }
 
+    /**
+     * @param slot the slot to register this gate under
+     */
     public Gate(SlotType slot) {
         super(slot);
     }

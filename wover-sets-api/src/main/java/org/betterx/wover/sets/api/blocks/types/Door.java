@@ -20,11 +20,22 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a door slot: a {@link DoorBlock} using the set's {@link BlockSet#setType()}, carrying
+ * {@link BlockTraits#DOOR_BLOCK}, with a vanilla-style door model and an auto-generated recipe from the set's
+ * base block.
+ */
 public class Door extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#DOOR} slot.
+     */
     public Door() {
         this(SlotType.DOOR);
     }
 
+    /**
+     * @param slot the slot to register this door under
+     */
     public Door(SlotType slot) {
         super(slot);
     }

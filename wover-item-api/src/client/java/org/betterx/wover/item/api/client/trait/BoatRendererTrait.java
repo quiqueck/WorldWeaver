@@ -19,10 +19,30 @@ import net.minecraft.world.item.BoatItem;
  * `/assets/namespace/textures/entity/chest_boat/obsidian_chest_boat.png`.
  */
 public interface BoatRendererTrait extends ItemTrait<BoatItem, BoatRendererTrait> {
+    /**
+     * Builder for {@link BoatRendererTrait} instances.
+     */
     interface Builder extends ItemTraitBuilder<BoatItem, BoatRendererTrait> {
+        /**
+         * Creates the default-configured boat renderer trait (a plain boat, without a chest).
+         *
+         * @return The default boat renderer trait
+         */
         BoatRendererTrait withDefault();
+
+        /**
+         * Creates a boat renderer trait configured for a plain or chest boat.
+         *
+         * @param withChest Whether the boat has a chest and should be rendered as a chest boat
+         * @return The configured boat renderer trait
+         */
         BoatRendererTrait with(boolean withChest);
     }
 
+    /**
+     * Whether this trait renders the boat with a chest.
+     *
+     * @return {@code true} if the boat should be rendered as a chest boat, {@code false} for a plain boat
+     */
     boolean withChest();
 }

@@ -26,9 +26,20 @@ import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds the {@link SlotType#HANGING_SIGN} slot (plus its {@link #HANGING_WALL_SIGN} companion): a
+ * {@link org.betterx.wover.block.api.trait.SignBlockDefinition} pairing a {@link CeilingHangingSignBlock} with a
+ * {@link WallHangingSignBlock}, both using the set's {@link WoodenBlockSet#woodType()}, carrying
+ * {@link BlockTraits#HANGING_SIGN_BLOCK}, with a vanilla-style hanging sign model and an auto-generated recipe
+ * from the set's stripped log. Only usable on a {@link WoodenBlockSet}.
+ */
 public class HangingSign extends WoodenSlotFromDefinition {
+    /** The slot the wall variant of this hanging sign is registered under. */
     public static final SlotType HANGING_WALL_SIGN = new SlotType("hanging_wall_sign");
 
+    /**
+     * Creates a factory for the {@link SlotType#HANGING_SIGN} slot.
+     */
     public HangingSign() {
         super(SlotType.HANGING_SIGN);
     }
@@ -49,7 +60,7 @@ public class HangingSign extends WoodenSlotFromDefinition {
                     HangingSignItem::new
             );
         } else {
-            throw new IllegalArgumentException("Gate slot can only be used with WoodenBlockSet.");
+            throw new IllegalArgumentException("HangingSign slot can only be used with WoodenBlockSet.");
         }
     }
 

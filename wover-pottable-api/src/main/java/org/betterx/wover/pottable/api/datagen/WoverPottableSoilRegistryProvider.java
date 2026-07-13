@@ -16,10 +16,21 @@ import net.minecraft.data.worldgen.BootstrapContext;
  * to your datagen entrypoint - no custom provider class is needed.
  */
 public class WoverPottableSoilRegistryProvider extends WoverRegistryContentProvider<PottableSoil> {
+    /**
+     * Creates a new instance of {@link WoverPottableSoilRegistryProvider}.
+     *
+     * @param modCore The ModCore instance of the Mod that is providing this instance.
+     */
     public WoverPottableSoilRegistryProvider(ModCore modCore) {
         super(modCore, modCore.modId + " - Pottable Soils", PottableSoilRegistry.POTTABLE_SOIL_REGISTRY);
     }
 
+    /**
+     * Registers a {@link PottableSoil} for every block of this provider's mod that carries a
+     * {@link PottableSoilBlockTrait}.
+     *
+     * @param context The bootstrap context used to register the soils.
+     */
     @Override
     protected void bootstrap(BootstrapContext<PottableSoil> context) {
         PottableSoilBlockTrait.bootstrapPottableSoils(modCore, context, (key, block) -> true);

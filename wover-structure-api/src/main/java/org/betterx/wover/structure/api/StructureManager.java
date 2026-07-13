@@ -24,6 +24,16 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The main entry point for creating and registering {@link Structure}s, {@link StructureType}s and
+ * {@link StructurePieceType}s.
+ * <p>
+ * Use {@link #structure(ResourceLocation, StructureTypeKey)} (and its overloads) to create a
+ * {@link StructureKey.Simple} for a custom {@link Structure} subclass, {@link #jigsaw(ResourceLocation)}
+ * to create a {@link StructureKey.Jigsaw} for a {@link net.minecraft.world.level.levelgen.structure.structures.JigsawStructure},
+ * or {@link #randomNbt(ResourceLocation)} to create a {@link StructureKey.RandomNbt} for a
+ * {@link RandomNbtStructure}. {@link StructureKeys} provides shorter aliases for all methods in this class.
+ */
 public class StructureManager {
     private StructureManager() {
     }
@@ -37,9 +47,17 @@ public class StructureManager {
     public static final Event<OnBootstrapRegistry<Structure>> BOOTSTRAP_STRUCTURES
             = StructureManagerImpl.BOOTSTRAP_STRUCTURES;
 
+    /**
+     * The {@link StructureType} for {@link RandomNbtStructure}. This is registered internally
+     * by WoVer and is needed to implement {@link RandomNbtStructure#type()}.
+     */
     public static final StructureType<RandomNbtStructure> RANDOM_NBT_STRUCTURE_TYPE
             = StructureManagerImpl.RANDOM_NBT_STRUCTURE_TYPE;
 
+    /**
+     * The {@link StructurePieceType} used by {@link org.betterx.wover.structure.api.structures.nbt.RandomNbtStructurePiece}.
+     * This is registered internally by WoVer.
+     */
     public static final StructurePieceType RANDOM_NBT_STRUCTURE_PIECE
             = StructureManagerImpl.RANDOM_NBT_STRUCTURE_PIECE;
 
@@ -172,6 +190,18 @@ public class StructureManager {
         );
     }
 
+    /**
+     * Registers a new {@link net.minecraft.world.level.levelgen.structure.StructureType}
+     * for the given {@link ResourceLocation}, using the given {@link MapCodec} to (de)serialize
+     * the {@link Structure}.
+     *
+     * @param location         The location of the {@link StructureTypeKey}
+     * @param structureFactory The {@link StructureTypeKey.StructureFactory} used to create new instances
+     *                         of the {@link Structure}
+     * @param codec            The {@link Codec} used to (de)serialize the {@link Structure}
+     * @param <S>              The {@link Structure} type
+     * @return The {@link StructureTypeKey}
+     */
     public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
             @NotNull ResourceLocation location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
@@ -180,6 +210,15 @@ public class StructureManager {
         return StructureManagerImpl.registerType(location, structureFactory, codec);
     }
 
+    /**
+     * Registers a new {@link StructurePieceType} for the given {@link ResourceLocation}. A
+     * {@link StructurePieceType} is needed if you implement a custom
+     * {@link net.minecraft.world.level.levelgen.structure.pieces.StructurePiece}.
+     *
+     * @param location  The location of the {@link StructurePieceType}
+     * @param pieceType The {@link StructurePieceType} to register
+     * @return The registered {@link StructurePieceType}
+     */
     public static @NotNull StructurePieceType registerPiece(
             @NotNull ResourceLocation location,
             @NotNull StructurePieceType pieceType

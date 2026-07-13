@@ -21,6 +21,15 @@ import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
 
+/**
+ * The built and registered result of registering a single {@link ToolSlot} on an {@link EquipmentSet}, created
+ * by {@link #registerTool}.
+ *
+ * @param item    the built and registered item
+ * @param itemKey the registry key the item was registered under
+ * @param slot    the tool slot this item was registered for
+ * @param <I>     the item type
+ */
 public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey, ToolSlot slot) {
     @SuppressWarnings("unchecked")
     private static TagKey<Item>[] getTagKey(ToolSlot slot) {
@@ -36,6 +45,21 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
         };
     }
 
+    /**
+     * Builds and registers a single tool item for {@code equipmentSet}, with an auto-generated crafting/smithing
+     * recipe unless {@code recipeOverride} is given.
+     *
+     * @param modCore        the mod to register the item under
+     * @param slot           the tool slot being registered
+     * @param path           the item's registration name
+     * @param creator        creates the item from its definition and this slot's resolved tool values
+     * @param equipmentSet   the set the item belongs to (for its tier, template base set, and recipe material)
+     * @param recipeOverride the recipe trait to use instead of the auto-generated recipe, or {@code null} to
+     *                       keep the default
+     * @param <I>            the item type being registered
+     * @return the registered item description
+     * @throws IllegalArgumentException if {@code equipmentSet}'s tool tier has no values configured for {@code slot}
+     */
     public static <I extends Item> ToolDescription<I> registerTool(
             ModCore modCore,
             ToolSlot slot,

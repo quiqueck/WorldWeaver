@@ -20,13 +20,26 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a slab slot: a {@link SlabBlock} carrying {@link BlockTraits#SLAB_BLOCK}, with a vanilla-style slab
+ * model and an auto-generated recipe from a source block (with a matching stonecutting recipe for non-wood
+ * materials).
+ */
 public class Slab extends SlotFromDefinition {
     protected final @Nullable SlotType baseBlockType;
 
+    /**
+     * Creates a factory for the {@link SlotType#SLAB} slot, slabbing the set's base block.
+     */
     public Slab() {
         this(null, SlotType.SLAB);
     }
 
+    /**
+     * @param baseBlockType the slot (with fallback to the set's base slot, then vanilla stone) this slab is cut
+     *                      from, or {@code null} to always use the set's base block
+     * @param slot          the slot to register this slab under
+     */
     public Slab(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
         this.baseBlockType = baseBlockType;

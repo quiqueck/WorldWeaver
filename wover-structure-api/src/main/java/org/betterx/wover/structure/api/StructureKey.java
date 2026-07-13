@@ -37,12 +37,25 @@ public interface StructureKey<
         T extends BaseStructureBuilder<S, T>,
         R extends StructureKey<S, T, R>
         > {
+    /**
+     * A {@link StructureKey} for a plain {@link Structure} subclass that only needs the generic
+     * {@link StructureBuilder} to be registered (i.e. it does not need any additional builder methods
+     * beyond {@link BaseStructureBuilder}).
+     *
+     * @param <S> The {@link Structure} type
+     */
     interface Simple<S extends Structure> extends StructureKey<S, StructureBuilder<S>, Simple<S>> {
     }
 
+    /**
+     * A {@link StructureKey} for a {@link JigsawStructure}, bootstrapped with a {@link JigsawBuilder}.
+     */
     interface Jigsaw extends StructureKey<JigsawStructure, JigsawBuilder, Jigsaw> {
     }
 
+    /**
+     * A {@link StructureKey} for a {@link RandomNbtStructure}, bootstrapped with a {@link RandomNbtBuilder}.
+     */
     interface RandomNbt extends StructureKey<RandomNbtStructure, RandomNbtBuilder, RandomNbt> {
     }
 

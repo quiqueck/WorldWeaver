@@ -20,11 +20,21 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a fence slot: a {@link FenceBlock} carrying {@link BlockTraits#FENCE_BLOCK}, with a vanilla-style fence
+ * model and an auto-generated recipe from the set's base block.
+ */
 public class Fence extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#FENCE} slot.
+     */
     public Fence() {
         this(SlotType.FENCE);
     }
 
+    /**
+     * @param slot the slot to register this fence under
+     */
     public Fence(SlotType slot) {
         super(slot);
     }

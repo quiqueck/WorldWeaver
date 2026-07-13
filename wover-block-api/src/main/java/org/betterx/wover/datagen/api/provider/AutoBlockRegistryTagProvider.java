@@ -19,11 +19,21 @@ import java.util.List;
  */
 public class AutoBlockRegistryTagProvider extends WoverTagProvider.ForBlocks implements WoverAutoProvider {
 
+    /**
+     * Creates a new provider for the given mod. Tags from every namespace are written (no filtering).
+     *
+     * @param modCore The mod this provider generates block tags for
+     */
     public AutoBlockRegistryTagProvider(ModCore modCore) {
         //do not filter any tags
         super(modCore, (List<String>) null);
     }
 
+    /**
+     * Adds the tags collected by every {@link BlockRegistry} to {@code context}.
+     *
+     * @param context The context to add the collected tags to
+     */
     @Override
     public void prepareTags(TagBootstrapContext<Block> context) {
         BlockRegistry.streamAll().forEach(registry -> registry.bootstrapBlockTags(context));

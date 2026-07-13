@@ -10,6 +10,12 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProc
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A wrapper around {@link ResourceKey} that identifies a {@link StructureProcessorList}. Create one with
+ * {@link StructureProcessorManager#createKey(ResourceLocation)} (or the
+ * {@link org.betterx.wover.structure.api.StructureKeys#processor(ResourceLocation)} alias), then call
+ * {@link #bootstrap(BootstrapContext)} to start building the processor list.
+ */
 public class StructureProcessorKey {
     /**
      * The key for the {@link StructureProcessorList} you can use to reference it.
@@ -17,6 +23,13 @@ public class StructureProcessorKey {
     @NotNull
     public final ResourceKey<StructureProcessorList> key;
 
+    /**
+     * Creates a {@link StructureProcessorBuilder} to build and register the {@link StructureProcessorList}
+     * for this key with the given {@link BootstrapContext}.
+     *
+     * @param context The bootstrap context to register the processor list with
+     * @return The builder
+     */
     public StructureProcessorBuilder bootstrap(@NotNull BootstrapContext<StructureProcessorList> context) {
         return new StructureProcessorBuilderImpl(key, context);
     }

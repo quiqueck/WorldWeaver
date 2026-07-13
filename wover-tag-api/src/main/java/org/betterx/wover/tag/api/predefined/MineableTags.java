@@ -31,7 +31,6 @@ public class MineableTags {
      * {@code wover:mineable/shears}
      */
     public static final TagKey<Block> SHEARS = TagManager.BLOCKS.makeWorldWeaverTag("mineable/shears");
-    ;
     /**
      * {@code minecraft:mineable/shovel}
      */

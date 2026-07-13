@@ -20,21 +20,44 @@ import net.fabricmc.api.Environment;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Builds the "log"/"stripped log" slot of a {@link WoodenBlockSet}: a {@link RotatedPillarBlock} carrying
+ * {@link BlockTraits#LOG_BLOCK}, with a matching log model (rotated pillar with side/end textures) and an
+ * auto-generated recipe converting to/from the set's bark block.
+ */
 public class Log extends WoodenSlotFromDefinition {
+    /** Flag bit marking this log as strippable (see {@link BlockTraits#STRIPABLE}). */
     public static final byte STRIPABLE_FLAG = 0x01;
+    /** Flag bit requesting a mirrored side texture on alternate faces. */
     public static final byte MIRRORED_TEXTURE_FLAG = 0x02;
     protected final byte flags;
 
     protected final String[] alternativeTextureSuffixe;
 
+    /**
+     * @param stripable whether this log can be stripped into {@link SlotType#STRIPPED_LOG}; also selects
+     *                  {@link SlotType#LOG} vs. {@link SlotType#STRIPPED_LOG} as the slot
+     */
     public Log(boolean stripable) {
         this(stripable, false);
     }
 
+    /**
+     * @param stripable                 whether this log can be stripped; also selects
+     *                                  {@link SlotType#LOG} vs. {@link SlotType#STRIPPED_LOG} as the slot
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     */
     public Log(boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
         this(stripable ? SlotType.LOG : SlotType.STRIPPED_LOG, stripable, mirroredTexture, alternativeTextureSuffixe);
     }
 
+    /**
+     * @param slot                      the slot to register this log under
+     * @param stripable                 whether this log can be stripped
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     */
     public Log(SlotType slot, boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
         super(slot);
 

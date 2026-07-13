@@ -65,7 +65,8 @@ public interface VolumeThresholdCondition extends NoiseCondition {
      */
     double getScaleZ();
     /**
-     * additional noise on top of the regular noise floor. This is used to create
+     * Additional noise on top of the regular noise floor. This is used to create
+     * more variation in the surface.
      *
      * @return the additional noise on top of the regular noise floor
      */

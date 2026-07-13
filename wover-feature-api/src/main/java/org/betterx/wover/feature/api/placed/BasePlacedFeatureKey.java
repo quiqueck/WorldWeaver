@@ -12,6 +12,17 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Base interface for keys that reference a {@link PlacedFeature}.
+ * <p>
+ * This is shared by {@link PlacedFeatureKey} (which can start a fresh {@link FeaturePlacementBuilder}) and
+ * {@link PlacedConfiguredFeatureKey} (which places a specific, already known {@link ConfiguredFeature}) and
+ * exposes the parts common to both: resolving the {@link Holder}, and getting/setting the
+ * {@link GenerationStep.Decoration} the feature is placed in.
+ *
+ * @param <K> The concrete type of the key, used to make the fluent {@link #setDecoration(GenerationStep.Decoration)}
+ *            return the correct type
+ */
 public interface BasePlacedFeatureKey<K extends BasePlacedFeatureKey<K>> {
     /**
      * The key for the {@link PlacedFeature} you can use to reference it.

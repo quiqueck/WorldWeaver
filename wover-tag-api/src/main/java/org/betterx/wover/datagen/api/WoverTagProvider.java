@@ -226,12 +226,12 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
                 return getTitle() + " (" + super.getName() + ")";
             }
 
-            @Override
             /**
              * Adds all tags to the {@link HolderLookup.Provider}.
              *
              * @param arg the {@link HolderLookup.Provider} to add the tags to
              */
+            @Override
             protected final void addTags(HolderLookup.Provider arg) {
                 P provider = tagRegistry.createBootstrapContext(initAll());
 

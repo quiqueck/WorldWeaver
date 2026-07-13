@@ -4,6 +4,13 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.equipment.ArmorType;
 
+/**
+ * The armor pieces an {@link EquipmentSet} can register, one per vanilla {@link ArmorType}.
+ * <p>
+ * Each constant carries the naming suffix used by {@link EquipmentSet#add(ArmorSlot)} (e.g.
+ * {@code <baseName>_helmet}), the matching vanilla {@link ArmorType}, and the {@link RecipeCategory} used for
+ * the auto-generated recipe.
+ */
 public enum ArmorSlot {
     HELMET_SLOT(0, "helmet", ArmorType.HELMET, RecipeCategory.COMBAT),
     CHESTPLATE_SLOT(1, "chestplate", ArmorType.CHESTPLATE, RecipeCategory.COMBAT),
@@ -11,6 +18,11 @@ public enum ArmorSlot {
     BOOTS_SLOT(3, "boots", ArmorType.BOOTS, RecipeCategory.COMBAT),
     BODY_SLOT(4, "body", ArmorType.BODY, RecipeCategory.COMBAT);
 
+    /**
+     * @param slot the slot to convert
+     * @return the matching vanilla {@link EquipmentSlot}
+     * @throws IllegalArgumentException if {@code slot} has no vanilla {@link EquipmentSlot} counterpart
+     */
     public static EquipmentSlot toEquipmentSlot(ArmorSlot slot) {
         return switch (slot) {
             case HELMET_SLOT -> EquipmentSlot.HEAD;
@@ -22,6 +34,11 @@ public enum ArmorSlot {
         };
     }
 
+    /**
+     * @param slot the slot to convert
+     * @return the matching {@link ArmorSlot}
+     * @throws IllegalArgumentException if {@code slot} has no {@link ArmorSlot} counterpart
+     */
     public static ArmorSlot fromEquipmentSlot(EquipmentSlot slot) {
         return switch (slot) {
             case HEAD -> HELMET_SLOT;
@@ -33,9 +50,13 @@ public enum ArmorSlot {
         };
     }
 
+    /** The {@link RecipeCategory} used for this slot's auto-generated recipe. */
     public final RecipeCategory category;
+    /** The naming suffix appended to an {@link EquipmentSet}'s base name for this slot (e.g. {@code "helmet"}). */
     public final String name;
+    /** The index of this slot's values within an {@link ArmorTier}'s internal value array. */
     public final int slotIndex;
+    /** The vanilla {@link ArmorType} this slot corresponds to. */
     public final ArmorType armorType;
 
     ArmorSlot(

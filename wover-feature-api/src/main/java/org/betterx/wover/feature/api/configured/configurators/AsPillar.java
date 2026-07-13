@@ -20,6 +20,13 @@ import org.jetbrains.annotations.NotNull;
  * built from a predefined collection of {@link BlockState}s.
  */
 public interface AsPillar extends FeatureConfigurator<PillarFeatureConfig, PillarFeature> {
+    /**
+     * Sets the {@link PillarFeatureConfig.KnownTransformers} that determines the {@link BlockState} for
+     * each position of the pillar depending on its height.
+     *
+     * @param transformer The transformer to use
+     * @return the same instance
+     */
     AsPillar transformer(@NotNull PillarFeatureConfig.KnownTransformers transformer);
     /**
      * Determines for each position that was selected to be part of the pillar weather or not

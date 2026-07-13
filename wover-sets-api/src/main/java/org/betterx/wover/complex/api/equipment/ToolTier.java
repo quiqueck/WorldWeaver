@@ -16,6 +16,14 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * The per-material configuration used by {@link EquipmentSet} to build a full set of tools: the vanilla
+ * {@link ToolMaterial} to build items with, plus one {@link ToolValues} entry (attack stats, mining tag, and an
+ * optional smithing template) per {@link ToolSlot}.
+ * <p>
+ * Built with {@link #builder(String)}; see {@link ToolTiers} for the predefined vanilla tiers, and
+ * {@link #copyWithOffset} for deriving a new tier (e.g. an upgraded material) from an existing one.
+ */
 public class ToolTier {
     interface TraitBuilder {
         ItemTrait<Item, ?> with(ToolSlot slot, ToolTier tier);
@@ -103,6 +111,17 @@ public class ToolTier {
     }
 
 
+    /**
+     * The per-{@link ToolSlot} configuration of a {@link ToolTier}.
+     *
+     * @param attackDamage               the attack damage bonus for this slot
+     * @param attackSpeed                the attack speed modifier for this slot
+     * @param disableBlockingForSeconds  seconds a shield is disabled for when hit by this tool (0 for none)
+     * @param smithingTemplate           the smithing template used to upgrade into this slot's item, or
+     *                                   {@code null} for a plain crafting recipe
+     * @param minableWithTag             the block tag this slot's tool is effective against, used both for the
+     *                                   item's {@code tool(...)} component and its mining tag
+     */
     public record ToolValues(
             float attackDamage,
             float attackSpeed,
@@ -110,24 +129,60 @@ public class ToolTier {
             SmithingTemplateItem smithingTemplate,
             TagKey<Block> minableWithTag
     ) {
+        /** Values representing "no change", useful as an offset for {@link ToolTier#copyWithOffset}. */
         public static ToolValues NO_OFFSET = new ToolValues(0, 0);
 
+        /**
+         * Creates values with no blocking penalty, smithing template, or mining tag.
+         *
+         * @param attackDamage the attack damage bonus for this slot
+         * @param attackSpeed  the attack speed modifier for this slot
+         */
         public ToolValues(float attackDamage, float attackSpeed) {
             this(attackDamage, attackSpeed, 0, null, null);
         }
 
+        /**
+         * Creates values with no smithing template or mining tag.
+         *
+         * @param attackDamage              the attack damage bonus for this slot
+         * @param attackSpeed               the attack speed modifier for this slot
+         * @param disableBlockingForSeconds seconds a shield is disabled for when hit by this tool
+         */
         public ToolValues(float attackDamage, float attackSpeed, float disableBlockingForSeconds) {
             this(attackDamage, attackSpeed, disableBlockingForSeconds, null, null);
         }
 
+        /**
+         * Creates values with no blocking penalty or mining tag.
+         *
+         * @param attackDamage     the attack damage bonus for this slot
+         * @param attackSpeed      the attack speed modifier for this slot
+         * @param smithingTemplate the smithing template used to upgrade into this slot's item
+         */
         public ToolValues(float attackDamage, float attackSpeed, SmithingTemplateItem smithingTemplate) {
             this(attackDamage, attackSpeed, 0, smithingTemplate, null);
         }
 
+        /**
+         * Creates values with no blocking penalty or smithing template.
+         *
+         * @param attackDamage    the attack damage bonus for this slot
+         * @param attackSpeed     the attack speed modifier for this slot
+         * @param minableWithTag  the block tag this slot's tool is effective against
+         */
         public ToolValues(float attackDamage, float attackSpeed, TagKey<Block> minableWithTag) {
             this(attackDamage, attackSpeed, 0, null, minableWithTag);
         }
 
+        /**
+         * Creates values with no mining tag.
+         *
+         * @param attackDamage              the attack damage bonus for this slot
+         * @param attackSpeed               the attack speed modifier for this slot
+         * @param disableBlockingForSeconds seconds a shield is disabled for when hit by this tool
+         * @param smithingTemplate          the smithing template used to upgrade into this slot's item
+         */
         public ToolValues(
                 float attackDamage,
                 float attackSpeed,
@@ -137,6 +192,14 @@ public class ToolTier {
             this(attackDamage, attackSpeed, disableBlockingForSeconds, smithingTemplate, null);
         }
 
+        /**
+         * Creates values with no smithing template.
+         *
+         * @param attackDamage              the attack damage bonus for this slot
+         * @param attackSpeed               the attack speed modifier for this slot
+         * @param disableBlockingForSeconds seconds a shield is disabled for when hit by this tool
+         * @param minableWithTag            the block tag this slot's tool is effective against
+         */
         public ToolValues(
                 float attackDamage,
                 float attackSpeed,
@@ -146,6 +209,11 @@ public class ToolTier {
             this(attackDamage, attackSpeed, disableBlockingForSeconds, null, minableWithTag);
         }
 
+        /**
+         * @param offset the values to add on top of this instance
+         * @return a new {@link ToolValues} with {@code offset} added; a non-null {@code smithingTemplate}/
+         *         {@code minableWithTag} in {@code offset} replaces this instance's value
+         */
         ToolValues copyWithOffset(ToolValues offset) {
             return new ToolValues(
                     attackDamage + offset.attackDamage,
@@ -157,9 +225,13 @@ public class ToolTier {
         }
     }
 
+    /** The name of this tier, used as a naming component and in {@link #toString()}. */
     public final String name;
+    /** The vanilla {@link ToolMaterial} items built for this tier use. */
     public final ToolMaterial toolMaterial;
+    /** The mining level of this tier (higher is stronger; matches vanilla's tier ordering). */
     public final int level;
+    /** The block tag identifying which blocks require at least this tier to be mined correctly. */
     public final TagKey<Block> blockTag;
     private final ToolValues[] toolValues;
 
@@ -178,15 +250,26 @@ public class ToolTier {
         this.level = level;
     }
 
+    /**
+     * @param slot the slot to look up
+     * @return the values configured for {@code slot}, or {@code null} if this tier does not support it
+     */
     @Nullable
     public ToolValues getValues(ToolSlot slot) {
         return toolValues[slot.slotIndex];
     }
 
+    /**
+     * @param name the name of the new tier
+     * @return a new {@link Builder}
+     */
     public static ToolTier.Builder builder(String name) {
         return new ToolTier.Builder(name);
     }
 
+    /**
+     * Fluent builder for {@link ToolTier}.
+     */
     //a BuilderWithDefaults class
     public static class Builder {
         private int level;
@@ -199,26 +282,53 @@ public class ToolTier {
             this.name = name;
         }
 
+        /**
+         * @param level the mining level of the tier being built
+         * @return this builder
+         */
         public Builder level(int level) {
             this.level = level;
             return this;
         }
 
+        /**
+         * @param blockTag the block tag identifying which blocks require at least this tier to be mined correctly
+         * @return this builder
+         */
         public Builder blockTag(TagKey<Block> blockTag) {
             this.blockTag = blockTag;
             return this;
         }
 
+        /**
+         * @param toolMaterial the tool material to use
+         * @return this builder
+         */
         public Builder toolMaterial(ToolMaterial toolMaterial) {
             this.toolMaterial = toolMaterial;
             return this;
         }
 
+        /**
+         * Sets the {@link ToolValues} for a single slot.
+         *
+         * @param slot       the slot to configure
+         * @param toolValues the values to use for that slot
+         * @return this builder
+         */
         public Builder toolValues(ToolSlot slot, ToolValues toolValues) {
             this.toolValues[slot.slotIndex] = toolValues;
             return this;
         }
 
+        /**
+         * Copies every slot's values from {@code source}, offset by {@code offset}. Slots {@code source} does
+         * not configure are left untouched.
+         *
+         * @param source the tier to copy values from
+         * @param offset the offset to apply to each copied value
+         * @return this builder
+         */
         public Builder toolValuesWithOffset(ToolTier source, ToolValues offset) {
             for (int i = 0; i < toolValues.length; i++) {
                 if (source.toolValues[i] != null)
@@ -228,6 +338,9 @@ public class ToolTier {
             return this;
         }
 
+        /**
+         * @return the built {@link ToolTier}
+         */
         public ToolTier build() {
             return new ToolTier(name, toolMaterial, toolValues, blockTag, level);
         }
@@ -241,9 +354,10 @@ public class ToolTier {
     /**
      * Create a new ToolTier for the specified Tier where all Values are offset by the given amount
      *
-     * @param newName New Name to use for the copy
-     * @param newTier New Tier to use or null if the one from this ToolTier should be used
-     * @param offset  Offset to apply to all values
+     * @param newName  New Name to use for the copy
+     * @param newTier  New Tier to use or null if the one from this ToolTier should be used
+     * @param offset   Offset to apply to all values
+     * @param blockTag New block tag identifying which blocks require at least this tier to be mined correctly
      * @return New ToolTier with the specified offset
      */
     public ToolTier copyWithOffset(

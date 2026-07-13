@@ -20,11 +20,22 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a button slot: a {@link ButtonBlock} carrying {@link BlockTraits#BUTTON_BLOCK}, with a
+ * material-appropriate press duration (20 ticks for stone, 30 for wood, 8 otherwise), a vanilla-style button
+ * model, and an auto-generated recipe in the matching {@code wooden_button}/{@code stone_button} recipe group.
+ */
 public class Button extends SlotFromDefinition {
+    /**
+     * Creates a factory for the {@link SlotType#BUTTON} slot.
+     */
     public Button() {
         this(SlotType.BUTTON);
     }
 
+    /**
+     * @param slot the slot to register this button under
+     */
     public Button(SlotType slot) {
         super(slot);
     }

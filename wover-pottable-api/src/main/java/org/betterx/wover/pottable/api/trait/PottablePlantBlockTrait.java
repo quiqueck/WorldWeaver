@@ -30,6 +30,9 @@ import java.util.function.BiPredicate;
  * no custom datagen code is needed.
  */
 public class PottablePlantBlockTrait extends BlockTraitImpl<Block, GenericBlockTrait> implements GenericBlockTrait {
+    /**
+     * The unique key identifying this trait.
+     */
     public static final BlockTraitKey KEY = BlockTraitKey.ofUnique(LibWoverPottable.C, "pottable_plant");
 
     private static final PottablePlantBlockTrait ANY = new PottablePlantBlockTrait(Optional.empty());

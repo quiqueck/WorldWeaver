@@ -11,7 +11,28 @@ import net.minecraft.world.level.biome.BiomeSource;
 
 import java.util.Set;
 
+/**
+ * Registers custom {@link BiomeSource} types and reads the biome exclusion config used by WoVer's own
+ * {@link BiomeSource} implementations.
+ * <p>
+ * Registering a new {@link BiomeSource} type here is only necessary if you are implementing your own
+ * {@link BiomeSource} (comparable to {@link org.betterx.wover.generator.api.biomesource.end.WoverEndConfig
+ * WoverEndConfig}/{@link org.betterx.wover.generator.api.biomesource.nether.WoverNetherConfig
+ * WoverNetherConfig}). Most mod developers instead reuse the {@code wover:nether_biome_source}/
+ * {@code wover:end_biome_source} types that WoVer already registers.
+ */
 public class BiomeSourceManager {
+    /**
+     * Registers a new {@link BiomeSource} type under the given id.
+     * <p>
+     * This is the same mechanism vanilla uses to register {@link BiomeSource} codecs
+     * ({@code minecraft:biome_source}, e.g. {@code multi_noise} or {@code fixed}) — it makes {@code type: <location>}
+     * a valid value for the {@code biome_source} field of a {@code chunk_generator} in
+     * {@code data/<namespace>/dimension/*.json}.
+     *
+     * @param location The id the {@link BiomeSource} type is registered under.
+     * @param codec    The {@link MapCodec} used to (de)serialize the {@link BiomeSource}.
+     */
     public static void register(ResourceLocation location, MapCodec<BiomeSource> codec) {
         BiomeSourceManagerImpl.register(location, codec);
     }

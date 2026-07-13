@@ -23,7 +23,27 @@ import org.apache.commons.lang3.time.StopWatch;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A {@link Structure} that, at generation time, picks one of several {@code .nbt} templates
+ * ({@link RandomNbtStructureElement}) at random (weighted) and places it using a
+ * {@link StructurePlacement} strategy. Built via
+ * {@link org.betterx.wover.structure.api.builders.RandomNbtBuilder}, created through
+ * {@link org.betterx.wover.structure.api.StructureManager#randomNbt(net.minecraft.resources.ResourceLocation)}.
+ * <p>
+ * Subclasses only need to provide a {@link MapCodec} (see {@link #simpleRandomCodec(Function4)}) and a
+ * constructor matching its shape; the actual generation logic lives entirely in this class.
+ */
 public class RandomNbtStructure extends Structure {
+    /**
+     * Builds a {@link MapCodec} for a {@link RandomNbtStructure} subclass, adding the
+     * {@code placement}, {@code keep_air} and {@code configs} fields (in addition to the base
+     * {@link Structure#settingsCodec}) to the standard structure JSON format.
+     *
+     * @param instancer A factory that creates the subclass instance from the decoded fields, typically a
+     *                  method reference to its constructor
+     * @param <T>       The {@link RandomNbtStructure} subclass
+     * @return The built {@link MapCodec}
+     */
     public static <T extends RandomNbtStructure> MapCodec<T> simpleRandomCodec(Function4<StructureSettings, StructurePlacement, Boolean, RandomizedWeightedList<RandomNbtStructureElement>, T> instancer) {
         return RecordCodecBuilder.mapCodec((instance) -> instance
                 .group(
@@ -47,6 +67,16 @@ public class RandomNbtStructure extends Structure {
     private final StructurePlacement placement;
     private final boolean keepAir;
 
+    /**
+     * Creates a new {@link RandomNbtStructure}. Usually called through a subclass constructor referenced
+     * by {@link #simpleRandomCodec(Function4)}, or by
+     * {@link org.betterx.wover.structure.api.builders.RandomNbtBuilder}.
+     *
+     * @param structureSettings The base {@link StructureSettings}
+     * @param placement         The placement strategy used to find a valid generation point
+     * @param keepAir           Whether air blocks in the template are preserved during placement
+     * @param elements          The weighted list of {@code .nbt} templates to randomly pick from
+     */
     public RandomNbtStructure(
             StructureSettings structureSettings,
             StructurePlacement placement,
@@ -60,14 +90,29 @@ public class RandomNbtStructure extends Structure {
     }
 
 
+    /**
+     * The weighted list of {@code .nbt} templates this structure randomly picks from.
+     *
+     * @return The elements
+     */
     public RandomizedWeightedList<RandomNbtStructureElement> elements() {
         return elements;
     }
 
+    /**
+     * The placement strategy used to find a valid generation point for this structure.
+     *
+     * @return The placement strategy
+     */
     public StructurePlacement placement() {
         return placement;
     }
 
+    /**
+     * Whether air blocks in the placed template are preserved (instead of being ignored).
+     *
+     * @return {@code true} if air blocks are kept
+     */
     public boolean keepAir() {
         return keepAir;
     }

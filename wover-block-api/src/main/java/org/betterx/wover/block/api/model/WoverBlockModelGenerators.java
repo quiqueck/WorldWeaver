@@ -33,14 +33,38 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Client-side helper that wraps vanilla's {@link BlockModelGenerators} with convenience methods for the
+ * most common blockstate/model shapes (full cubes, stairs, walls, fences, slabs, pillars, doors, signs,
+ * chests, ...), plus a few extra shapes not covered by vanilla (obsidian-style random rotation, particle-only
+ * models, top/side/bottom covers).
+ * <p>
+ * Passed to {@link BlockModelProvider#provideBlockModels(WoverBlockModelGenerators)} and
+ * {@link org.betterx.wover.datagen.api.provider.WoverModelProvider#bootstrapBlockStateModels}.
+ */
 @Environment(EnvType.CLIENT)
 public class WoverBlockModelGenerators {
+    /**
+     * Vanilla's cross-shaped model parent ({@code block/cross}).
+     */
     public static final ResourceLocation CROSS = ResourceLocation.withDefaultNamespace("block/cross");
+    /**
+     * Vanilla's plain cube model parent ({@code block/cube}).
+     */
     public static final ResourceLocation CUBE = ResourceLocation.withDefaultNamespace("block/cube");
+    /**
+     * Vanilla's cube-with-one-texture model parent ({@code block/cube_all}).
+     */
     public static final ResourceLocation CUBE_ALL = ResourceLocation.withDefaultNamespace("block/cube_all");
+    /**
+     * The model parent used by {@link #COMPOSTER_MODEL} ({@code wover:block/composter}).
+     */
     public static final ResourceLocation COMPOSTER = LibWoverBlock.C.id("block/composter");
     private static final ResourceLocation LADDER = ResourceLocation.withDefaultNamespace("block/ladder");
 
+    /**
+     * Model template for composter-shaped blocks (side/bottom/top textures), used by {@link #createComposter(Block)}.
+     */
     public static final ModelTemplate COMPOSTER_MODEL = new ModelTemplate(
             Optional.of(COMPOSTER),
             Optional.empty(),
@@ -48,12 +72,18 @@ public class WoverBlockModelGenerators {
             TextureSlot.BOTTOM,
             TextureSlot.TOP
     );
+    /**
+     * Model template for ladder-shaped blocks (particle/texture textures), used by {@link #createLadder(Block)}.
+     */
     public static final ModelTemplate LADDER_MODEL = new ModelTemplate(
             Optional.of(LADDER),
             Optional.empty(),
             TextureSlot.PARTICLE,
             TextureSlot.TEXTURE
     );
+    /**
+     * The wrapped vanilla generator that this class delegates to.
+     */
     public final BlockModelGenerators vanillaGenerator;
 
     public WoverBlockModelGenerators(
@@ -62,6 +92,13 @@ public class WoverBlockModelGenerators {
         this.vanillaGenerator = vanillaGenerator;
     }
 
+    /**
+     * Creates all 16 rotation variants for an obsidian-like block that should appear with a randomized
+     * orientation, mirroring vanilla's obsidian/crying-obsidian model generation.
+     *
+     * @param generators    The generator to emit models through (usually {@code this})
+     * @param obsidianBlock The block to generate the variants for
+     */
     public void createObsidianVariants(WoverBlockModelGenerators generators, Block obsidianBlock) {
         var model = generators.getTextureModels(obsidianBlock, TexturedModel.CUBE.get(obsidianBlock));
         var template = model.getTemplate();
@@ -94,44 +131,108 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    /**
+     * Emits a blockstate definition. Thin wrapper around the vanilla generator's {@code blockStateOutput}.
+     *
+     * @param blockStateGenerator The blockstate definition to emit
+     */
     public void acceptBlockState(BlockModelDefinitionGenerator blockStateGenerator) {
         this.vanillaGenerator.blockStateOutput.accept(blockStateGenerator);
     }
 
+    /**
+     * Emits a model file. Thin wrapper around the vanilla generator's {@code modelOutput}.
+     *
+     * @param id    The resource location the model should be written to
+     * @param model The model definition to emit
+     */
     public void acceptModelOutput(ResourceLocation id, ModelInstance model) {
         this.vanillaGenerator.modelOutput.accept(id, model);
     }
 
+    /**
+     * Registers a simple item model for the block that uses the block's own texture.
+     *
+     * @param block The block whose item model to generate
+     */
     public void delegateItemModel(Block block) {
         this.vanillaGenerator.registerSimpleItemModel(block, TextureMapping.getBlockTexture(block));
     }
 
+    /**
+     * Registers a simple item model for the block that references an existing model.
+     *
+     * @param block            The block whose item model to generate
+     * @param resourceLocation The model the item should reference
+     */
     public void delegateItemModel(Block block, ResourceLocation resourceLocation) {
         this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
     }
 
+    /**
+     * Looks up the vanilla {@link TexturedModel} registered for {@code block} in
+     * {@link BlockModelGenerators#TEXTURED_MODELS}, falling back to {@code defaultModel} if none is registered.
+     *
+     * @param block        The block to look up
+     * @param defaultModel The model to use if none is registered for the block
+     * @return The resolved textured model
+     */
     public TexturedModel getTextureModels(Block block, TexturedModel defaultModel) {
         return BlockModelGenerators.TEXTURED_MODELS.getOrDefault(block, defaultModel);
     }
 
+    /**
+     * Starts a fluent {@link Builder} for {@code block}, using its registered {@link TexturedModel} (or a
+     * plain cube model as fallback).
+     *
+     * @param block The block to build models for
+     * @return A new builder
+     */
     public Builder modelFor(Block block) {
         final TexturedModel texturedModel = this.getTextureModels(block, TexturedModel.CUBE.get(block));
         return modelFor(texturedModel);
     }
 
+    /**
+     * Starts a fluent {@link Builder} using an explicit {@link TexturedModel} and its default mapping.
+     *
+     * @param texturedModel The textured model to build with
+     * @return A new builder
+     */
     public Builder modelFor(TexturedModel texturedModel) {
         return new Builder(texturedModel, texturedModel.getMapping());
     }
 
+    /**
+     * Starts a fluent {@link Builder} using an explicit {@link TexturedModel} and a custom texture mapping.
+     *
+     * @param texturedModel  The textured model to build with
+     * @param textureMapping The texture mapping to use instead of the model's own mapping
+     * @return A new builder
+     */
     public Builder modelFor(TexturedModel texturedModel, TextureMapping textureMapping) {
         return new Builder(texturedModel, textureMapping);
     }
 
+    /**
+     * Starts a fluent {@link Builder} for {@code block}, overriding its texture mapping.
+     *
+     * @param block                  The block to build models for
+     * @param textureMappingOverride The texture mapping to use instead of the block's registered mapping
+     * @return A new builder
+     */
     public Builder modelFor(Block block, TextureMapping textureMappingOverride) {
         final TexturedModel texturedModel = this.getTextureModels(block, TexturedModel.CUBE.get(block));
         return new Builder(texturedModel, textureMappingOverride);
     }
 
+    /**
+     * Creates a single-entry {@link TextureMapping}.
+     *
+     * @param slotA    The texture slot
+     * @param locationA The texture to map the slot to
+     * @return A new texture mapping
+     */
     public static TextureMapping textureMappingOf(
             TextureSlot slotA,
             ResourceLocation locationA
@@ -139,6 +240,15 @@ public class WoverBlockModelGenerators {
         return new TextureMapping().put(slotA, locationA);
     }
 
+    /**
+     * Creates a two-entry {@link TextureMapping}.
+     *
+     * @param slotA     The first texture slot
+     * @param locationA The texture to map the first slot to
+     * @param slotB     The second texture slot
+     * @param locationB The texture to map the second slot to
+     * @return A new texture mapping
+     */
     public static TextureMapping textureMappingOf(
             TextureSlot slotA,
             ResourceLocation locationA,
@@ -148,6 +258,13 @@ public class WoverBlockModelGenerators {
         return textureMappingOf(slotA, locationA).put(slotB, locationB);
     }
 
+    /**
+     * Generates a bookshelf-style model (column texture mapping from the shelf and plank textures) and its
+     * blockstate.
+     *
+     * @param shelf  The bookshelf block
+     * @param planks The plank block whose texture is used for the shelf's top/bottom
+     */
     public void createBookshelf(Block shelf, Block planks) {
         TextureMapping textureMapping = TextureMapping.column(
                 TextureMapping.getBlockTexture(shelf),
@@ -164,6 +281,11 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    /**
+     * Generates a plain full-cube model (using {@link ModelTemplates#CUBE_ALL}) and blockstate for the block.
+     *
+     * @param block The block to generate the model for
+     */
     public void createFullBlock(Block block) {
         var textureMapping = new TextureMapping()
                 .put(TextureSlot.ALL, TextureMapping.getBlockTexture(block))
@@ -188,6 +310,13 @@ public class WoverBlockModelGenerators {
             .select(Direction.NORTH, NOP);
 
 
+    /**
+     * Generates a ladder-style model (using {@link #LADDER_MODEL}) and blockstate, rotated per
+     * {@link net.minecraft.world.level.block.state.properties.BlockStateProperties#HORIZONTAL_FACING}, plus
+     * a flat item model.
+     *
+     * @param ladderBlock The block to generate the model for
+     */
     public void createLadder(Block ladderBlock) {
         //vanillaGenerator.createNonTemplateHorizontalBlock(ladderBlock);
         var mapping = new TextureMapping().put(TextureSlot.PARTICLE, TextureMapping.getBlockTexture(ladderBlock))
@@ -206,6 +335,17 @@ public class WoverBlockModelGenerators {
         vanillaGenerator.registerSimpleFlatItemModel(ladderBlock);
     }
 
+    /**
+     * Generates the multipart blockstate and models for a vanilla iron-bars-style block (post/cap/side
+     * variants driven by the {@code NORTH}/{@code EAST}/{@code SOUTH}/{@code WEST} connection properties)
+     * plus a flat item model. The 6 suffixed model files ({@code _post}, {@code _post_ends}, {@code _cap},
+     * {@code _cap_alt}, {@code _side}, {@code _side_alt}) are generated with the same element geometry as
+     * vanilla's own {@code minecraft:block/iron_bars_*} models, textured with {@code barsBlock}'s own
+     * block texture (there's no reusable vanilla {@link ModelTemplate} for this shape to parent from,
+     * since vanilla ships its iron bars models as complete/standalone files rather than datagenning them).
+     *
+     * @param barsBlock The block to generate the blockstate for
+     */
     public void createBars(
             Block barsBlock
     ) {
@@ -276,6 +416,14 @@ public class WoverBlockModelGenerators {
 
     private final Map<ResourceLocation, ResourceLocation> PARTICLE_ONLY_MODELS = Maps.newHashMap();
 
+    /**
+     * Creates (and caches) a particle-only model for {@code block}, useful for blocks like signs or chests
+     * whose actual model is rendered by a block-entity renderer but still need a texture for break
+     * particles.
+     *
+     * @param block The block to create the particle model for
+     * @return The resource location of the generated particle-only model
+     */
     public ResourceLocation particleOnlyModel(Block block) {
         var name = ModelLocationUtils.getModelLocation(block).withSuffix("_particles");
         if (name.getNamespace().equals("minecraft")) name = LibWoverBlock.C.mk(name.getPath());
@@ -295,6 +443,14 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the particle-only-based blockstates for a standing/wall sign pair and a flat item model
+     * for the standing sign.
+     *
+     * @param baseBlock    The block whose texture is used for the sign's particle model (e.g. the plank block)
+     * @param signBlock    The standing sign block
+     * @param wallSignBlock The wall sign block
+     */
     public void createSign(Block baseBlock, Block signBlock, Block wallSignBlock) {
         final ResourceLocation particleLocation = particleOnlyModel(baseBlock);
 
@@ -310,6 +466,14 @@ public class WoverBlockModelGenerators {
         vanillaGenerator.registerSimpleFlatItemModel(signBlock.asItem());
     }
 
+    /**
+     * Generates the particle-only-based blockstates for a hanging/wall-hanging sign pair and a flat item
+     * model for the hanging sign.
+     *
+     * @param baseBlock              The block whose texture is used for the sign's particle model
+     * @param hangingSignBlock       The hanging sign block
+     * @param wallHangingSignBlock   The wall hanging sign block
+     */
     public void createHangingSign(Block baseBlock, Block hangingSignBlock, Block wallHangingSignBlock) {
         ResourceLocation resourceLocation = particleOnlyModel(baseBlock);
         acceptBlockState(BlockModelGenerators.createSimpleBlock(
@@ -323,6 +487,12 @@ public class WoverBlockModelGenerators {
         vanillaGenerator.registerSimpleFlatItemModel(hangingSignBlock.asItem());
     }
 
+    /**
+     * Generates the open/closed blockstate variants for a barrel-style block, driven by the vanilla
+     * {@code OPEN} property, plus axis rotation.
+     *
+     * @param barrelBlock The block to generate the blockstate for
+     */
     public void createBarrel(Block barrelBlock) {
         ResourceLocation resourceLocation = TextureMapping.getBlockTexture(barrelBlock, "_top_open");
         MultiVariant closedVariant = BlockModelGenerators.plainVariant(
@@ -354,6 +524,13 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the multipart blockstate for a composter-style block, layering in the vanilla composter's
+     * content-level overlay textures (using {@link #COMPOSTER_MODEL}) for
+     * {@code LEVEL_COMPOSTER} 1 through 8.
+     *
+     * @param composterBlock The block to generate the blockstate for
+     */
     public void createComposter(Block composterBlock) {
         var mapping = new TextureMapping()
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(composterBlock, "_side"))
@@ -421,6 +598,15 @@ public class WoverBlockModelGenerators {
                 ));
     }
 
+    /**
+     * Generates a {@link ModelTemplates#CUBE_BOTTOM_TOP} model (top/side textures from {@code coverBlock},
+     * bottom texture from {@code bottomBlock}) and its blockstate.
+     *
+     * @param bottomBlock  The block whose texture is used for the bottom face
+     * @param coverBlock   The block that owns the generated model/blockstate, and whose texture is used for
+     *                     the top/side faces
+     * @param withVariants If {@code true}, generates four randomly-rotated top variants instead of a single one
+     */
     public void createBlockTopSideBottom(Block bottomBlock, Block coverBlock, boolean withVariants) {
         var mapping = new TextureMapping()
                 .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(coverBlock, "_side"))
@@ -435,6 +621,13 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    /**
+     * Generates the cube model and blockstate for {@code block}, using its registered {@link TexturedModel}
+     * (or a plain cube as fallback). Does not generate an item model - see
+     * {@link #createCubeModelWithFlatItem(Block)}.
+     *
+     * @param block The block to generate the model for
+     */
     public void createCubeModel(Block block) {
         final var model = TexturedModel.CUBE.get(block);
         final TextureMapping mapping = this.getTextureModels(block, model).getMapping();
@@ -478,10 +671,23 @@ public class WoverBlockModelGenerators {
         return location;
     }
 
+    /**
+     * Generates the up/down blockstate and models for a pressure-plate-style block from an explicit texture.
+     *
+     * @param plateBlock      The block to generate the blockstate for
+     * @param textureLocation The texture to use for the plate
+     */
     public void createPressurePlate(Block plateBlock, ResourceLocation textureLocation) {
         createPressurePlate(plateBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
     }
 
+    /**
+     * Generates the up/down blockstate and models for a pressure-plate-style block, reusing the registered
+     * (or cube) texture of {@code materialBlock}.
+     *
+     * @param materialBlock The block whose texture should be used for the plate
+     * @param plateBlock    The block to generate the blockstate for
+     */
     public void createPressurePlate(Block materialBlock, Block plateBlock) {
         createPressurePlate(
                 plateBlock, this
@@ -504,10 +710,24 @@ public class WoverBlockModelGenerators {
     }
 
 
+    /**
+     * Generates the pressed/unpressed blockstate and models (plus an item model) for a button-style block
+     * from an explicit texture.
+     *
+     * @param buttonBlock     The block to generate the blockstate for
+     * @param textureLocation The texture to use for the button
+     */
     public void createButton(Block buttonBlock, ResourceLocation textureLocation) {
         createButton(buttonBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
     }
 
+    /**
+     * Generates the pressed/unpressed blockstate and models (plus an item model) for a button-style block,
+     * reusing the registered (or cube) texture of {@code materialBlock}.
+     *
+     * @param materialBlock The block whose texture should be used for the button
+     * @param buttonBlock   The block to generate the blockstate for
+     */
     public void createButton(Block materialBlock, Block buttonBlock) {
         createButton(
                 buttonBlock, this
@@ -530,10 +750,24 @@ public class WoverBlockModelGenerators {
         createItemModel(buttonBlock, ModelTemplates.BUTTON_INVENTORY, mapping);
     }
 
+    /**
+     * Generates the post/side blockstate and models (plus an inventory model) for a fence-style block from
+     * an explicit texture.
+     *
+     * @param fenceBlock      The block to generate the blockstate for
+     * @param textureLocation The texture to use for the fence
+     */
     public void createFence(Block fenceBlock, ResourceLocation textureLocation) {
         createFence(fenceBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
     }
 
+    /**
+     * Generates the post/side blockstate and models (plus an inventory model) for a fence-style block,
+     * reusing the registered (or cube) texture of {@code materialBlock}.
+     *
+     * @param materialBlock The block whose texture should be used for the fence
+     * @param fenceBlock    The block to generate the blockstate for
+     */
     public void createFence(Block materialBlock, Block fenceBlock) {
         createFence(
                 fenceBlock, this
@@ -542,6 +776,13 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the post/side blockstate and models (plus an inventory model) for a fence-style block from
+     * an explicit texture mapping.
+     *
+     * @param fenceBlock The block to generate the blockstate for
+     * @param mapping    The texture mapping to apply to the fence's model templates
+     */
     public void createFence(Block fenceBlock, TextureMapping mapping) {
         final List<ResourceLocation> locations = Stream.of(
                 ModelTemplates.FENCE_POST,
@@ -556,10 +797,24 @@ public class WoverBlockModelGenerators {
         createInventoryModel(fenceBlock, ModelTemplates.FENCE_INVENTORY, mapping);
     }
 
+    /**
+     * Generates the open/closed (and wall-adjacent) blockstate and models for a fence-gate-style block from
+     * an explicit texture.
+     *
+     * @param gateBlock       The block to generate the blockstate for
+     * @param textureLocation The texture to use for the gate
+     */
     public void createFenceGate(Block gateBlock, ResourceLocation textureLocation) {
         createFence(gateBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
     }
 
+    /**
+     * Generates the open/closed (and wall-adjacent) blockstate and models for a fence-gate-style block,
+     * reusing the registered (or cube) texture of {@code materialBlock}.
+     *
+     * @param materialBlock The block whose texture should be used for the gate
+     * @param gateBlock     The block to generate the blockstate for
+     */
     public void createFenceGate(Block materialBlock, Block gateBlock) {
         createFenceGate(
                 gateBlock, this
@@ -568,6 +823,13 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the open/closed (and wall-adjacent) blockstate and models for a fence-gate-style block from
+     * an explicit texture mapping.
+     *
+     * @param gateBlock The block to generate the blockstate for
+     * @param mapping   The texture mapping to apply to the gate's model templates
+     */
     public void createFenceGate(Block gateBlock, TextureMapping mapping) {
         final List<ResourceLocation> locations = Stream.of(
                 ModelTemplates.FENCE_GATE_OPEN,
@@ -586,6 +848,15 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    /**
+     * Generates the inner/straight/outer blockstate and models for a stairs-style block from explicit
+     * top/side/bottom textures, plus an item model.
+     *
+     * @param stairBlock            The block to generate the blockstate for
+     * @param topTextureLocation    The texture to use for the top face
+     * @param sideTextureLocation   The texture to use for the side faces
+     * @param bottomTextureLocation The texture to use for the bottom face
+     */
     public void createStairs(
             Block stairBlock,
             ResourceLocation topTextureLocation,
@@ -600,14 +871,33 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Delegates to vanilla's {@link BlockModelGenerators#createOrientableTrapdoor(Block)} to generate the
+     * blockstate/models for a trapdoor that has separate top/bottom-facing textures.
+     *
+     * @param trapdoorBlock The block to generate the blockstate for
+     */
     public void createOrientableTrapdoor(Block trapdoorBlock) {
         vanillaGenerator.createOrientableTrapdoor(trapdoorBlock);
     }
 
+    /**
+     * Delegates to vanilla's {@link BlockModelGenerators#createTrapdoor(Block)} to generate the
+     * blockstate/models for a regular trapdoor.
+     *
+     * @param trapdoorBlock The block to generate the blockstate for
+     */
     public void createTrapdoor(Block trapdoorBlock) {
         vanillaGenerator.createTrapdoor(trapdoorBlock);
     }
 
+    /**
+     * Generates the inner/straight/outer blockstate and models for a stairs-style block, reusing the
+     * registered (or cube) texture of {@code materialBlock}.
+     *
+     * @param materialBlock The block whose texture should be used for the stairs
+     * @param stairBlock    The block to generate the blockstate for
+     */
     public void createStairs(Block materialBlock, Block stairBlock) {
         createStairs(
                 stairBlock, this
@@ -616,6 +906,15 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the stairs blockstate directly from pre-existing straight/outer/inner model locations,
+     * without creating new model files, plus an item model that references the straight model.
+     *
+     * @param stairBlock The block to generate the blockstate for
+     * @param stair      The location of the straight-stairs model
+     * @param outer      The location of the outer-corner model
+     * @param inner      The location of the inner-corner model
+     */
     public void createStairsWithModels(
             Block stairBlock,
             ResourceLocation stair,
@@ -631,6 +930,13 @@ public class WoverBlockModelGenerators {
         delegateItemModel(stairBlock, stair);
     }
 
+    /**
+     * Generates the inner/straight/outer blockstate and models for a stairs-style block from an explicit
+     * texture mapping, plus an item model.
+     *
+     * @param stairBlock The block to generate the blockstate for
+     * @param mapping    The texture mapping to apply to the stairs' model templates
+     */
     public void createStairs(Block stairBlock, TextureMapping mapping) {
         final List<ResourceLocation> locations = Stream
                 .of(
@@ -649,6 +955,13 @@ public class WoverBlockModelGenerators {
         delegateItemModel(stairBlock, locations.get(1));
     }
 
+    /**
+     * Generates the post/low-side/tall-side blockstate and models (plus an inventory model) for a
+     * wall-style block, reusing the registered (or cube) texture of {@code materialBlock}.
+     *
+     * @param materialBlock The block whose texture should be used for the wall
+     * @param wallBlock     The block to generate the blockstate for
+     */
     public void createWall(Block materialBlock, Block wallBlock) {
         createWall(
                 wallBlock, this
@@ -657,6 +970,13 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the post/low-side/tall-side blockstate and models (plus an inventory model) for a
+     * wall-style block from an explicit texture mapping.
+     *
+     * @param wallBlock The block to generate the blockstate for
+     * @param mapping   The texture mapping to apply to the wall's model templates
+     */
     public void createWall(Block wallBlock, TextureMapping mapping) {
         final List<ResourceLocation> locations = Stream.of(
                 ModelTemplates.WALL_POST,
@@ -673,6 +993,14 @@ public class WoverBlockModelGenerators {
         createInventoryModel(wallBlock, ModelTemplates.WALL_INVENTORY, mapping);
     }
 
+    /**
+     * Generates the bottom/top/double blockstate and models (plus an item model) for a slab-style block,
+     * using a single texture (from {@code baseBlock}) for all faces.
+     *
+     * @param slabBlock The block to generate the blockstate for
+     * @param baseBlock The full block whose texture, and whose existing model (for the double-slab state),
+     *                  are reused
+     */
     public void createSlab(Block slabBlock, Block baseBlock) {
         var res = TextureMapping.getBlockTexture(baseBlock);
         createSlab(
@@ -683,6 +1011,14 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the bottom/top/double blockstate and models (plus an item model) for a slab-style block
+     * from an explicit texture mapping.
+     *
+     * @param slabBlock The block to generate the blockstate for
+     * @param baseBlock The full block whose existing model is reused for the double-slab state
+     * @param mapping   The texture mapping to apply to the slab's model templates
+     */
     public void createSlab(Block slabBlock, Block baseBlock, TextureMapping mapping) {
         final var fullBlockLocation = ModelLocationUtils.getModelLocation(baseBlock);
         final List<ResourceLocation> locations = Stream.of(
@@ -699,6 +1035,12 @@ public class WoverBlockModelGenerators {
         delegateItemModel(slabBlock, locations.get(0));
     }
 
+    /**
+     * Generates the axial/horizontal blockstate and models (plus an item model) for a log-style block,
+     * deriving side/end textures from the block's own texture with {@code _side}/{@code _top} suffixes.
+     *
+     * @param logBlock The block to generate the blockstate for
+     */
     public void createLog(Block logBlock) {
         var res = TextureMapping.getBlockTexture(logBlock);
         createLog(
@@ -708,6 +1050,13 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the axial/horizontal blockstate and models (plus an item model) for a log-style block from
+     * an explicit texture mapping.
+     *
+     * @param logBlock The block to generate the blockstate for
+     * @param mapping  The texture mapping to apply to the log's model templates
+     */
     public void createLog(
             Block logBlock,
             TextureMapping mapping
@@ -715,6 +1064,17 @@ public class WoverBlockModelGenerators {
         createLog(logBlock, false, mapping);
     }
 
+    /**
+     * Generates the axial/horizontal blockstate and models (plus an item model) for a log-style block,
+     * optionally with a mirrored variant and/or additional weighted texture alternatives (e.g. mossy log
+     * variants that should be randomly picked).
+     *
+     * @param logBlock             The block to generate the blockstate for
+     * @param mirroredAlternative  If {@code true}, adds a mirrored copy of every texture mapping as an
+     *                             additional weighted variant
+     * @param mapping              The primary texture mapping to apply to the log's model templates
+     * @param alternatives         Additional texture mappings to add as equally-weighted variants
+     */
     public void createLog(
             Block logBlock,
             boolean mirroredAlternative, TextureMapping mapping,
@@ -774,6 +1134,13 @@ public class WoverBlockModelGenerators {
         }
     }
 
+    /**
+     * Generates the axis-aligned-pillar blockstate and models (plus an item model) for a pillar-style block
+     * (e.g. a quartz-pillar-like block, without a distinct horizontal texture), deriving side/end textures
+     * from the block's own texture with {@code _side}/{@code _top} suffixes.
+     *
+     * @param pillarBlock The block to generate the blockstate for
+     */
     public void createRotatedPillar(Block pillarBlock) {
         var res = TextureMapping.getBlockTexture(pillarBlock);
         createRotatedPillar(
@@ -783,10 +1150,27 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Generates the axis-aligned-pillar blockstate and models (plus an item model) for a pillar-style block
+     * from an explicit texture mapping.
+     *
+     * @param pillarBlock The block to generate the blockstate for
+     * @param mapping     The texture mapping to apply to the pillar's model templates
+     */
     public void createRotatedPillar(Block pillarBlock, TextureMapping mapping) {
         createRotatedPillar(pillarBlock, false, mapping);
     }
 
+    /**
+     * Generates the axis-aligned-pillar blockstate and models (plus an item model) for a pillar-style block,
+     * optionally with a mirrored variant and/or additional weighted texture alternatives.
+     *
+     * @param pillarBlock         The block to generate the blockstate for
+     * @param mirroredAlternative If {@code true}, adds a mirrored copy of every texture mapping as an
+     *                            additional weighted variant
+     * @param mapping             The primary texture mapping to apply to the pillar's model templates
+     * @param alternatives        Additional texture mappings to add as equally-weighted variants
+     */
     public void createRotatedPillar(
             Block pillarBlock,
             boolean mirroredAlternative,
@@ -839,6 +1223,14 @@ public class WoverBlockModelGenerators {
     }
 
 
+    /**
+     * Generates a simple blockstate for a chest-style block that reuses {@code materialBlock}'s
+     * {@link #particleOnlyModel(Block) particle-only model} (the actual chest is rendered by a block-entity
+     * renderer, so this model is only used for break particles and inventory fallback).
+     *
+     * @param materialBlock The block whose texture is used for the particle model
+     * @param chestBlock    The block to generate the blockstate for
+     */
     public void createChest(Block materialBlock, Block chestBlock) {
         final var baseModel = particleOnlyModel(materialBlock);
         acceptBlockState(BlockModelGenerators.createSimpleBlock(
@@ -847,6 +1239,14 @@ public class WoverBlockModelGenerators {
         ));
     }
 
+    /**
+     * Generates an item model for {@code block}'s item from an arbitrary {@link ModelTemplate} and
+     * {@link TextureMapping}. Does nothing if the block has no item ({@link Items#AIR}).
+     *
+     * @param block    The block whose item model to generate
+     * @param template The model template (parent model) to use
+     * @param mapping  The texture mapping to apply to the template
+     */
     public final void createItemModel(Block block, ModelTemplate template, TextureMapping mapping) {
         Item item = block.asItem();
         if (item != Items.AIR) {
@@ -857,11 +1257,25 @@ public class WoverBlockModelGenerators {
         }
     }
 
+    /**
+     * Registers a simple flat (2D, {@code item/generated}-parented) item model for the block, using the
+     * block's own texture.
+     *
+     * @param block The block whose item model to generate
+     */
     public void createFlatItem(Block block) {
         vanillaGenerator.registerSimpleFlatItemModel(block);
     }
 
 
+    /**
+     * Generates a wall-style inventory item model from an explicit texture, for blocks whose blockstate was
+     * created without going through {@link #createWall(Block, TextureMapping)} (e.g. custom wall block
+     * classes).
+     *
+     * @param block           The block whose item model to generate
+     * @param textureLocation The texture to use for the wall item model
+     */
     public void createWallItem(Block block, ResourceLocation textureLocation) {
         createInventoryModel(
                 block,
@@ -870,6 +1284,14 @@ public class WoverBlockModelGenerators {
         );
     }
 
+    /**
+     * Registers a flat (2D, {@code item/generated}-parented) item model for the block, either from an
+     * explicit texture, or (if {@code itemLocation} is {@code null}) falling back to
+     * {@link #createFlatItem(Block)}. Does nothing if the block has no item ({@link Items#AIR}).
+     *
+     * @param block        The block whose item model to generate
+     * @param itemLocation The texture to use for the item model, or {@code null} to use the block's own texture
+     */
     public void createFlatItem(Block block, @Nullable ResourceLocation itemLocation) {
         if (itemLocation == null) {
             this.createFlatItem(block);
@@ -886,6 +1308,14 @@ public class WoverBlockModelGenerators {
         }
     }
 
+    /**
+     * Creates a blockstate that randomly picks between the four Y-axis rotations (0/90/180/270 degrees) of
+     * a single model, e.g. for blocks that should look less repetitive when placed in bulk.
+     *
+     * @param block The block to generate the blockstate for
+     * @param model The model to rotate
+     * @return The generated blockstate definition
+     */
     public static MultiVariantGenerator randomTopModelVariant(Block block, ResourceLocation model) {
         return MultiVariantGenerator
                 .dispatch(
@@ -899,10 +1329,20 @@ public class WoverBlockModelGenerators {
                 );
     }
 
+    /**
+     * Gets the underlying model-output consumer that model files are emitted through.
+     *
+     * @return The model output consumer
+     */
     public BiConsumer<ResourceLocation, ModelInstance> modelOutput() {
         return vanillaGenerator.modelOutput;
     }
 
+    /**
+     * Fluent helper, obtained from {@link #modelFor(Block)} and its overloads, for generating a related set
+     * of blockstates/models (full block, slab, door, custom fence/fence-gate, ...) that share the same
+     * {@link TexturedModel}/{@link TextureMapping}.
+     */
     public class Builder {
         private ResourceLocation fullBlockLocation;
         private final TexturedModel model;
@@ -914,6 +1354,13 @@ public class WoverBlockModelGenerators {
             this.mapping = mapping;
         }
 
+        /**
+         * Generates the full-cube model and blockstate for {@code fullBlock}. Must be called before
+         * {@link #createSlab(Block)}, which reuses the generated model for the double-slab state.
+         *
+         * @param fullBlock The block to generate the blockstate for
+         * @return This builder, for chaining
+         */
         public Builder createFullBlock(Block fullBlock) {
             this.fullBlockLocation = model
                     .getTemplate()
@@ -929,11 +1376,26 @@ public class WoverBlockModelGenerators {
             return this;
         }
 
+        /**
+         * Delegates to vanilla's {@link BlockModelGenerators#createDoor(Block)} to generate the
+         * blockstate/models for a door.
+         *
+         * @param doorBlock The block to generate the blockstate for
+         * @return This builder, for chaining
+         */
         public Builder createDoor(Block doorBlock) {
             vanillaGenerator.createDoor(doorBlock);
             return this;
         }
 
+        /**
+         * Generates the post/side (per-direction) blockstate and models (plus an inventory model) for a
+         * "custom fence" - a fence whose sides are modeled per-direction rather than mirrored, using this
+         * builder's texture mapping with a custom particle texture.
+         *
+         * @param fenceBlock The block to generate the blockstate for
+         * @return This builder, for chaining
+         */
         public Builder createCustomFence(Block fenceBlock) {
             final TextureMapping particles = TextureMapping.customParticle(fenceBlock);
 
@@ -958,6 +1420,14 @@ public class WoverBlockModelGenerators {
             return this;
         }
 
+        /**
+         * Generates the open/closed (and wall-adjacent) blockstate and models for a "custom fence gate" -
+         * a fence gate matched with a {@link #createCustomFence(Block) custom fence} - using this builder's
+         * texture mapping with a custom particle texture.
+         *
+         * @param gateBlock The block to generate the blockstate for
+         * @return This builder, for chaining
+         */
         public Builder createCustomFenceGate(Block gateBlock) {
             final TextureMapping particles = TextureMapping.customParticle(gateBlock);
 
@@ -1001,6 +1471,14 @@ public class WoverBlockModelGenerators {
             }
         }
 
+        /**
+         * Generates the bottom/top/double blockstate and models (plus an item model) for a slab matched with
+         * this builder's full block, reusing the full block's model for the double-slab state.
+         *
+         * @param slabBlock The block to generate the blockstate for
+         * @return This builder, for chaining
+         * @throws IllegalStateException if {@link #createFullBlock(Block)} was not called first
+         */
         public Builder createSlab(Block slabBlock) {
             if (this.fullBlockLocation == null) {
                 throw new IllegalStateException("Please call createFullBlock before calling createSlab");

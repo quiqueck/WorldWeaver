@@ -20,13 +20,31 @@ import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Builds a "source" (plain full-block) slot of a stone-like set: a plain block dropping itself
+ * ({@link BlockTraits#LOOT_TABLE}{@code .dropSelf()}), with a plain cube model. For {@link SlotType#SOURCE}
+ * itself, the block is named after the set's {@code baseName} directly (no suffix) and no recipe is generated -
+ * it is meant to be the set's raw material. Named variants (brick/cracked/chiseled/polished/tiles/weathered, via
+ * the second constructor) instead generate a matching crafting/blasting/stonecutting recipe from a source
+ * material.
+ */
 public class Source extends SlotFromDefinition {
     protected final @Nullable SlotType baseBlockType;
 
+    /**
+     * Creates a factory for the {@link SlotType#SOURCE} slot itself (no recipe generated).
+     */
     public Source() {
         this(null, SlotType.SOURCE);
     }
 
+    /**
+     * @param baseBlockType the slot (with fallback to the set's base slot, then vanilla stone) this variant is
+     *                      derived from, or {@code null} to always use the set's base block
+     * @param slot          the slot to register this variant under; recognized values with a generated recipe
+     *                      are {@link SlotType#BRICK}, {@link SlotType#CRACKED}, {@link SlotType#CHISELED},
+     *                      {@link SlotType#POLISHED}, {@link SlotType#TILES}, and {@link SlotType#WEATHERED}
+     */
     public Source(@Nullable SlotType baseBlockType, @NotNull SlotType slot) {
         super(slot);
         this.baseBlockType = baseBlockType;

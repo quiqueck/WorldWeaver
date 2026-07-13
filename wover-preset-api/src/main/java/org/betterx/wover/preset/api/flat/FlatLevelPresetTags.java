@@ -27,7 +27,7 @@ public class FlatLevelPresetTags {
             TagManager.registerType(Registries.FLAT_LEVEL_GENERATOR_PRESET);
 
     /**
-     * Tag that determines weather a {@link FlatLevelGeneratorPreset} is visible in the UI.
+     * Tag that determines whether a {@link FlatLevelGeneratorPreset} is visible in the UI.
      */
     public static final TagKey<FlatLevelGeneratorPreset> VISIBLE = FlatLevelGeneratorPresetTags.VISIBLE;
 

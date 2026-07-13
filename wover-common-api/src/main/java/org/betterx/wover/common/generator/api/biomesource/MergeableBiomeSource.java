@@ -6,7 +6,21 @@ import net.minecraft.world.level.biome.BiomeSource;
 
 import java.util.Set;
 
+/**
+ * Marks a {@link BiomeSource} that can merge its set of possible biomes with another {@link BiomeSource}, for
+ * example when another mod's generator is installed alongside this one and both should contribute biomes.
+ *
+ * @param <B> The concrete {@link BiomeSource} type
+ */
 public interface MergeableBiomeSource<B extends BiomeSource> {
+    /**
+     * Checks if {@code inputBiomeSource} provides a different set of possible biomes than this one, and merging
+     * would therefore change the result.
+     *
+     * @param inputBiomeSource The {@link BiomeSource} to compare against
+     * @return {@code true} if the two sources should be merged
+     * @throws IllegalStateException if the possible biomes of either source could not be determined
+     */
     default boolean shouldMergeWith(BiomeSource inputBiomeSource) throws IllegalStateException {
         Set<Holder<Biome>> mySet = ((B) this).possibleBiomes();
         try {

@@ -95,6 +95,7 @@ public class Conditions {
      *                  {@link org.betterx.wover.math.api.noise.OpenSimplexNoise}
      * @param threshold The threshold that the noise value has to be above to be true.
      * @param roughness additional noise on top of the regular noise floor. This is used to create
+     *                  more variation in the surface.
      * @param scaleX    The scale of the noise in the x direction.
      * @param scaleY    The scale of the noise in the y direction.
      * @param scaleZ    The scale of the noise in the z direction.
