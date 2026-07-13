@@ -104,7 +104,8 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
                                                 writer,
                                                 LootTable.DIRECT_CODEC
                                                         .encodeStart(ops, entry.getValue())
-                                                        .getOrThrow(IllegalStateException::new),
+                                                        .getOrThrow(msg -> new IllegalStateException(
+                                                                entry.getKey() + ": " + msg)),
                                                 output.createRegistryElementsPathProvider(Registries.LOOT_TABLE)
                                                       .json(entry.getKey())
                                         )

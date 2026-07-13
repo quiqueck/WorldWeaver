@@ -75,7 +75,7 @@ public interface ItemTrait<I extends Item, R extends RuntimeItemTrait<I, R>> ext
             }
         }
 
-        return result;
+        return result.isEmpty() ? null : result;
     }
 
     R forRuntime();

@@ -213,7 +213,7 @@ public class CustomArmorMaterial {
          * @return This builder instance for chaining
          */
         public Builder createRepairIngredient() {
-            TagManager.ITEMS.makeTag(location.withSuffix("repair/"));
+            this.repairIngredient = TagManager.ITEMS.makeTag(location.withSuffix("repair/"));
             return this;
         }
 

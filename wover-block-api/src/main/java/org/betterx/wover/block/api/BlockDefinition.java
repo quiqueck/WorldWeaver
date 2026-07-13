@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -235,7 +236,10 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         if (this.traits == null) this.traits = new LinkedList<>();
 
         if (trait.keepLatestOnly()) {
-            this.traits = this.traits.stream().filter(t -> !t.is(trait.key())).toList();
+            this.traits = this.traits
+                    .stream()
+                    .filter(t -> !t.is(trait.key()))
+                    .collect(Collectors.toCollection(LinkedList::new));
         }
         this.traits.add((BlockTrait<? super B, ?>) trait);
         return (D) this;
@@ -828,7 +832,9 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * @return This configuration instance for method chaining
      */
     public D replacePropertiesWithCopy(BlockBehaviour block) {
-        this.properties = BlockBehaviour.Properties.ofFullCopy(block);
+        // ofFullCopy() builds a fresh Properties with no id - the constructor already set one on
+        // the properties object we're replacing here, so re-apply it explicitly.
+        this.properties = BlockBehaviour.Properties.ofFullCopy(block).setId(this.blockKey);
         return (D) this;
     }
 }

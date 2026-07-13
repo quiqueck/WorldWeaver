@@ -52,7 +52,7 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
                                 item,
                                 equipmentSet.armorTier,
                                 slot,
-                                equipmentSet.templateBaseSet
+                                equipmentSet.templateBaseSet == null ? null : equipmentSet.templateBaseSet.get()
                         ))
         );
 
@@ -74,10 +74,11 @@ public record ArmorDescription<I extends Item>(I item, ResourceKey<Item> itemKey
         var repairWith = tier.armorMaterial.repairIngredient();
 
         var values = tier.getValues(slot);
-        if (values != null && values.smithingTemplate() != null && sourceSet != null) {
+        var smithingTemplate = values == null ? null : values.resolveSmithingTemplate();
+        if (values != null && smithingTemplate != null && sourceSet != null) {
             RecipeBuilder
                     .smithing(location, item)
-                    .template(values.smithingTemplate())
+                    .template(smithingTemplate)
                     .base(sourceSet.get(slot))
                     .addon(repairWith)
                     .category(slot.category)

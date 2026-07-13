@@ -172,5 +172,10 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
         public LootTableTrait forRuntime() {
             return this;
         }
+
+        @Override
+        public boolean keepLatestOnly() {
+            return true;
+        }
     }
 }

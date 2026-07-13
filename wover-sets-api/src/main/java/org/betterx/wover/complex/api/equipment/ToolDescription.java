@@ -71,7 +71,7 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
                                 equipmentSet.toolTier,
                                 slot,
                                 equipmentSet.handleItem,
-                                equipmentSet.templateBaseSet
+                                equipmentSet.templateBaseSet == null ? null : equipmentSet.templateBaseSet.get()
                         ))
         );
 

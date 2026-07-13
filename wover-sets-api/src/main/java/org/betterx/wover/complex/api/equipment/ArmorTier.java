@@ -5,15 +5,26 @@ import net.minecraft.world.item.SmithingTemplateItem;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ArmorTier {
-    public record ArmorValues(int durability, SmithingTemplateItem smithingTemplate) {
+    /**
+     * @param smithingTemplate Lazily supplies the upgrade template, since it is only needed when
+     *                          recipes are actually built and eagerly resolving it here can trigger
+     *                          circular class-initialization (e.g. a template registry that itself
+     *                          depends on equipment tiers).
+     */
+    public record ArmorValues(int durability, @Nullable Supplier<SmithingTemplateItem> smithingTemplate) {
         public ArmorValues(int durability) {
             this(durability, null);
         }
 
+        @Nullable
+        public SmithingTemplateItem resolveSmithingTemplate() {
+            return smithingTemplate == null ? null : smithingTemplate.get();
+        }
 
         public ArmorValues copyWithOffset(ArmorValues offset) {
             return new ArmorValues(

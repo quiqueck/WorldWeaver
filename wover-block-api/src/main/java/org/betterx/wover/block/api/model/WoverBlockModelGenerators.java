@@ -442,6 +442,42 @@ public class WoverBlockModelGenerators {
         acceptBlockState(BlockModelGenerators.createSimpleBlock(block, BlockModelGenerators.plainVariant(location)));
     }
 
+    /**
+     * Convenience for the common "plain cube blockstate + matching flat item" pair, which
+     * would otherwise require a {@link #createCubeModel(Block)} + {@link #createFlatItem(Block)}
+     * call pair at every use site.
+     */
+    public void createCubeModelWithFlatItem(Block block) {
+        createCubeModel(block);
+        createFlatItem(block);
+    }
+
+    /**
+     * Same as {@link #createCubeModelWithFlatItem(Block)}, but lets the item icon reference a
+     * texture other than the block's own (e.g. a dedicated small-item render).
+     */
+    public void createCubeModelWithFlatItem(Block block, @Nullable ResourceLocation itemTexture) {
+        createCubeModel(block);
+        createFlatItem(block, itemTexture);
+    }
+
+    /**
+     * Creates a single-variant block model from an arbitrary {@link ModelTemplate} and
+     * {@link TextureMapping}. Useful for addon block classes that just need a single,
+     * non-blockstate-dependent model (e.g. an unshaded cube, or a tinted cube) without
+     * having to duplicate the {@code acceptBlockState(createSimpleBlock(...))} boilerplate.
+     *
+     * @param block    the block to generate the model for
+     * @param template the model template (parent model) to use
+     * @param mapping  the texture mapping to apply to the template
+     * @return the {@link ResourceLocation} of the generated model
+     */
+    public ResourceLocation createSimpleTemplatedBlock(Block block, ModelTemplate template, TextureMapping mapping) {
+        final var location = template.create(block, mapping, vanillaGenerator.modelOutput);
+        acceptBlockState(BlockModelGenerators.createSimpleBlock(block, BlockModelGenerators.plainVariant(location)));
+        return location;
+    }
+
     public void createPressurePlate(Block plateBlock, ResourceLocation textureLocation) {
         createPressurePlate(plateBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
     }
@@ -841,11 +877,12 @@ public class WoverBlockModelGenerators {
         }
         final var item = block.asItem();
         if (item != Items.AIR) {
-            ModelTemplates.FLAT_ITEM.create(
+            final var modelLocation = ModelTemplates.FLAT_ITEM.create(
                     ModelLocationUtils.getModelLocation(item),
                     TextureMapping.layer0(itemLocation),
                     vanillaGenerator.modelOutput
             );
+            delegateItemModel(block, modelLocation);
         }
     }
 

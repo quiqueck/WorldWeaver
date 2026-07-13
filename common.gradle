@@ -381,7 +381,11 @@ task javadocJar(type: Jar, dependsOn: [javadoc, copyHighlightJs]) {
 }
 
 artifacts {
-    dev remapJar
+    // Intentionally NOT attaching remapJar (intermediary-mapped) here: 'dev'/'localDev' are
+    // consumed directly by local composite-included projects (BCLib, BetterEnd) running in the
+    // "named" dev namespace. Mixing in the remapped jar puts two differently-namespaced copies
+    // of wover.accesswidener on the same runtime classpath, causing Fabric Loader to throw
+    // AccessWidenerFormatException (namespace mismatch) depending on classpath ordering.
     localDev jar
     archives sourcesJar
     archives javadocJar

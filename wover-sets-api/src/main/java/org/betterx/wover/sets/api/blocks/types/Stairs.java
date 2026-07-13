@@ -40,7 +40,11 @@ public class Stairs extends SlotFromDefinition {
     ) {
         return registry.defineDefaultBlockWithProps(
                 name,
-                (props) -> new StairBlock(set.getBaseBlock().defaultBlockState(), props)
+                (props) -> new StairBlock(
+                        (baseBlockType == null ? set.getBaseBlock() : set.getBlockWithFallback(baseBlockType))
+                                .defaultBlockState(),
+                        props
+                )
         );
     }
 

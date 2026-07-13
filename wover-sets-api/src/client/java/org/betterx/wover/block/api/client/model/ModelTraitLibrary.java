@@ -250,13 +250,18 @@ public class ModelTraitLibrary {
 
     public static ItemModelTrait itemModel() {
         return ClientItemTraits.MODEL.with((key, item, generator) -> {
-            generator.createFlatItemModel(item, ModelTemplates.FLAT_ITEM);
+            generator.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
         });
     }
 
     public static ItemModelTrait itemModel(Supplier<Item> material) {
         return ClientItemTraits.MODEL.with((key, item, generator) -> {
-            generator.createFlatItemModel(material.get(), ModelTemplates.FLAT_ITEM);
+            final var modelLocation = ModelTemplates.FLAT_ITEM.create(
+                    ModelLocationUtils.getModelLocation(item),
+                    TextureMapping.layer0(ModelLocationUtils.getModelLocation(material.get())),
+                    generator.modelOutput
+            );
+            generator.itemModelOutput.accept(item, ItemModelUtils.plainModel(modelLocation));
         });
     }
 

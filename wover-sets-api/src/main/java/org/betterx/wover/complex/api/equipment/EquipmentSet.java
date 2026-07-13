@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +34,13 @@ public abstract class EquipmentSet {
 
     private final Map<ToolSlot, ToolDescription<?>> tools = new HashMap<>();
     private final Map<ArmorSlot, ArmorDescription<?>> armors = new HashMap<>();
-    protected final EquipmentSet templateBaseSet;
+    /**
+     * Lazily supplies the equipment set that recipes for this set should be upgraded from
+     * (e.g. via a smithing template). Resolved only when recipes are actually built, since the
+     * referenced set (typically a static field on some registry class) may not exist yet at the
+     * time this set itself is constructed.
+     */
+    protected final @Nullable Supplier<EquipmentSet> templateBaseSet;
 
     public EquipmentSet(
             ModCore C, String baseName,
@@ -47,7 +54,7 @@ public abstract class EquipmentSet {
     public EquipmentSet(
             ModCore C, String baseName,
             ToolTier toolTier, ArmorTier armorTier,
-            ItemLike handleItem, EquipmentSet templateBaseSet
+            ItemLike handleItem, @Nullable Supplier<EquipmentSet> templateBaseSet
     ) {
         this.C = C;
         this.baseName = baseName;
