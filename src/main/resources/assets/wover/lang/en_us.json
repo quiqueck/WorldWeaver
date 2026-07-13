@@ -14,5 +14,14 @@
   "title.config.wover.main.log.verbose": "Verbose Logging",
   "title.config.wover.main.server.force_default_world_preset": "BetterX World Type as default for new server worlds",
   "title.config.wover.client.general.prefere_modrinth": "Link to Modrinth",
-  "wover.mainmenu.title": "WorldWeaver Configuration"
+  "wover.mainmenu.title": "WorldWeaver Configuration",
+  "tag.item.wover.tools.hammers": "Hammers",
+  "tag.item.wover.vegetation.saplings": "Saplings",
+  "tag.item.wover.vegetation.seeds": "Seeds",
+  "tag.item.wover.vegetation.leaves": "Leaves",
+  "tag.item.wover.workbench": "Workbenches",
+  "tag.item.wover.water_bottles": "Water Bottles",
+  "tag.item.wover.furnaces": "Furnaces",
+  "tag.item.wover.compostable": "Compostable",
+  "tag.item.wover.surfaces.soul_ground": "Soul Ground"
 }

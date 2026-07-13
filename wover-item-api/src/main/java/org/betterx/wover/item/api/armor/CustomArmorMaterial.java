@@ -207,13 +207,13 @@ public class CustomArmorMaterial {
         /**
          * Creates a repair ingredient tag for this armor material.
          *
-         * <p>This method automatically creates a tag with the suffix "repair/" based on the material location.
+         * <p>This method automatically creates a tag with the suffix "/repair" based on the material location.
          * It is useful for ensuring consistent repair ingredients across different armor pieces.
          *
          * @return This builder instance for chaining
          */
         public Builder createRepairIngredient() {
-            this.repairIngredient = TagManager.ITEMS.makeTag(location.withSuffix("repair/"));
+            this.repairIngredient = TagManager.ITEMS.makeTag(location.withSuffix("/repair"));
             return this;
         }
 
