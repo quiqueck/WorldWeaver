@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-pottable",
+  "version": "21.7.0",
+  "name": "WorldWeaver - Pottable API",
+  "description": "Provides a datapack-driven registry for pottable plants and soils (e.g. for flower pots).",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/wover-pottable/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "org.betterx.wover.entrypoint.LibWoverPottable"
+    ],
+    "wover.datapack.registry": [
+      "org.betterx.wover.entrypoint.PottableDatapackRegistryEntrypoint"
+    ]
+  },
+  "accessWidener": "wover-pottable.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": ["1.21.6", "1.21.7"],
+    "java": ">=21",
+    "fabric-api": ">=0.100.0"
+  },
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ],
+      "parent": "wover"
+    }
+  }
+}

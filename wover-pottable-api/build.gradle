@@ -1,0 +1,16 @@
+archivesBaseName = "wover-pottable-api"
+
+ext {
+    baseNamespace = "pottable"
+    baseClass = "LibWoverPottable"
+}
+
+dependencies {
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover-pottable.accesswidener')
+}
+
+moduleDependencies(project, ['wover-core-api', 'wover-block-api', 'wover-tag-api', 'wover-event-api', 'wover-datagen-api'])

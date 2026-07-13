@@ -22,6 +22,8 @@ Use the following order to upgrade the single packages (based on inter-dependenc
 * **wover-biome** (depends on _wover-core-api_, _wover-event-api_ and _wover-feature-api_)
 * **wover-generator** (depends on _wover-core-api_, _wover-event-api_, _wover-surface-api_, _wover-biome-api_,
   _wover-preset-api_, _wover-ui-api_ and _wover-tag-api_)
+* **wover-pottable** (depends on _wover-core-api_, _wover-block-api_, _wover-tag-api_, _wover-event-api_ and
+  _wover-datagen-api_)
 
 ### Event order for the wover-event test mods
 
