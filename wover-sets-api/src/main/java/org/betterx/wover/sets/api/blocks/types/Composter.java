@@ -61,7 +61,7 @@ public class Composter extends SlotFromDefinition {
 
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
-        return RecipeTraitLibrary.planks(set.recipeMaterial(SlotType.SLAB));
+        return RecipeTraitLibrary.composter(set.recipeMaterial(SlotType.SLAB));
     }
 
 }

@@ -375,7 +375,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public TagKey<Item>[] tags() {
-        return this.tags.toArray(TagKey[]::new);
+        return this.tags == null ? new TagKey[0] : this.tags.toArray(TagKey[]::new);
     }
 
 

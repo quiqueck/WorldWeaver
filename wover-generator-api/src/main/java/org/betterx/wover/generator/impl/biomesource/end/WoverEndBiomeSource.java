@@ -264,7 +264,7 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
             mapLand.clearCache();
             mapVoid.clearCache();
             mapCenter.clearCache();
-            mapVoid.clearCache();
+            mapBarrens.clearCache();
             for (BiomeDecider decider : deciders) {
                 decider.clearMapCache();
             }

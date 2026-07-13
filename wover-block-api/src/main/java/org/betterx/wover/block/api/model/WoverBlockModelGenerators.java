@@ -25,10 +25,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonParser;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
@@ -86,6 +89,44 @@ public class WoverBlockModelGenerators {
      */
     public final BlockModelGenerators vanillaGenerator;
 
+    /**
+     * Every block whose item model was registered through {@link #delegateItemModel} or
+     * {@link #createFlatItem} on this instance, so callers (like a mod's {@code ItemModelProvider})
+     * can check whether a block's item model was already provided during block-state generation before
+     * generating a fallback - unlike catching the "already has a model" exception from a second
+     * registration attempt, this doesn't risk the fallback silently overwriting the real one first (the
+     * underlying registration map always overwrites, then reports the conflict too late to undo it).
+     */
+    private final Set<Block> itemModelDelegatedBlocks = new HashSet<>();
+
+    /**
+     * Checks whether {@code block}'s item model was already registered through {@link #delegateItemModel}
+     * or {@link #createFlatItem} on this instance.
+     *
+     * @param block The block to check
+     * @return {@code true} if the block's item model was already generated
+     */
+    public boolean hasItemModel(Block block) {
+        return itemModelDelegatedBlocks.contains(block);
+    }
+
+    /**
+     * Marks {@code block}'s item model as already provided, for callers that generate it by going
+     * straight through {@link #vanillaGenerator} (e.g. {@code vanillaGenerator.createDoor(block)}, which
+     * registers its own flat item model internally) instead of through {@link #delegateItemModel} or
+     * {@link #createFlatItem}, and so wouldn't otherwise show up in {@link #hasItemModel}.
+     *
+     * @param block The block whose item model was already provided
+     */
+    public void markItemModelProvided(Block block) {
+        itemModelDelegatedBlocks.add(block);
+    }
+
+    /**
+     * Wraps a vanilla {@link BlockModelGenerators} instance.
+     *
+     * @param vanillaGenerator The vanilla generator to delegate to
+     */
     public WoverBlockModelGenerators(
             BlockModelGenerators vanillaGenerator
     ) {
@@ -157,6 +198,7 @@ public class WoverBlockModelGenerators {
      */
     public void delegateItemModel(Block block) {
         this.vanillaGenerator.registerSimpleItemModel(block, TextureMapping.getBlockTexture(block));
+        itemModelDelegatedBlocks.add(block);
     }
 
     /**
@@ -167,6 +209,7 @@ public class WoverBlockModelGenerators {
      */
     public void delegateItemModel(Block block, ResourceLocation resourceLocation) {
         this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        itemModelDelegatedBlocks.add(block);
     }
 
     /**
@@ -300,6 +343,7 @@ public class WoverBlockModelGenerators {
                 block,
                 BlockModelGenerators.plainVariant(resourceLocation)
         ));
+        delegateItemModel(block, resourceLocation);
     }
 
     private static final PropertyDispatch<VariantMutator> ROTATION_HORIZONTAL_FACING = PropertyDispatch
@@ -333,6 +377,7 @@ public class WoverBlockModelGenerators {
         //createInventoryModel(fenceBlock, ModelTemplates.FENCE_INVENTORY, mapping);
 
         vanillaGenerator.registerSimpleFlatItemModel(ladderBlock);
+        itemModelDelegatedBlocks.add(ladderBlock);
     }
 
     /**
@@ -350,6 +395,14 @@ public class WoverBlockModelGenerators {
             Block barsBlock
     ) {
         final var barsModel = ModelLocationUtils.getModelLocation(barsBlock);
+        final var texture = TextureMapping.getBlockTexture(barsBlock);
+
+        acceptModelOutput(barsModel.withSuffix("_post"), BarsModels.post(texture));
+        acceptModelOutput(barsModel.withSuffix("_post_ends"), BarsModels.postEnds(texture));
+        acceptModelOutput(barsModel.withSuffix("_cap"), BarsModels.cap(texture));
+        acceptModelOutput(barsModel.withSuffix("_cap_alt"), BarsModels.capAlt(texture));
+        acceptModelOutput(barsModel.withSuffix("_side"), BarsModels.side(texture));
+        acceptModelOutput(barsModel.withSuffix("_side_alt"), BarsModels.sideAlt(texture));
 
         MultiVariant postVariant = plainVariant(barsModel.withSuffix("_post"));
         MultiVariant postEndsVariant = plainVariant(barsModel.withSuffix("_post_ends"));
@@ -414,6 +467,90 @@ public class WoverBlockModelGenerators {
         this.createFlatItem(barsBlock);
     }
 
+    /**
+     * Raw (non-templated) model JSON for the 6 shapes an iron-bars-style block needs, mirroring vanilla's
+     * own {@code minecraft:block/iron_bars_*} element geometry with {@code texture} substituted for every
+     * face. Kept as literal element geometry (rather than a {@link ModelTemplate} parenting the vanilla
+     * model) because vanilla's iron bars models don't use {@code #slot}-style texture placeholders that a
+     * child model could override.
+     */
+    private static final class BarsModels {
+        private static ModelInstance raw(String elementsJson, ResourceLocation texture) {
+            final String tex = texture.toString();
+            return () -> JsonParser.parseString(elementsJson.replace("%TEX%", tex));
+        }
+
+        private static ModelInstance post(ResourceLocation texture) {
+            return raw(
+                    """
+                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%"}, "elements": [
+                    {"from":[8,0,7],"to":[8,16,9],"faces":{"west":{"uv":[7,0,9,16],"texture":"#bars"},"east":{"uv":[9,0,7,16],"texture":"#bars"}}},
+                    {"from":[7,0,8],"to":[9,16,8],"faces":{"north":{"uv":[7,0,9,16],"texture":"#bars"},"south":{"uv":[9,0,7,16],"texture":"#bars"}}}
+                    ]}""",
+                    texture
+            );
+        }
+
+        private static ModelInstance postEnds(ResourceLocation texture) {
+            return raw(
+                    """
+                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "edge": "%TEX%"}, "elements": [
+                    {"from":[7,0.001,7],"to":[9,0.001,9],"faces":{"down":{"uv":[7,7,9,9],"texture":"#edge"},"up":{"uv":[7,7,9,9],"texture":"#edge"}}},
+                    {"from":[7,15.999,7],"to":[9,15.999,9],"faces":{"down":{"uv":[7,7,9,9],"texture":"#edge"},"up":{"uv":[7,7,9,9],"texture":"#edge"}}}
+                    ]}""",
+                    texture
+            );
+        }
+
+        private static ModelInstance cap(ResourceLocation texture) {
+            return raw(
+                    """
+                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                    {"from":[8,0,8],"to":[8,16,9],"faces":{"west":{"uv":[8,0,7,16],"texture":"#bars"},"east":{"uv":[7,0,8,16],"texture":"#bars"}}},
+                    {"from":[7,0,9],"to":[9,16,9],"faces":{"north":{"uv":[9,0,7,16],"texture":"#bars"},"south":{"uv":[7,0,9,16],"texture":"#bars"}}}
+                    ]}""",
+                    texture
+            );
+        }
+
+        private static ModelInstance capAlt(ResourceLocation texture) {
+            return raw(
+                    """
+                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                    {"from":[8,0,7],"to":[8,16,8],"faces":{"west":{"uv":[8,0,9,16],"texture":"#bars"},"east":{"uv":[9,0,8,16],"texture":"#bars"}}},
+                    {"from":[7,0,7],"to":[9,16,7],"faces":{"north":{"uv":[7,0,9,16],"texture":"#bars"},"south":{"uv":[9,0,7,16],"texture":"#bars"}}}
+                    ]}""",
+                    texture
+            );
+        }
+
+        private static ModelInstance side(ResourceLocation texture) {
+            return raw(
+                    """
+                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                    {"from":[8,0,0],"to":[8,16,8],"faces":{"west":{"uv":[16,0,8,16],"texture":"#bars"},"east":{"uv":[8,0,16,16],"texture":"#bars"}}},
+                    {"from":[7,0,0],"to":[9,16,7],"faces":{"north":{"uv":[7,0,9,16],"texture":"#edge","cullface":"north"}}},
+                    {"from":[7,0.001,0],"to":[9,0.001,7],"faces":{"down":{"uv":[9,0,7,7],"texture":"#edge"},"up":{"uv":[7,0,9,7],"texture":"#edge"}}},
+                    {"from":[7,15.999,0],"to":[9,15.999,7],"faces":{"down":{"uv":[9,0,7,7],"texture":"#edge"},"up":{"uv":[7,0,9,7],"texture":"#edge"}}}
+                    ]}""",
+                    texture
+            );
+        }
+
+        private static ModelInstance sideAlt(ResourceLocation texture) {
+            return raw(
+                    """
+                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                    {"from":[8,0,8],"to":[8,16,16],"faces":{"west":{"uv":[8,0,0,16],"texture":"#bars"},"east":{"uv":[0,0,8,16],"texture":"#bars"}}},
+                    {"from":[7,0,9],"to":[9,16,16],"faces":{"south":{"uv":[7,0,9,16],"texture":"#edge","cullface":"south"},"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}},
+                    {"from":[7,0.001,9],"to":[9,0.001,16],"faces":{"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}},
+                    {"from":[7,15.999,9],"to":[9,15.999,16],"faces":{"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}}
+                    ]}""",
+                    texture
+            );
+        }
+    }
+
     private final Map<ResourceLocation, ResourceLocation> PARTICLE_ONLY_MODELS = Maps.newHashMap();
 
     /**
@@ -464,6 +601,7 @@ public class WoverBlockModelGenerators {
         ));
 
         vanillaGenerator.registerSimpleFlatItemModel(signBlock.asItem());
+        itemModelDelegatedBlocks.add(signBlock);
     }
 
     /**
@@ -485,6 +623,7 @@ public class WoverBlockModelGenerators {
                 BlockModelGenerators.plainVariant(resourceLocation)
         ));
         vanillaGenerator.registerSimpleFlatItemModel(hangingSignBlock.asItem());
+        itemModelDelegatedBlocks.add(hangingSignBlock);
     }
 
     /**
@@ -619,6 +758,7 @@ public class WoverBlockModelGenerators {
                 coverBlock,
                 BlockModelGenerators.plainVariant(location)
         ));
+        delegateItemModel(coverBlock, location);
     }
 
     /**
@@ -805,7 +945,7 @@ public class WoverBlockModelGenerators {
      * @param textureLocation The texture to use for the gate
      */
     public void createFenceGate(Block gateBlock, ResourceLocation textureLocation) {
-        createFence(gateBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
+        createFenceGate(gateBlock, new TextureMapping().put(TextureSlot.TEXTURE, textureLocation));
     }
 
     /**
@@ -879,6 +1019,7 @@ public class WoverBlockModelGenerators {
      */
     public void createOrientableTrapdoor(Block trapdoorBlock) {
         vanillaGenerator.createOrientableTrapdoor(trapdoorBlock);
+        itemModelDelegatedBlocks.add(trapdoorBlock);
     }
 
     /**
@@ -889,6 +1030,7 @@ public class WoverBlockModelGenerators {
      */
     public void createTrapdoor(Block trapdoorBlock) {
         vanillaGenerator.createTrapdoor(trapdoorBlock);
+        itemModelDelegatedBlocks.add(trapdoorBlock);
     }
 
     /**
@@ -1218,6 +1360,30 @@ public class WoverBlockModelGenerators {
         }
     }
 
+    private static final ModelTemplate CHAIN_TEMPLATE = new ModelTemplate(
+            Optional.of(ResourceLocation.withDefaultNamespace("block/chain")),
+            Optional.empty(),
+            TextureSlot.ALL
+    );
+
+    /**
+     * Generates the axis-aligned-pillar blockstate and model (plus an item model) for a chain-style block,
+     * reusing vanilla's own thin X-cross {@code minecraft:block/chain} shape as the model's parent (chains
+     * aren't a cube shape, so {@link ModelTemplates#CUBE_COLUMN} doesn't apply here).
+     *
+     * @param chainBlock The block to generate the blockstate for
+     * @param texture    The single texture used on every face of the chain shape
+     */
+    public void createChainModel(Block chainBlock, ResourceLocation texture) {
+        final var mapping = new TextureMapping().put(TextureSlot.ALL, texture);
+        final var model = CHAIN_TEMPLATE.create(chainBlock, mapping, vanillaGenerator.modelOutput);
+        vanillaGenerator.createAxisAlignedPillarBlockCustomModel(
+                chainBlock,
+                BlockModelGenerators.plainVariant(model)
+        );
+        delegateItemModel(chainBlock, model);
+    }
+
     private void createInventoryModel(Block wallBlock, ModelTemplate inventoryModel, TextureMapping mapping) {
         delegateItemModel(wallBlock, inventoryModel.create(wallBlock, mapping, vanillaGenerator.modelOutput));
     }
@@ -1254,6 +1420,7 @@ public class WoverBlockModelGenerators {
                     block,
                     template.create(ModelLocationUtils.getModelLocation(item), mapping, vanillaGenerator.modelOutput)
             );
+            itemModelDelegatedBlocks.add(block);
         }
     }
 
@@ -1265,6 +1432,7 @@ public class WoverBlockModelGenerators {
      */
     public void createFlatItem(Block block) {
         vanillaGenerator.registerSimpleFlatItemModel(block);
+        itemModelDelegatedBlocks.add(block);
     }
 
 
@@ -1385,6 +1553,7 @@ public class WoverBlockModelGenerators {
          */
         public Builder createDoor(Block doorBlock) {
             vanillaGenerator.createDoor(doorBlock);
+            itemModelDelegatedBlocks.add(doorBlock);
             return this;
         }
 
@@ -1469,6 +1638,7 @@ public class WoverBlockModelGenerators {
             } else {
                 vanillaGenerator.createOrientableTrapdoor(block);
             }
+            itemModelDelegatedBlocks.add(block);
         }
 
         /**

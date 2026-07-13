@@ -401,7 +401,7 @@ public interface BiomeModification {
          * @see BiomePredicate#notInNamespace(ModCore)
          */
         public Builder notInNamespace(ModCore core) {
-            return predicate(BiomePredicate.inNamespace(core));
+            return predicate(BiomePredicate.notInNamespace(core));
         }
 
         /**

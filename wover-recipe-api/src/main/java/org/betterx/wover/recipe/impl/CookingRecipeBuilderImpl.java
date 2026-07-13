@@ -199,7 +199,7 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
         if (smoker) {
             buildRecipe(
                     context, "smoker",
-                    SimpleCookingRecipeBuilder.campfireCooking(
+                    SimpleCookingRecipeBuilder.smoking(
                             input.createIngredient(context),
                             category,
                             output.getItem(),

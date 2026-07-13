@@ -273,6 +273,7 @@ public abstract class EquipmentSet {
             ArmorSlot slot,
             ArmorFactory<I> armorFactory
     ) {
+        add(slot, armorFactory, null);
     }
 
     /**
