@@ -1,5 +1,6 @@
 package org.betterx.wover.block.api.model;
 
+import org.betterx.wover.block.impl.ModelProviderExclusions;
 import org.betterx.wover.entrypoint.LibWoverBlock;
 
 import net.minecraft.client.data.models.BlockModelGenerators;
@@ -27,11 +28,7 @@ import net.fabricmc.api.Environment;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonParser;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
@@ -100,6 +97,14 @@ public class WoverBlockModelGenerators {
     private final Set<Block> itemModelDelegatedBlocks = new HashSet<>();
 
     /**
+     * @param path
+     * @return
+     */
+    public static ResourceLocation vanilla(String path) {
+        return ResourceLocation.withDefaultNamespace("block/" + path);
+    }
+
+    /**
      * Checks whether {@code block}'s item model was already registered through {@link #delegateItemModel}
      * or {@link #createFlatItem} on this instance.
      *
@@ -120,6 +125,21 @@ public class WoverBlockModelGenerators {
      */
     public void markItemModelProvided(Block block) {
         itemModelDelegatedBlocks.add(block);
+    }
+
+    /**
+     * Excludes {@code block} from vanilla's block-model validation, for blocks whose blockstate/model
+     * files are provided as hand-authored static assets rather than generated here. Without this, the
+     * vanilla {@code ModelProvider} fails datagen for any registered block it never saw a model for.
+     * <p>
+     * This is the trait-driven replacement for the old central "ignore" list in a mod's model provider:
+     * a block that renders from static assets carries a model trait (e.g.
+     * {@code ModelTraitLibrary.externalModel()}) that calls this instead of emitting a blockstate.
+     *
+     * @param block The block to exclude from block-model validation
+     */
+    public void excludeBlockFromValidation(Block block) {
+        ModelProviderExclusions.excludeFromBlockModelValidation(block);
     }
 
     /**
@@ -272,7 +292,7 @@ public class WoverBlockModelGenerators {
     /**
      * Creates a single-entry {@link TextureMapping}.
      *
-     * @param slotA    The texture slot
+     * @param slotA     The texture slot
      * @param locationA The texture to map the slot to
      * @return A new texture mapping
      */
@@ -322,6 +342,7 @@ public class WoverBlockModelGenerators {
                 shelf,
                 BlockModelGenerators.plainVariant(resourceLocation)
         ));
+        delegateItemModel(shelf, resourceLocation);
     }
 
     /**
@@ -483,10 +504,10 @@ public class WoverBlockModelGenerators {
         private static ModelInstance post(ResourceLocation texture) {
             return raw(
                     """
-                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%"}, "elements": [
-                    {"from":[8,0,7],"to":[8,16,9],"faces":{"west":{"uv":[7,0,9,16],"texture":"#bars"},"east":{"uv":[9,0,7,16],"texture":"#bars"}}},
-                    {"from":[7,0,8],"to":[9,16,8],"faces":{"north":{"uv":[7,0,9,16],"texture":"#bars"},"south":{"uv":[9,0,7,16],"texture":"#bars"}}}
-                    ]}""",
+                            {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%"}, "elements": [
+                            {"from":[8,0,7],"to":[8,16,9],"faces":{"west":{"uv":[7,0,9,16],"texture":"#bars"},"east":{"uv":[9,0,7,16],"texture":"#bars"}}},
+                            {"from":[7,0,8],"to":[9,16,8],"faces":{"north":{"uv":[7,0,9,16],"texture":"#bars"},"south":{"uv":[9,0,7,16],"texture":"#bars"}}}
+                            ]}""",
                     texture
             );
         }
@@ -494,10 +515,10 @@ public class WoverBlockModelGenerators {
         private static ModelInstance postEnds(ResourceLocation texture) {
             return raw(
                     """
-                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "edge": "%TEX%"}, "elements": [
-                    {"from":[7,0.001,7],"to":[9,0.001,9],"faces":{"down":{"uv":[7,7,9,9],"texture":"#edge"},"up":{"uv":[7,7,9,9],"texture":"#edge"}}},
-                    {"from":[7,15.999,7],"to":[9,15.999,9],"faces":{"down":{"uv":[7,7,9,9],"texture":"#edge"},"up":{"uv":[7,7,9,9],"texture":"#edge"}}}
-                    ]}""",
+                            {"ambientocclusion": false, "textures": {"particle": "%TEX%", "edge": "%TEX%"}, "elements": [
+                            {"from":[7,0.001,7],"to":[9,0.001,9],"faces":{"down":{"uv":[7,7,9,9],"texture":"#edge"},"up":{"uv":[7,7,9,9],"texture":"#edge"}}},
+                            {"from":[7,15.999,7],"to":[9,15.999,9],"faces":{"down":{"uv":[7,7,9,9],"texture":"#edge"},"up":{"uv":[7,7,9,9],"texture":"#edge"}}}
+                            ]}""",
                     texture
             );
         }
@@ -505,10 +526,10 @@ public class WoverBlockModelGenerators {
         private static ModelInstance cap(ResourceLocation texture) {
             return raw(
                     """
-                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
-                    {"from":[8,0,8],"to":[8,16,9],"faces":{"west":{"uv":[8,0,7,16],"texture":"#bars"},"east":{"uv":[7,0,8,16],"texture":"#bars"}}},
-                    {"from":[7,0,9],"to":[9,16,9],"faces":{"north":{"uv":[9,0,7,16],"texture":"#bars"},"south":{"uv":[7,0,9,16],"texture":"#bars"}}}
-                    ]}""",
+                            {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                            {"from":[8,0,8],"to":[8,16,9],"faces":{"west":{"uv":[8,0,7,16],"texture":"#bars"},"east":{"uv":[7,0,8,16],"texture":"#bars"}}},
+                            {"from":[7,0,9],"to":[9,16,9],"faces":{"north":{"uv":[9,0,7,16],"texture":"#bars"},"south":{"uv":[7,0,9,16],"texture":"#bars"}}}
+                            ]}""",
                     texture
             );
         }
@@ -516,10 +537,10 @@ public class WoverBlockModelGenerators {
         private static ModelInstance capAlt(ResourceLocation texture) {
             return raw(
                     """
-                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
-                    {"from":[8,0,7],"to":[8,16,8],"faces":{"west":{"uv":[8,0,9,16],"texture":"#bars"},"east":{"uv":[9,0,8,16],"texture":"#bars"}}},
-                    {"from":[7,0,7],"to":[9,16,7],"faces":{"north":{"uv":[7,0,9,16],"texture":"#bars"},"south":{"uv":[9,0,7,16],"texture":"#bars"}}}
-                    ]}""",
+                            {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                            {"from":[8,0,7],"to":[8,16,8],"faces":{"west":{"uv":[8,0,9,16],"texture":"#bars"},"east":{"uv":[9,0,8,16],"texture":"#bars"}}},
+                            {"from":[7,0,7],"to":[9,16,7],"faces":{"north":{"uv":[7,0,9,16],"texture":"#bars"},"south":{"uv":[9,0,7,16],"texture":"#bars"}}}
+                            ]}""",
                     texture
             );
         }
@@ -527,12 +548,12 @@ public class WoverBlockModelGenerators {
         private static ModelInstance side(ResourceLocation texture) {
             return raw(
                     """
-                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
-                    {"from":[8,0,0],"to":[8,16,8],"faces":{"west":{"uv":[16,0,8,16],"texture":"#bars"},"east":{"uv":[8,0,16,16],"texture":"#bars"}}},
-                    {"from":[7,0,0],"to":[9,16,7],"faces":{"north":{"uv":[7,0,9,16],"texture":"#edge","cullface":"north"}}},
-                    {"from":[7,0.001,0],"to":[9,0.001,7],"faces":{"down":{"uv":[9,0,7,7],"texture":"#edge"},"up":{"uv":[7,0,9,7],"texture":"#edge"}}},
-                    {"from":[7,15.999,0],"to":[9,15.999,7],"faces":{"down":{"uv":[9,0,7,7],"texture":"#edge"},"up":{"uv":[7,0,9,7],"texture":"#edge"}}}
-                    ]}""",
+                            {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                            {"from":[8,0,0],"to":[8,16,8],"faces":{"west":{"uv":[16,0,8,16],"texture":"#bars"},"east":{"uv":[8,0,16,16],"texture":"#bars"}}},
+                            {"from":[7,0,0],"to":[9,16,7],"faces":{"north":{"uv":[7,0,9,16],"texture":"#edge","cullface":"north"}}},
+                            {"from":[7,0.001,0],"to":[9,0.001,7],"faces":{"down":{"uv":[9,0,7,7],"texture":"#edge"},"up":{"uv":[7,0,9,7],"texture":"#edge"}}},
+                            {"from":[7,15.999,0],"to":[9,15.999,7],"faces":{"down":{"uv":[9,0,7,7],"texture":"#edge"},"up":{"uv":[7,0,9,7],"texture":"#edge"}}}
+                            ]}""",
                     texture
             );
         }
@@ -540,12 +561,12 @@ public class WoverBlockModelGenerators {
         private static ModelInstance sideAlt(ResourceLocation texture) {
             return raw(
                     """
-                    {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
-                    {"from":[8,0,8],"to":[8,16,16],"faces":{"west":{"uv":[8,0,0,16],"texture":"#bars"},"east":{"uv":[0,0,8,16],"texture":"#bars"}}},
-                    {"from":[7,0,9],"to":[9,16,16],"faces":{"south":{"uv":[7,0,9,16],"texture":"#edge","cullface":"south"},"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}},
-                    {"from":[7,0.001,9],"to":[9,0.001,16],"faces":{"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}},
-                    {"from":[7,15.999,9],"to":[9,15.999,16],"faces":{"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}}
-                    ]}""",
+                            {"ambientocclusion": false, "textures": {"particle": "%TEX%", "bars": "%TEX%", "edge": "%TEX%"}, "elements": [
+                            {"from":[8,0,8],"to":[8,16,16],"faces":{"west":{"uv":[8,0,0,16],"texture":"#bars"},"east":{"uv":[0,0,8,16],"texture":"#bars"}}},
+                            {"from":[7,0,9],"to":[9,16,16],"faces":{"south":{"uv":[7,0,9,16],"texture":"#edge","cullface":"south"},"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}},
+                            {"from":[7,0.001,9],"to":[9,0.001,16],"faces":{"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}},
+                            {"from":[7,15.999,9],"to":[9,15.999,16],"faces":{"down":{"uv":[9,9,7,16],"texture":"#edge"},"up":{"uv":[7,9,9,16],"texture":"#edge"}}}
+                            ]}""",
                     texture
             );
         }
@@ -584,8 +605,8 @@ public class WoverBlockModelGenerators {
      * Generates the particle-only-based blockstates for a standing/wall sign pair and a flat item model
      * for the standing sign.
      *
-     * @param baseBlock    The block whose texture is used for the sign's particle model (e.g. the plank block)
-     * @param signBlock    The standing sign block
+     * @param baseBlock     The block whose texture is used for the sign's particle model (e.g. the plank block)
+     * @param signBlock     The standing sign block
      * @param wallSignBlock The wall sign block
      */
     public void createSign(Block baseBlock, Block signBlock, Block wallSignBlock) {
@@ -608,9 +629,9 @@ public class WoverBlockModelGenerators {
      * Generates the particle-only-based blockstates for a hanging/wall-hanging sign pair and a flat item
      * model for the hanging sign.
      *
-     * @param baseBlock              The block whose texture is used for the sign's particle model
-     * @param hangingSignBlock       The hanging sign block
-     * @param wallHangingSignBlock   The wall hanging sign block
+     * @param baseBlock            The block whose texture is used for the sign's particle model
+     * @param hangingSignBlock     The hanging sign block
+     * @param wallHangingSignBlock The wall hanging sign block
      */
     public void createHangingSign(Block baseBlock, Block hangingSignBlock, Block wallHangingSignBlock) {
         ResourceLocation resourceLocation = particleOnlyModel(baseBlock);
@@ -735,6 +756,7 @@ public class WoverBlockModelGenerators {
                                 "_contents_ready"
                         ))
                 ));
+        delegateItemModel(composterBlock, location);
     }
 
     /**
@@ -847,6 +869,7 @@ public class WoverBlockModelGenerators {
                 BlockModelGenerators.plainVariant(locations.get(0)),
                 BlockModelGenerators.plainVariant(locations.get(1))
         ));
+        delegateItemModel(plateBlock, locations.get(0));
     }
 
 
@@ -986,6 +1009,7 @@ public class WoverBlockModelGenerators {
                 BlockModelGenerators.plainVariant(locations.get(3)),
                 true
         ));
+        delegateItemModel(gateBlock, locations.get(1));
     }
 
     /**
@@ -1211,11 +1235,11 @@ public class WoverBlockModelGenerators {
      * optionally with a mirrored variant and/or additional weighted texture alternatives (e.g. mossy log
      * variants that should be randomly picked).
      *
-     * @param logBlock             The block to generate the blockstate for
-     * @param mirroredAlternative  If {@code true}, adds a mirrored copy of every texture mapping as an
-     *                             additional weighted variant
-     * @param mapping              The primary texture mapping to apply to the log's model templates
-     * @param alternatives         Additional texture mappings to add as equally-weighted variants
+     * @param logBlock            The block to generate the blockstate for
+     * @param mirroredAlternative If {@code true}, adds a mirrored copy of every texture mapping as an
+     *                            additional weighted variant
+     * @param mapping             The primary texture mapping to apply to the log's model templates
+     * @param alternatives        Additional texture mappings to add as equally-weighted variants
      */
     public void createLog(
             Block logBlock,

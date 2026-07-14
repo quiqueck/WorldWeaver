@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
@@ -27,6 +28,7 @@ import net.fabricmc.api.Environment;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A library of common {@link BlockModelTrait}/{@link ItemModelTrait} patterns. Every method here
@@ -231,6 +233,25 @@ public class ModelTraitLibrary {
     }
 
     /**
+     * A chain-style model (thin axis-aligned X-cross, reusing vanilla's own {@code minecraft:block/chain}
+     * shape) using the block's own texture.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait chain() {
+        return ModCore.isDatagen() ? Impl.chain() : null;
+    }
+
+    /**
+     * A vanilla iron-bars-style model (post/cap/side multipart variants) using the block's own texture.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait bars() {
+        return ModCore.isDatagen() ? Impl.bars() : null;
+    }
+
+    /**
      * A vanilla-style stairs model.
      *
      * @param planksMaterial supplies the block whose texture is used for the stairs
@@ -276,6 +297,73 @@ public class ModelTraitLibrary {
      */
     public static BlockModelTrait cube() {
         return ModCore.isDatagen() ? Impl.cube() : null;
+    }
+
+    /**
+     * A plain full-cube model plus a matching flat item icon, both using the block's own registered
+     * {@link net.minecraft.client.data.models.model.TexturedModel} texture (or a plain cube texture if none
+     * is registered) - the default model shape for a simple, unremarkable block.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait cubeWithFlatItem() {
+        return ModCore.isDatagen() ? Impl.cubeWithFlatItem() : null;
+    }
+
+    /**
+     * A vanilla cross-shaped (untinted) plant model plus a matching flat item icon.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait crossPlant() {
+        return ModCore.isDatagen() ? Impl.crossPlant() : null;
+    }
+
+    /**
+     * A trait for a block whose blockstate/block model <em>and</em> item model are both provided as
+     * hand-authored static assets. Generates nothing itself: it excludes the block from block-model
+     * validation and wires the item-model-definition to the conventional static item model
+     * ({@code <namespace>:item/<name>}). This is the trait-based replacement for a central "ignore"
+     * entry in a model provider.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait externalModel() {
+        return ModCore.isDatagen() ? Impl.externalModel() : null;
+    }
+
+    /**
+     * Like {@link #externalModel()}, but the item-model-definition is derived from the block's own texture
+     * ({@code registerSimpleItemModel}) rather than a conventional {@code item/<name>} model. For static
+     * blocks whose inventory item should reuse the block texture directly.
+     *
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait externalModelDelegatedItem() {
+        return ModCore.isDatagen() ? Impl.externalModelDelegatedItem() : null;
+    }
+
+    /**
+     * Like {@link #externalModel()}, but the item-model-definition points at an explicit model location
+     * instead of the conventional {@code item/<name>} (e.g. a block's own multi-variant model file).
+     *
+     * @param itemModel supplies the model location the item should reference
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait externalModelDelegatedItem(Supplier<ResourceLocation> itemModel) {
+        return ModCore.isDatagen() ? Impl.externalModelDelegatedItem(itemModel) : null;
+    }
+
+    /**
+     * A trait for a block whose blockstate/block model is a hand-authored static asset, but whose item
+     * model should be a generated flat icon. Excludes the block from block-model validation and generates
+     * a flat item model from {@code itemTexture} (or the block's own texture if {@code null}).
+     *
+     * @param itemTexture supplies the texture for the flat item, or {@code null} for the block's own texture
+     * @return the model trait, or {@code null} outside of datagen
+     */
+    public static BlockModelTrait externalModelFlatItem(@Nullable Supplier<ResourceLocation> itemTexture) {
+        return ModCore.isDatagen() ? Impl.externalModelFlatItem(itemTexture) : null;
     }
 
     /**
@@ -340,15 +428,16 @@ public class ModelTraitLibrary {
                                 .select(Direction.SOUTH, X_ROT_90.then(Y_ROT_180))
                                 .select(Direction.WEST, X_ROT_90.then(Y_ROT_270))
                                 .select(Direction.EAST, X_ROT_90.then(Y_ROT_90));
-                ResourceLocation resourceLocation = TextureMapping.getBlockTexture(block, "_top_open");
-                MultiVariant multiVariant = generator.vanillaGenerator.plainVariant(TexturedModel.CUBE_TOP_BOTTOM.create(
+                ResourceLocation openTopTexture = TextureMapping.getBlockTexture(block, "_top_open");
+                ResourceLocation closedModel = TexturedModel.CUBE_TOP_BOTTOM.create(
                         block,
                         generator.vanillaGenerator.modelOutput
-                ));
+                );
+                MultiVariant multiVariant = generator.vanillaGenerator.plainVariant(closedModel);
                 MultiVariant multiVariant2 = generator.vanillaGenerator.plainVariant(
                         TexturedModel.CUBE_TOP_BOTTOM
                                 .get(block)
-                                .updateTextures(textureMapping -> textureMapping.put(TextureSlot.TOP, resourceLocation))
+                                .updateTextures(textureMapping -> textureMapping.put(TextureSlot.TOP, openTopTexture))
                                 .createWithSuffix(block, "_open", generator.vanillaGenerator.modelOutput)
                 );
                 generator.acceptBlockState(
@@ -358,6 +447,7 @@ public class ModelTraitLibrary {
                                                                    .select(true, multiVariant2))
                                              .with(ROTATIONS_COLUMN_WITH_FACING)
                 );
+                generator.delegateItemModel(block, closedModel);
             });
         }
 
@@ -431,6 +521,12 @@ public class ModelTraitLibrary {
                                 .put(TextureSlot.SOUTH, TextureMapping.getBlockTexture(block, "_side"))
                                 .put(TextureSlot.DOWN, TextureMapping.getBlockTexture(block, "_bottom"))
                 );
+                // Mirrors vanilla's own crafting_table item, which reuses the block model directly
+                // rather than getting a dedicated models/item/* file.
+                generator.delegateItemModel(
+                        carftingTableBlock,
+                        ModelLocationUtils.getModelLocation(carftingTableBlock)
+                );
             });
         }
 
@@ -443,6 +539,7 @@ public class ModelTraitLibrary {
         private static BlockModelTrait planks() {
             return ClientBlockTraits.MODEL.with((key, block, generator) -> {
                 generator.createCubeModel(block);
+                generator.delegateItemModel(block, ModelLocationUtils.getModelLocation(block));
             });
         }
 
@@ -495,6 +592,18 @@ public class ModelTraitLibrary {
             });
         }
 
+        private static BlockModelTrait chain() {
+            return ClientBlockTraits.MODEL.with((key, chainBlock, generator) -> {
+                generator.createChainModel(chainBlock, TextureMapping.getBlockTexture(chainBlock));
+            });
+        }
+
+        private static BlockModelTrait bars() {
+            return ClientBlockTraits.MODEL.with((key, barsBlock, generator) -> {
+                generator.createBars(barsBlock);
+            });
+        }
+
         private static BlockModelTrait stairs(Supplier<Block> planksMaterial) {
             return ClientBlockTraits.MODEL.with((key, stairsBlock, generator) -> {
                 generator.createStairs(planksMaterial.get(), stairsBlock);
@@ -522,6 +631,53 @@ public class ModelTraitLibrary {
         private static BlockModelTrait cube() {
             return ClientBlockTraits.MODEL.with((key, block, generator) -> {
                 generator.createFullBlock(block);
+            });
+        }
+
+        private static BlockModelTrait cubeWithFlatItem() {
+            return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+                generator.createCubeModelWithFlatItem(block);
+            });
+        }
+
+        private static BlockModelTrait crossPlant() {
+            return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+                generator.vanillaGenerator.createCrossBlock(block, PlantType.NOT_TINTED);
+                generator.createFlatItem(block);
+            });
+        }
+
+        private static BlockModelTrait externalModel() {
+            return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+                generator.excludeBlockFromValidation(block);
+                if (block.asItem() != Items.AIR) {
+                    generator.delegateItemModel(block, key.location().withPrefix("item/"));
+                }
+            });
+        }
+
+        private static BlockModelTrait externalModelDelegatedItem() {
+            return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+                generator.excludeBlockFromValidation(block);
+                if (block.asItem() != Items.AIR) {
+                    generator.delegateItemModel(block);
+                }
+            });
+        }
+
+        private static BlockModelTrait externalModelDelegatedItem(Supplier<ResourceLocation> itemModel) {
+            return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+                generator.excludeBlockFromValidation(block);
+                if (block.asItem() != Items.AIR) {
+                    generator.delegateItemModel(block, itemModel.get());
+                }
+            });
+        }
+
+        private static BlockModelTrait externalModelFlatItem(Supplier<ResourceLocation> itemTexture) {
+            return ClientBlockTraits.MODEL.with((key, block, generator) -> {
+                generator.excludeBlockFromValidation(block);
+                generator.createFlatItem(block, itemTexture == null ? null : itemTexture.get());
             });
         }
 
