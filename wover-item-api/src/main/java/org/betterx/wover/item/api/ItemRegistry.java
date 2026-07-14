@@ -533,7 +533,11 @@ public abstract class ItemRegistry {
                 .setAdditionalSlotEmptyIcons(additionalSlotEmptyIcons)
                 .build();
 
-        return registerSmithingTemplateItem(path + "_smithing_template", item);
+        // SmithingTemplates.Builder.build() bakes the item's own registry key as "path" (via
+        // Item.Properties#setId) - registering it under a different key here ("path_smithing_template")
+        // desyncs the two, and the client's item-model resolution follows the baked-in id, not
+        // whatever key this call used. Must match exactly, or the item renders as missing/placeholder.
+        return registerSmithingTemplateItem(path, item);
     }
 
     /**
