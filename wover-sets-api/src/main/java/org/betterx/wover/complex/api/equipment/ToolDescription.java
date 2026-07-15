@@ -129,8 +129,9 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
                                        .addMaterial('#', repairItems)
                                        .category(RecipeCategory.TOOLS);
 
-            builder.addMaterial('I', stick);
             if (slot == ToolSlot.SHEARS_SLOT) {
+                // shears shape uses only '#'; do NOT declare the 'I' (stick) material or the recipe
+                // fails validation with "Material 'I' is not used in shape".
                 builder.shape(" #", "# ");
             } else {
                 builder.addMaterial('I', stick);
