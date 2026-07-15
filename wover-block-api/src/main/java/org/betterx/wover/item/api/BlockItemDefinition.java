@@ -28,6 +28,11 @@ public class BlockItemDefinition<BI extends BlockItem, D extends BlockItemDefini
             ItemFactory<BI, D> itemFactory
     ) {
         super(sourceDefinition.registry.itemRegistry(), sourceDefinition.itemKey(), itemFactory);
+        // Block items share their block's translation key by default (matching pre-1.21.2 BlockItem
+        // behaviour, where getDescriptionId() always delegated to the block). Without this, Item.Properties
+        // defaults to an "item."-prefixed key that no block-item ever has an entry for. Callers that want a
+        // distinct item-only key can still opt back out via useItemDescriptionPrefix().
+        this.useBlockDescriptionPrefix();
     }
 
     @Override
