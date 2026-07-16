@@ -14,8 +14,8 @@ import net.minecraft.world.level.material.MapColor;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
-public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
-    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new WoodMaterialBuilder();
+public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.WoodBuilderWithDefaults {
+    public static final GenericBlockTrait.WoodBuilderWithDefaults BUILDER = new WoodMaterialBuilder();
     private final GenericBlockTrait DEFAULT = new Trait();
 
     private WoodMaterialBuilder() {
@@ -27,6 +27,7 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
         return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe(), BlockTraits.FLAMMABLE.withDefault());
     }
 
+    @Override
     public @Nullable List<BlockTrait<?, ?>> withFireResistance() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
         return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe());

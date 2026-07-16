@@ -23,7 +23,7 @@ public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe());
+        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsPickAxe());
     }
 
     class Trait extends BlockTraitImpl.Generic {

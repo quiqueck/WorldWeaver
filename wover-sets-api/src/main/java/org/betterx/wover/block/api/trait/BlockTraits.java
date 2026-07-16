@@ -43,7 +43,7 @@ public class BlockTraits {
     /** Marks a block as belonging to the "metal" material family. */
     public static final GenericBlockTrait.BuilderWithDefaults METAL_BLOCK = MetalMaterialBuilder.BUILDER;
     /** Marks a block as belonging to the "wood" material family (used to pick recipe groups/model shapes throughout {@code sets.api.blocks.types}). */
-    public static final GenericBlockTrait.BuilderWithDefaults WOOD_BLOCK = WoodMaterialBuilder.BUILDER;
+    public static final GenericBlockTrait.WoodBuilderWithDefaults WOOD_BLOCK = WoodMaterialBuilder.BUILDER;
     /** Marks a block as belonging to the "obsidian" material family. */
     public static final GenericBlockTrait.BuilderWithDefaults OBSIDIAN_BLOCK = ObsidianMaterialBuilder.BUILDER;
 
