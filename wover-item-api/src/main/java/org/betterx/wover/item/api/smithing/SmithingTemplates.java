@@ -253,6 +253,20 @@ public class SmithingTemplates {
          * @return The configured smithing template item
          * @throws IllegalStateException if required properties are missing
          */
+        /**
+         * The registry path of the template ITEM, which is the builder's {@code path} plus vanilla's
+         * {@code _smithing_template} suffix - {@code netherite_upgrade} is registered as
+         * {@code minecraft:netherite_upgrade_smithing_template}, while its description keys stay on the bare
+         * path ({@code item.minecraft.smithing_template.netherite_upgrade.applies_to}). The bare path is
+         * therefore what callers pass, and both the baked id and the registry key must use this.
+         *
+         * @param path the builder path
+         * @return the item's registry path
+         */
+        public static String itemPath(String path) {
+            return path + "_smithing_template";
+        }
+
         public SmithingTemplateItem build() {
             if (baseSlotEmptyIcons == null || baseSlotEmptyIcons.isEmpty()) {
                 throw new IllegalStateException("Base slot empty icons must contain at least one icon");
@@ -264,7 +278,7 @@ public class SmithingTemplates {
             if (this.properties == null) {
                 this.properties = new Item.Properties();
             }
-            this.properties = properties.setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), C.mk(path)));
+            this.properties = properties.setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), C.mk(itemPath(path))));
 
             return new SmithingTemplateItem(
                     Component.translatable(Util.makeDescriptionId(
