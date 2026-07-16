@@ -186,6 +186,7 @@ public class SmithingTemplates {
         private List<ResourceLocation> baseSlotEmptyIcons;
         private List<ResourceLocation> additionalSlotEmptyIcons;
         private Item.Properties properties;
+        private ResourceKey<Item> itemKey;
 
         private Builder(ModCore modCore, String templatePath) {
             this.C = modCore;
@@ -224,14 +225,31 @@ public class SmithingTemplates {
         /**
          * Sets custom item properties for the smithing template.
          *
-         * <p>If not set, default properties will be used. The resource ID will be
-         * automatically set based on the template path.
+         * <p>If not set, default properties will be used. The resource ID is taken from
+         * {@link #itemKey(ResourceKey)}, or derived from the template path when no key was supplied.
          *
          * @param itemProperties The item properties to use
          * @return This builder instance for chaining
          */
         public Builder setProperties(Item.Properties itemProperties) {
             this.properties = itemProperties;
+            return this;
+        }
+
+        /**
+         * Sets the resource key identifying the template item.
+         *
+         * <p>Callers that already own the item's identity - such as
+         * {@code SmithingTemplateDefinition}, which bakes its key into the properties it hands to
+         * {@link #setProperties(Item.Properties)} - must pass it here rather than let this builder
+         * re-derive one, so that a single component owns the identity. When no key is supplied, {@link #build()}
+         * falls back to deriving it from the template path via {@link #itemPath(String)}.
+         *
+         * @param itemKey The resource key the built item identifies itself by
+         * @return This builder instance for chaining
+         */
+        public Builder itemKey(ResourceKey<Item> itemKey) {
+            this.itemKey = itemKey;
             return this;
         }
 
@@ -278,7 +296,17 @@ public class SmithingTemplates {
             if (this.properties == null) {
                 this.properties = new Item.Properties();
             }
-            this.properties = properties.setId(ResourceKey.create(BuiltInRegistries.ITEM.key(), C.mk(itemPath(path))));
+
+            // The item's identity is an INPUT here, not something this builder re-derives. A caller that owns
+            // the identity (SmithingTemplateDefinition, whose properties already carry the baked id) passes its
+            // key via itemKey(), and we bake exactly that - re-deriving one would make this builder a second
+            // claimant on the identity, agreeing with the definition only by convention. Only callers with no
+            // definition behind them (the deprecated ItemRegistry#registerSmithingTemplateItem path) leave the
+            // key unset; for those we still derive it from the template path.
+            if (this.itemKey == null) {
+                this.itemKey = ResourceKey.create(BuiltInRegistries.ITEM.key(), C.mk(itemPath(path)));
+            }
+            this.properties = properties.setId(this.itemKey);
 
             return new SmithingTemplateItem(
                     Component.translatable(Util.makeDescriptionId(

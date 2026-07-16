@@ -52,10 +52,16 @@ public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends 
      * The template path/name used for generating descriptions
      */
     /**
-     * The bare template name, fixed at construction. Everything the item is identified by derives from it -
-     * the registry key and the baked id via {@link SmithingTemplates.Builder#itemPath}, the four description
-     * keys as-is - so it must not be settable: re-pointing it after construction would move one and not the
-     * others. Vanilla goes further and bakes its description Components as static finals, with no path at all.
+     * The bare template name, fixed at construction. It feeds the four description keys as-is, and - via
+     * {@link SmithingTemplates.Builder#itemPath} in the constructor - {@link #itemKey}, which is both the
+     * registry key and the id the item bakes into itself. It stays alongside the key rather than being
+     * replaced by it because the description keys need the bare name, not the suffixed one.
+     *
+     * <p>It must not be settable: re-pointing it after construction would move the description keys away from
+     * the already-baked key. That desync is now only a translation-key hazard - the tooltip would show a raw
+     * {@code item.<ns>.smithing_template.<path>.applies_to} - rather than an unrenderable item, because the key
+     * no longer gets re-derived from this field downstream. Vanilla goes further and bakes its description
+     * Components as static finals, with no path at all.
      */
     protected final String templatePath;
 
@@ -73,9 +79,10 @@ public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends 
     ) {
         // The item registers as <templateName>_smithing_template, matching vanilla
         // (minecraft:netherite_upgrade_smithing_template), while templatePath keeps the bare name for the
-        // description keys (item.<ns>.smithing_template.<templateName>.applies_to). This key MUST match the
-        // id SmithingTemplates.Builder.build() bakes via Item.Properties#setId - the client resolves the
-        // item model from the baked id, so a desync renders the item as a placeholder.
+        // description keys (item.<ns>.smithing_template.<templateName>.applies_to). This is the ONE place the
+        // item's identity is derived: the key built here is what ItemDefinition bakes via Item.Properties#setId
+        // AND what createSmithingTemplate hands to SmithingTemplates.Builder#itemKey, so the builder consumes
+        // this identity instead of re-deriving a competing one.
         super(registry, SmithingTemplates.Builder.itemPath(templateName), itemFactory);
         this.templatePath = templateName;
     }
@@ -201,6 +208,7 @@ public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends 
                 .setBaseSlotEmptyIcons(config.baseSlotEmptyIcons)
                 .setAdditionalSlotEmptyIcons(config.additionalSlotEmptyIcons)
                 .setProperties(config.getProperties())
+                .itemKey(config.itemKey)
                 .build();
     }
 }
