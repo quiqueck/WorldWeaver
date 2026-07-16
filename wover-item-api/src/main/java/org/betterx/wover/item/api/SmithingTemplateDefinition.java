@@ -51,7 +51,13 @@ public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends 
     /**
      * The template path/name used for generating descriptions
      */
-    protected String templatePath;
+    /**
+     * The bare template name, fixed at construction. Everything the item is identified by derives from it -
+     * the registry key and the baked id via {@link SmithingTemplates.Builder#itemPath}, the four description
+     * keys as-is - so it must not be settable: re-pointing it after construction would move one and not the
+     * others. Vanilla goes further and bakes its description Components as static finals, with no path at all.
+     */
+    protected final String templatePath;
 
     /**
      * Creates a new smithing template configuration.
@@ -143,18 +149,6 @@ public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends 
     ) {
         this.baseSlotEmptyIcons = baseIcons;
         this.additionalSlotEmptyIcons = additionalIcons;
-        return this;
-    }
-
-    /**
-     * Sets the template path used for generating descriptions and translation keys.
-     * If not set, the item name will be used as the template path.
-     *
-     * @param path The template path for description generation
-     * @return This configuration instance for method chaining
-     */
-    public SmithingTemplateDefinition<I> templatePath(String path) {
-        this.templatePath = path;
         return this;
     }
 
