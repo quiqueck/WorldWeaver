@@ -65,7 +65,12 @@ public class SmithingTemplateDefinition<I extends SmithingTemplateItem> extends 
             String templateName,
             ItemDefinition.ItemFactory<I, SmithingTemplateDefinition<I>> itemFactory
     ) {
-        super(registry, templateName, itemFactory);
+        // The item registers as <templateName>_smithing_template, matching vanilla
+        // (minecraft:netherite_upgrade_smithing_template), while templatePath keeps the bare name for the
+        // description keys (item.<ns>.smithing_template.<templateName>.applies_to). This key MUST match the
+        // id SmithingTemplates.Builder.build() bakes via Item.Properties#setId - the client resolves the
+        // item model from the baked id, so a desync renders the item as a placeholder.
+        super(registry, SmithingTemplates.Builder.itemPath(templateName), itemFactory);
         this.templatePath = templateName;
     }
 
