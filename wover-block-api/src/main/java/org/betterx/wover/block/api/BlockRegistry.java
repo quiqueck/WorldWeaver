@@ -200,7 +200,7 @@ public abstract class BlockRegistry {
      * @param <T>      The type of block being registered
      *                 Will be removed in the 21.6.x series once BetterNether and BetterEnd were updated to use the new system.
      */
-    //TODO: @Deprecated(forRemoval = true, since = "21.6.0")
+    @Deprecated(forRemoval = true, since = "21.6.0")
     <T extends Block> void registerLegacy(
             @NotNull ResourceKey<Block> key,
             T block,

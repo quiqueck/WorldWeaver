@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * datagen by {@link org.betterx.wover.block.api.BlockRegistry#bootstrapBlockLoot}, normally invoked
  * automatically via {@link org.betterx.wover.datagen.api.provider.AutoBlockLootProvider}.
  */
-//TODO: @Deprecated(forRemoval = true)
+@Deprecated(forRemoval = true)
 public interface BlockLootProvider {
     /**
      * Builds the loot table for this block.

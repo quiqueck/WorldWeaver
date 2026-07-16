@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.Block;
  * If a Block Object implements this interface and is registered with the BlockRegistry, #registerBlockTags will be called
  * during the tag bootstrap datagen process.
  */
-//TODO: @Deprecated(forRemoval = true, since = "21.6.0")
+@Deprecated(forRemoval = true, since = "21.6.0")
 public interface BlockTagProvider {
     /**
      * Register block tags for the given location.

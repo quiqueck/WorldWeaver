@@ -7,7 +7,7 @@ import net.minecraft.world.item.Item;
 /**
  * Will be deprecated in after Wover 21.6.x
  */
-//TODO: @Deprecated(forRemoval = true)
+@Deprecated(forRemoval = true)
 public interface CustomBlockItemProvider {
     /**
      * Used to generate a custom Block Item when a block is registered to the {@link BlockRegistry}.
@@ -16,6 +16,6 @@ public interface CustomBlockItemProvider {
      *
      * @return {@link BlockItem}
      */
-    //TODO: @Deprecated(forRemoval = true)
+    @Deprecated(forRemoval = true)
     BlockItem getCustomBlockItem(ResourceLocation blockID, Item.Properties settings);
 }
