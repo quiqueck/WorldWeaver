@@ -38,7 +38,7 @@ public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
                     .instrument(NoteBlockInstrument.IRON_XYLOPHONE)
                     .requiresCorrectToolForDrops()
                     .strength(5.0F, 6.0F)
-                    .sound(SoundType.IRON);
+                    .sound(SoundType.METAL);
         }
     }
 }
