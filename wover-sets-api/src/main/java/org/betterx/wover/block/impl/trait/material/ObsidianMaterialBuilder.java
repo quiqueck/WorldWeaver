@@ -36,7 +36,15 @@ public class ObsidianMaterialBuilder extends AbstractBlockTraitBuilder.Generic i
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.addTags(CommonBlockTags.IMMOBILE, BlockTags.DRAGON_IMMUNE);
+            // IS_OBSIDIAN and NEEDS_DIAMOND_TOOL come from the BehaviourObsidian marker (via bclib's
+            // BCLAutoBlockTagProvider), so they must be supplied here for this trait to be a complete
+            // replacement for it - otherwise a block that swaps the marker for the trait silently loses both.
+            definition.addTags(
+                    CommonBlockTags.IS_OBSIDIAN,
+                    CommonBlockTags.IMMOBILE,
+                    BlockTags.DRAGON_IMMUNE,
+                    BlockTags.NEEDS_DIAMOND_TOOL
+            );
 
             definition
                     .mapColor(MapColor.COLOR_BLACK)
