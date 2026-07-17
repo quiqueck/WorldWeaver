@@ -1104,14 +1104,39 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     }
 
     /**
-     * Replaces the current properties with a copy of the provided block's properties.
-     * This is useful for copying properties from an existing block. This will
-     * overwrite any existing properties set on this configuration.
+     * Replaces the whole {@link BlockBehaviour.Properties} object with a full copy of {@code block}'s, so
+     * this block starts from that block's exact properties (destroyTime, resistance, sound, mapColor, loot,
+     * light, friction, pushReaction, the state predicates, ...). It is the mirror-a-vanilla-block primitive.
+     * <p>
+     * This <b>must be the first operation on the chain</b>: it is <em>eager</em> (it swaps the properties
+     * object immediately) and therefore acts as the <b>base</b> that every later chain setter and
+     * {@code addTrait(...)} configures on top of - it does not, and cannot, override anything written after
+     * it (those are applied in {@link #build()} on top of this copy). Calling it after any property setter or
+     * added trait would silently discard nothing useful yet read as if it wiped them, so it is rejected:
+     * calling it once a fluent property op has already been recorded throws {@link IllegalStateException}.
+     * Move the copy to the front of the chain instead.
+     * <p>
+     * A trait may still call this from its own {@code configure(...)} (it runs during {@code build()} as the
+     * trait's base); the guard only applies to direct calls on the fluent chain.
      *
      * @param block The block whose properties should be copied
      * @return This configuration instance for method chaining
+     * @throws IllegalStateException if called on the fluent chain after a property setter or added trait
      */
     public D replacePropertiesWithCopy(BlockBehaviour block) {
+        // Guard only the fluent-chain case (collectingSetters == null). During build()'s phase 1 a trait's
+        // configure() runs with collectingSetters != null; a trait is allowed to use this as its own base.
+        if (this.collectingSetters == null && !this.propertySetters.isEmpty()) {
+            long traits = this.propertySetters.stream().filter(op -> op instanceof BlockDefinition<?, ?>.TraitOp).count();
+            long setters = this.propertySetters.size() - traits;
+            throw new IllegalStateException(
+                    "replacePropertiesWithCopy() must be the first operation on the block definition - it is "
+                            + "the eager base that the rest of the chain layers over, so calling it after "
+                            + setters + " property setter(s) and " + traits + " trait(s) reads as if it "
+                            + "overrides them but does not. Move the replacePropertiesWithCopy(...) call to "
+                            + "the front of the chain (right after define...Block(...))."
+            );
+        }
         // ofFullCopy() builds a fresh Properties with no id - the constructor already set one on
         // the properties object we're replacing here, so re-apply it explicitly.
         this.properties = BlockBehaviour.Properties.ofFullCopy(block).setId(this.blockKey);
