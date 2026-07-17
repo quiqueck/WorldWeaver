@@ -112,6 +112,21 @@ allprojects { projIt ->
                     }
                 }
 
+                // Headless Fabric GameTest run for the block/item testmod. Only wover-block-api ships a
+                // gametest (the call-order build() precedence contract, CallOrderGameTest); other modules'
+                // testmods don't register a `fabric-gametest` entrypoint, so gate it by module name.
+                if (projIt.name == 'wover-block-api' && projIt.file('src/testmod').exists()) {
+                    "${projIt.name}-testmodGametest" {
+                        server()
+                        runDir "build/gametest"
+                        name = "Testmod GameTest - ${projIt.name}"
+                        vmArg "-Dfabric-api.gametest"
+                        vmArg "-Dfabric-api.gametest.report-file=${file("build/gametest/report.xml")}"
+                        ideConfigGenerated true
+                        source sourceSets.testmod
+                    }
+                }
+
                 if (projIt.file('src/testmodClient').exists()) {
                     "${projIt.name}-testmodClient" {
                         client()

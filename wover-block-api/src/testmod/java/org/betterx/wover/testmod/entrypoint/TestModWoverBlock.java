@@ -2,6 +2,7 @@ package org.betterx.wover.testmod.entrypoint;
 
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.tabs.api.CreativeTabs;
+import org.betterx.wover.testmod.block.CallOrderTestBlocks;
 import org.betterx.wover.testmod.block.TestBlockRegistry;
 
 import net.minecraft.world.item.Items;
@@ -16,6 +17,8 @@ public class TestModWoverBlock implements ModInitializer {
     @Override
     public void onInitialize() {
         TestBlockRegistry.ensureStaticallyLoaded();
+        // Register the call-order precedence probe blocks (their own namespace; read by CallOrderGameTest).
+        CallOrderTestBlocks.ensureStaticallyLoaded();
 
         CreativeTabs.start(C)
                     .createBlockOnlyTab(Items.OAK_LOG)
