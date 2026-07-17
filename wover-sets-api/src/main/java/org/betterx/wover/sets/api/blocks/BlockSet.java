@@ -117,21 +117,6 @@ public class BlockSet<S extends BlockSet<S>> {
     }
 
     /**
-     * Hook called for every block this set builds, <b>before</b> {@code addSlotSpecificDefinitions} and
-     * {@link #addCommonBlockDefinitions(SlotType, BlockDefinition)} - i.e. while the definition is still
-     * untouched. This is where a material establishes its <b>base</b> properties, in particular
-     * {@link BlockDefinition#replacePropertiesWithCopy(net.minecraft.world.level.block.state.BlockBehaviour)},
-     * which must be the first operation on the chain (the slot-specific hook then adds its classification
-     * trait on top of that base). The default implementation does nothing.
-     *
-     * @param slot           the slot being built
-     * @param blockDefinition the definition to configure
-     */
-    protected void addBaseBlockDefinitions(SlotType slot, BlockDefinition<?, ?> blockDefinition) {
-        // This method can be overridden to establish the base properties (e.g. replacePropertiesWithCopy)
-    }
-
-    /**
      * Hook called for every item this set builds (see {@link ItemSlotFromDefinition}), after slot-specific
      * configuration but before the item is built. The default implementation does nothing.
      *

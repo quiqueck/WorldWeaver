@@ -1114,12 +1114,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * (those are applied in {@link #build()} on top of this copy). Calling it after any property setter or
      * added trait reads as if it wiped them but does not, so it is rejected: {@link IllegalStateException}.
      * <p>
-     * In a block set the base-copy therefore belongs in a material's
-     * {@link org.betterx.wover.block.api.BlockRegistry BlockRegistry}-level base hook that runs before the
-     * slot-specific configuration (wover's {@code BlockSet.addBaseBlockDefinitions}), not in
-     * {@code addCommonBlockDefinitions} which runs after the slot has already added its classification trait.
-     * A trait may still call this from its own {@code configure(...)} (it runs during {@code build()} as the
-     * trait's base); that is exempt, as the guard only applies to direct calls on the fluent chain.
+     * In a block set (where the slot-specific configuration runs first and would already have recorded a
+     * classification trait/setter) add the base-copy as a <b>trait</b> instead - see BetterEnd's
+     * {@code CopyPropertiesBlockTrait} / {@code IceBlockTrait} - rather than calling this directly on the
+     * common-definition chain. A trait's {@code configure(...)} runs during {@code build()} as the trait's
+     * base and is therefore exempt; the guard only applies to direct calls on the fluent chain.
      *
      * @param block The block whose properties should be copied
      * @return This configuration instance for method chaining
@@ -1135,9 +1134,10 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
                     "replacePropertiesWithCopy() must be the first operation on the block definition - it is "
                             + "the eager base that the rest of the chain layers over, so calling it after "
                             + setters + " property setter(s) and " + traits + " trait(s) reads as if it "
-                            + "overrides them but does not. In a block set, do the base-copy in "
-                            + "addBaseBlockDefinitions() (which runs before slot-specific configuration), not "
-                            + "addCommonBlockDefinitions()."
+                            + "overrides them but does not. It must be the first operation on the chain; in a "
+                            + "block set (where slot-specific config runs first) add the base-copy as a trait "
+                            + "instead (see BetterEnd's CopyPropertiesBlockTrait / IceBlockTrait), which runs "
+                            + "during build() and is exempt."
             );
         }
         // ofFullCopy() builds a fresh Properties with no id - the constructor already set one on
