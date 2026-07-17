@@ -276,14 +276,47 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @SuppressWarnings("unchecked")
     public final B build() {
         this.beforeBuild();
+
+        // Property application happens in two phases, mirroring the original design so that the eager
+        // replacePropertiesWithCopy() keeps landing first while only chain-setter-vs-trait order changes:
+        //
+        // Phase 1 walks the queued operations in call order. A TraitOp runs its trait's configure(): its
+        // eager replacePropertiesWithCopy() (whether called on the chain or from inside the trait) mutates
+        // this.properties immediately, and its individual setters are *collected* (not yet applied) into
+        // orderedSetters at the trait's call-position. A plain setter op is likewise collected at its
+        // position. Index-based on purpose: configure() may enqueue further ops (a subclass setter that
+        // appends directly, or a nested addTrait()); those land at the end and are visited in turn.
+        //
+        // Phase 2 applies orderedSetters, in call order, on top of the finished properties. Because every
+        // eager copy has already run in phase 1, no copy can wipe a setter - exactly as before - yet chain
+        // setters and trait-configured setters now interleave by the order they were written.
+        final List<Consumer<BlockBehaviour.Properties>> orderedSetters = new ArrayList<>(this.propertySetters.size());
+        final List<Consumer<BlockBehaviour.Properties>> previousSink = this.collectingSetters;
+        this.collectingSetters = orderedSetters;
+        try {
+            for (int i = 0; i < this.propertySetters.size(); i++) {
+                final Consumer<BlockBehaviour.Properties> op = this.propertySetters.get(i);
+                if (op instanceof BlockDefinition<?, ?>.TraitOp) {
+                    op.accept(this.properties);
+                } else {
+                    orderedSetters.add(op);
+                }
+            }
+        } finally {
+            this.collectingSetters = previousSink;
+        }
+
+        for (Consumer<BlockBehaviour.Properties> setter : orderedSetters) {
+            setter.accept(this.properties);
+        }
+
         final Map<BlockTraitKey, List<RuntimeBlockTrait<B, ?>>> runtimeTraits;
 
-        // If traits are defined, configure them and collect RuntimeTraits
+        // Collect the RuntimeTraits contributed by the added traits. Configuration already ran above via
+        // the TraitOp entries; here we only gather the runtime form of each trait (order preserved).
         if (this.traits != null && !this.traits.isEmpty()) {
             runtimeTraits = new HashMap<>(8);
             for (var configuredTrait : this.traits) {
-                this.configurePropertiesUnchecked(configuredTrait);
-
                 final RuntimeBlockTrait<B, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
                 if (runtimeTrait != null) {
                     // Collect runtime traits by their key
@@ -294,11 +327,6 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
                 }
             }
         } else runtimeTraits = null;
-
-        // Apply all property setters to the properties
-        for (Consumer<BlockBehaviour.Properties> propertySetter : this.propertySetters) {
-            propertySetter.accept(this.properties);
-        }
 
         B block = blockFactory.createItem((D) this);
 
@@ -396,13 +424,21 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
         if (this.traits == null) this.traits = new LinkedList<>();
 
+        final BlockTrait<? super B, ?> castTrait = (BlockTrait<? super B, ?>) trait;
+
         if (trait.keepLatestOnly()) {
             this.traits = this.traits
                     .stream()
                     .filter(t -> !t.is(trait.key()))
                     .collect(Collectors.toCollection(LinkedList::new));
+            // Drop the superseded trait's queued configuration op so it does not run in addition to the
+            // latest one (keepLatestOnly() means only the most recently added trait for this key applies).
+            this.propertySetters.removeIf(op -> op instanceof BlockDefinition<?, ?>.TraitOp to && to.trait.is(trait.key()));
         }
-        this.traits.add((BlockTrait<? super B, ?>) trait);
+        this.traits.add(castTrait);
+        // Queue the trait's configuration at its call-position so it interleaves with chain setters (see
+        // TraitOp / build()). this.traits keeps the trait for runtime collection and afterBlockRegistration.
+        this.propertySetters.add(new TraitOp(castTrait));
         return (D) this;
     }
 
@@ -565,7 +601,58 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     // **********************************************************************
     // Redirect all BlockTrait.Properties methods (except setId) to this.properties
+    //
+    // This single, ordered list holds every property-mutating operation in the exact order the fluent
+    // chain produced it: chain setters append an "apply this setter" op, {@link #addTrait} appends a
+    // {@link TraitOp} that configures the trait at its call-position. {@link #build()} runs them in
+    // insertion order, so chain setters and trait-configured properties interleave by call order and the
+    // last write for a given property wins (see {@link #queueProperty(Consumer)} / {@link TraitOp}).
     protected List<Consumer<BlockBehaviour.Properties>> propertySetters = new LinkedList<>();
+
+    /**
+     * While {@link #build()} is collecting setters (phase 1), this is the ordered list the setters are
+     * gathered into - in call order - so they can be applied together in phase 2. It is {@code null} at all
+     * other times (notably during the fluent chain), in which case a setter is queued onto
+     * {@link #propertySetters} at its call-position instead.
+     */
+    private transient List<Consumer<BlockBehaviour.Properties>> collectingSetters = null;
+
+    /**
+     * Records a single property setter. During {@link #build()}'s collection phase
+     * ({@link #collectingSetters} is set) the setter is gathered into that ordered list so trait-configured
+     * setters land at the trait's call-position; otherwise (fluent chain) it is queued onto
+     * {@link #propertySetters} to preserve its call-position for {@link #build()}.
+     *
+     * @param setter The property mutation to record
+     */
+    private void queueProperty(Consumer<BlockBehaviour.Properties> setter) {
+        if (this.collectingSetters != null) {
+            this.collectingSetters.add(setter);
+        } else {
+            this.propertySetters.add(setter);
+        }
+    }
+
+    /**
+     * A {@link #propertySetters} entry that marks the call-position of an added trait. When visited during
+     * {@link #build()}'s phase 1 it runs the trait's {@link BlockTrait#configure(BlockDefinition)}: the
+     * trait's eager {@code replacePropertiesWithCopy()} takes effect immediately while its individual
+     * setters are collected (via {@link #queueProperty(Consumer)}) at this position, to be applied in
+     * phase 2. Kept as a marker type so {@code build()} and {@code keepLatestOnly()} de-duplication can
+     * recognise it.
+     */
+    private final class TraitOp implements Consumer<BlockBehaviour.Properties> {
+        private final BlockTrait<? super B, ?> trait;
+
+        private TraitOp(BlockTrait<? super B, ?> trait) {
+            this.trait = trait;
+        }
+
+        @Override
+        public void accept(BlockBehaviour.Properties properties) {
+            configurePropertiesUnchecked(trait);
+        }
+    }
 
     /**
      * Sets the map color for this block using a dye color.
@@ -575,7 +662,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D mapColor(DyeColor dyeColor) {
-        propertySetters.add((properties) -> properties.mapColor(dyeColor));
+        queueProperty((properties) -> properties.mapColor(dyeColor));
         return (D) this;
     }
 
@@ -587,7 +674,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D mapColor(MapColor mapColor) {
-        propertySetters.add((properties) -> properties.mapColor(mapColor));
+        queueProperty((properties) -> properties.mapColor(mapColor));
         return (D) this;
     }
 
@@ -599,7 +686,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D mapColor(Function<BlockState, MapColor> function) {
-        propertySetters.add((properties) -> properties.mapColor(function));
+        queueProperty((properties) -> properties.mapColor(function));
         return (D) this;
     }
 
@@ -610,7 +697,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D noCollission() {
-        propertySetters.add((properties) -> properties.noCollission());
+        queueProperty((properties) -> properties.noCollission());
         return (D) this;
     }
 
@@ -621,7 +708,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D noOcclusion() {
-        propertySetters.add((properties) -> properties.noOcclusion());
+        queueProperty((properties) -> properties.noOcclusion());
         return (D) this;
     }
 
@@ -633,7 +720,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D friction(float friction) {
-        propertySetters.add((properties) -> properties.friction(friction));
+        queueProperty((properties) -> properties.friction(friction));
         return (D) this;
     }
 
@@ -645,7 +732,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D speedFactor(float speedFactor) {
-        propertySetters.add((properties) -> properties.speedFactor(speedFactor));
+        queueProperty((properties) -> properties.speedFactor(speedFactor));
         return (D) this;
     }
 
@@ -657,7 +744,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D jumpFactor(float jumpFactor) {
-        propertySetters.add((properties) -> properties.jumpFactor(jumpFactor));
+        queueProperty((properties) -> properties.jumpFactor(jumpFactor));
         return (D) this;
     }
 
@@ -669,7 +756,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D sound(SoundType soundType) {
-        propertySetters.add((properties) -> properties.sound(soundType));
+        queueProperty((properties) -> properties.sound(soundType));
         return (D) this;
     }
 
@@ -681,7 +768,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D lightLevel(ToIntFunction<BlockState> lightLevel) {
-        propertySetters.add((properties) -> properties.lightLevel(lightLevel));
+        queueProperty((properties) -> properties.lightLevel(lightLevel));
         return (D) this;
     }
 
@@ -694,7 +781,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D strength(float destroyTime, float explosionResistance) {
-        propertySetters.add((properties) -> properties.strength(destroyTime, explosionResistance));
+        queueProperty((properties) -> properties.strength(destroyTime, explosionResistance));
         return (D) this;
     }
 
@@ -705,7 +792,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D instabreak() {
-        propertySetters.add((properties) -> properties.instabreak());
+        queueProperty((properties) -> properties.instabreak());
         return (D) this;
     }
 
@@ -717,7 +804,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D strength(float strength) {
-        propertySetters.add((properties) -> properties.strength(strength));
+        queueProperty((properties) -> properties.strength(strength));
         return (D) this;
     }
 
@@ -728,7 +815,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D randomTicks() {
-        propertySetters.add((properties) -> properties.randomTicks());
+        queueProperty((properties) -> properties.randomTicks());
         return (D) this;
     }
 
@@ -739,7 +826,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D dynamicShape() {
-        propertySetters.add((properties) -> properties.dynamicShape());
+        queueProperty((properties) -> properties.dynamicShape());
         return (D) this;
     }
 
@@ -750,7 +837,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D noLootTable() {
-        propertySetters.add((properties) -> properties.noLootTable());
+        queueProperty((properties) -> properties.noLootTable());
         return (D) this;
     }
 
@@ -762,7 +849,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D overrideLootTable(Optional<ResourceKey<LootTable>> lootTable) {
-        propertySetters.add((properties) -> properties.overrideLootTable(lootTable));
+        queueProperty((properties) -> properties.overrideLootTable(lootTable));
         return (D) this;
     }
 
@@ -777,7 +864,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @Deprecated(forRemoval = true)
     @SuppressWarnings("unchecked")
     public D ignitedByLava() {
-        propertySetters.add((properties) -> properties.ignitedByLava());
+        queueProperty((properties) -> properties.ignitedByLava());
         return (D) this;
     }
 
@@ -788,7 +875,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D liquid() {
-        propertySetters.add((properties) -> properties.liquid());
+        queueProperty((properties) -> properties.liquid());
         return (D) this;
     }
 
@@ -799,7 +886,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D forceSolidOn() {
-        propertySetters.add((properties) -> properties.forceSolidOn());
+        queueProperty((properties) -> properties.forceSolidOn());
         return (D) this;
     }
 
@@ -812,7 +899,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     @Deprecated
     @SuppressWarnings("unchecked")
     public D forceSolidOff() {
-        propertySetters.add((properties) -> properties.forceSolidOff());
+        queueProperty((properties) -> properties.forceSolidOff());
         return (D) this;
     }
 
@@ -824,7 +911,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D pushReaction(PushReaction pushReaction) {
-        propertySetters.add((properties) -> properties.pushReaction(pushReaction));
+        queueProperty((properties) -> properties.pushReaction(pushReaction));
         return (D) this;
     }
 
@@ -835,7 +922,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D air() {
-        propertySetters.add((properties) -> properties.air());
+        queueProperty((properties) -> properties.air());
         return (D) this;
     }
 
@@ -847,7 +934,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D isValidSpawn(BlockBehaviour.StateArgumentPredicate<EntityType<?>> predicate) {
-        propertySetters.add((properties) -> properties.isValidSpawn(predicate));
+        queueProperty((properties) -> properties.isValidSpawn(predicate));
         return (D) this;
     }
 
@@ -859,7 +946,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D isRedstoneConductor(BlockBehaviour.StatePredicate predicate) {
-        propertySetters.add((properties) -> properties.isRedstoneConductor(predicate));
+        queueProperty((properties) -> properties.isRedstoneConductor(predicate));
         return (D) this;
     }
 
@@ -871,7 +958,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D isSuffocating(BlockBehaviour.StatePredicate predicate) {
-        propertySetters.add((properties) -> properties.isSuffocating(predicate));
+        queueProperty((properties) -> properties.isSuffocating(predicate));
         return (D) this;
     }
 
@@ -883,7 +970,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D isViewBlocking(BlockBehaviour.StatePredicate predicate) {
-        propertySetters.add((properties) -> properties.isViewBlocking(predicate));
+        queueProperty((properties) -> properties.isViewBlocking(predicate));
         return (D) this;
     }
 
@@ -895,7 +982,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D hasPostProcess(BlockBehaviour.StatePredicate predicate) {
-        propertySetters.add((properties) -> properties.hasPostProcess(predicate));
+        queueProperty((properties) -> properties.hasPostProcess(predicate));
         return (D) this;
     }
 
@@ -907,7 +994,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D emissiveRendering(BlockBehaviour.StatePredicate predicate) {
-        propertySetters.add((properties) -> properties.emissiveRendering(predicate));
+        queueProperty((properties) -> properties.emissiveRendering(predicate));
         return (D) this;
     }
 
@@ -918,7 +1005,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D requiresCorrectToolForDrops() {
-        propertySetters.add((properties) -> properties.requiresCorrectToolForDrops());
+        queueProperty((properties) -> properties.requiresCorrectToolForDrops());
         return (D) this;
     }
 
@@ -930,7 +1017,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D destroyTime(float destroyTime) {
-        propertySetters.add((properties) -> properties.destroyTime(destroyTime));
+        queueProperty((properties) -> properties.destroyTime(destroyTime));
         return (D) this;
     }
 
@@ -942,7 +1029,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D explosionResistance(float explosionResistance) {
-        propertySetters.add((properties) -> properties.explosionResistance(explosionResistance));
+        queueProperty((properties) -> properties.explosionResistance(explosionResistance));
         return (D) this;
     }
 
@@ -954,7 +1041,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D offsetType(BlockBehaviour.OffsetType offsetType) {
-        propertySetters.add((properties) -> properties.offsetType(offsetType));
+        queueProperty((properties) -> properties.offsetType(offsetType));
         return (D) this;
     }
 
@@ -965,7 +1052,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D noTerrainParticles() {
-        propertySetters.add((properties) -> properties.noTerrainParticles());
+        queueProperty((properties) -> properties.noTerrainParticles());
         return (D) this;
     }
 
@@ -977,7 +1064,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D requiredFeatures(FeatureFlag... featureFlags) {
-        propertySetters.add((properties) -> properties.requiredFeatures(featureFlags));
+        queueProperty((properties) -> properties.requiredFeatures(featureFlags));
         return (D) this;
     }
 
@@ -989,7 +1076,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D instrument(NoteBlockInstrument instrument) {
-        propertySetters.add((properties) -> properties.instrument(instrument));
+        queueProperty((properties) -> properties.instrument(instrument));
         return (D) this;
     }
 
@@ -1000,7 +1087,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D replaceable() {
-        propertySetters.add((properties) -> properties.replaceable());
+        queueProperty((properties) -> properties.replaceable());
         return (D) this;
     }
 
@@ -1012,7 +1099,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D overrideDescription(String descriptionKey) {
-        propertySetters.add((properties) -> properties.overrideDescription(descriptionKey));
+        queueProperty((properties) -> properties.overrideDescription(descriptionKey));
         return (D) this;
     }
 

@@ -144,27 +144,48 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
     public final I build() {
         this.beforeBuild();
 
+        // Property application happens in two phases (see BlockDefinition.build() for the full rationale):
+        // Phase 1 walks the queued operations in call order, running each trait's configure() - collecting
+        // its setters (via queueProperty) at the trait's call-position - while plain setter ops are
+        // collected at their own position. Index-based on purpose: configure() may enqueue further ops (a
+        // subclass setter that appends directly, or a nested addTrait()). Phase 2 applies the collected
+        // setters in call order, so chain setters and trait-configured setters interleave as written.
+        final List<Consumer<Item.Properties>> orderedSetters = new ArrayList<>(this.propertySetters.size());
+        final List<Consumer<Item.Properties>> previousSink = this.collectingSetters;
+        this.collectingSetters = orderedSetters;
+        try {
+            for (int i = 0; i < this.propertySetters.size(); i++) {
+                final Consumer<Item.Properties> op = this.propertySetters.get(i);
+                if (op instanceof ItemDefinition<?, ?>.TraitOp) {
+                    op.accept(this.properties);
+                } else {
+                    orderedSetters.add(op);
+                }
+            }
+        } finally {
+            this.collectingSetters = previousSink;
+        }
+
+        for (Consumer<Item.Properties> setter : orderedSetters) {
+            setter.accept(this.properties);
+        }
+
+        // Accumulated attribute modifiers are applied after everything else, matching prior behaviour.
+        if (this.attributes != null) {
+            this.properties.attributes(new ItemAttributeModifiers(this.attributes.build()));
+        }
+
         final List<RuntimeItemTrait<I, ?>> runtimeTraits;
 
-        // If traits are defined, configure them and collect RuntimeTraits
+        // Collect the RuntimeTraits contributed by the added traits. Configuration already ran above via
+        // the TraitOp entries; here we only gather the runtime form of each trait (order preserved).
         if (this.traits != null && !this.traits.isEmpty()) {
             runtimeTraits = new LinkedList<>();
             for (var configuredTrait : this.traits) {
-                this.configurePropertiesUnchecked(configuredTrait);
-
                 final RuntimeItemTrait<I, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
                 if (runtimeTrait != null) runtimeTraits.add(runtimeTrait);
             }
         } else runtimeTraits = null;
-
-        if (this.attributes != null) {
-            propertySetters.add((properties) -> properties.attributes(new ItemAttributeModifiers(this.attributes.build())));
-        }
-
-        // Apply all property setters to the properties
-        for (Consumer<Item.Properties> propertySetter : this.propertySetters) {
-            propertySetter.accept(this.properties);
-        }
 
         I item = itemFactory.createItem((D) this);
 
@@ -218,7 +239,11 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
 
         if (this.traits == null) this.traits = new LinkedList<>();
 
-        this.traits.add((ItemTrait<? super I, ?>) trait);
+        final ItemTrait<? super I, ?> castTrait = (ItemTrait<? super I, ?>) trait;
+        this.traits.add(castTrait);
+        // Queue the trait's configuration at its call-position so it interleaves with chain setters (see
+        // TraitOp / build()). this.traits keeps the trait for runtime collection and afterItemRegistration.
+        this.propertySetters.add(new TraitOp(castTrait));
         return (D) this;
     }
 
@@ -381,7 +406,56 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
 
     // **********************************************************************
     // Redirect all (but setId) Item.Properties methods to this.properties
+    //
+    // This single, ordered list holds every property-mutating operation in the exact order the fluent
+    // chain produced it: chain setters append an "apply this setter" op, {@link #addTrait} appends a
+    // {@link TraitOp} that configures the trait at its call-position. {@link #build()} runs them in
+    // insertion order, so chain setters and trait-configured properties interleave by call order and the
+    // last write for a given property wins (see {@link #queueProperty(Consumer)} / {@link TraitOp}).
     protected List<Consumer<Item.Properties>> propertySetters = new LinkedList<>();
+
+    /**
+     * While {@link #build()} is collecting setters (phase 1), this is the ordered list the setters are
+     * gathered into - in call order - so they can be applied together in phase 2. It is {@code null} at all
+     * other times (notably during the fluent chain), in which case a setter is queued onto
+     * {@link #propertySetters} at its call-position instead.
+     */
+    private transient List<Consumer<Item.Properties>> collectingSetters = null;
+
+    /**
+     * Records a single property setter. During {@link #build()}'s collection phase
+     * ({@link #collectingSetters} is set) the setter is gathered into that ordered list so trait-configured
+     * setters land at the trait's call-position; otherwise (fluent chain) it is queued onto
+     * {@link #propertySetters} to preserve its call-position for {@link #build()}.
+     *
+     * @param setter The property mutation to record
+     */
+    private void queueProperty(Consumer<Item.Properties> setter) {
+        if (this.collectingSetters != null) {
+            this.collectingSetters.add(setter);
+        } else {
+            this.propertySetters.add(setter);
+        }
+    }
+
+    /**
+     * A {@link #propertySetters} entry that marks the call-position of an added trait. When visited during
+     * {@link #build()}'s phase 1 it runs the trait's {@link ItemTrait#configure(ItemDefinition)}, collecting
+     * the trait's individual setters (via {@link #queueProperty(Consumer)}) at this position to be applied
+     * in phase 2. Kept as a marker type so {@code build()} can recognise it.
+     */
+    private final class TraitOp implements Consumer<Item.Properties> {
+        private final ItemTrait<? super I, ?> trait;
+
+        private TraitOp(ItemTrait<? super I, ?> trait) {
+            this.trait = trait;
+        }
+
+        @Override
+        public void accept(Item.Properties properties) {
+            configurePropertiesUnchecked(trait);
+        }
+    }
 
     /**
      * Sets the item that this item converts to when used in crafting.
@@ -391,7 +465,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D usingConvertsTo(Item convertToItem) {
-        propertySetters.add((properties) -> properties.usingConvertsTo(convertToItem));
+        queueProperty((properties) -> properties.usingConvertsTo(convertToItem));
         return (D) this;
     }
 
@@ -403,7 +477,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D useCooldown(float cooldownSeconds) {
-        propertySetters.add((properties) -> properties.useCooldown(cooldownSeconds));
+        queueProperty((properties) -> properties.useCooldown(cooldownSeconds));
         return (D) this;
     }
 
@@ -415,7 +489,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D stacksTo(int maxStackSize) {
-        propertySetters.add((properties) -> properties.stacksTo(maxStackSize));
+        queueProperty((properties) -> properties.stacksTo(maxStackSize));
         return (D) this;
     }
 
@@ -428,7 +502,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D durability(int maxDurability) {
-        propertySetters.add((properties) -> properties.durability(maxDurability));
+        queueProperty((properties) -> properties.durability(maxDurability));
         return (D) this;
     }
 
@@ -440,7 +514,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D craftRemainder(Item remainderItem) {
-        propertySetters.add((properties) -> properties.craftRemainder(remainderItem));
+        queueProperty((properties) -> properties.craftRemainder(remainderItem));
         return (D) this;
     }
 
@@ -452,7 +526,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D rarity(Rarity itemRarity) {
-        propertySetters.add((properties) -> properties.rarity(itemRarity));
+        queueProperty((properties) -> properties.rarity(itemRarity));
         return (D) this;
     }
 
@@ -463,7 +537,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D fireResistant() {
-        propertySetters.add((properties) -> properties.fireResistant());
+        queueProperty((properties) -> properties.fireResistant());
         return (D) this;
     }
 
@@ -475,7 +549,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D jukeboxPlayable(ResourceKey<JukeboxSong> songKey) {
-        propertySetters.add((properties) -> properties.jukeboxPlayable(songKey));
+        queueProperty((properties) -> properties.jukeboxPlayable(songKey));
         return (D) this;
     }
 
@@ -488,7 +562,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D enchantable(int enchantability) {
-        propertySetters.add((properties) -> properties.enchantable(enchantability));
+        queueProperty((properties) -> properties.enchantable(enchantability));
         return (D) this;
     }
 
@@ -500,7 +574,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D repairable(Item repairItem) {
-        propertySetters.add((properties) -> properties.repairable(repairItem));
+        queueProperty((properties) -> properties.repairable(repairItem));
         return (D) this;
     }
 
@@ -512,7 +586,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D repairable(TagKey<Item> repairTag) {
-        propertySetters.add((properties) -> properties.repairable(repairTag));
+        queueProperty((properties) -> properties.repairable(repairTag));
         return (D) this;
     }
 
@@ -524,7 +598,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D equippable(EquipmentSlot slot) {
-        propertySetters.add((properties) -> properties.equippable(slot));
+        queueProperty((properties) -> properties.equippable(slot));
         return (D) this;
     }
 
@@ -536,7 +610,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D equippableUnswappable(EquipmentSlot slot) {
-        propertySetters.add((properties) -> properties.equippableUnswappable(slot));
+        queueProperty((properties) -> properties.equippableUnswappable(slot));
         return (D) this;
     }
 
@@ -548,7 +622,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D requiredFeatures(FeatureFlag... requiredFlags) {
-        propertySetters.add((properties) -> properties.requiredFeatures(requiredFlags));
+        queueProperty((properties) -> properties.requiredFeatures(requiredFlags));
         return (D) this;
     }
 
@@ -560,7 +634,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D overrideDescription(String descriptionKey) {
-        propertySetters.add((properties) -> properties.overrideDescription(descriptionKey));
+        queueProperty((properties) -> properties.overrideDescription(descriptionKey));
         return (D) this;
     }
 
@@ -571,7 +645,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D useBlockDescriptionPrefix() {
-        propertySetters.add((properties) -> properties.useBlockDescriptionPrefix());
+        queueProperty((properties) -> properties.useBlockDescriptionPrefix());
         return (D) this;
     }
 
@@ -582,7 +656,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D useItemDescriptionPrefix() {
-        propertySetters.add((properties) -> properties.useItemDescriptionPrefix());
+        queueProperty((properties) -> properties.useItemDescriptionPrefix());
         return (D) this;
     }
 
@@ -605,7 +679,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public <T> D component(DataComponentType<T> componentType, T componentData) {
-        propertySetters.add((properties) -> properties.component(componentType, componentData));
+        queueProperty((properties) -> properties.component(componentType, componentData));
         return (D) this;
     }
 
@@ -617,7 +691,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      */
     @SuppressWarnings("unchecked")
     public D attributes(ItemAttributeModifiers attributeModifiers) {
-        propertySetters.add((properties) -> properties.attributes(attributeModifiers));
+        queueProperty((properties) -> properties.attributes(attributeModifiers));
         return (D) this;
     }
 
