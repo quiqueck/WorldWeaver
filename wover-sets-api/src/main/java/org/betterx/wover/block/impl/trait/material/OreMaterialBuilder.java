@@ -7,11 +7,14 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.entrypoint.LibWoverSets;
 import org.betterx.wover.tag.api.predefined.CommonBlockTags;
 
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 import java.util.List;
+import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,8 +34,8 @@ import org.jetbrains.annotations.Nullable;
  * {@code addTrait(ORE_BLOCK.withDefault())} - or set by the block factory, which runs last - wins over these
  * defaults, so an ore with different toughness (e.g. BetterNether's 3/5 netherrack ores) keeps its values.
  */
-public class OreMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.BuilderWithDefaults {
-    public static final GenericBlockTrait.BuilderWithDefaults BUILDER = new OreMaterialBuilder();
+public class OreMaterialBuilder extends AbstractBlockTraitBuilder.Generic implements GenericBlockTrait.OreBuilderWithDefaults {
+    public static final GenericBlockTrait.OreBuilderWithDefaults BUILDER = new OreMaterialBuilder();
     private final GenericBlockTrait DEFAULT = new Trait();
 
     private OreMaterialBuilder() {
@@ -42,6 +45,19 @@ public class OreMaterialBuilder extends AbstractBlockTraitBuilder.Generic implem
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
         return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsPickAxe());
+    }
+
+    @Override
+    public @Nullable List<BlockTrait<?, ?>> dropping(@NotNull Supplier<Item> drop, int min, int max) {
+        // withDefault() (classification + pickaxe tag) plus the vanilla ore-drop loot trait. Both the pickaxe
+        // tag and the loot trait are datagen-only (null off-datagen); combine(...) drops the nulls, so this
+        // reduces to combine(DEFAULT) outside datagen, exactly like withDefault().
+        if (!ModCore.isDatagen()) return combine(DEFAULT);
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                BlockTraits.LOOT_TABLE.dropOre(drop, min, max)
+        );
     }
 
     class Trait extends BlockTraitImpl.Generic {

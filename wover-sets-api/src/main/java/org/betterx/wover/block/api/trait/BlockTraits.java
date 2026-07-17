@@ -48,7 +48,7 @@ public class BlockTraits {
     /** Marks a block as belonging to the "obsidian" material family. */
     public static final GenericBlockTrait.BuilderWithDefaults OBSIDIAN_BLOCK = ObsidianMaterialBuilder.BUILDER;
     /** Marks a block as an ore (the trait-side replacement for bclib's {@code BaseOreBlock} base class). */
-    public static final GenericBlockTrait.BuilderWithDefaults ORE_BLOCK = OreMaterialBuilder.BUILDER;
+    public static final GenericBlockTrait.OreBuilderWithDefaults ORE_BLOCK = OreMaterialBuilder.BUILDER;
 
     // Tab-Based traits
     /** Adds one or more {@code minecraft:mineable/...}-style tool tags to a block. */
