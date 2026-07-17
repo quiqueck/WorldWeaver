@@ -63,6 +63,9 @@ public class SlotFromDefinition implements SlotFactory {
 
         if (definition == null) return;
 
+        // Base hook runs first (while the definition is untouched) so a material's replacePropertiesWithCopy
+        // is the chain-start; the slot then adds its classification trait on top of that base.
+        set.addBaseBlockDefinitions(this.slot, definition);
         this.addSlotSpecificDefinitions(set, definition);
         set.addCommonBlockDefinitions(this.slot, definition);
 

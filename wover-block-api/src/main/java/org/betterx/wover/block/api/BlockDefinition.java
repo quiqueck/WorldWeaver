@@ -1110,14 +1110,16 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      * <p>
      * This <b>must be the first operation on the chain</b>: it is <em>eager</em> (it swaps the properties
      * object immediately) and therefore acts as the <b>base</b> that every later chain setter and
-     * {@code addTrait(...)} configures on top of - it does not, and cannot, override anything written after
-     * it (those are applied in {@link #build()} on top of this copy). Calling it after any property setter or
-     * added trait would silently discard nothing useful yet read as if it wiped them, so it is rejected:
-     * calling it once a fluent property op has already been recorded throws {@link IllegalStateException}.
-     * Move the copy to the front of the chain instead.
+     * {@code addTrait(...)} configures on top of - it does not, and cannot, override anything written after it
+     * (those are applied in {@link #build()} on top of this copy). Calling it after any property setter or
+     * added trait reads as if it wiped them but does not, so it is rejected: {@link IllegalStateException}.
      * <p>
+     * In a block set the base-copy therefore belongs in a material's
+     * {@link org.betterx.wover.block.api.BlockRegistry BlockRegistry}-level base hook that runs before the
+     * slot-specific configuration (wover's {@code BlockSet.addBaseBlockDefinitions}), not in
+     * {@code addCommonBlockDefinitions} which runs after the slot has already added its classification trait.
      * A trait may still call this from its own {@code configure(...)} (it runs during {@code build()} as the
-     * trait's base); the guard only applies to direct calls on the fluent chain.
+     * trait's base); that is exempt, as the guard only applies to direct calls on the fluent chain.
      *
      * @param block The block whose properties should be copied
      * @return This configuration instance for method chaining
@@ -1133,8 +1135,9 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
                     "replacePropertiesWithCopy() must be the first operation on the block definition - it is "
                             + "the eager base that the rest of the chain layers over, so calling it after "
                             + setters + " property setter(s) and " + traits + " trait(s) reads as if it "
-                            + "overrides them but does not. Move the replacePropertiesWithCopy(...) call to "
-                            + "the front of the chain (right after define...Block(...))."
+                            + "overrides them but does not. In a block set, do the base-copy in "
+                            + "addBaseBlockDefinitions() (which runs before slot-specific configuration), not "
+                            + "addCommonBlockDefinitions()."
             );
         }
         // ofFullCopy() builds a fresh Properties with no id - the constructor already set one on
