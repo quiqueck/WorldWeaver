@@ -85,6 +85,26 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
         @Nullable LootTableTrait dropSlab();
 
         /**
+         * Creates a trait that drops the block itself only when mined with Silk Touch: a single pool with one
+         * roll and a single item entry (the block), gated by a pool-level {@code match_tool} Silk Touch
+         * condition. Reproduces vanilla's silk-touch-only table ({@code createSilkTouchOnlyTable}). No
+         * {@code survives_explosion} / explosion decay is applied.
+         *
+         * @return the new trait, or {@code null} outside of a datagen environment
+         */
+        @Nullable LootTableTrait silkTouchSelf();
+
+        /**
+         * Creates a trait that drops the block itself (like {@link #dropSelf()}, including the pool-level
+         * {@code survives_explosion} condition) with a {@code copy_name} function sourced from the
+         * {@code block_entity}, so a renamed block keeps its custom name on the dropped item. Reproduces
+         * vanilla's nameable-block-entity table ({@code createNameableBlockEntityTable}).
+         *
+         * @return the new trait, or {@code null} outside of a datagen environment
+         */
+        @Nullable LootTableTrait dropSelfCopyName();
+
+        /**
          * Creates a trait that drops the block itself only when mined with Silk Touch, and nothing otherwise.
          *
          * @return the new trait, or {@code null} outside of a datagen environment

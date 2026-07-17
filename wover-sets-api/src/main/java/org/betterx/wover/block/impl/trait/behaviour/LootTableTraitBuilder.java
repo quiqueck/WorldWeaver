@@ -64,6 +64,22 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     }
 
     @Override
+    public @Nullable LootTableTrait silkTouchSelf() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropWithSilkTouch(block)
+        );
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropSelfCopyName() {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropNamedBlockEntity(block)
+        );
+    }
+
+    @Override
     public @Nullable LootTableTrait dropWithSilktouchOrHoeOrShears() {
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider)
