@@ -7,6 +7,7 @@ import org.betterx.wover.block.impl.trait.BlockRecipeTraitBuilder;
 import org.betterx.wover.block.impl.trait.behaviour.*;
 import org.betterx.wover.block.impl.trait.material.MetalMaterialBuilder;
 import org.betterx.wover.block.impl.trait.material.ObsidianMaterialBuilder;
+import org.betterx.wover.block.impl.trait.material.OreMaterialBuilder;
 import org.betterx.wover.block.impl.trait.material.StoneMaterialBuilder;
 import org.betterx.wover.block.impl.trait.material.WoodMaterialBuilder;
 import org.betterx.wover.block.impl.trait.type.*;
@@ -46,6 +47,8 @@ public class BlockTraits {
     public static final GenericBlockTrait.WoodBuilderWithDefaults WOOD_BLOCK = WoodMaterialBuilder.BUILDER;
     /** Marks a block as belonging to the "obsidian" material family. */
     public static final GenericBlockTrait.BuilderWithDefaults OBSIDIAN_BLOCK = ObsidianMaterialBuilder.BUILDER;
+    /** Marks a block as an ore (the trait-side replacement for bclib's {@code BaseOreBlock} base class). */
+    public static final GenericBlockTrait.BuilderWithDefaults ORE_BLOCK = OreMaterialBuilder.BUILDER;
 
     // Tab-Based traits
     /** Adds one or more {@code minecraft:mineable/...}-style tool tags to a block. */

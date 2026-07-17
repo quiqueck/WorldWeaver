@@ -7,6 +7,7 @@ import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.loot.api.LootLookupProvider;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,6 +115,28 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
          * @return the new trait, or {@code null} outside of a datagen environment
          */
         @Nullable LootTableTrait dropWithSilktouchOrHoeOrShears();
+
+        /**
+         * Creates a trait using vanilla's ore-drop logic: Silk Touch drops the block itself, otherwise a
+         * fortune-boosted {@code count} of {@code drop}. Reproduces bclib's {@code BaseOreBlock} loot table.
+         *
+         * @param drop  supplies the item the ore drops (read lazily, so it may reference a not-yet-assigned
+         *              registry field)
+         * @param count the base number of items to drop before the fortune bonus
+         * @return the new trait, or {@code null} outside of a datagen environment
+         */
+        @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull NumberProvider count);
+
+        /**
+         * Creates a trait using vanilla's ore-drop logic with a {@code min..max} uniform drop count. Shorthand
+         * for {@link #dropOre(Supplier, NumberProvider)} with {@code UniformGenerator.between(min, max)}.
+         *
+         * @param drop supplies the item the ore drops
+         * @param min  the minimum number of items to drop before the fortune bonus
+         * @param max  the maximum number of items to drop before the fortune bonus
+         * @return the new trait, or {@code null} outside of a datagen environment
+         */
+        @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, int min, int max);
 
         /**
          * Creates a trait using vanilla's leaves drop logic (chance-based sapling drop, plus sticks).

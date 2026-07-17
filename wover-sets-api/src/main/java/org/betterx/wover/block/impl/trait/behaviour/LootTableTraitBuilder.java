@@ -13,14 +13,17 @@ import org.betterx.wover.loot.api.LootLookupProvider;
 import org.betterx.wover.loot.api.LootTableManager;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -87,6 +90,19 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
         return new Trait((tableKey, blockKey, block, provider)
                 -> provider.dropWithSilkTouch(block)
         );
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull NumberProvider count) {
+        if (!ModCore.isDatagen()) return null;
+        return new Trait((tableKey, blockKey, block, provider)
+                -> provider.dropOre(block, drop.get(), count)
+        );
+    }
+
+    @Override
+    public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, int min, int max) {
+        return dropOre(drop, UniformGenerator.between(min, max));
     }
 
     @Override
