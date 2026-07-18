@@ -262,8 +262,15 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         );
 
 
-        ctx.add(CommonBlockTags.SOIL_OR_LOGS, BlockTags.DIRT, BlockTags.LOGS, BlockTags.PLANKS);
-        ctx.addOptional(CommonBlockTags.SOIL_OR_LOGS, CommonBlockTags.TERRAIN);
+        // BlockTags.DIRT already covers grass_block, podzol, mycelium, moss, mud, ...
+        ctx.add(CommonBlockTags.SOIL, BlockTags.DIRT);
+        // Vanilla soils are declared here on the tag owner (WoVer): a downstream mod's tag provider
+        // is namespace-scoped and cannot add minecraft:* blocks to a wover:* tag. end_stone is the
+        // End's vanilla ground, so it groups with the other vanilla soils.
+        ctx.add(CommonBlockTags.SOIL, Blocks.FARMLAND, Blocks.END_STONE);
+
+        ctx.add(CommonBlockTags.SOIL_OR_LOGS, BlockTags.LOGS, BlockTags.PLANKS);
+        ctx.addOptional(CommonBlockTags.SOIL_OR_LOGS, CommonBlockTags.SOIL, CommonBlockTags.TERRAIN);
 
         ctx.addOptional(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, MineableTags.NEEDS_NETHERITE_TOOL);
         ctx.addOptional(BlockTags.INCORRECT_FOR_WOODEN_TOOL, MineableTags.NEEDS_GOLD_TOOL);
