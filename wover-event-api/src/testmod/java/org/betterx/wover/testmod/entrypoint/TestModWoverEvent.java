@@ -12,6 +12,10 @@ public class TestModWoverEvent implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        // Record the real firing order of every WorldLifecycle event during world load so the
+        // EventOrderGameTest can assert it once the server is up. See EventOrderRecorder.
+        org.betterx.wover.testmod.gametest.EventOrderRecorder.install();
+
         ConfigResource config = ConfigResource.create(C, "test");
         ConfigResource configB = ConfigResource.create(C, "test");
         WorldDatapackConfig.registerConfig(config);

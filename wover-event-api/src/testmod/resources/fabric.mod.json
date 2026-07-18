@@ -21,6 +21,9 @@
     ],
     "client": [
       "org.betterx.wover.testmod.entrypoint.client.TestModWoverEventClient"
+    ],
+    "fabric-gametest": [
+      "org.betterx.wover.testmod.gametest.EventOrderGameTest"
     ]
   },
   "depends": {
