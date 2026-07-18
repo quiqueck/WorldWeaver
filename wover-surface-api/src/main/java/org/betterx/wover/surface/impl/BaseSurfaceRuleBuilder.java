@@ -157,8 +157,17 @@ public interface BaseSurfaceRuleBuilder<T extends BaseSurfaceRuleBuilder<T>> {
 
     /**
      * Allows to add custom rule.
+     * <p>
+     * <b>HIGHER values = higher priority.</b> Rules are composed into a {@code SurfaceRules.sequence}
+     * ordered by descending priority (see {@link PriorityLinkedList}) and the sequence is
+     * first-match-wins, so a higher-priority rule is placed earlier and gets the first chance to
+     * match. Notably the built-in fillers/floors use the named constants above (e.g.
+     * {@link #FILLER_PRIORITY} = 900, {@link #FLOOR_PRIORITY} = 2500): a custom rule that must beat
+     * the unconditional filler has to use a priority <b>greater than</b> {@link #FILLER_PRIORITY}. A
+     * small number like {@code 2} sorts <i>after</i> the filler and never runs.
      *
-     * @param priority rule priority, lower values = higher priority (rule will be applied before others).
+     * @param priority rule priority; higher values win. Use a value above {@link #FILLER_PRIORITY}
+     *                 for anything that should paint the surface.
      * @param rule     custom {@link SurfaceRules.RuleSource}.
      * @return same {@link BaseSurfaceRuleBuilder} instance.
      */
