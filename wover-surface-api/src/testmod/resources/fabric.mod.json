@@ -24,6 +24,9 @@
     ],
     "fabric-datagen": [
       "org.betterx.wover.testmod.surface.datagen.TestModWoverSurfaceDatagen"
+    ],
+    "fabric-gametest": [
+      "org.betterx.wover.testmod.gametest.SurfaceRuleGameTest"
     ]
   },
   "depends": {
