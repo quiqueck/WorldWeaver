@@ -49,12 +49,19 @@ echo "Regenerating datagen via ${#TASKS[@]} task(s)..."
 ./gradlew "${TASKS[@]}" --console=plain
 
 echo "Checking for drift against committed golden files..."
-if git diff --quiet -- "${GEN_DIRS[@]}"; then
+# `git diff` covers modified/deleted TRACKED golden files; `git status --porcelain` additionally
+# surfaces NEW untracked generated files (a rule/model/loot-table that regeneration would add but
+# that was never committed). Both are drift. Ignore the datagen `.cache` bookkeeping directory.
+MODIFIED="$(git diff --name-only -- "${GEN_DIRS[@]}" | grep -v '/\.cache/' || true)"
+UNTRACKED="$(git ls-files --others --exclude-standard -- "${GEN_DIRS[@]}" | grep -v '/\.cache/' || true)"
+
+if [ -z "$MODIFIED" ] && [ -z "$UNTRACKED" ]; then
     echo "OK: datagen output matches the committed golden files."
     exit 0
 else
     echo "DATAGEN DRIFT DETECTED - generated output differs from what is committed:" >&2
-    git --no-pager diff --stat -- "${GEN_DIRS[@]}" >&2
+    [ -n "$MODIFIED" ] && { echo "Changed/removed committed files:" >&2; echo "$MODIFIED" | sed 's/^/  /' >&2; }
+    [ -n "$UNTRACKED" ] && { echo "New, uncommitted generated files:" >&2; echo "$UNTRACKED" | sed 's/^/  /' >&2; }
     echo >&2
     echo "If this change is intentional, re-run the datagen and commit the updated files." >&2
     exit 1
