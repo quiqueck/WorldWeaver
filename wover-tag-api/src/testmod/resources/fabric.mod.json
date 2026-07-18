@@ -24,6 +24,9 @@
     ],
     "fabric-datagen": [
       "org.betterx.wover.testmod.tag.datagen.TestModWoverTagDatagen"
+    ],
+    "fabric-gametest": [
+      "org.betterx.wover.testmod.gametest.TagInjectionGameTest"
     ]
   },
   "mixins": [],
