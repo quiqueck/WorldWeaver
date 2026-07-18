@@ -10,8 +10,10 @@ import org.betterx.wover.item.api.trait.ItemTraitKey;
 import org.betterx.wover.item.impl.trait.ItemTraitImpl;
 
 import net.minecraft.client.model.BoatModel;
+import net.minecraft.client.model.RaftModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.entity.BoatRenderer;
+import net.minecraft.client.renderer.entity.RaftRenderer;
 import net.minecraft.world.item.BoatItem;
 
 import net.fabricmc.api.EnvType;
@@ -33,21 +35,23 @@ public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem,
     @Override
     public BoatRendererTrait withDefault() {
         if (!ModCore.isClient()) return null;
-        return new Trait(false);
+        return new Trait(false, false);
     }
 
 
-    public @Nullable BoatRendererTrait with(boolean withChest) {
+    public @Nullable BoatRendererTrait with(boolean withChest, boolean isRaft) {
         if (!ModCore.isClient()) return null;
-        return new Trait(withChest);
+        return new Trait(withChest, isRaft);
     }
 
     @Environment(EnvType.CLIENT)
     class Trait extends ItemTraitImpl<BoatItem, BoatRendererTrait> implements BoatRendererTrait {
         private final boolean withChest;
+        private final boolean isRaft;
 
-        Trait(boolean withChest) {
+        Trait(boolean withChest, boolean isRaft) {
             this.withChest = withChest;
+            this.isRaft = isRaft;
         }
 
         @Override
@@ -61,6 +65,7 @@ public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem,
                 ItemDefinition<BoatItem, ? extends ItemDefinition<BoatItem, ?>> definition
         ) {
             if (definition instanceof BoatItemDefinition<?> boatDefinition) {
+                // rafts still use the "boat"/"chest_boat" texture folders, matching vanilla's bamboo raft
                 final var modelLocation = new ModelLayerLocation(
                         definition.itemKey.location()
                                           .withPrefix(withChest ? "chest_boat/" : "boat/"),
@@ -69,14 +74,16 @@ public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem,
 
                 EntityModelLayerRegistry.registerModelLayer(
                         modelLocation,
-                        withChest
-                                ? BoatModel::createChestBoatModel
-                                : BoatModel::createBoatModel
+                        isRaft
+                                ? (withChest ? RaftModel::createChestRaftModel : RaftModel::createRaftModel)
+                                : (withChest ? BoatModel::createChestBoatModel : BoatModel::createBoatModel)
                 );
 
                 EntityRendererRegistry.register(
                         boatDefinition.entityType(),
-                        (context) -> new BoatRenderer(context, modelLocation)
+                        isRaft
+                                ? (context) -> new RaftRenderer(context, modelLocation)
+                                : (context) -> new BoatRenderer(context, modelLocation)
                 );
             } else {
                 throw new IllegalStateException("BoatRendererTrait can only be used with BoatItemDefinition");
@@ -86,6 +93,11 @@ public class BoatRendererTraitBuilder extends AbstractItemTraitBuilder<BoatItem,
         @Override
         public boolean withChest() {
             return this.withChest;
+        }
+
+        @Override
+        public boolean isRaft() {
+            return this.isRaft;
         }
     }
 

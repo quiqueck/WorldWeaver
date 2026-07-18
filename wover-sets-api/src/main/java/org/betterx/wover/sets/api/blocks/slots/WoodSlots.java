@@ -13,7 +13,10 @@ import org.betterx.wover.sets.api.blocks.types.*;
  * (e.g. with a different {@link org.betterx.wover.sets.api.blocks.SlotType}). Note there is no {@code WALL}
  * constant here (vanilla has no wooden walls); add
  * {@code org.betterx.wover.sets.api.blocks.types.Wall} explicitly if the mod wants one (it will use
- * {@link org.betterx.wover.recipe.api.RecipeTraitLibrary#woodWall}).
+ * {@link org.betterx.wover.recipe.api.RecipeTraitLibrary#woodWall}). Likewise {@link #RAFT}/{@link #CHEST_RAFT}
+ * are not part of the default set - use {@link org.betterx.wover.sets.api.blocks.SlotMap#remove} on
+ * {@link #BOAT}/{@link #CHEST_BOAT} and {@link org.betterx.wover.sets.api.blocks.SlotMap#add} them instead for a
+ * set whose boat should be a raft (e.g. vanilla's bamboo raft), like a plant-based "wood" set.
  */
 public class WoodSlots {
     public static final SlotFromDefinition BARK = new Bark(true);
@@ -31,6 +34,8 @@ public class WoodSlots {
     public static final SlotFromDefinition HANGING_SIGN = new HangingSign();
     public static final SlotFromDefinition LADDER = new Ladder();
     public static final SlotFromDefinition PRESSURE_PLATE = new PressurePlate();
+    public static final SlotFromDefinition RAFT = new Boat(false, true);
+    public static final SlotFromDefinition CHEST_RAFT = new Boat(true, true);
     public static final SlotFromDefinition STAIRS = new Stairs();
     public static final SlotFromDefinition LOG = new Log(true);
     public static final SlotFromDefinition PLANKS = new Planks();

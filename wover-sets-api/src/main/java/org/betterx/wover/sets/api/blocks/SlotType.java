@@ -77,6 +77,11 @@ public record SlotType(String suffix) {
     public static final SlotType COMPOSTER = new SlotType("composter");
     public static final SlotType BOAT = new SlotType("boat");
     public static final SlotType CHEST_BOAT = new SlotType("chest_boat");
+    /** A raft (e.g. vanilla's bamboo raft): an {@link org.betterx.wover.sets.api.blocks.types.Boat} slot built
+     *  with {@code isRaft = true}, rendered with {@code RaftRenderer}/{@code RaftModel} and backed by vanilla's
+     *  {@code Raft} entity instead of {@code Boat}. */
+    public static final SlotType RAFT = new SlotType("raft");
+    public static final SlotType CHEST_RAFT = new SlotType("chest_raft");
     public static final SlotType TABURET = new SlotType("taburet");
     public static final SlotType CHAIR = new SlotType("chair");
     public static final SlotType BAR_STOOL = new SlotType("bar_stool");

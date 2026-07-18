@@ -7,6 +7,8 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.vehicle.AbstractBoat;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.entity.vehicle.ChestRaft;
+import net.minecraft.world.entity.vehicle.Raft;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.level.Level;
 
@@ -52,9 +54,14 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
      */
     private BoatItem boatItem;
     /**
-     * Whether this boat has a chest (spawns a {@link ChestBoat} instead of a plain {@link Boat})
+     * Whether this boat has a chest (spawns a {@link ChestBoat}/{@link ChestRaft} instead of a plain
+     * {@link Boat}/{@link Raft})
      */
     private final boolean withChest;
+    /**
+     * Whether this is a raft (spawns a {@link Raft}/{@link ChestRaft} instead of a {@link Boat}/{@link ChestBoat})
+     */
+    private final boolean isRaft;
 
     /**
      * Creates a new boat item configuration.
@@ -70,8 +77,29 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
             ItemFactory<I> itemFactory,
             boolean withChest
     ) {
+        this(registry, itemName, itemFactory, withChest, false);
+    }
+
+    /**
+     * Creates a new boat/raft item configuration.
+     *
+     * @param registry    The item registry to use for registration
+     * @param itemName    The name identifier for the boat item
+     * @param itemFactory The factory used to create the boat item instance
+     * @param withChest   Whether this boat should spawn as a chest boat/raft
+     * @param isRaft      Whether this should spawn a {@link Raft}/{@link ChestRaft} instead of a
+     *                    {@link Boat}/{@link ChestBoat}
+     */
+    protected BoatItemDefinition(
+            ItemRegistry registry,
+            String itemName,
+            ItemFactory<I> itemFactory,
+            boolean withChest,
+            boolean isRaft
+    ) {
         super(registry, itemName, itemFactory);
         this.withChest = withChest;
+        this.isRaft = isRaft;
     }
 
     /**
@@ -99,17 +127,41 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
     }
 
     /**
+     * Entity factory used to spawn a plain {@link Raft} for the registered entity type.
+     *
+     * @param entityType The entity type being spawned
+     * @param level      The level the raft is spawned in
+     * @return A new {@link Raft} instance backed by this definition's boat item
+     */
+    @SuppressWarnings("unchecked")
+    Raft raftFactory(EntityType<? extends AbstractBoat> entityType, Level level) {
+        return new Raft((EntityType<? extends Raft>) entityType, level, () -> this.boatItem);
+    }
+
+    /**
+     * Entity factory used to spawn a {@link ChestRaft} for the registered entity type.
+     *
+     * @param entityType The entity type being spawned
+     * @param level      The level the raft is spawned in
+     * @return A new {@link ChestRaft} instance backed by this definition's boat item
+     */
+    @SuppressWarnings("unchecked")
+    ChestRaft chestRaftFactory(EntityType<? extends AbstractBoat> entityType, Level level) {
+        return new ChestRaft((EntityType<? extends ChestRaft>) entityType, level, () -> this.boatItem);
+    }
+
+    /**
      * Registers the entity type for this boat before the item is built.
-     * Uses a chest boat or plain boat entity factory depending on {@link #withChest}.
+     * Picks a raft or boat entity factory (with or without a chest) depending on {@link #isRaft}/{@link #withChest}.
      */
     @Override
     protected void beforeBuild() {
         properties.stacksTo(1);
 
         final var entityKey = registry.entityKey(itemKey);
-        final EntityType.EntityFactory<? extends AbstractBoat> factory = withChest
-                ? this::chestBoatFactory
-                : this::boatFactory;
+        final EntityType.EntityFactory<? extends AbstractBoat> factory = isRaft
+                ? (withChest ? this::chestRaftFactory : this::raftFactory)
+                : (withChest ? this::chestBoatFactory : this::boatFactory);
 
         this.entityType = Registry.register(
                 BuiltInRegistries.ENTITY_TYPE,
@@ -144,6 +196,14 @@ public class BoatItemDefinition<I extends BoatItem> extends ItemDefinition<I, Bo
      */
     public EntityType<? extends AbstractBoat> entityType() {
         return this.entityType;
+    }
+
+    /**
+     * @return {@code true} if this definition spawns a {@link Raft}/{@link ChestRaft} rather than a
+     * {@link Boat}/{@link ChestBoat}
+     */
+    public boolean isRaft() {
+        return this.isRaft;
     }
 
     /**

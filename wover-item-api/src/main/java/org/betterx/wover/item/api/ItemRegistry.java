@@ -423,7 +423,29 @@ public abstract class ItemRegistry {
             BoatItemDefinition.ItemFactory<I> itemFactory,
             boolean withChest
     ) {
-        return new BoatItemDefinition<>(this, boatName, itemFactory, withChest);
+        return defineBoatItem(boatName, itemFactory, withChest, false);
+    }
+
+    /**
+     * Creates a configuration for a boat or raft item.
+     * This allows for creating custom boat/raft items with specific properties and behaviors.
+     *
+     * @param boatName    The name identifier for the boat item
+     * @param itemFactory The factory used to create the boat item instance
+     * @param withChest   Whether this boat should spawn as a chest boat/raft
+     * @param isRaft      Whether the spawned entity is a raft ({@code Raft}/{@code ChestRaft}, rendered with
+     *                    {@code RaftRenderer}) rather than a boat ({@code Boat}/{@code ChestBoat}, rendered with
+     *                    {@code BoatRenderer})
+     * @param <I>         The type of boat item to create
+     * @return A new BoatItemDefinition instance for method chaining
+     */
+    public <I extends BoatItem> BoatItemDefinition<I> defineBoatItem(
+            String boatName,
+            BoatItemDefinition.ItemFactory<I> itemFactory,
+            boolean withChest,
+            boolean isRaft
+    ) {
+        return new BoatItemDefinition<>(this, boatName, itemFactory, withChest, isRaft);
     }
 
     /**
@@ -435,11 +457,27 @@ public abstract class ItemRegistry {
      * @return A new BoatItemDefinition instance for method chaining
      */
     public BoatItemDefinition<BoatItem> defineBoatItem(String boatName, boolean withChest) {
+        return defineBoatItem(boatName, withChest, false);
+    }
+
+    /**
+     * Creates a configuration for a boat or raft item with default properties.
+     * This is a convenience method that uses the default boat item factory
+     * to create a boat/raft item with standard properties.
+     *
+     * @param boatName The name identifier for the boat item
+     * @param withChest Whether this boat should spawn as a chest boat/raft
+     * @param isRaft    Whether the spawned entity is a raft rather than a boat, see
+     *                  {@link #defineBoatItem(String, BoatItemDefinition.ItemFactory, boolean, boolean)}
+     * @return A new BoatItemDefinition instance for method chaining
+     */
+    public BoatItemDefinition<BoatItem> defineBoatItem(String boatName, boolean withChest, boolean isRaft) {
         return new BoatItemDefinition<>(
                 this,
                 boatName,
                 (def) -> new BoatItem(def.entityType(), def.getProperties()),
-                withChest
+                withChest,
+                isRaft
         );
     }
 

@@ -24,19 +24,24 @@ public class BoatItemBuilder extends AbstractItemTraitBuilder<BoatItem, BoatItem
 
     public @Nullable List<ItemTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(ClientBlockTraits.BOAT_RENDERER.withDefault());
-        return combine(new BoatItemBuilder.Trait(false), ClientBlockTraits.BOAT_RENDERER.with(false));
+        return combine(new BoatItemBuilder.Trait(false, false), ClientBlockTraits.BOAT_RENDERER.with(false, false));
     }
 
-    public @Nullable List<ItemTrait<?, ?>> with(boolean withChest) {
-        if (!ModCore.isDatagen()) return combine(ClientBlockTraits.BOAT_RENDERER.with(withChest));
-        return combine(new BoatItemBuilder.Trait(withChest), ClientBlockTraits.BOAT_RENDERER.with(withChest));
+    public @Nullable List<ItemTrait<?, ?>> with(boolean withChest, boolean isRaft) {
+        if (!ModCore.isDatagen()) return combine(ClientBlockTraits.BOAT_RENDERER.with(withChest, isRaft));
+        return combine(
+                new BoatItemBuilder.Trait(withChest, isRaft),
+                ClientBlockTraits.BOAT_RENDERER.with(withChest, isRaft)
+        );
     }
 
     public class Trait extends ItemTraitImpl<BoatItem, BoatItemTrait> implements BoatItemTrait {
         private final boolean withChest;
+        private final boolean isRaft;
 
-        Trait(boolean withChest) {
+        Trait(boolean withChest, boolean isRaft) {
             this.withChest = withChest;
+            this.isRaft = isRaft;
         }
 
         @Override
@@ -46,6 +51,7 @@ public class BoatItemBuilder extends AbstractItemTraitBuilder<BoatItem, BoatItem
 
         @Override
         public void configure(ItemDefinition<BoatItem, ? extends ItemDefinition<BoatItem, ?>> definition) {
+            // rafts are part of the vanilla "boats" tag as well (see minecraft:bamboo_raft)
             definition.addTags(ItemTags.BOATS);
             if (withChest) {
                 definition.addTags(ItemTags.CHEST_BOATS);
@@ -55,6 +61,11 @@ public class BoatItemBuilder extends AbstractItemTraitBuilder<BoatItem, BoatItem
         @Override
         public boolean withChest() {
             return withChest;
+        }
+
+        @Override
+        public boolean isRaft() {
+            return isRaft;
         }
     }
 }
