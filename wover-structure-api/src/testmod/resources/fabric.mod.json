@@ -24,6 +24,9 @@
     ],
     "client": [
       "org.betterx.wover.testmod.entrypoint.client.TestModWoverStructureClient"
+    ],
+    "fabric-gametest": [
+      "org.betterx.wover.testmod.gametest.StructureGameTest"
     ]
   },
   "mixins": [],
