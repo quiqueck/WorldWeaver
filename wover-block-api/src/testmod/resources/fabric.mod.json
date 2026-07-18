@@ -26,7 +26,8 @@
       "org.betterx.wover.testmod.entrypoint.client.TestModWoverBlockAndItemClient"
     ],
     "fabric-gametest": [
-      "org.betterx.wover.testmod.gametest.CallOrderGameTest"
+      "org.betterx.wover.testmod.gametest.CallOrderGameTest",
+      "org.betterx.wover.testmod.gametest.TraitPropertyGameTest"
     ]
   },
   "mixins": [],
