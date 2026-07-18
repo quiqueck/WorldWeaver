@@ -30,6 +30,8 @@ run-client/
 run-server/
 output/
 *.log
+# Minecraft/log4j output dirs produced by fabric-loader-junit tests and dev runs
+logs/
 CHANGES.md
 modrinth.json
 node_modules/
