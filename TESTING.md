@@ -47,8 +47,28 @@ The three primary concerns, plus broader validation:
 3. **World preset & surface rules** (`wover-preset-api`, `wover-surface-api`) — custom datapack files
    are loaded and processed, and custom surface rules get injected into the world registry.
 
-Other libraries (math, tag, recipe, …) carry unit and/or smoke tests to catch registration and
-datagen regressions.
+Other libraries (math, tag, recipe, …) are covered by unit tests and the cross-library datagen guard.
+
+### Coverage matrix
+
+| Concern / module | Test | Kind | Asserts |
+|------------------|------|------|---------|
+| Events (`wover-event-api`) | `EventOrderGameTest` | GameTest | Lifecycle events fire once, in order; subscriber priority ordering |
+| Traits (`wover-block-api`) | `CallOrderGameTest` | GameTest | `build()` call-order precedence between chain/trait/ctor/copy |
+| Traits (`wover-block-api`) | `TraitPropertyGameTest` | GameTest | FlammableBlockTrait registration + plain property setters survive |
+| Surface rules (`wover-surface-api`) | `SurfaceRuleGameTest` | GameTest | Datapack-JSON rules loaded + programmatic rule injected |
+| World presets (`wover-preset-api`) | `WorldPresetGameTest` | GameTest | Datapack-JSON preset loaded + programmatic preset injected |
+| Math (`wover-math-api`) | `MathHelperTest`, `NoiseDeterminismTest` | JUnit | floor/seed/length contracts; noise reproducibility |
+| Datagen, ~11 modules | `tools/verify-datagen.sh` | Golden-file | Regenerated datagen matches committed output (no drift, no new files) |
+
+## Continuous integration
+
+`.github/workflows/tests.yml` runs on push and PR:
+
+- **Unit + GameTest** job: `./gradlew test` then `./gradlew gametestAll`, uploading the XML reports.
+- **Datagen golden-file** job: `xvfb-run -a bash tools/verify-datagen.sh --main`.
+
+Both use JDK 21. A red build means a real regression in one of the guarded behaviours.
 
 ## Adding tests
 
