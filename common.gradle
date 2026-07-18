@@ -112,10 +112,12 @@ allprojects { projIt ->
                     }
                 }
 
-                // Headless Fabric GameTest run for the block/item testmod. Only wover-block-api ships a
-                // gametest (the call-order build() precedence contract, CallOrderGameTest); other modules'
-                // testmods don't register a `fabric-gametest` entrypoint, so gate it by module name.
-                if (projIt.name == 'wover-block-api' && projIt.file('src/testmod').exists()) {
+                // Headless Fabric GameTest run. Generated for any module whose testmod registers a
+                // `fabric-gametest` entrypoint in its fabric.mod.json. The run boots a dedicated server
+                // headless, executes every @GameTest method, writes a JUnit-style report.xml and exits
+                // non-zero if any test fails. See TESTING.md for how to run them and what each covers.
+                def testmodModJson = projIt.file('src/testmod/resources/fabric.mod.json')
+                if (testmodModJson.exists() && testmodModJson.text.contains('fabric-gametest')) {
                     "${projIt.name}-testmodGametest" {
                         server()
                         runDir "build/gametest"
@@ -200,6 +202,16 @@ allprojects { projIt ->
         testmodDatagenImplementation sourceSets.testmod.output
         testmodDatagenImplementation sourceSets.testmodClient.output
 
+        // Plain JUnit 5 unit tests (`src/test/java`, run via `./gradlew test`). fabric-loader-junit
+        // bootstraps a headless Fabric/Minecraft classpath so tests that need Bootstrap.bootStrap(),
+        // registries or datagen can run without launching a full game; pure-logic tests (e.g. math)
+        // need none of that. See TESTING.md.
+        testImplementation platform("org.junit:junit-bom:5.11.4")
+        testImplementation "org.junit.jupiter:junit-jupiter"
+        testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+        testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
+        testImplementation sourceSets.main.output
+
         if (projIt.name != "wunderlib") {
             if (local_wunderlib) {
                 implementation project(path: ":wunderlib", configuration: 'dev')
@@ -229,6 +241,20 @@ allprojects { projIt ->
     tasks.withType(AbstractArchiveTask).configureEach {
         preserveFileTimestamps = false
         reproducibleFileOrder = true
+    }
+
+    // JUnit 5 for `src/test/java`. Give the test source set access to the (named/Mojmap) Minecraft
+    // classpath from `main` so fabric-loader-junit-based tests can touch registries/datagen; pure
+    // tests simply ignore it. Tests are opt-in per module - a module with no `src/test/java` gets a
+    // no-op `test` task.
+    sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+    sourceSets.test.runtimeClasspath += sourceSets.main.runtimeClasspath
+    tasks.named('test') {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+            exceptionFormat "full"
+        }
     }
 
     // Run this task after updating minecraft to regenerate any required resources
@@ -265,6 +291,24 @@ allprojects.each { p ->
 
 subprojects.each {
     remapJar.dependsOn("${it.path}:remapJar")
+}
+
+// Aggregate task: run every module's headless Fabric GameTest suite. Each module that declares a
+// `fabric-gametest` entrypoint gets a `run<Module>-testmodGametest` task (see the loom runs block
+// above); those are wired up lazily by loom, so we collect them after all projects are evaluated.
+// Usage: `./gradlew gametestAll`. Pure JUnit tests run separately via `./gradlew test`.
+tasks.register('gametestAll') {
+    group = 'verification'
+    description = 'Runs the headless Fabric GameTest suite for every module that declares one.'
+}
+gradle.projectsEvaluated {
+    subprojects.each { sub ->
+        def runName = 'run' + sub.name[0].toUpperCase() + sub.name.substring(1) + '-testmodGametest'
+        def gametestTask = sub.tasks.findByName(runName)
+        if (gametestTask != null) {
+            tasks.named('gametestAll').configure { dependsOn gametestTask }
+        }
+    }
 }
 
 tasks.sourcesJar {
