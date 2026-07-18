@@ -47,19 +47,35 @@ The three primary concerns, plus broader validation:
 3. **World preset & surface rules** (`wover-preset-api`, `wover-surface-api`) — custom datapack files
    are loaded and processed, and custom surface rules get injected into the world registry.
 
-Other libraries (math, tag, recipe, …) are covered by unit tests and the cross-library datagen guard.
+**Every** module has its own isolated test, so during a Minecraft version port you can validate one
+library at a time (in the dependency order of `Notes.md`) without porting the whole tree first.
 
-### Coverage matrix
+### Coverage matrix (all 18 libraries)
 
-| Concern / module | Test | Kind | Asserts |
-|------------------|------|------|---------|
-| Events (`wover-event-api`) | `EventOrderGameTest` | GameTest | Lifecycle events fire once, in order; subscriber priority ordering |
-| Traits (`wover-block-api`) | `CallOrderGameTest` | GameTest | `build()` call-order precedence between chain/trait/ctor/copy |
-| Traits (`wover-block-api`) | `TraitPropertyGameTest` | GameTest | FlammableBlockTrait registration + plain property setters survive |
-| Surface rules (`wover-surface-api`) | `SurfaceRuleGameTest` | GameTest | Datapack-JSON rules loaded + programmatic rule injected |
-| World presets (`wover-preset-api`) | `WorldPresetGameTest` | GameTest | Datapack-JSON preset loaded + programmatic preset injected |
-| Math (`wover-math-api`) | `MathHelperTest`, `NoiseDeterminismTest` | JUnit | floor/seed/length contracts; noise reproducibility |
+| Module | Test | Kind | Asserts |
+|--------|------|------|---------|
+| `wover-common-api` | `CustomRegistryDataKeyTest` | JUnit | `DataKey` equals/hashCode value semantics (the custom-data lookup contract) |
+| `wover-core-api` | `PriorityLinkedListTest` | JUnit | Priority/tie ordering of the list the event-subscriber system uses |
+| `wover-math-api` | `MathHelperTest`, `NoiseDeterminismTest` | JUnit | floor/seed/length contracts; OpenSimplex/Voronoi reproducibility |
+| `wover-event-api` | `EventOrderGameTest` | GameTest | Lifecycle events fire once, in order; subscriber priority ordering |
+| `wover-surface-api` | `SurfaceRuleGameTest` | GameTest | Datapack-JSON surface rules loaded + programmatic rule injected |
+| `wover-ui-api` | `VersionCheckerModelTest` | JUnit | Version-check Gson wire model (de)serialization round-trip |
+| `wover-datagen-api` | `PackBuilderRedirectTest` | JUnit | Auto-provider redirector bookkeeping in PackBuilderImpl |
+| `wover-tag-api` | `TagInjectionGameTest` | GameTest | Runtime tag injection (no committed JSON) binds members; non-member excluded |
+| `wover-preset-api` | `WorldPresetGameTest` | GameTest | Datapack-JSON preset loaded + programmatic preset injected |
+| `wover-block-api` | `CallOrderGameTest`, `TraitPropertyGameTest` | GameTest | `build()` call-order precedence; FlammableBlockTrait + property setters |
+| `wover-item-api` | `ItemGameTest` | GameTest | Item registration + custom-stack trait enchants the stack |
+| `wover-recipe-api` | `RecipeGameTest` | GameTest | Datapack + programmatic recipes present in the RecipeManager |
+| `wover-sets-api` | `SetGameTest` | GameTest | A WoodenBlockSet expands into and registers its member family |
+| `wover-structure-api` | `StructureGameTest` | GameTest | Structures/sets (datapack) + custom structure-type (programmatic) |
+| `wover-feature-api` | `FeatureGameTest` | GameTest | Configured/placed features (datapack) + feature-types (programmatic) |
+| `wover-biome-api` | `BiomeGameTest` | GameTest | Biome + custom BiomeData registry + biome-modifications (datapack + injected) |
+| `wover-generator-api` | `GeneratorGameTest` | GameTest | World-presets/noise (datapack) + chunk-generator/biome-source codecs |
+| `wover-pottable-api` | `PottableGameTest` | GameTest | pottable_plant / pottable_soil datapack registries resolve at runtime |
 | Datagen, ~11 modules | `tools/verify-datagen.sh` | Golden-file | Regenerated datagen matches committed output (no drift, no new files) |
+
+Every GameTest that checks datapack-loaded entries also includes a negative case (a plausible-but-absent
+id) so a registry that silently accepted everything would still fail the test.
 
 ## Continuous integration
 
