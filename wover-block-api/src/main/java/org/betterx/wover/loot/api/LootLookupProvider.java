@@ -40,11 +40,11 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Passed to {@link BlockLootProvider#registerBlockLoot} during loot table datagen. Wraps vanilla's
- * {@link VanillaBlockLoot} with the registry lookups (enchantments, items) needed to build loot table
- * conditions/functions, and adds a set of higher-level {@code drop...(...)} helpers that mirror the
- * private helper methods vanilla's own loot table providers use internally (silk touch dispatch, ore drops,
- * leaves drops, plant/crop drops, composters, ...).
+ * Passed to loot table factories during loot table datagen. Wraps vanilla's {@link VanillaBlockLoot} with
+ * the registry lookups (enchantments, items) needed to build loot table conditions/functions, and adds a set
+ * of higher-level {@code drop...(...)} helpers that mirror the private helper methods vanilla's own loot
+ * table providers use internally (silk touch dispatch, ore drops, leaves drops, plant/crop drops,
+ * composters, ...).
  */
 public class LootLookupProvider {
     /**

@@ -1,15 +1,10 @@
 package org.betterx.wover.block.api;
 
 import org.betterx.wover.block.impl.BlockRegistryImpl;
-import org.betterx.wover.block.impl.WoverBlockItemImpl;
 import org.betterx.wover.core.api.ModCore;
 import org.betterx.wover.item.api.ItemRegistry;
-import org.betterx.wover.loot.api.BlockLootProvider;
-import org.betterx.wover.loot.api.LootLookupProvider;
-import org.betterx.wover.loot.api.LootTableManager;
 import org.betterx.wover.tag.api.event.context.TagBootstrapContext;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -19,13 +14,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.storage.loot.LootTable;
 
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  * ({@link #defineDefaultBlock(String)}, {@link #defineDefaultBlockWithProps(String, Function)}, ...), and also
  * exposes lower-level {@code register(...)}/{@code registerBlockOnly(...)} methods for registering blocks
  * directly. Registered blocks are used by the auto datagen providers in
- * {@link org.betterx.wover.datagen.api.provider} to generate block tags and loot tables.
+ * {@link org.betterx.wover.datagen.api.provider} to generate block tags.
  * <p>
  * Obtain an instance with {@link #forMod(ModCore)}; use {@link #streamAll()} to iterate every registry that
  * currently exists (e.g. when writing datagen providers that need to process blocks from every mod).
@@ -188,8 +181,7 @@ public abstract class BlockRegistry {
     }
 
     /**
-     * This is here for legacy support. It allows registering a block with a
-     * {@link CustomBlockItemProvider}. Going forward we use the BlockDefinition system
+     * This is here for legacy support. Going forward we use the BlockDefinition system
      * to handle block registration and item creation.
      *
      * @param key      The resource key identifying the block
@@ -209,19 +201,7 @@ public abstract class BlockRegistry {
             @Nullable TagKey<Item>[] itemTags
     ) {
         if (register(key, block, tags)) {
-            final BlockItem item;
-
-            if (block instanceof CustomBlockItemProvider provider) {
-                item = provider.getCustomBlockItem(
-                        itemKey.location(),
-                        defaultBlockItemSettings().setId(ResourceKey.create(
-                                BuiltInRegistries.ITEM.key(),
-                                itemKey.location()
-                        ))
-                );
-            } else {
-                item = WoverBlockItemImpl.create(block, defaultBlockItemSettings().setId(itemKey));
-            }
+            final BlockItem item = new BlockItem(block, defaultBlockItemSettings().setId(itemKey));
 
             if (itemTags == null)
                 registerBlockItem(itemKey, item);
@@ -324,8 +304,8 @@ public abstract class BlockRegistry {
     }
 
     /**
-     * Called during tag datagen to add every tag registered against a block in this registry (either via
-     * {@code tags} passed to {@code register(...)}, or via {@link BlockTagProvider}) to {@code ctx}.
+     * Called during tag datagen to add every tag registered against a block in this registry (via
+     * {@code tags} passed to {@code register(...)}) to {@code ctx}.
      * Normally invoked automatically by {@link org.betterx.wover.datagen.api.provider.AutoBlockRegistryTagProvider}.
      *
      * @param ctx The context to add the collected tags to
@@ -334,42 +314,6 @@ public abstract class BlockRegistry {
         if (datagenTags != null) {
             datagenTags.forEach(ctx::add);
         }
-
-        blocks
-                .entrySet()
-                .stream()
-                .filter(b -> b.getValue() instanceof BlockTagProvider)
-                .forEach(b -> ((BlockTagProvider) b.getValue()).registerBlockTags(b.getKey().location(), ctx));
-    }
-
-    /**
-     * Called during loot table datagen to generate the loot table of every block in this registry that
-     * implements {@link BlockLootProvider}. Normally invoked automatically by
-     * {@link org.betterx.wover.datagen.api.provider.AutoBlockLootProvider}.
-     *
-     * @param lookup     The registry lookup provider, forwarded to {@link LootLookupProvider}
-     * @param biConsumer Consumer that a generated loot table's key/builder pair is passed to
-     */
-    public void bootstrapBlockLoot(
-            @NotNull HolderLookup.Provider lookup,
-            @NotNull BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer
-    ) {
-        LootLookupProvider provider = new LootLookupProvider(lookup);
-        blocks
-                .entrySet()
-                .stream()
-                .filter(b -> b.getValue() instanceof BlockLootProvider)
-                .forEach(b -> {
-                    var key = LootTableManager.getBlockLootTableKey(b.getKey());
-                    var builder = ((BlockLootProvider) b.getValue()).registerBlockLoot(
-                            b.getKey().location(),
-                            provider,
-                            key
-                    );
-
-                    if (builder != null)
-                        biConsumer.accept(key, builder);
-                });
     }
 
     /**

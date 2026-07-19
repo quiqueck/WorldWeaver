@@ -610,9 +610,7 @@ public abstract class ItemRegistry {
     /**
      * Bootstraps item tags for data generation.
      * This method is called during the data generation process to register all
-     * item tags that were specified during item configuration. It handles both
-     * tags specified through configuration classes and tags from items that
-     * implement {@link ItemTagProvider}.
+     * item tags that were specified during item configuration.
      *
      * @param ctx The item tag bootstrap context for registering tags
      */
@@ -620,10 +618,5 @@ public abstract class ItemRegistry {
         if (datagenTags != null) {
             datagenTags.forEach(ctx::add);
         }
-        items
-                .entrySet()
-                .stream()
-                .filter(i -> i.getValue() instanceof ItemTagProvider)
-                .forEach(i -> ((ItemTagProvider) i.getValue()).registerItemTags(i.getKey().location(), ctx));
     }
 }

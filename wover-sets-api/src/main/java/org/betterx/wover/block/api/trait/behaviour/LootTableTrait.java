@@ -22,8 +22,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A {@link BlockTrait} that attaches a code-driven loot table factory to a block.
  * <p>
- * This is an alternative to implementing {@code BlockLootProvider} directly on the block class: any of the
- * {@link Builder} shortcuts (or a fully custom {@link LootTableFactory}) can be handed to
+ * Any of the {@link Builder} shortcuts (or a fully custom {@link LootTableFactory}) can be handed to
  * {@link org.betterx.wover.block.api.BlockDefinition#addTrait} while the block is being configured, and the
  * resulting loot table is generated automatically for every block carrying the trait via
  * {@link #bootstrapLootTables}.

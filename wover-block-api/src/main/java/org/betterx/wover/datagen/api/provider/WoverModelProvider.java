@@ -1,7 +1,6 @@
 package org.betterx.wover.datagen.api.provider;
 
 import org.betterx.wover.block.api.BlockRegistry;
-import org.betterx.wover.block.api.model.BlockModelProvider;
 import org.betterx.wover.block.api.model.WoverBlockModelGenerators;
 import org.betterx.wover.block.impl.ModelProviderExclusions;
 import org.betterx.wover.core.api.ModCore;
@@ -25,9 +24,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Base class for client-side model datagen providers. Subclasses implement
  * {@link #bootstrapBlockStateModels(WoverBlockModelGenerators)} and {@link #bootstrapItemModels(ItemModelGenerators)}
- * to emit blockstate/model files, and can use {@link #addFromRegistry} to automatically call
- * {@link org.betterx.wover.block.api.model.BlockModelProvider#provideBlockModels} for every block in a
- * {@link BlockRegistry} that implements it.
+ * to emit blockstate/model files, and can use {@link #addFromRegistry} to automatically process every block in a
+ * {@link BlockRegistry}, applying any per-block {@link ModelOverides} that were configured.
  */
 public abstract class WoverModelProvider implements WoverDataProvider<FabricModelProvider> {
     /**
@@ -61,8 +59,7 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
     }
 
     /**
-     * Calls {@link org.betterx.wover.block.api.model.BlockModelProvider#provideBlockModels} for every block
-     * in {@code registry} that implements it, without any overrides.
+     * Processes every block in {@code registry}, without any overrides.
      *
      * @param generator The generator to emit models through
      * @param registry  The registry whose blocks should be processed
@@ -84,7 +81,7 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
     public static class ModelOverides {
         /**
          * A callback that generates the models for a single block, used to override the default
-         * {@link org.betterx.wover.block.api.model.BlockModelProvider} behavior.
+         * per-block model generation.
          */
         public interface BlockModelProvider {
             /**
@@ -174,14 +171,18 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
 
 
     /**
-     * Calls {@link org.betterx.wover.block.api.model.BlockModelProvider#provideBlockModels} for every block
-     * in {@code registry}, unless it has an override in {@code overrides} (which is called instead), or it
-     * doesn't implement {@link org.betterx.wover.block.api.model.BlockModelProvider} at all.
+     * Processes every block in {@code registry}: runs the per-block {@code overrides} (which emit the block's
+     * models, or deliberately provide none for blocks whose blockstate/model is hand-authored), then excludes
+     * the block from vanilla's "missing blockstate" validation.
+     * <p>
+     * Historically the exclusion was skipped for blocks implementing the (now-removed) {@code BlockModelProvider}
+     * hook, which generated their own models and were meant to be validated. With that hook gone, every block
+     * handled here is excluded - it either generated a blockstate through an override, or intentionally has
+     * none - so {@code validateMissing} no longer changes the outcome and is kept only for API compatibility.
      *
      * @param generator      The generator to emit models through
      * @param registry       The registry whose blocks should be processed
-     * @param validateMissing If {@code true}, blocks without models are excluded from model validation
-     *                        instead of failing it
+     * @param validateMissing Retained for API compatibility; no longer affects the outcome (see above)
      * @param overrides      Per-block overrides that replace or skip the default model generation
      */
     protected void addFromRegistry(
@@ -193,17 +194,9 @@ public abstract class WoverModelProvider implements WoverDataProvider<FabricMode
         registry
                 .allBlocks()
                 .forEach(block -> {
-                    // If the block is not in the overrides, and it is a BlockModelProvider, provide the models.
-                    if (!overrides.provideBlockModel(block) && block instanceof BlockModelProvider bmp) {
-                        bmp.provideBlockModels(generator);
-                    } else if (validateMissing) {
-                        ModelProviderExclusions.excludeFromBlockModelValidation(block);
-                    }
-
-                    if (!validateMissing) {
-                        ModelProviderExclusions.excludeFromBlockModelValidation(block);
-                    }
-
+                    // provideBlockModel runs the override (emitting the block's models, if any) as a side effect.
+                    overrides.provideBlockModel(block);
+                    ModelProviderExclusions.excludeFromBlockModelValidation(block);
                 });
     }
 

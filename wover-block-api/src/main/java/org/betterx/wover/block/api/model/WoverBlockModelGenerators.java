@@ -39,8 +39,7 @@ import org.jetbrains.annotations.Nullable;
  * chests, ...), plus a few extra shapes not covered by vanilla (obsidian-style random rotation, particle-only
  * models, top/side/bottom covers).
  * <p>
- * Passed to {@link BlockModelProvider#provideBlockModels(WoverBlockModelGenerators)} and
- * {@link org.betterx.wover.datagen.api.provider.WoverModelProvider#bootstrapBlockStateModels}.
+ * Passed to {@link org.betterx.wover.datagen.api.provider.WoverModelProvider#bootstrapBlockStateModels}.
  */
 @Environment(EnvType.CLIENT)
 public class WoverBlockModelGenerators {
