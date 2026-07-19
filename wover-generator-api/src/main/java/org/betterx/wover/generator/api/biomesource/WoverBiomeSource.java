@@ -48,7 +48,9 @@ public abstract class WoverBiomeSource extends BiomeSource implements
         BiomeSourceWithNoiseRelatedSettings,
         BiomeSourceWithSeed,
         MergeableBiomeSource<WoverBiomeSource> {
-    private boolean didCreatePickers;
+    // volatile + synchronized rebuild/reload: getNoiseBiome lazily calls reloadBiomes(false) off the chunk
+    // worker threads, so concurrent first-samples must not both run the (HashMap-mutating) picker rebuild.
+    private volatile boolean didCreatePickers;
     Set<Holder<Biome>> dynamicPossibleBiomes;
     /**
      * The world seed this source currently generates with. Updated by {@link #setSeed(long)}.
@@ -296,7 +298,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
      * @param force if {@code false}, does nothing once the pickers were already built at least once (see
      *              {@link #wasBound()})
      */
-    protected final void rebuildBiomes(boolean force) {
+    protected final synchronized void rebuildBiomes(boolean force) {
         if (!force && didCreatePickers) return;
 
         LibWoverWorldGenerator.C.log.verbose("Updating Pickers for " + this.toShortString());
@@ -321,7 +323,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
      *
      * @param force if {@code false}, skips the picker rebuild if it already ran once
      */
-    protected void reloadBiomes(boolean force) {
+    protected synchronized void reloadBiomes(boolean force) {
         rebuildBiomes(force);
         this.initMap(currentSeed);
     }
