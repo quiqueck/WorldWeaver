@@ -1,5 +1,6 @@
 package org.betterx.wover.generator.impl.biomesource.end;
 
+import org.betterx.wover.biome.api.data.BiomeData;
 import org.betterx.wover.biome.impl.data.BiomeDataRegistryImpl;
 import org.betterx.wover.common.generator.api.biomesource.BiomeSourceWithConfig;
 import org.betterx.wover.core.api.ModCore;
@@ -134,6 +135,25 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
                 new TagToPicker(CommonBiomeTags.IS_END_MIDLAND, endLandBiomePicker),
                 new TagToPicker(BiomeTags.IS_END, endLandBiomePicker)
         );
+    }
+
+    @Override
+    protected boolean addToPicker(BiomeData biomeData, TagKey<Biome> type, WoverBiomePicker picker) {
+        picker.addBiome(biomeData);
+
+        // A Biome is normally added to a single picker: the first accepted tag it carries, in
+        // the order of createFreshPickerMap(). Because the barrens picker is visited *before* the
+        // small-island (void) picker, a Biome whose intended placement is a small end island but
+        // which is *also* tagged as barrens (e.g. betterend:ice_starfield, so it appears in both
+        // the common barrens ring and its natural void ring) would otherwise land only in the
+        // barrens picker, leaving the void picker empty. Returning false here means it is not yet
+        // marked as fully placed, so the small-island picker (visited next) receives it as well;
+        // it is finally deduplicated once added to its intended small-island picker.
+        if (type.equals(CommonBiomeTags.IS_END_BARRENS)
+                && biomeData.isIntendedFor(CommonBiomeTags.IS_SMALL_END_ISLAND)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
