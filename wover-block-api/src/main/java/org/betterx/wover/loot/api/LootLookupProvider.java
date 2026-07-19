@@ -867,6 +867,27 @@ public class LootLookupProvider {
     }
 
     /**
+     * Builds a loot table for a two-tall plant that drops two of itself when broken with ANY tool (or by
+     * hand), mirroring how a single ground plant drops via {@code dropSelf}. Unlike
+     * {@link #dropDoublePlantShears(Block)} there is no shears requirement; the drop is still subject to
+     * explosion survival.
+     *
+     * @param block The plant block
+     * @return The loot table builder
+     */
+    public LootTable.Builder dropDoublePlant(Block block) {
+        return LootTable.lootTable().withPool(
+                LootPool.lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .add(vanillaBlockLoot.applyExplosionCondition(
+                                block,
+                                LootItem.lootTableItem(block)
+                                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(2.0F)))
+                        ))
+        );
+    }
+
+    /**
      * Builds a loot table for a two-tall plant that drops itself when broken with shears, and a seed item
      * (with a small random chance) otherwise.
      *
