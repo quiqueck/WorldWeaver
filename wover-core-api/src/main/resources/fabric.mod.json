@@ -1,41 +1,45 @@
 {
-  "schemaVersion": 1,
-  "id": "wover-core",
-  "version": "21.8.0",
-  "name": "WorldWeaver - Core API",
-  "description": "Provides Common functionality for our WorldWeaver Mods.",
-  "authors": [
-    "Quiqueck"
-  ],
-  "contact": {
-    "homepage": "https://github.com/quiqueck/WorldWeaver",
-    "sources": "https://github.com/quiqueck/WorldWeaver",
-    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-  },
-  "license": "MIT",
-  "icon": "assets/wover-core/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "org.betterx.wover.entrypoint.LibWoverCore"
-    ]
-  },
-  "mixins": [
-    "wover.core.mixins.common.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6", "1.21.7", "1.21.8"],
-    "java": ">=21",
-    "fabric-api": ">=0.100.0"
-  },
-  "custom": {
-    "modmenu": {
-      "badges": [
-        "library"
-      ],
-      "parent": "wover"
-    }
-  },
-  "accessWidener": "wover.core.accesswidener"
+    "schemaVersion": 1,
+    "id": "wover-core",
+    "version": "21.8.1",
+    "name": "WorldWeaver - Core API",
+    "description": "Provides Common functionality for our WorldWeaver Mods.",
+    "authors": [
+        "Quiqueck"
+    ],
+    "contact": {
+        "homepage": "https://github.com/quiqueck/WorldWeaver",
+        "sources": "https://github.com/quiqueck/WorldWeaver",
+        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/wover-core/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "org.betterx.wover.entrypoint.LibWoverCore"
+        ]
+    },
+    "mixins": [
+        "wover.core.mixins.common.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.0",
+        "minecraft": [
+            "1.21.6",
+            "1.21.7",
+            "1.21.8"
+        ],
+        "java": ">=21",
+        "fabric-api": ">=0.100.0"
+    },
+    "custom": {
+        "modmenu": {
+            "badges": [
+                "library"
+            ],
+            "parent": "wover"
+        }
+    },
+    "accessWidener": "wover.core.accesswidener"
 }

@@ -1,46 +1,50 @@
 {
-  "schemaVersion": 1,
-  "id": "wover",
-  "version": "21.8.0",
-  "name": "WorldWeaver",
-  "description": "Unleash your world-building potential with WorldWeaver, a Minecraft utility mod for Fabric, simplifying tasks and enhancing the possibilities of data-driven world generation.",
-  "authors": [
-    "Quiqueck"
-  ],
-  "contact": {
-    "homepage": "https://github.com/quiqueck/WorldWeaver",
-    "sources": "https://github.com/quiqueck/WorldWeaver",
-    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-  },
-  "license": "MIT",
-  "icon": "assets/wover/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "org.betterx.wover.entrypoint.Wover"
+    "schemaVersion": 1,
+    "id": "wover",
+    "version": "21.8.1",
+    "name": "WorldWeaver",
+    "description": "Unleash your world-building potential with WorldWeaver, a Minecraft utility mod for Fabric, simplifying tasks and enhancing the possibilities of data-driven world generation.",
+    "authors": [
+        "Quiqueck"
     ],
-    "modmenu": [
-      "org.betterx.wover.entrypoint.client.ModMenuEntryPoint"
-    ]
-  },
-  "accessWidener": "wover.accesswidener",
-  "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6", "1.21.7", "1.21.8"],
-    "java": ">=21",
-    "fabric-api": ">=0.100.0",
-    "wunderlib": "21.8.x"
-  },
-  "breaks": {
-    "wunderlib": "<21.8.0"
-  },
-  "custom": {
-    "wover": {
-      "updater_icon": "icon_updater.png",
-      "downloads": {
-        "modrinth": "https://modrinth.com/mod/worldweaver",
-        "curseforge": "https://legacy.curseforge.com/minecraft/mc-mods/worldweaver"
-      }
+    "contact": {
+        "homepage": "https://github.com/quiqueck/WorldWeaver",
+        "sources": "https://github.com/quiqueck/WorldWeaver",
+        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/wover/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "org.betterx.wover.entrypoint.Wover"
+        ],
+        "modmenu": [
+            "org.betterx.wover.entrypoint.client.ModMenuEntryPoint"
+        ]
+    },
+    "accessWidener": "wover.accesswidener",
+    "depends": {
+        "fabricloader": ">=0.16.0",
+        "minecraft": [
+            "1.21.6",
+            "1.21.7",
+            "1.21.8"
+        ],
+        "java": ">=21",
+        "fabric-api": ">=0.100.0",
+        "wunderlib": "21.8.x"
+    },
+    "breaks": {
+        "wunderlib": "<21.8.0"
+    },
+    "custom": {
+        "wover": {
+            "updater_icon": "icon_updater.png",
+            "downloads": {
+                "modrinth": "https://modrinth.com/mod/worldweaver",
+                "curseforge": "https://legacy.curseforge.com/minecraft/mc-mods/worldweaver"
+            }
+        }
     }
-  }
 }

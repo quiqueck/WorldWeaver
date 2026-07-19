@@ -1,44 +1,48 @@
 {
-  "schemaVersion": 1,
-  "id": "wover-biome",
-  "version": "21.8.0",
-  "name": "WorldWeaver - Biome API",
-  "description": "",
-  "authors": [
-    "Quiqueck"
-  ],
-  "contact": {
-    "homepage": "https://github.com/quiqueck/WorldWeaver",
-    "sources": "https://github.com/quiqueck/WorldWeaver",
-    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-  },
-  "license": "MIT",
-  "icon": "assets/wover-biome/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "org.betterx.wover.entrypoint.LibWoverBiome"
+    "schemaVersion": 1,
+    "id": "wover-biome",
+    "version": "21.8.1",
+    "name": "WorldWeaver - Biome API",
+    "description": "",
+    "authors": [
+        "Quiqueck"
     ],
-    "wover.datapack.registry": [
-      "org.betterx.wover.entrypoint.BiomeDatapackRegistryEntrypoint"
-    ]
-  },
-  "mixins": [
-    "wover.biome.mixins.common.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6", "1.21.7", "1.21.8"],
-    "java": ">=21",
-    "fabric-api": ">=0.100.0"
-  },
-  "custom": {
-    "modmenu": {
-      "badges": [
-        "library"
-      ],
-      "parent": "wover"
-    }
-  },
-  "accessWidener": "wover-biome.accesswidener"
+    "contact": {
+        "homepage": "https://github.com/quiqueck/WorldWeaver",
+        "sources": "https://github.com/quiqueck/WorldWeaver",
+        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/wover-biome/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "org.betterx.wover.entrypoint.LibWoverBiome"
+        ],
+        "wover.datapack.registry": [
+            "org.betterx.wover.entrypoint.BiomeDatapackRegistryEntrypoint"
+        ]
+    },
+    "mixins": [
+        "wover.biome.mixins.common.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.0",
+        "minecraft": [
+            "1.21.6",
+            "1.21.7",
+            "1.21.8"
+        ],
+        "java": ">=21",
+        "fabric-api": ">=0.100.0"
+    },
+    "custom": {
+        "modmenu": {
+            "badges": [
+                "library"
+            ],
+            "parent": "wover"
+        }
+    },
+    "accessWidener": "wover-biome.accesswidener"
 }

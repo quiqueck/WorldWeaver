@@ -1,45 +1,49 @@
 {
-  "schemaVersion": 1,
-  "id": "wover-events",
-  "version": "21.8.0",
-  "name": "WorldWeaver - Events API",
-  "description": "Provides an API for registering events in the Lifecycle of a Minecraft World.",
-  "authors": [
-    "Quiqueck"
-  ],
-  "contact": {
-    "homepage": "https://github.com/quiqueck/WorldWeaver",
-    "sources": "https://github.com/quiqueck/WorldWeaver",
-    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
-  },
-  "license": "MIT",
-  "icon": "assets/wover-events/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "org.betterx.wover.entrypoint.LibWoverEvents"
+    "schemaVersion": 1,
+    "id": "wover-events",
+    "version": "21.8.1",
+    "name": "WorldWeaver - Events API",
+    "description": "Provides an API for registering events in the Lifecycle of a Minecraft World.",
+    "authors": [
+        "Quiqueck"
     ],
-    "client": [
-      "org.betterx.wover.entrypoint.client.LibWoverEventsClient"
-    ]
-  },
-  "mixins": [
-    "wover.event.mixins.common.json",
-    "wover.event.mixins.client.json"
-  ],
-  "accessWidener": "wover.event.accesswidener",
-  "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": ["1.21.6", "1.21.7", "1.21.8"],
-    "java": ">=21",
-    "fabric-api": ">=0.100.0"
-  },
-  "custom": {
-    "modmenu": {
-      "badges": [
-        "library"
-      ],
-      "parent": "wover"
+    "contact": {
+        "homepage": "https://github.com/quiqueck/WorldWeaver",
+        "sources": "https://github.com/quiqueck/WorldWeaver",
+        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/wover-events/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "org.betterx.wover.entrypoint.LibWoverEvents"
+        ],
+        "client": [
+            "org.betterx.wover.entrypoint.client.LibWoverEventsClient"
+        ]
+    },
+    "mixins": [
+        "wover.event.mixins.common.json",
+        "wover.event.mixins.client.json"
+    ],
+    "accessWidener": "wover.event.accesswidener",
+    "depends": {
+        "fabricloader": ">=0.16.0",
+        "minecraft": [
+            "1.21.6",
+            "1.21.7",
+            "1.21.8"
+        ],
+        "java": ">=21",
+        "fabric-api": ">=0.100.0"
+    },
+    "custom": {
+        "modmenu": {
+            "badges": [
+                "library"
+            ],
+            "parent": "wover"
+        }
     }
-  }
 }
