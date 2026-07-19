@@ -1,7 +1,6 @@
 package org.betterx.wover.structure.impl.pools;
 
 import org.betterx.wover.entrypoint.LibWoverStructure;
-import org.betterx.wover.legacy.api.LegacyHelper;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
@@ -29,9 +28,6 @@ public class StructurePoolElementTypeManagerImpl {
             MapCodec<P> codec
     ) {
         final StructurePoolElementType<P> res = register(location, codec);
-        if (LegacyHelper.isLegacyEnabled()) {
-            register(LegacyHelper.BCLIB_CORE.convertNamespace(location), LegacyHelper.wrap(codec));
-        }
         return res;
     }
 

@@ -2,7 +2,6 @@ package org.betterx.wover.feature.impl.placed.modifiers;
 
 import org.betterx.wover.entrypoint.LibWoverFeature;
 import org.betterx.wover.feature.api.placed.modifiers.*;
-import org.betterx.wover.legacy.api.LegacyHelper;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
@@ -92,53 +91,29 @@ public class PlacementModifiersImpl {
             MapCodec<P> codec
     ) {
         var id = LibWoverFeature.C.id(path);
-        return register(id, codec, true);
+        return register(id, codec);
     }
 
     private static <P extends PlacementModifier> PlacementModifierType<P> register(String path, MapCodec<P> codec) {
         var id = LibWoverFeature.C.id(path);
-        return register(id, codec, false);
+        return register(id, codec);
     }
 
     public static <P extends PlacementModifier> PlacementModifierType<P> register(
             ResourceLocation location,
-            MapCodec<P> codec,
-            boolean withLegacyBCLib
+            MapCodec<P> codec
     ) {
         PlacementModifierType<P> res = Registry.register(
                 BuiltInRegistries.PLACEMENT_MODIFIER_TYPE,
                 location,
                 () -> codec
         );
-
-        if (withLegacyBCLib && LegacyHelper.isLegacyEnabled()) {
-            Registry.<PlacementModifierType<?>, PlacementModifierType<P>>register(
-                    BuiltInRegistries.PLACEMENT_MODIFIER_TYPE,
-                    LegacyHelper.BCLIB_CORE.convertNamespace(location),
-                    () -> codec
-            );
-        }
         return res;
     }
 
     @ApiStatus.Internal
     public static void ensureStaticInitialization() {
 
-    }
-
-    static {
-        if (LegacyHelper.isLegacyEnabled()) {
-            final PlacementModifierType<EveryLayer> ON_EVERY_LAYER_LEGACY = register(
-                    LegacyHelper.BCLIB_CORE.id("on_every_layer"),
-                    EveryLayer.CODEC,
-                    false
-            );
-            final PlacementModifierType<EveryLayer> UNDER_EVERY_LAYER_LEGACY = register(
-                    LegacyHelper.BCLIB_CORE.id("under_every_layer"),
-                    EveryLayer.CODEC_LEGACY_UNDER,
-                    false
-            );
-        }
     }
 }
 

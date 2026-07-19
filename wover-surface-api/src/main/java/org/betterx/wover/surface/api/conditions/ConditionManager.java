@@ -25,7 +25,7 @@ public class ConditionManager {
             ResourceLocation location,
             MapCodec<? extends SurfaceRules.ConditionSource> codec
     ) {
-        return MaterialConditionRegistryImpl.register(MaterialConditionRegistryImpl.createKey(location), codec, false);
+        return MaterialConditionRegistryImpl.register(MaterialConditionRegistryImpl.createKey(location), codec);
     }
 
     /**
@@ -39,7 +39,7 @@ public class ConditionManager {
             ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> key,
             MapCodec<? extends SurfaceRules.ConditionSource> codec
     ) {
-        return MaterialConditionRegistryImpl.register(key, codec, false);
+        return MaterialConditionRegistryImpl.register(key, codec);
     }
 
     /**

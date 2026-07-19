@@ -13,7 +13,6 @@ import org.betterx.wover.generator.api.biomesource.WoverBiomeData;
 import org.betterx.wover.generator.impl.biomesource.end.TheEndBiomesHelper;
 import org.betterx.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
 import org.betterx.wover.generator.impl.biomesource.nether.WoverNetherBiomeSource;
-import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldState;
 import org.betterx.wover.tag.api.predefined.CommonBiomeTags;
 import org.betterx.wover.util.ResourceLocationSet;
@@ -62,14 +61,6 @@ public class BiomeSourceManagerImpl {
         register(LibWoverWorldGenerator.C.id("nether_biome_source"), WoverNetherBiomeSource.CODEC);
 
         register(LibWoverWorldGenerator.C.id("end_biome_source"), WoverEndBiomeSource.CODEC);
-
-        if (LegacyHelper.isLegacyEnabled()) {
-            register(
-                    LegacyHelper.BCLIB_CORE.id("nether_biome_source"),
-                    LegacyHelper.wrap(WoverNetherBiomeSource.CODEC)
-            );
-            register(LegacyHelper.BCLIB_CORE.id("end_biome_source"), LegacyHelper.wrap(WoverEndBiomeSource.CODEC));
-        }
 
         WorldLifecycle.RESOURCES_LOADED.subscribe(BiomeSourceManagerImpl::onResourcesLoaded);
 

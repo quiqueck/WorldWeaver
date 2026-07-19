@@ -4,7 +4,6 @@ import org.betterx.wover.core.api.registry.DatapackRegistryBuilder;
 import org.betterx.wover.entrypoint.LibWoverStructure;
 import org.betterx.wover.events.api.types.OnBootstrapRegistry;
 import org.betterx.wover.events.impl.EventImpl;
-import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.structure.api.StructureTypeKey;
 import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructure;
 import org.betterx.wover.structure.api.structures.nbt.RandomNbtStructurePiece;
@@ -132,14 +131,5 @@ public class StructureManagerImpl {
             @NotNull StructurePieceType pieceType
     ) {
         return Registry.register(BuiltInRegistries.STRUCTURE_PIECE, location, pieceType);
-    }
-
-    static {
-        if (LegacyHelper.isLegacyEnabled()) {
-            registerPiece(
-                    LegacyHelper.BCLIB_CORE.id("template_piece"),
-                    RandomNbtStructurePiece::new
-            );
-        }
     }
 }

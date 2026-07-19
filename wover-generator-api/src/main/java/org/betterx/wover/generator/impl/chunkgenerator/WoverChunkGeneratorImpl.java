@@ -3,7 +3,6 @@ package org.betterx.wover.generator.impl.chunkgenerator;
 import org.betterx.wover.common.generator.api.chunkgenerator.RestorableBiomeSource;
 import org.betterx.wover.entrypoint.LibWoverWorldGenerator;
 import org.betterx.wover.events.api.WorldLifecycle;
-import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.state.api.WorldState;
 
 import com.mojang.serialization.Lifecycle;
@@ -16,7 +15,6 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
@@ -26,11 +24,6 @@ import java.util.Set;
 import org.jetbrains.annotations.ApiStatus;
 
 public class WoverChunkGeneratorImpl {
-    public static final ResourceKey<NoiseGeneratorSettings> LEGACY_AMPLIFIED_NETHER = ResourceKey.create(
-            Registries.NOISE_SETTINGS,
-            LegacyHelper.BCLIB_CORE.convertNamespace(WoverChunkGenerator.AMPLIFIED_NETHER.location())
-    );
-
     @ApiStatus.Internal
     public static void initialize() {
         WorldLifecycle.MINECRAFT_SERVER_READY.subscribe(WoverChunkGeneratorImpl::restoreInitialBiomeSourceInAllDimensions);

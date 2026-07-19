@@ -2,7 +2,6 @@ package org.betterx.wover.block.impl.predicate;
 
 import org.betterx.wover.block.api.predicate.IsFullShape;
 import org.betterx.wover.entrypoint.LibWoverBlock;
-import org.betterx.wover.legacy.api.LegacyHelper;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
@@ -26,14 +25,5 @@ public class BlockPredicatesImpl {
 
     public static void ensureStaticInitialization() {
 
-    }
-
-    static {
-        if (LegacyHelper.isLegacyEnabled()) {
-            final BlockPredicateType<IsFullShape> FULL_SHAPE_LEGACY = register(
-                    LegacyHelper.BCLIB_CORE.id("full_shape"),
-                    IsFullShape.CODEC
-            );
-        }
     }
 }

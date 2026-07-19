@@ -135,6 +135,8 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
                 + "  speed=" + block.getSpeedFactor()
                 + "  jump=" + block.getJumpFactor()
                 + "  ignitedByLava=" + state.ignitedByLava()
+                + "  lightEmission=" + state.getLightEmission()
+                + "  replaceable=" + state.canBeReplaced()
                 + "  randomlyTicks=" + state.isRandomlyTicking()
                 + "  hasCollision=" + hasCollision(block)
                 + "  canOcclude=" + state.canOcclude()

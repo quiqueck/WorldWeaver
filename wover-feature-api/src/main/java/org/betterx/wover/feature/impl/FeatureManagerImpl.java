@@ -3,7 +3,6 @@ package org.betterx.wover.feature.impl;
 import org.betterx.wover.entrypoint.LibWoverFeature;
 import org.betterx.wover.feature.api.features.*;
 import org.betterx.wover.feature.api.features.config.*;
-import org.betterx.wover.legacy.api.LegacyHelper;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
@@ -43,9 +42,6 @@ public class FeatureManagerImpl {
     ) {
         final var key = createKey(id);
         F res = register(key, feature.apply(codec));
-        if (LegacyHelper.isLegacyEnabled()) {
-            register(LegacyHelper.BCLIB_CORE.convertNamespace(key.location()), feature.apply(codec));
-        }
         return res;
     }
 

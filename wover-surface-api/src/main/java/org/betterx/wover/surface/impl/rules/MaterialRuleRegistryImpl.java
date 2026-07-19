@@ -1,7 +1,6 @@
 package org.betterx.wover.surface.impl.rules;
 
 import org.betterx.wover.entrypoint.LibWoverSurface;
-import org.betterx.wover.legacy.api.LegacyHelper;
 import org.betterx.wover.surface.api.rules.MaterialRuleManager;
 
 import com.mojang.serialization.MapCodec;
@@ -37,13 +36,5 @@ public class MaterialRuleRegistryImpl {
     @ApiStatus.Internal
     public static void bootstrap() {
         register(SWITCH_RULE, SwitchRuleSource.CODEC);
-
-        if (LegacyHelper.isLegacyEnabled()) {
-            Registry.register(
-                    BuiltInRegistries.MATERIAL_RULE,
-                    "bclib_switch_rule",
-                    LegacyHelper.wrap(SwitchRuleSource.CODEC)
-            );
-        }
     }
 }
