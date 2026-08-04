@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.betterx.wover.potions.mixin",
+  "package": "de.ambertation.wover.potions.mixin",
   "compatibilityLevel": "JAVA_21",
   "injectors": {
     "defaultRequire": 1

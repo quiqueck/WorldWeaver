@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "wover-sets-testmod:block/stony_brick"
+  }
+}

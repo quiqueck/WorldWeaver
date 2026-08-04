@@ -1,23 +1,16 @@
-buildscript {
-    dependencies {
-        classpath 'org.kohsuke:github-api:1.114'
-    }
-
-    repositories {
-        gradlePluginPortal()
-    }
-}
-
 version = project.mod_version
 group = project.maven_group
-def local_wunderlib = findProject(':wunderlib') != null
 
 
-allprojects { projIt ->
+// wunderlib is excluded here: it's a foreign, self-configuring project (applies its own
+// fabric-loom conventions and a real loom.splitEnvironmentSourceSets() via wunderlib.gradle).
+// Applying fabric-loom to it a second time through this shared block would finalize Loom's
+// environment-source-set-split decision before wunderlib.gradle gets a chance to opt into it,
+// causing "the value for this property is final and cannot be changed any further".
+configure(allprojects.findAll { it.name != 'wunderlib' }) { projIt ->
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'eclipse'
-    apply plugin: 'maven-publish'
     apply plugin: 'fabric-loom'
 
     repositories {
@@ -40,6 +33,13 @@ allprojects { projIt ->
         withSourcesJar()
     }
 
+    // Must run before anything below references sourceSets.client - this is what creates it,
+    // backed by the Fabric convention src/client/java (the same convention wunderlib already
+    // uses, see wunderlib.gradle).
+    loom {
+        splitEnvironmentSourceSets()
+    }
+
     sourceSets {
         main {
             resources {
@@ -48,7 +48,7 @@ allprojects { projIt ->
                 ]
             }
             java {
-                srcDirs += ['src/client/java', 'src/datagen/java']
+                srcDirs += ['src/datagen/java']
             }
         }
 
@@ -65,6 +65,9 @@ allprojects { projIt ->
         testmodClient {
             compileClasspath += main.compileClasspath
             runtimeClasspath += main.runtimeClasspath
+
+            compileClasspath += client.compileClasspath
+            runtimeClasspath += client.runtimeClasspath
 
             compileClasspath += testmod.compileClasspath
             runtimeClasspath += testmod.runtimeClasspath
@@ -184,6 +187,16 @@ allprojects { projIt ->
         localDev {
             extendsFrom dev
         }
+        // Client-side counterpart of 'dev': carries a module's own sourceSets.client.output, so
+        // moduleDependencies() can wire clientApi the same way it wires api from 'dev'. Without this,
+        // a dependent module's client sourceSet only ever sees its dependencies' *main* output - which
+        // is what broke once src/client/java stopped being merged into main (splitEnvironmentSourceSets()).
+        devClient {
+            transitive true
+            canBeResolved = true
+            canBeConsumed = true
+            extendsFrom clientImplementation
+        }
     }
 
     dependencies {
@@ -193,9 +206,11 @@ allprojects { projIt ->
         modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
         dev sourceSets.main.output
+        devClient sourceSets.client.output
 
         testmodImplementation sourceSets.main.output
         testmodClientImplementation sourceSets.main.output
+        testmodClientImplementation sourceSets.client.output
         testmodClientImplementation sourceSets.testmod.output
 
         testmodDatagenImplementation sourceSets.main.output
@@ -213,11 +228,10 @@ allprojects { projIt ->
         testImplementation sourceSets.main.output
 
         if (projIt.name != "wunderlib") {
-            if (local_wunderlib) {
-                implementation project(path: ":wunderlib", configuration: 'dev')
-            } else {
-                modApi "de.ambertation:wunderlib:${project.wunderlib_version}"
-            }
+            // alsoInclude=false: only the WorldWeaver aggregator embeds wunderlib
+            // (see build.composit.gradle/build.gradle) - sub-modules just need it
+            // on their own compile classpath.
+            gradle.modApiOrLocal(dependencies, ':wunderlib', "de.ambertation:wunderlib:${project.wunderlib_version}", false)
         }
     }
 
@@ -277,9 +291,10 @@ allprojects { projIt ->
     }
 }
 
-allprojects.each { p ->
+allprojects.findAll { it.name != 'wunderlib' }.each { p ->
     loom.mods.register(p.name) {
         sourceSet p.sourceSets.main
+        sourceSet p.sourceSets.client
     }
 
     loom.mods.register(p.name + "-testmod") {
@@ -311,6 +326,22 @@ gradle.projectsEvaluated {
     }
 }
 
+// The global "Data Generation" run (task runDatagen, defined in the loom runs
+// block below) only generates the root project's own resources. Each module
+// with a src/datagen dir gets its own run<Module>-datagen task (same loom
+// runs block above) - wire those in too, so a single runDatagen invocation
+// regenerates everything. Deliberately excludes each module's separate
+// run<Module>-testmodDatagen task (testmod fixtures, not real content).
+gradle.projectsEvaluated {
+    subprojects.each { sub ->
+        def runName = 'run' + sub.name[0].toUpperCase() + sub.name.substring(1) + '-datagen'
+        def datagenTask = sub.tasks.findByName(runName)
+        if (datagenTask != null) {
+            tasks.named('runDatagen').configure { dependsOn datagenTask }
+        }
+    }
+}
+
 tasks.sourcesJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
@@ -322,6 +353,11 @@ dependencies {
 
     subprojects.each {
         api project(path: "${it.path}", configuration: "namedElements")
+        if (it.name != "wunderlib") {
+            // wunderlib is foreign and self-configuring (see common.gradle's top-of-file note) - it
+            // never gets the devClient configuration the shared configure(allprojects...) block sets up.
+            clientImplementation project(path: "${it.path}", configuration: "devClient")
+        }
 
 //        testmodImplementation project("${it.path}").sourceSets.testmod.output
 //        testmodClientImplementation project("${it.path}").sourceSets.testmodClient.output
@@ -334,14 +370,12 @@ dependencies {
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
     modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 
-    if (local_wunderlib) {
-        implementation project(path: ":wunderlib", configuration: 'dev')
-        include project(path: ":wunderlib")
-    } else {
-        modApi "de.ambertation:wunderlib:${project.wunderlib_version}"
-        include "de.ambertation:wunderlib:${project.wunderlib_version}"
-    }
+    gradle.modApiOrLocal(dependencies, ':wunderlib', "de.ambertation:wunderlib:${project.wunderlib_version}")
 }
+
+// Aggregator maven publishing lives in common-publish-maven.gradle (applied from
+// build.gradle) - the wover-* submodules are bundled directly into this project's
+// jar by the `include project(...)` above, so they are never published separately.
 
 loom {
     runs {
@@ -413,8 +447,11 @@ javadoc {
 
     classpath = files(sourceSets.main.compileClasspath, sourceSets.main.runtimeClasspath)
     include("**/api/**")
-    include("de/ambertation/**")
-    include("org/betterx/wover/util/**")
+    include("de/ambertation/wunderlib/**")
+    include("de/ambertation/wover/util/**")
+    // Mixins target private/final vanilla members via access widening, which javadoc's
+    // compiler does not apply - they can never be part of the documented API surface.
+    exclude("**/mixin/**")
     failOnError true
 
     finalizedBy copyHighlightJs

@@ -1,0 +1,733 @@
+package de.ambertation.wover.item.api;
+
+import de.ambertation.wover.item.api.trait.*;
+import de.ambertation.wover.item.impl.trait.ItemTraitImpl;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.flag.FeatureFlag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.JukeboxSong;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
+
+import com.google.common.collect.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import org.jetbrains.annotations.Nullable;
+
+/**
+ * Abstract base class for configuring and building Minecraft items with a fluent API.
+ * This class provides a builder pattern for item creation with support for tags, properties,
+ * and automatic registration.
+ *
+ * @param <I> The type of item being created, must extend {@link Item}
+ * @param <D> The concrete configuration class type for method chaining
+ * @author Quiqueck
+ * @since 21.6.0
+ */
+public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I, D>> implements ItemTraitLookup {
+    /**
+     * Factory interface for creating items from configuration objects.
+     *
+     * @param <I> The type of item to create
+     * @param <D> The configuration type used to create the item
+     */
+    public interface ItemFactory<I extends Item, D extends ItemDefinition<I, D>> {
+        /**
+         * Creates an item instance from the given configuration.
+         *
+         * @param definition The configuration object containing all item settings
+         * @return The created item instance
+         */
+        I createItem(D definition);
+    }
+
+    /**
+     * The item registry used for registering the item
+     */
+    public final ItemRegistry registry;
+
+    /**
+     * The resource key identifying this item
+     */
+    public final ResourceKey<Item> itemKey;
+
+    /**
+     * The properties configuration for the item
+     */
+    protected final Item.Properties properties;
+
+    /**
+     * Optional tags to be applied to the item
+     */
+    protected List<TagKey<Item>> tags;
+
+    /**
+     * List of traits applied to this item.
+     * Each trait is configured with its own configuration object.
+     */
+    protected List<ItemTrait<? super I, ?>> traits;
+
+    /**
+     * Factory instance used to create the item
+     */
+    protected final ItemDefinition.ItemFactory<I, D> itemFactory;
+
+
+    /**
+     * Creates a new item configuration.
+     *
+     * @param registry    The item registry to use for registration
+     * @param itemName    The name identifier for the item
+     * @param itemFactory The factory used to create the item instance
+     */
+    protected ItemDefinition(ItemRegistry registry, String itemName, ItemDefinition.ItemFactory<I, D> itemFactory) {
+        this(registry, registry.key(itemName), itemFactory);
+    }
+
+    /**
+     * Creates a new item configuration with a given ResourceKey.
+     *
+     * @param registry    The item registry to use for registration
+     * @param itemKey     The resource key identifying the item
+     * @param itemFactory The factory used to create the item instance
+     */
+    protected ItemDefinition(
+            ItemRegistry registry,
+            ResourceKey<Item> itemKey,
+            ItemDefinition.ItemFactory<I, D> itemFactory
+    ) {
+        assert (registry.C.namespace.equals(itemKey.location().getNamespace()));
+        this.itemKey = itemKey;
+        this.properties = new Item.Properties().setId(this.itemKey);
+        this.itemFactory = itemFactory;
+        this.registry = registry;
+    }
+
+    /**
+     * Called before the item is built to allow subclasses to perform any final configuration.
+     * This method is called automatically by {@link #build()} and should be implemented
+     * by subclasses to set up any last-minute properties or validations.
+     */
+    abstract protected void beforeBuild();
+
+    /**
+     * Called before the item is registered to allow subclasses to perform any final modifications.
+     * This method is called automatically by {@link #buildAndRegister()} after the item is built
+     * but before it is registered with the registry. Subclasses can use this to perform any
+     * post-creation setup or modifications that need to happen before registration.
+     *
+     * @param item The built item instance that will be registered
+     * @return The item instance (potentially modified) that should be registered
+     */
+    abstract protected I beforeRegister(I item);
+
+    /**
+     * Builds the item instance using the configured properties.
+     * This method calls {@link #beforeBuild()} before creating the item.
+     *
+     * @return The created item instance
+     */
+    @SuppressWarnings("unchecked")
+    public final I build() {
+        this.beforeBuild();
+
+        // Property application happens in two phases (see BlockDefinition.build() for the full rationale):
+        // Phase 1 walks the queued operations in call order, running each trait's configure() - collecting
+        // its setters (via queueProperty) at the trait's call-position - while plain setter ops are
+        // collected at their own position. Index-based on purpose: configure() may enqueue further ops (a
+        // subclass setter that appends directly, or a nested addTrait()). Phase 2 applies the collected
+        // setters in call order, so chain setters and trait-configured setters interleave as written.
+        final List<Consumer<Item.Properties>> orderedSetters = new ArrayList<>(this.propertySetters.size());
+        final List<Consumer<Item.Properties>> previousSink = this.collectingSetters;
+        this.collectingSetters = orderedSetters;
+        try {
+            for (int i = 0; i < this.propertySetters.size(); i++) {
+                final Consumer<Item.Properties> op = this.propertySetters.get(i);
+                if (op instanceof ItemDefinition<?, ?>.TraitOp) {
+                    op.accept(this.properties);
+                } else {
+                    orderedSetters.add(op);
+                }
+            }
+        } finally {
+            this.collectingSetters = previousSink;
+        }
+
+        for (Consumer<Item.Properties> setter : orderedSetters) {
+            setter.accept(this.properties);
+        }
+
+        // Accumulated attribute modifiers are applied after everything else, matching prior behaviour.
+        if (this.attributes != null) {
+            this.properties.attributes(new ItemAttributeModifiers(this.attributes.build()));
+        }
+
+        final List<RuntimeItemTrait<I, ?>> runtimeTraits;
+
+        // Collect the RuntimeTraits contributed by the added traits. Configuration already ran above via
+        // the TraitOp entries; here we only gather the runtime form of each trait (order preserved).
+        if (this.traits != null && !this.traits.isEmpty()) {
+            runtimeTraits = new LinkedList<>();
+            for (var configuredTrait : this.traits) {
+                final RuntimeItemTrait<I, ?> runtimeTrait = this.forRuntimeUnchecked(configuredTrait);
+                if (runtimeTrait != null) runtimeTraits.add(runtimeTrait);
+            }
+        } else runtimeTraits = null;
+
+        I item = itemFactory.createItem((D) this);
+
+        // If runtime traits were collected, set them on the item
+        if (runtimeTraits != null && !runtimeTraits.isEmpty() && item instanceof ItemWithTraits<?>) {
+            ((ItemWithTraits<I>) item).wover_setItemTraits(runtimeTraits);
+        }
+
+        return item;
+    }
+
+    /**
+     * Builds the item and automatically registers it with the item registry.
+     * This is a convenience method that combines {@link #build()}, {@link #beforeRegister(I)},
+     * and registration. The process is: build item → call beforeRegister → register with registry.
+     *
+     * @return The created and registered item instance
+     */
+    @SuppressWarnings("unchecked")
+    public final I buildAndRegister() {
+        I item = this.beforeRegister(this.build());
+        final TagKey<Item>[] tags = this.tags == null ? null : this.tags.toArray(TagKey[]::new);
+        this.registry.register(this.itemKey, item, tags);
+
+        // If traits are defined, call afterItemRegistration for each trait
+        if (this.traits != null) {
+            for (var trait : this.traits) {
+
+                this.afterItemRegistrationUnchecked(item, trait);
+            }
+        }
+
+        return item;
+    }
+
+    /**
+     * Adds a trait to this item definition.
+     * Traits are used to add additional behaviors or properties to the item.
+     *
+     * @param trait The trait to add
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D addTrait(
+            @Nullable ItemTrait<?, ?> trait
+    ) {
+        if (trait == null) {
+            // Skip null traits
+            return (D) this;
+        }
+
+        if (this.traits == null) this.traits = new LinkedList<>();
+
+        final ItemTrait<? super I, ?> castTrait = (ItemTrait<? super I, ?>) trait;
+        this.traits.add(castTrait);
+        // Queue the trait's configuration at its call-position so it interleaves with chain setters (see
+        // TraitOp / build()). this.traits keeps the trait for runtime collection and afterItemRegistration.
+        this.propertySetters.add(new TraitOp(castTrait));
+        return (D) this;
+    }
+
+    /**
+     * Adds a list of traits to this item definition.
+     * Traits are used to add additional behaviors or properties to the item.
+     *
+     * @param traits The traits to add, may be {@code null} or contain {@code null} elements (both are ignored)
+     * @return This configuration instance for method chaining
+     */
+    public D addTrait(
+            @Nullable List<ItemTrait<?, ?>> traits
+    ) {
+        if (traits == null) {
+            return (D) this;
+        }
+
+        traits.forEach(this::addTrait);
+
+        return (D) this;
+    }
+
+    /**
+     * Adds the default trait produced by a {@link ItemTraitBuilder.WithDefault} to this item definition.
+     *
+     * @param <T>          The runtime trait type produced by the builder
+     * @param traitBuilder The trait builder whose {@link ItemTraitBuilder.WithDefault#withDefault()} result is added
+     * @return This configuration instance for method chaining
+     */
+    public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefault<?, ?> traitBuilder) {
+        return this.addTrait(traitBuilder.withDefault());
+    }
+
+    /**
+     * Adds the default traits produced by a {@link ItemTraitBuilder.WithDefaults} to this item definition.
+     *
+     * @param <T>          The runtime trait type produced by the builder
+     * @param traitBuilder The trait builder whose {@link ItemTraitBuilder.WithDefaults#withDefault()} result is added
+     * @return This configuration instance for method chaining
+     */
+    public <T extends ItemTrait<? super I, ?>> D addTrait(ItemTraitBuilder.WithDefaults<?, ?> traitBuilder) {
+        return this.addTrait(traitBuilder.withDefault());
+    }
+
+    /**
+     * Checks whether this item definition already has a trait with the same {@link ItemTraitKey} as the given trait.
+     *
+     * @param trait The trait to check for, may be {@code null}
+     * @return {@code true} if a trait with the same key was already added, {@code false} otherwise
+     */
+    public boolean hasTrait(ItemTraitImpl<?, ?> trait) {
+        if (trait == null) return false;
+        return hasTrait(trait.key());
+    }
+
+    /**
+     * Checks whether this item definition already has a trait with the same {@link ItemTraitKey} as the given
+     * trait builder.
+     *
+     * @param traitBuilder The trait builder to check for, may be {@code null}
+     * @return {@code true} if a trait with the same key was already added, {@code false} otherwise
+     */
+    public boolean hasTrait(ItemTraitBuilder<?, ?> traitBuilder) {
+        if (traitBuilder == null) return false;
+        return hasTrait(traitBuilder.key());
+    }
+
+    /**
+     * Checks whether this item definition already has a trait with the given {@link ItemTraitKey}.
+     *
+     * @param traitKey The trait key to check for, may be {@code null}
+     * @return {@code true} if a trait with the given key was already added, {@code false} otherwise
+     */
+    public boolean hasTrait(ItemTraitKey traitKey) {
+        if (this.traits == null || this.traits.isEmpty() || traitKey == null) {
+            return false;
+        }
+        for (ItemTrait<? super I, ?> trait : this.traits) {
+            if (trait.is(traitKey)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // **********************************************************************
+    // Handle Tags
+
+    /**
+     * Sets the tags that should be applied to this item.
+     *
+     * @param itemTags The tags to apply to the item
+     * @return This configuration instance for method chaining
+     */
+    @SafeVarargs
+    @SuppressWarnings("unchecked")
+    public final D addTags(TagKey<Item>... itemTags) {
+        if (this.tags == null) {
+            this.tags = new ArrayList<>(itemTags.length);
+        }
+
+        for (TagKey<Item> tag : itemTags) {
+            if (tag != null) {
+                this.tags.add(tag);
+            }
+        }
+        return (D) this;
+    }
+
+    public final D addTags(Collection<TagKey<Item>> itemTags) {
+        if (itemTags == null || itemTags.isEmpty()) {
+            return (D) this;
+        }
+
+        if (this.tags == null) {
+            this.tags = new ArrayList<>();
+        }
+        this.tags.addAll(itemTags);
+
+        return (D) this;
+    }
+
+    /**
+     * Accumulates attribute modifier entries added through {@link #addAttribute(Holder, AttributeModifier, EquipmentSlotGroup)}.
+     * Built into an {@link ItemAttributeModifiers} property setter in {@link #build()} when non-null.
+     */
+    private ImmutableList.Builder<ItemAttributeModifiers.Entry> attributes;
+
+    /**
+     * Adds an attribute modifier that is applied while this item is equipped in the given equipment slot group.
+     * Multiple calls accumulate entries into a single {@link ItemAttributeModifiers} property.
+     *
+     * @param holder              The attribute the modifier applies to
+     * @param attributeModifier   The modifier (amount, operation, and id) to apply
+     * @param equipmentSlotGroup  The equipment slot group in which the modifier is active
+     * @return This configuration instance for method chaining
+     */
+    public D addAttribute(
+            Holder<Attribute> holder,
+            AttributeModifier attributeModifier,
+            EquipmentSlotGroup equipmentSlotGroup
+    ) {
+        if (attributes == null) {
+            attributes = ImmutableList.builder();
+        }
+        attributes.add(new ItemAttributeModifiers.Entry(holder, attributeModifier, equipmentSlotGroup));
+        return (D) this;
+    }
+
+    /**
+     * Gets the currently configured tags for this item.
+     *
+     * @return Array of tags applied to this item, or an empty array if none were set
+     */
+    @SuppressWarnings("unchecked")
+    public TagKey<Item>[] tags() {
+        return this.tags == null ? new TagKey[0] : this.tags.toArray(TagKey[]::new);
+    }
+
+
+    // **********************************************************************
+    // Redirect all (but setId) Item.Properties methods to this.properties
+    //
+    // This single, ordered list holds every property-mutating operation in the exact order the fluent
+    // chain produced it: chain setters append an "apply this setter" op, {@link #addTrait} appends a
+    // {@link TraitOp} that configures the trait at its call-position. {@link #build()} runs them in
+    // insertion order, so chain setters and trait-configured properties interleave by call order and the
+    // last write for a given property wins (see {@link #queueProperty(Consumer)} / {@link TraitOp}).
+    protected List<Consumer<Item.Properties>> propertySetters = new LinkedList<>();
+
+    /**
+     * While {@link #build()} is collecting setters (phase 1), this is the ordered list the setters are
+     * gathered into - in call order - so they can be applied together in phase 2. It is {@code null} at all
+     * other times (notably during the fluent chain), in which case a setter is queued onto
+     * {@link #propertySetters} at its call-position instead.
+     */
+    private transient List<Consumer<Item.Properties>> collectingSetters = null;
+
+    /**
+     * Records a single property setter. During {@link #build()}'s collection phase
+     * ({@link #collectingSetters} is set) the setter is gathered into that ordered list so trait-configured
+     * setters land at the trait's call-position; otherwise (fluent chain) it is queued onto
+     * {@link #propertySetters} to preserve its call-position for {@link #build()}.
+     *
+     * @param setter The property mutation to record
+     */
+    private void queueProperty(Consumer<Item.Properties> setter) {
+        if (this.collectingSetters != null) {
+            this.collectingSetters.add(setter);
+        } else {
+            this.propertySetters.add(setter);
+        }
+    }
+
+    /**
+     * A {@link #propertySetters} entry that marks the call-position of an added trait. When visited during
+     * {@link #build()}'s phase 1 it runs the trait's {@link ItemTrait#configure(ItemDefinition)}, collecting
+     * the trait's individual setters (via {@link #queueProperty(Consumer)}) at this position to be applied
+     * in phase 2. Kept as a marker type so {@code build()} can recognise it.
+     */
+    private final class TraitOp implements Consumer<Item.Properties> {
+        private final ItemTrait<? super I, ?> trait;
+
+        private TraitOp(ItemTrait<? super I, ?> trait) {
+            this.trait = trait;
+        }
+
+        @Override
+        public void accept(Item.Properties properties) {
+            configurePropertiesUnchecked(trait);
+        }
+    }
+
+    /**
+     * Sets the item that this item converts to when used in crafting.
+     *
+     * @param convertToItem The item to convert to
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D usingConvertsTo(Item convertToItem) {
+        queueProperty((properties) -> properties.usingConvertsTo(convertToItem));
+        return (D) this;
+    }
+
+    /**
+     * Sets the cooldown duration for this item when used.
+     *
+     * @param cooldownSeconds The cooldown duration in seconds
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D useCooldown(float cooldownSeconds) {
+        queueProperty((properties) -> properties.useCooldown(cooldownSeconds));
+        return (D) this;
+    }
+
+    /**
+     * Sets the maximum stack size for this item.
+     *
+     * @param maxStackSize The maximum number of items that can be stacked (1-64)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D stacksTo(int maxStackSize) {
+        queueProperty((properties) -> properties.stacksTo(maxStackSize));
+        return (D) this;
+    }
+
+    /**
+     * Sets the durability (maximum damage) for this item.
+     * Items with durability can be damaged and repaired.
+     *
+     * @param maxDurability The maximum durability value
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D durability(int maxDurability) {
+        queueProperty((properties) -> properties.durability(maxDurability));
+        return (D) this;
+    }
+
+    /**
+     * Sets the item that remains in the crafting grid after this item is used in a recipe.
+     *
+     * @param remainderItem The item to leave behind after crafting
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D craftRemainder(Item remainderItem) {
+        queueProperty((properties) -> properties.craftRemainder(remainderItem));
+        return (D) this;
+    }
+
+    /**
+     * Sets the rarity of this item, which affects its text color and other display properties.
+     *
+     * @param itemRarity The rarity level (COMMON, UNCOMMON, RARE, EPIC)
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D rarity(Rarity itemRarity) {
+        queueProperty((properties) -> properties.rarity(itemRarity));
+        return (D) this;
+    }
+
+    /**
+     * Makes this item immune to fire and lava damage.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D fireResistant() {
+        queueProperty((properties) -> properties.fireResistant());
+        return (D) this;
+    }
+
+    /**
+     * Makes this item playable in a jukebox.
+     *
+     * @param songKey The resource key for the jukebox song
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D jukeboxPlayable(ResourceKey<JukeboxSong> songKey) {
+        queueProperty((properties) -> properties.jukeboxPlayable(songKey));
+        return (D) this;
+    }
+
+    /**
+     * Sets the enchantability value for this item.
+     * Higher values make the item more likely to receive better enchantments.
+     *
+     * @param enchantability The enchantability value
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D enchantable(int enchantability) {
+        queueProperty((properties) -> properties.enchantable(enchantability));
+        return (D) this;
+    }
+
+    /**
+     * Sets an item that can be used to repair this item.
+     *
+     * @param repairItem The item that can repair this item
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D repairable(Item repairItem) {
+        queueProperty((properties) -> properties.repairable(repairItem));
+        return (D) this;
+    }
+
+    /**
+     * Sets a tag of items that can be used to repair this item.
+     *
+     * @param repairTag The tag containing items that can repair this item
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D repairable(TagKey<Item> repairTag) {
+        queueProperty((properties) -> properties.repairable(repairTag));
+        return (D) this;
+    }
+
+    /**
+     * Makes this item equippable in the specified equipment slot.
+     *
+     * @param slot The equipment slot where this item can be equipped
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D equippable(EquipmentSlot slot) {
+        queueProperty((properties) -> properties.equippable(slot));
+        return (D) this;
+    }
+
+    /**
+     * Makes this item equippable in the specified equipment slot, but prevents swapping with other items.
+     *
+     * @param slot The equipment slot where this item can be equipped
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D equippableUnswappable(EquipmentSlot slot) {
+        queueProperty((properties) -> properties.equippableUnswappable(slot));
+        return (D) this;
+    }
+
+    /**
+     * Sets the required feature flags for this item to be available.
+     *
+     * @param requiredFlags The feature flags required for this item
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D requiredFeatures(FeatureFlag... requiredFlags) {
+        queueProperty((properties) -> properties.requiredFeatures(requiredFlags));
+        return (D) this;
+    }
+
+    /**
+     * Overrides the description key for this item.
+     *
+     * @param descriptionKey The custom description key
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D overrideDescription(String descriptionKey) {
+        queueProperty((properties) -> properties.overrideDescription(descriptionKey));
+        return (D) this;
+    }
+
+    /**
+     * Uses the block description prefix for this item's translation key.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D useBlockDescriptionPrefix() {
+        queueProperty((properties) -> properties.useBlockDescriptionPrefix());
+        return (D) this;
+    }
+
+    /**
+     * Uses the item description prefix for this item's translation key.
+     *
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D useItemDescriptionPrefix() {
+        queueProperty((properties) -> properties.useItemDescriptionPrefix());
+        return (D) this;
+    }
+
+    /**
+     * Gets the effective model location for this item.
+     *
+     * @return The resource location of the item's model
+     */
+    public ResourceLocation effectiveModel() {
+        return this.properties.effectiveModel();
+    }
+
+    /**
+     * Adds a data component to this item.
+     *
+     * @param <T>           The type of the component data
+     * @param componentType The type of data component to add
+     * @param componentData The data for the component
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public <T> D component(DataComponentType<T> componentType, T componentData) {
+        queueProperty((properties) -> properties.component(componentType, componentData));
+        return (D) this;
+    }
+
+    /**
+     * Sets the attribute modifiers for this item.
+     *
+     * @param attributeModifiers The attribute modifiers to apply
+     * @return This configuration instance for method chaining
+     */
+    @SuppressWarnings("unchecked")
+    public D attributes(ItemAttributeModifiers attributeModifiers) {
+        queueProperty((properties) -> properties.attributes(attributeModifiers));
+        return (D) this;
+    }
+
+    /**
+     * Gets the underlying Item.Properties object used by this configuration.
+     * This provides direct access to the properties for advanced configuration scenarios.
+     *
+     * @return The Item.Properties instance containing all configured properties
+     */
+    public Item.Properties getProperties() {
+        return this.properties;
+    }
+
+
+    // Helper methods to handle generic type casting
+    @SuppressWarnings("unchecked")
+    private void configurePropertiesUnchecked(
+            ItemTrait<? super I, ?> trait
+    ) {
+        ((ItemTrait<I, ?>) trait).configure((D) this);
+    }
+
+    @SuppressWarnings("unchecked")
+    private RuntimeItemTrait<I, ?> forRuntimeUnchecked(
+            ItemTrait<? super I, ?> trait
+    ) {
+        // Cast is safe because the trait can work with B (since B extends the super type)
+        return (RuntimeItemTrait<I, ?>) trait.forRuntime();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void afterItemRegistrationUnchecked(
+            I item,
+            ItemTrait<? super I, ?> trait
+    ) {
+        // Cast is safe because the trait can work with B (since B extends the super type)
+        ((ItemTrait<I, ?>) trait).afterItemRegistration(item, (D) this);
+    }
+}

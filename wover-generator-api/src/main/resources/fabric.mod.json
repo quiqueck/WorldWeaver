@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-generator",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - World Generator API",
     "description": "",
     "authors": [
@@ -17,13 +17,16 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverWorldGenerator"
+            "de.ambertation.wover.entrypoint.LibWoverWorldGenerator"
         ],
         "client": [
-            "org.betterx.wover.entrypoint.client.LibWoverWorldGeneratorClient"
+            "de.ambertation.wover.entrypoint.client.LibWoverWorldGeneratorClient"
         ],
         "fabric-datagen": [
-            "org.betterx.wover.generator.datagen.WoverWorldGeneratorDatagen"
+            "de.ambertation.wover.generator.datagen.WoverWorldGeneratorDatagen"
+        ],
+        "wover.client.traits": [
+            "de.ambertation.wover.generator.impl.client.WoverBiomeSourceConfigScreenFactories"
         ]
     },
     "mixins": [

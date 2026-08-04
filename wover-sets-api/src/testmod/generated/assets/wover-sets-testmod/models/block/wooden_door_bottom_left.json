@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_left",
+  "textures": {
+    "bottom": "wover-sets-testmod:block/wooden_door_bottom",
+    "top": "wover-sets-testmod:block/wooden_door_top"
+  }
+}

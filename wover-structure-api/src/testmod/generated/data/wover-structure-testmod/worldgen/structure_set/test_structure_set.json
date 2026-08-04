@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 368567765,
+    "separation": 8,
+    "spacing": 32
+  },
+  "structures": [
+    {
+      "structure": "wover-structure-testmod:test_structure",
+      "weight": 1
+    },
+    {
+      "structure": "wover-structure-testmod:jigsaw_structure",
+      "weight": 1
+    }
+  ]
+}

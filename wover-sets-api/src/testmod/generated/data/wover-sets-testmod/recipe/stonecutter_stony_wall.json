@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "group": "wall",
+  "ingredient": "wover-sets-testmod:stony",
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:stony_wall"
+  }
+}

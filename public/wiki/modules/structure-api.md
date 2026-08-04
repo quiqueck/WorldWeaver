@@ -7,17 +7,17 @@ so mod code doesn't have to hand-write structure JSON or fight vanilla's generic
 ready-made custom `Structure` (`RandomNbtStructure`) for the common "spawn a random `.nbt` template
 somewhere valid" use case that vanilla has no equivalent of.
 
-- **Gradle artifact:** `org.betterx:wover-structure-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-structure`)
 - **Depends on:** `wover-core-api`, `wover-math-api`, `wover-event-api`, `wover-block-api`
 - **Java packages:**
-  - `org.betterx.wover.structure.api`
-  - `org.betterx.wover.structure.api.builders`
-  - `org.betterx.wover.structure.api.pools`
-  - `org.betterx.wover.structure.api.processors`
-  - `org.betterx.wover.structure.api.sets`
-  - `org.betterx.wover.structure.api.structures`
-  - `org.betterx.wover.structure.api.structures.nbt`
-  - `org.betterx.wover.datagen.api.provider.multi` (adds `WoverStructureProvider`, the multi-registry
+  - `de.ambertation.wover.structure.api`
+  - `de.ambertation.wover.structure.api.builders`
+  - `de.ambertation.wover.structure.api.pools`
+  - `de.ambertation.wover.structure.api.processors`
+  - `de.ambertation.wover.structure.api.sets`
+  - `de.ambertation.wover.structure.api.structures`
+  - `de.ambertation.wover.structure.api.structures.nbt`
+  - `de.ambertation.wover.datagen.api.provider.multi` (adds `WoverStructureProvider`, the multi-registry
     provider used below, to the datagen module's package)
 
 ## For Datapack Developers
@@ -80,7 +80,7 @@ standard structure settings (`biomes`, `step`, `terrain_adaptation`, ...):
   vertical `offset_y` applied to the found generation point) and a `weight` used to randomly pick between
   elements.
 
-`StructurePlacement` values (`org.betterx.wover.structure.api.structures.StructurePlacement`):
+`StructurePlacement` values (`de.ambertation.wover.structure.api.structures.StructurePlacement`):
 
 | Value | Behavior |
 |---|---|
@@ -176,8 +176,8 @@ worldgen. WoVer wraps each one behind a small "key" type (`StructureKey`, `Struc
 
 ### Registering everything (data generator, recommended)
 
-Subclass [`WoverStructureProvider`](../../wover-structure-api/src/main/java/org/betterx/wover/datagen/api/provider/multi/WoverStructureProvider.java)
-(`org.betterx.wover.datagen.api.provider.multi.WoverStructureProvider`) — a `WoverMultiProvider` that
+Subclass [`WoverStructureProvider`](../../../wover-structure-api/src/main/java/de/ambertation/wover/datagen/api/provider/multi/WoverStructureProvider.java)
+(`de.ambertation.wover.datagen.api.provider.multi.WoverStructureProvider`) — a `WoverMultiProvider` that
 bundles the four registry providers (structures, sets, pools, processors) plus a biome-tag provider into
 one class:
 
@@ -282,7 +282,7 @@ remembers) a structure-tag `TagKey` from the structure's own id if you never exp
 
 If you only need one of the four registries (e.g. just structures, referencing a pool defined elsewhere),
 you can instead subclass the single-registry providers `WoverStructureProvider`, `WoverStructureSetProvider`,
-`WoverStructurePoolProvider` or `WoverStructureProcessorProvider` from `org.betterx.wover.datagen.api.provider`
+`WoverStructurePoolProvider` or `WoverStructureProcessorProvider` from `de.ambertation.wover.datagen.api.provider`
 (see the `wover-datagen-api` wiki page) and register each with `PackBuilder#addRegistryProvider`.
 
 ### `StructureKey` variants
@@ -316,7 +316,7 @@ to `SURFACE_STRUCTURES`).
   `maxDepth` (default `6`), `startHeight` (default constant `0`), `maxDistanceFromCenter` (default `80`),
   `projectStartToHeightmap`, `startJigsawName`, `useExpansionHack` (default `false`),
   `addAliasBinding(s)`, `liquidSettings`, `dimensionPadding`.
-- **`RandomNbtBuilder`**: `addElement(ResourceLocation elementId, int yOffset, double weight)` (call
+- **`RandomNbtBuilder`**: `addElement(Identifier elementId, int yOffset, double weight)` (call
   repeatedly to add candidates), `placement(StructurePlacement)` (default `SURFACE`), `keepAir(boolean)`
   (default `false`).
 - **`StructureBuilder<S>`**: no extra methods beyond `BaseStructureBuilder` — used when your custom
@@ -387,7 +387,7 @@ MY_PROCESSOR.bootstrap(context)
 ### Placing `.nbt` templates without a `Structure` (`StructureNBT`)
 
 For simple, non-worldgen use cases (e.g. a `/mymod place` command, or a feature you build entirely at
-runtime) `org.betterx.wover.structure.api.StructureNBT` loads and caches a `.nbt` file from
+runtime) `de.ambertation.wover.structure.api.StructureNBT` loads and caches a `.nbt` file from
 `data/<namespace>/structure/<path>.nbt` on the classpath, without going through the
 `Structure`/`StructureSet` machinery at all:
 
@@ -398,7 +398,7 @@ nbt.generateCentered(serverLevel, pos, StructureNBT.getRandomRotation(random), S
 
 `generateAt(...)` places the template's raw origin at `pos` instead of centering it;
 `getBoundingBox`/`getCenteredBoundingBox` compute the box a placement would occupy without placing anything;
-`createResourcesFrom(ResourceLocation folder, int recursionDepth)` walks a whole folder (recursively, or one
+`createResourcesFrom(Identifier folder, int recursionDepth)` walks a whole folder (recursively, or one
 level with `recursionDepth = 1`) and returns a `StructureNBT` for every `.nbt` file found — useful for a mod
 that ships a large, self-discovering library of small structures.
 

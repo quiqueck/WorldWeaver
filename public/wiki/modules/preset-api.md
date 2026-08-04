@@ -7,15 +7,15 @@ registries. On top of that it adds one small WoVer-only registry (`WorldPresetIn
 has no room for (sort order in the UI, "reuse another preset's dimension" overrides), plus Java helpers to build,
 register, tag and (client-side) customize the UI for both registries without hand-writing JSON.
 
-- **Gradle artifact:** `org.betterx:wover-preset-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-preset`)
 - **Depends on:** `wover-core-api`, `wover-tag-api`, `wover-event-api`
 - **Java packages:**
-  - `org.betterx.wover.preset.api`
-  - `org.betterx.wover.preset.api.context`
-  - `org.betterx.wover.preset.api.event`
-  - `org.betterx.wover.preset.api.flat`
-  - `org.betterx.wover.preset.api.client` (client only)
-  - `org.betterx.wover.datagen.api.provider` (adds `WoverWorldPresetProvider`/`WoverFlatLevelPresetProvider` to the
+  - `de.ambertation.wover.preset.api`
+  - `de.ambertation.wover.preset.api.context`
+  - `de.ambertation.wover.preset.api.event`
+  - `de.ambertation.wover.preset.api.flat`
+  - `de.ambertation.wover.preset.api.client` (client only)
+  - `de.ambertation.wover.datagen.api.provider` (adds `WoverWorldPresetProvider`/`WoverFlatLevelPresetProvider` to the
     datagen module's package)
 
 ## For Datapack Developers
@@ -112,7 +112,7 @@ just won't show up as a selectable option in the vanilla UI.
 
 ### Registering a `WorldPreset` (data generator, recommended)
 
-Subclass [`WoverWorldPresetProvider`](../../wover-preset-api/src/main/java/org/betterx/wover/datagen/api/provider/WoverWorldPresetProvider.java)
+Subclass [`WoverWorldPresetProvider`](../../../wover-preset-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverWorldPresetProvider.java)
 and implement `bootstrap(WorldPresetBootstrapContext)` and `prepareTags(TagBootstrapContext<WorldPreset>)`. The
 context gives you ready-made default `LevelStem`s (`overworldStem`, `netherStem`, `endStem`) and registry lookups
 (`noiseSettings`, `biomes`, `placedFeatures`, `structureSets`, `parameterLists`) so you rarely have to build a
@@ -157,7 +157,7 @@ public class MyModDatagen extends WoverDataGenEntryPoint {
 }
 ```
 
-Create the preset's `ResourceKey` up front with `WorldPresetManager.createKey(ResourceLocation)`.
+Create the preset's `ResourceKey` up front with `WorldPresetManager.createKey(Identifier)`.
 
 ### Registering a `WorldPreset` at runtime (discouraged)
 
@@ -177,7 +177,7 @@ WorldPresetTags.TAGS.bootstrapEvent().subscribe(ctx -> {
 
 ### Registering a `FlatLevelGeneratorPreset`
 
-Same pattern, via [`WoverFlatLevelPresetProvider`](../../wover-preset-api/src/main/java/org/betterx/wover/datagen/api/provider/WoverFlatLevelPresetProvider.java)
+Same pattern, via [`WoverFlatLevelPresetProvider`](../../../wover-preset-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverFlatLevelPresetProvider.java)
 for datagen, or `FlatLevelPresetManager.BOOTSTRAP_FLAT_LEVEL_PRESETS`/`FlatLevelPresetTags.TAGS.bootstrapEvent()` at
 runtime. Both expose the same `register(...)` helper (icon, biome, allowed structure sets, decorations/lakes
 flags, and the flat layers, bottom layer first):
@@ -201,11 +201,11 @@ FlatLevelPresetTags.TAGS.bootstrapEvent().subscribe(ctx -> {
 });
 ```
 
-`FlatLevelPresetManager.createKey(ResourceLocation)` creates the preset's `ResourceKey`.
+`FlatLevelPresetManager.createKey(Identifier)` creates the preset's `ResourceKey`.
 
 ### Registering `WorldPresetInfo` (sort order / dimension overrides)
 
-Build one with [`WorldPresetInfoBuilder`](../../wover-preset-api/src/main/java/org/betterx/wover/preset/api/WorldPresetInfoBuilder.java)
+Build one with [`WorldPresetInfoBuilder`](../../../wover-preset-api/src/main/java/de/ambertation/wover/preset/api/WorldPresetInfoBuilder.java)
 inside a `BootstrapContext<WorldPresetInfo>` (e.g. a `WoverRegistryContentProvider<WorldPresetInfo>` data
 generator registered against `WorldPresetInfoRegistry.WORLD_PRESET_INFO_REGISTRY`, the same way WoVer's own
 `WorldPresetInfoProvider` seeds vanilla's presets):
@@ -234,14 +234,14 @@ WorldPresetManager.suggestDefault(MyMod.END_START, 1000);
 
 ### Other `WorldPresetManager` helpers
 
-`WorldPresetManager` also has: `createKey(ResourceLocation)`, `get(RegistryAccess, ResourceKey<WorldPreset>)`,
+`WorldPresetManager` also has: `createKey(Identifier)`, `get(RegistryAccess, ResourceKey<WorldPreset>)`,
 `getDefault()`, `fromStems(overworld, nether, end)`, `of(Map<ResourceKey<LevelStem>, LevelStem>)`,
 `withDimensions(WorldDimensions)`, and `getDimensions(Holder<WorldPreset>)`/`getDimension(Holder<WorldPreset>,
 ResourceKey<LevelStem>)` to read the `LevelStem`s back out of a `WorldPreset` holder.
 
 ### Custom "Customize" screens (client only)
 
-[`WorldPresetsUI`](../../wover-preset-api/src/client/java/org/betterx/wover/preset/api/client/WorldPresetsUI.java)
+[`WorldPresetsUI`](../../../wover-preset-api/src/client/java/de/ambertation/wover/preset/api/client/WorldPresetsUI.java)
 lets you register a `PresetEditor` (the screen shown for "Customize" on the Create World screen) for one of your
 presets:
 

@@ -4,13 +4,13 @@ Java API and datapack-driven registry for building `SurfaceRules.RuleSource` tre
 **any** noise-based `ChunkGenerator` (vanilla's, another mod's, or your own) — without a mod having to overwrite
 `NoiseGeneratorSettings#surfaceRule()` itself and risk clobbering rules another mod already installed.
 
-- **Gradle artifact:** `org.betterx:wover-surface-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-surface`)
 - **Depends on:** `wover-common-api`, `wover-datagen-api`, `wover-core-api`, `wover-math-api`, `wover-event-api`
 - **Java packages:**
-  - `org.betterx.wover.surface.api`
-  - `org.betterx.wover.surface.api.conditions`
-  - `org.betterx.wover.surface.api.noise`
-  - `org.betterx.wover.surface.api.rules`
+  - `de.ambertation.wover.surface.api`
+  - `de.ambertation.wover.surface.api.conditions`
+  - `de.ambertation.wover.surface.api.noise`
+  - `de.ambertation.wover.surface.api.rules`
 
 ## How injection works
 
@@ -24,7 +24,7 @@ right before the level is created:
    from datapack JSON or from a `WoverRegistryContentProvider<AssignedSurfaceRule>` during datagen.
 2. When a world is about to be created, WoVer walks every `LevelStem` in the `LEVEL_STEM` registry. For each stem
    whose `ChunkGenerator` implements
-   [`InjectableSurfaceRules`](../../wover-common-api/src/main/java/org/betterx/wover/common/surface/api/InjectableSurfaceRules.java)
+   [`InjectableSurfaceRules`](../../../wover-common-api/src/main/java/de/ambertation/wover/common/surface/api/InjectableSurfaceRules.java)
    (vanilla's `NoiseBasedChunkGenerator` does, via a WoVer mixin), it collects every registered rule whose biome is
    one of the biomes the generator's `BiomeSource` can produce, wraps them per-biome in
    `SurfaceRules.ifTrue(SurfaceRules.isBiome(...), sequence(...))`, and merges the result into the generator's
@@ -32,7 +32,7 @@ right before the level is created:
    replacing it. In the Nether, the merge is careful to keep the existing roof/floor rules ahead of the injected
    per-biome rules.
 3. The actual field write happens through
-   [`SurfaceRuleProvider`](../../wover-common-api/src/main/java/org/betterx/wover/common/surface/api/SurfaceRuleProvider.java)
+   [`SurfaceRuleProvider`](../../../wover-common-api/src/main/java/de/ambertation/wover/common/surface/api/SurfaceRuleProvider.java)
    (implemented on vanilla `NoiseGeneratorSettings` by a WoVer mixin). If your mod supplies its own
    `NoiseGeneratorSettings`-like object with a custom surface rule field, implement `SurfaceRuleProvider` yourself
    so WoVer merges into it instead of ignoring it — see the `wover-common-api` wiki page.
@@ -95,7 +95,7 @@ Each file is one `AssignedSurfaceRule` with this shape (backed by the `AssignedS
 }
 ```
 
-- `biome` (required) — the `ResourceLocation` of the `Biome` this rule applies to. You can register several files
+- `biome` (required) — the `Identifier` of the `Biome` this rule applies to. You can register several files
   for the same biome; all of them are collected and combined.
 - `ruleSource` (required) — an ordinary `SurfaceRules.RuleSource`, using the vanilla codec (so any node type
   registered in `BuiltInRegistries.MATERIAL_RULE`/`MATERIAL_CONDITION`, vanilla or modded, works here).
@@ -134,7 +134,7 @@ Example (`wover:switch_rule` alternating between two blocks per column, keyed by
 }
 ```
 
-### Numeric providers (`org.betterx.wover.core.api.registries` `wover/numeric_provider`)
+### Numeric providers (`de.ambertation.wover.surface.api.noise` `wover/numeric_provider`)
 
 `NumericProvider`s are small `int`-returning helpers usable anywhere a `wover:switch_rule` (or your own custom
 rule) needs a selector. They live in their own registry (`NumericProviderRegistry`, in-code only, not
@@ -156,7 +156,7 @@ below); this module itself registers `wover:roughness_noise` this way.
 
 ### Building and registering a surface rule: `SurfaceRuleBuilder`
 
-[`SurfaceRuleBuilder`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/SurfaceRuleBuilder.java)
+[`SurfaceRuleBuilder`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/SurfaceRuleBuilder.java)
 gives you a fluent way to build a `RuleSource` for one biome and register it as an `AssignedSurfaceRule`, without
 hand-writing `SurfaceRules.ifTrue(...)` trees. Typical layered-terrain usage (from the test mod's datagen):
 
@@ -252,39 +252,39 @@ if (!ModCore.isDatagen()) {
 
 Beyond the JSON-configurable conditions, you can implement your own noise condition directly:
 
-- Extend [`SurfaceNoiseCondition`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/conditions/SurfaceNoiseCondition.java)
+- Extend [`SurfaceNoiseCondition`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/conditions/SurfaceNoiseCondition.java)
   for a condition evaluated once per X/Z column (lazily cached, like vanilla's `LazyXZCondition`).
-- Extend [`VolumeNoiseCondition`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/conditions/VolumeNoiseCondition.java)
+- Extend [`VolumeNoiseCondition`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/conditions/VolumeNoiseCondition.java)
   for a condition evaluated per 3D block position (like vanilla's `LazyCondition`).
 
 Both only require implementing `boolean test(SurfaceRulesContext context)` (from the shared
-[`NoiseCondition`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/conditions/NoiseCondition.java)
-interface); [`SurfaceRulesContext`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/conditions/SurfaceRulesContext.java)
+[`NoiseCondition`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/conditions/NoiseCondition.java)
+interface); [`SurfaceRulesContext`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/conditions/SurfaceRulesContext.java)
 exposes the block position, current biome, chunk/noise chunk, stone depth above/below and the `RandomState`. Use
-[`Conditions`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/Conditions.java)'s
+[`Conditions`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/Conditions.java)'s
 `threshold(...)`/`volumeThreshold(...)` factory methods (and its ready-made constants like
 `Conditions.NETHER_VOLUME_NOISE`, `Conditions.FORREST_FLOOR_SURFACE_NOISE_A/B`) if you just need an
 `OpenSimplexNoise`-backed threshold check rather than a fully custom condition.
 
 If you want your condition/rule usable from JSON too, register its `MapCodec` with
-[`ConditionManager`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/conditions/ConditionManager.java)
+[`ConditionManager`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/conditions/ConditionManager.java)
 (for `SurfaceRules.ConditionSource`s) or
-[`MaterialRuleManager`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/rules/MaterialRuleManager.java)
+[`MaterialRuleManager`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/rules/MaterialRuleManager.java)
 (for `SurfaceRules.RuleSource`s) — both are thin wrappers around vanilla's `BuiltInRegistries.MATERIAL_CONDITION`/
 `MATERIAL_RULE`.
 
 ### Custom numeric providers
 
-Implement [`NumericProvider`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/noise/NumericProvider.java)
+Implement [`NumericProvider`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/noise/NumericProvider.java)
 (`int getNumber(SurfaceRulesContext)` + a `pcodec()`) and register it with
-[`NumericProviderRegistry.register(...)`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/noise/NumericProviderRegistry.java)
+[`NumericProviderRegistry.register(...)`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/noise/NumericProviderRegistry.java)
 if you want a custom selector for `Rules.switchRules(...)` or your own rule types. Built-ins live in
-[`NumericProviders`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/noise/NumericProviders.java)
+[`NumericProviders`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/noise/NumericProviders.java)
 (`randomInt(bound)`, `netherNoise()`).
 
 ### Custom `NormalNoise` parameters
 
-[`NoiseParameterManager`](../../wover-surface-api/src/main/java/org/betterx/wover/surface/api/noise/NoiseParameterManager.java)
+[`NoiseParameterManager`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/noise/NoiseParameterManager.java)
 creates keys in / resolves instances from the vanilla `Registries.NOISE` registry:
 
 ```java
@@ -296,7 +296,7 @@ NormalNoise noise = NoiseParameterManager.getOrCreateNoise(registryAccess, rando
 ### Making a custom `BiomeSource`/`ChunkGenerator` support injection
 
 `wover-surface-api` only injects into generators that implement
-[`InjectableSurfaceRules`](../../wover-common-api/src/main/java/org/betterx/wover/common/surface/api/InjectableSurfaceRules.java)
+[`InjectableSurfaceRules`](../../../wover-common-api/src/main/java/de/ambertation/wover/common/surface/api/InjectableSurfaceRules.java)
 and settings objects that implement `SurfaceRuleProvider` (both from `wover-common-api`). Vanilla's
 `NoiseBasedChunkGenerator`/`NoiseGeneratorSettings` get these via WoVer's own mixins
 (`NoiseBasedChunkGeneratorMixin`, `NoiseGeneratorSettingsMixin`); if you ship a fully custom `ChunkGenerator` or a

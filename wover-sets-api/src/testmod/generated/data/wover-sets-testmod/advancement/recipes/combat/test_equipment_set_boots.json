@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_tag_minecraft_repairs_turtle_helmet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#minecraft:repairs_turtle_helmet"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "wover-sets-testmod:test_equipment_set_boots"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tag_minecraft_repairs_turtle_helmet"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "wover-sets-testmod:test_equipment_set_boots"
+    ]
+  }
+}

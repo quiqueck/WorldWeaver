@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "bookshelf",
+  "key": {
+    "#": "wover-sets-testmod:wooden_planks",
+    "P": "minecraft:book"
+  },
+  "pattern": [
+    "###",
+    "PPP",
+    "###"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:wooden_bookshelf"
+  }
+}

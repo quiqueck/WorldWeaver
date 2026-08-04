@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_mirrored",
+  "textures": {
+    "end": "wover-sets-testmod:block/wooden_log_side",
+    "side": "wover-sets-testmod:block/wooden_log_side"
+  }
+}

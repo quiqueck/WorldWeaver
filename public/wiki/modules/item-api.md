@@ -6,18 +6,18 @@ enchantments. It wraps the vanilla `Item.Properties`/`Item.Builder`-style setup 
 classes (`ItemDefinition` and its subclasses) so mod code registers items, tools, armor, food, spawn eggs, boats
 and smithing templates through one consistent API.
 
-- **Gradle artifact:** `org.betterx:wover-item-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-item`)
 - **Depends on:** `wover-core-api`, `wover-tag-api`, `wover-event-api`
 - **Java packages:**
-  - `org.betterx.wover.item.api`
-  - `org.betterx.wover.item.api.armor`
-  - `org.betterx.wover.item.api.smithing`
-  - `org.betterx.wover.item.api.trait`
-  - `org.betterx.wover.item.api.client.trait` (client-only)
-  - `org.betterx.wover.tabs.api`
-  - `org.betterx.wover.tabs.api.interfaces`
-  - `org.betterx.wover.enchantment.api`
-  - `org.betterx.wover.datagen.api.provider` (adds `WoverEnchantmentProvider` and `WoverLootTableProvider` to the
+  - `de.ambertation.wover.item.api`
+  - `de.ambertation.wover.item.api.armor`
+  - `de.ambertation.wover.item.api.smithing`
+  - `de.ambertation.wover.item.api.trait`
+  - `de.ambertation.wover.item.api.client.trait` (client-only)
+  - `de.ambertation.wover.tabs.api`
+  - `de.ambertation.wover.tabs.api.interfaces`
+  - `de.ambertation.wover.enchantment.api`
+  - `de.ambertation.wover.datagen.api.provider` (adds `WoverEnchantmentProvider` and `WoverLootTableProvider` to the
     datagen module's package)
 
 ## For Datapack Developers
@@ -59,7 +59,7 @@ the usual resource-pack assets. `SmithingTemplateDefinition`/`SmithingTemplates`
 keys* used by a smithing template's tooltip text (`item.<namespace>.smithing_template.<path>.applies_to`,
 `...ingredients`, `...base_slot_description`, `...additions_slot_description`) but you still supply the actual
 translations. Likewise, `CustomArmorMaterial` auto-derives the armor's `EquipmentAsset` id from the material's
-`ResourceLocation` unless you override it with `.assetId(...)`, but the equipment asset JSON and armor layer
+`Identifier` unless you override it with `.assetId(...)`, but the equipment asset JSON and armor layer
 textures themselves still need to be authored under `assets/<namespace>/equipment/<path>.json` /
 `textures/entity/equipment/...` as usual.
 
@@ -105,7 +105,7 @@ If you need a custom `Item` subclass, pass a factory — a method reference to a
 object works well, as in the example above (`EnchantedAxe::new`, where `EnchantedAxe(DefaultItemDefinition<EnchantedAxe> config)`
 calls `super(..., config.getProperties())`).
 
-### Item traits (`org.betterx.wover.item.api.trait`)
+### Item traits (`de.ambertation.wover.item.api.trait`)
 
 Traits are reusable, composable pieces of item configuration that can be attached to any `ItemDefinition` via
 `.addTrait(...)`. A trait can configure the definition at build time (add tags/properties in `configure(...)`) and
@@ -138,7 +138,7 @@ public class BoatItemBuilder extends AbstractItemTraitBuilder<BoatItem, BoatItem
 
 and is consumed as `definition.addTrait(ItemTraits.BOAT_ITEM.with(withChest))`.
 
-### Creative tabs (`org.betterx.wover.tabs.api`)
+### Creative tabs (`de.ambertation.wover.tabs.api`)
 
 `CreativeTabs.start(ModCore)` returns a builder that walks through: create tabs, populate them with items, then
 register them with the game.
@@ -159,9 +159,9 @@ CreativeTabs.start(C)
   `ItemStackHelper.callItemStackSetupIfPossible(...)` for each displayed stack so items implementing
   `ItemWithCustomStack` (see below) get correctly set up in the creative inventory too.
 
-### Enchantments (`org.betterx.wover.enchantment.api`)
+### Enchantments (`de.ambertation.wover.enchantment.api`)
 
-`EnchantmentManager.createKey(ResourceLocation)` creates an `EnchantmentKey` — a typed reference you can hold as a
+`EnchantmentManager.createKey(Identifier)` creates an `EnchantmentKey` — a typed reference you can hold as a
 static field before the enchantment is actually registered. Register the enchantment from the
 `EnchantmentManager.BOOTSTRAP_ENCHANTMENTS` event (fires during registry bootstrap, both in normal play and
 datagen) or from a `WoverEnchantmentProvider` subclass during datagen:
@@ -222,7 +222,7 @@ public class EnchantedAxe extends AxeItem implements ItemWithCustomStack {
 WoVer calls this helper for you in creative tab population; call it yourself anywhere else a fresh `ItemStack` for
 such an item is created (e.g. loot generation, commands).
 
-### Custom armor materials (`org.betterx.wover.item.api.armor`)
+### Custom armor materials (`de.ambertation.wover.item.api.armor`)
 
 `CustomArmorMaterial.start(location)` builds an `ArmorMaterial` without hand-assembling the `EnumMap<ArmorType, Integer>`
 defense table:
@@ -244,7 +244,7 @@ ArmorMaterial mythrilMaterial = CustomArmorMaterial
 repair ingredient, etc.) and throws `IllegalStateException` naming the missing property otherwise. Feed the result
 into `ItemRegistry.defineArmorItem(...).humanoidArmor(material, type)`.
 
-### Smithing templates (`org.betterx.wover.item.api.smithing`)
+### Smithing templates (`de.ambertation.wover.item.api.smithing`)
 
 `SmithingTemplates` ships predefined empty-slot icon sets (`TOOLS`, `ARMOR`, `ARMOR_AND_TOOLS`, plus individual
 `EMPTY_SLOT_*` constants) so you don't have to know the vanilla texture paths. Use it directly, or through
@@ -271,7 +271,7 @@ resolution instead of a fully custom entity renderer; see that trait's Javadoc f
 
 ### Datagen entry points used here
 
-`WoverEnchantmentProvider` and `WoverLootTableProvider` (both in `org.betterx.wover.datagen.api.provider`) plug
+`WoverEnchantmentProvider` and `WoverLootTableProvider` (both in `de.ambertation.wover.datagen.api.provider`) plug
 into the same `WoverDataGenEntryPoint`/`PackBuilder` machinery documented on the `datagen-api` wiki page:
 
 ```java

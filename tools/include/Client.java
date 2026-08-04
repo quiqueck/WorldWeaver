@@ -1,4 +1,4 @@
-package org.betterx.wover{postfix}.entrypoint.client;
+package de.ambertation.wover{postfix}.entrypoint.client;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "wover-sets-testmod:wooden_slab"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_wooden_planks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "wover-sets-testmod:wooden_planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_wooden_planks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "wover-sets-testmod:wooden_slab"
+    ]
+  }
+}

@@ -6,18 +6,18 @@ reusable "trait" system for bundling optional block behavior, helpers for buildi
 (`LootLookupProvider`), a code-only Point-of-Interest (POI) registration API, and client-side datagen helpers for
 blockstate/model files.
 
-- **Gradle artifact:** `org.betterx:wover-block-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-block`)
 - **Depends on:** `wover-core-api`, `wover-tag-api`, `wover-item-api`
 - **Java packages:**
-  - `org.betterx.wover.block.api`
-  - `org.betterx.wover.block.api.model`
-  - `org.betterx.wover.block.api.predicate`
-  - `org.betterx.wover.block.api.trait`
-  - `org.betterx.wover.block.api.trait.behaviour`
-  - `org.betterx.wover.item.api` (adds `BlockItemDefinition`/`VanillaBlockItemDefinition` to the item module's package)
-  - `org.betterx.wover.loot.api`
-  - `org.betterx.wover.poi.api`
-  - `org.betterx.wover.datagen.api.provider` (adds `AutoBlockLootProvider`/`AutoBlockRegistryTagProvider`/`WoverModelProvider` to the datagen module's package)
+  - `de.ambertation.wover.block.api`
+  - `de.ambertation.wover.block.api.model`
+  - `de.ambertation.wover.block.api.predicate`
+  - `de.ambertation.wover.block.api.trait`
+  - `de.ambertation.wover.block.api.trait.behaviour`
+  - `de.ambertation.wover.item.api` (adds `BlockItemDefinition`/`VanillaBlockItemDefinition` to the item module's package)
+  - `de.ambertation.wover.loot.api`
+  - `de.ambertation.wover.poi.api`
+  - `de.ambertation.wover.datagen.api.provider` (adds `AutoBlockRegistryTagProvider` and, client-side, `WoverModelProvider` to the datagen module's package)
 
 ## For Datapack Developers
 
@@ -85,7 +85,7 @@ the file format is special — the only WoVer-specific part is that the mod auth
 
 ### Registering a block with `BlockRegistry`/`BlockDefinition`
 
-[`BlockRegistry`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/BlockRegistry.java) is the
+[`BlockRegistry`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/BlockRegistry.java) is the
 per-mod entry point; get your instance once and reuse it:
 
 ```java
@@ -94,13 +94,13 @@ public class MyBlocks {
 }
 ```
 
-It exposes fluent [`BlockDefinition`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/BlockDefinition.java)
+It exposes fluent [`BlockDefinition`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/BlockDefinition.java)
 builders:
 
 | Method | Produces |
 |---|---|
-| `defineDefaultBlock(String)` | A [`VanillaBlockDefinition`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/VanillaBlockDefinition.java) for a plain `Block` |
-| `defineDefaultBlock(String, DefaultBlockDefinition.BlockFactory<B>)` | A [`DefaultBlockDefinition<B>`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/DefaultBlockDefinition.java) built from the full definition |
+| `defineDefaultBlock(String)` | A [`VanillaBlockDefinition`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/VanillaBlockDefinition.java) for a plain `Block` |
+| `defineDefaultBlock(String, DefaultBlockDefinition.BlockFactory<B>)` | A [`DefaultBlockDefinition<B>`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/DefaultBlockDefinition.java) built from the full definition |
 | `defineDefaultBlockWithProps(String, Function<Properties, B>)` | Same, but the factory only needs the configured `BlockBehaviour.Properties` (e.g. a constructor reference) |
 
 `BlockDefinition` re-exposes (almost) every `BlockBehaviour.Properties` setter (`strength`, `sound`,
@@ -137,9 +137,9 @@ public class TestBlockRegistry {
 are collected and written automatically by `AutoBlockRegistryTagProvider`, no extra provider needed.
 
 By default, `buildAndRegister()` creates a plain `BlockItem` for you (via
-[`VanillaBlockItemDefinition`](../../wover-block-api/src/main/java/org/betterx/wover/item/api/VanillaBlockItemDefinition.java)).
+[`VanillaBlockItemDefinition`](../../../wover-block-api/src/main/java/de/ambertation/wover/item/api/VanillaBlockItemDefinition.java)).
 Use `withBlockItem(BlockItemDefinitionFactory)` to customize the created item (e.g. build a
-[`BlockItemDefinition`](../../wover-block-api/src/main/java/org/betterx/wover/item/api/BlockItemDefinition.java)
+[`BlockItemDefinition`](../../../wover-block-api/src/main/java/de/ambertation/wover/item/api/BlockItemDefinition.java)
 subclass with extra properties/traits from `wover-item-api`), or `noBlockItem()` to skip item creation entirely.
 
 If you need to register a block manually (bypassing the `BlockDefinition` builder), `BlockRegistry` also exposes
@@ -149,53 +149,72 @@ lower-level `register(String, T, TagKey<Block>...)` / `registerBlockOnly(...)` m
 
 Traits let you bundle a reusable piece of block configuration (properties + tags + post-registration setup)
 behind a single object, without subclassing `BlockDefinition`. The built-in example is
-[`FlammableBlockTrait`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/behaviour/FlammableBlockTrait.java),
+[`FlammableBlockTrait`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/behaviour/FlammableBlockTrait.java),
 used above via `FlammableBlockBuilder.BUILDER.withDefault()` — it calls `definition.ignitedByLava()` while the
 block is being configured, then registers the finished block with Fabric's `FlammableBlockRegistry` once it
 exists.
 
 To use a trait, add it with `BlockDefinition#addTrait(...)`; to check whether one was already added, use
 `BlockDefinition#hasTrait(...)`. To query a trait's *runtime* data from a finished block (if the block class
-implements [`BlockWithTraits`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/BlockWithTraits.java)),
+implements [`BlockWithTraits`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/BlockWithTraits.java)),
 use the static helpers on
-[`BlockTrait`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/BlockTrait.java)
+[`BlockTrait`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/BlockTrait.java)
 (`BlockTrait.hasRuntimeTrait(block, key)`, `BlockTrait.getRuntimeTraits(block, key)`, ...) or the matching
 builder's `getRuntimeTraits(block)`.
 
 Writing your own trait means implementing
-[`BlockTrait<B, R>`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/BlockTrait.java)
+[`BlockTrait<B, R>`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/BlockTrait.java)
 (`configure(definition)` for build-time setup, `afterBlockRegistration(block, definition)` for post-registration
 setup, `forRuntime()` if the trait needs a runtime-visible component) plus a matching
-[`BlockTraitBuilder`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/BlockTraitBuilder.java)
+[`BlockTraitBuilder`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/BlockTraitBuilder.java)
 that exposes one or more ready-made instances — see `FlammableBlockBuilder` (in this module's `impl` package) for
-a minimal example, or `wover-sets-api`'s `org.betterx.wover.block.impl.trait.type` package for a much larger set
+a minimal example, or `wover-sets-api`'s `de.ambertation.wover.block.impl.trait.type` package for a much larger set
 of traits (doors, stairs, walls, slabs, fences, signs, chests, ...) built on top of this system.
-[`GenericBlockTrait`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/GenericBlockTrait.java)
+[`GenericBlockTrait`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/GenericBlockTrait.java)
 and its builder base class
-[`AbstractBlockTraitBuilder.Generic`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/AbstractBlockTraitBuilder.java)
+[`AbstractBlockTraitBuilder.Generic`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/AbstractBlockTraitBuilder.java)
 are the usual starting points for traits that apply to any `Block` rather than a specific subclass; the
-`combine(...)`/[`Combiner`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/trait/Combiner.java)
+`combine(...)`/[`Combiner`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/trait/Combiner.java)
 helpers let a single builder's `withDefault()` bundle several independent traits at once.
 
 ### Block loot tables in code
 
-If a block class implements
-[`BlockLootProvider`](../../wover-block-api/src/main/java/org/betterx/wover/loot/api/BlockLootProvider.java)
-and is registered with a `BlockRegistry`, its `registerBlockLoot(location, provider, tableKey)` is called
-automatically during loot table datagen (via `AutoBlockLootProvider`, itself auto-registered by
-`LibWoverBlock`) — no manual `WoverDataProvider` registration needed. The
-[`LootLookupProvider`](../../wover-block-api/src/main/java/org/betterx/wover/loot/api/LootLookupProvider.java)
-passed in wraps vanilla's internal `VanillaBlockLoot` helper methods (silk touch dispatch, ore drops, leaves
-drops, crop/plant drops, slabs, composters, ...) plus registry lookups for enchantments (`fortune()`,
-`silkTouch()`). Real usage, from this module's test mod:
+Block loot tables are written by an ordinary datagen provider: subclass `WoverLootTableProvider` (from
+`wover-item-api`, package `de.ambertation.wover.datagen.api.provider`), implement `boostrap(lookup, biConsumer)`,
+and hand each `ResourceKey<LootTable>` / `LootTable.Builder` pair to the consumer. There is no "implement an
+interface on your `Block` and it gets picked up" path — register the provider on a `PackBuilder` like any other
+`WoverDataProvider`.
+
+[`LootTableManager`](../../../wover-block-api/src/main/java/de/ambertation/wover/loot/api/LootTableManager.java)
+builds the keys: `getBlockLootTableKey(ResourceKey<Block>)` (or `getBlockLootTableKey(ModCore, ResourceLocation)`) for a
+block's standard `blocks/<name>` table, and `createLootTableKey(ModCore, String)` for a free-standing one.
+
+[`LootLookupProvider`](../../../wover-block-api/src/main/java/de/ambertation/wover/loot/api/LootLookupProvider.java)
+wraps vanilla's internal `VanillaBlockLoot` helper methods (silk touch dispatch, ore drops, leaves drops,
+crop/plant drops, slabs, composters, ...) plus registry lookups for enchantments (`fortune()`, `silkTouch()`).
+Construct one from the `HolderLookup.Provider` you're handed:
 
 ```java
-public class TestDoorBlock extends DoorBlock implements BlockLootProvider {
+public class MyLootProvider extends WoverLootTableProvider {
+    public MyLootProvider(ModCore modCore) {
+        super(modCore, LootContextParamSets.BLOCK);
+    }
+
     @Override
-    public LootTable.Builder registerBlockLoot(
-            ResourceLocation location, LootLookupProvider provider, ResourceKey<LootTable> tableKey
+    protected void boostrap(
+            HolderLookup.Provider lookup,
+            BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer
     ) {
-        return provider.dropWithSilkTouchAndCondition(this, DoorBlock.HALF, DoubleBlockHalf.LOWER);
+        final LootLookupProvider provider = new LootLookupProvider(lookup);
+
+        biConsumer.accept(
+                LootTableManager.getBlockLootTableKey(
+                        BuiltInRegistries.BLOCK.getResourceKey(MyBlocks.MY_DOOR).orElseThrow()
+                ),
+                provider.dropWithSilkTouchAndCondition(
+                        MyBlocks.MY_DOOR, DoorBlock.HALF, DoubleBlockHalf.LOWER
+                )
+        );
     }
 }
 ```
@@ -203,14 +222,17 @@ public class TestDoorBlock extends DoorBlock implements BlockLootProvider {
 For a more manual, from-scratch loot table (custom pools/conditions/functions), build a `LootTable.Builder`
 directly using vanilla's loot API — `provider` just saves you from re-deriving common conditions like
 `provider.hasSilkTouch()`, `provider.silkTouchCondition()`, `provider.shearsOrHoeSilkTouchCondition()`, or
-looking up the fortune/silk-touch `Holder<Enchantment>` yourself (see `TestBlock` in this module's test mod for
-a fully custom multi-pool example built this way).
+looking up the fortune/silk-touch `Holder<Enchantment>` yourself. Simply not calling `biConsumer` for a block
+skips loot table generation for it.
 
-`registerBlockLoot` returning `null` skips loot table generation for that block entirely.
+If you would rather attach a loot table to a block *type* than list it in a provider, `wover-sets-api`'s
+`LootTableTrait` is the trait-based route: blocks carrying it are collected by
+`LootTableTrait.bootstrapLootTables(modCore, provider, biConsumer)`, which you call from your own
+`WoverLootTableProvider`.
 
 ### Points of interest
 
-Register a custom POI type with [`PoiManager`](../../wover-block-api/src/main/java/org/betterx/wover/poi/api/PoiManager.java):
+Register a custom POI type with [`PoiManager`](../../../wover-block-api/src/main/java/de/ambertation/wover/poi/api/PoiManager.java):
 
 ```java
 WoverPoiType myWorkstation = PoiManager.register(
@@ -222,7 +244,7 @@ WoverPoiType myWorkstation = PoiManager.register(
 );
 ```
 
-The returned [`WoverPoiType`](../../wover-block-api/src/main/java/org/betterx/wover/poi/api/WoverPoiType.java)
+The returned [`WoverPoiType`](../../../wover-block-api/src/main/java/de/ambertation/wover/poi/api/WoverPoiType.java)
 wraps the vanilla `PoiType` and exposes `findPoiAround(level, center, wideSearch/radius, worldBorder)` and
 `findClosest(level, center, radius)` for locating instances at runtime, and `setTag(TagKey<Block>)` to
 (re)associate a block tag after the fact. Note that the `findPoiAround` overloads additionally filter results to
@@ -231,22 +253,22 @@ prefer `findClosest` if you need a general-purpose nearest-POI search that isn't
 
 ### Block-related predicates and helpers
 
-[`BlockPredicates`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/predicate/BlockPredicates.java)
+[`BlockPredicates`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/predicate/BlockPredicates.java)
 ships ready-made `BlockPredicate` constants for common worldgen checks (`ONLY_GROUND`, `ONLY_NETHER_GROUND`,
 `ONLY_GRAVEL_OR_SAND`, `IS_FULL_BLOCK`, ...), including the extra
-[`IsFullShape`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/predicate/IsFullShape.java)
+[`IsFullShape`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/predicate/IsFullShape.java)
 predicate (with an optional position offset) that vanilla doesn't provide out of the box.
-[`BlockHelper`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/BlockHelper.java) adds small
+[`BlockHelper`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/BlockHelper.java) adds small
 static utilities (`isFluid`, `isFreeOrFluid`, `isTerrain`, direction lists, `setBlock` flag constants,
 `getPossibleStates`), and
-[`BlockProperties`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/BlockProperties.java)
+[`BlockProperties`](../../../wover-block-api/src/main/java/de/ambertation/wover/block/api/BlockProperties.java)
 provides reusable `Property` constants (`TRIPLE_SHAPE`, `PENTA_SHAPE`, `ROTATION`, `COLOR`, `SIZE`, ...) for
 custom blockstates that aren't already covered by vanilla's `BlockStateProperties`.
 
 ### Datagen for block models
 
 Client-side model datagen has its own base class,
-[`WoverModelProvider`](../../wover-block-api/src/main/java/org/betterx/wover/datagen/api/provider/WoverModelProvider.java):
+[`WoverModelProvider`](../../../wover-block-api/src/client/java/de/ambertation/wover/datagen/api/provider/WoverModelProvider.java):
 
 ```java
 public class MyModelProvider extends WoverModelProvider {
@@ -271,7 +293,7 @@ public class MyModelProvider extends WoverModelProvider {
 
 Register it like any other provider from your `WoverDataGenEntryPoint` (see the `datagen-api` wiki page):
 `globalPack.addProvider(MyModelProvider::new);`.
-[`WoverBlockModelGenerators`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/model/WoverBlockModelGenerators.java)
+[`WoverBlockModelGenerators`](../../../wover-block-api/src/client/java/de/ambertation/wover/block/api/model/WoverBlockModelGenerators.java)
 wraps vanilla's `BlockModelGenerators` with convenience methods for the common shapes (full cubes, stairs,
 walls, fences, fence gates, slabs, log/pillar with optional random-rotation variants, doors, trapdoors,
 pressure plates, buttons, signs, hanging signs, chests, barrels, composters, bars, ladders) plus a couple of
@@ -279,10 +301,20 @@ extras vanilla doesn't have (`createObsidianVariants` for 16-way randomized rota
 block-entity-rendered blocks, `createBlockTopSideBottom` for simple top/side/bottom covers). The fluent
 `modelFor(Block)` builder (used above) is handy when a full block and its slab/door share one `TexturedModel`.
 
-If a block class implements
-[`BlockModelProvider`](../../wover-block-api/src/main/java/org/betterx/wover/block/api/model/BlockModelProvider.java)
-directly, `WoverModelProvider#addFromRegistry(generator, registry, validateMissing)` will call its
-`provideBlockModels(generator)` automatically for every matching block in a `BlockRegistry` — useful when you'd
-rather colocate a block's model generation with its class than with the rest of your mod's models. Per-block
-overrides (skip, redirect to a shared provider, or reuse another block's override) are available via the second
-`addFromRegistry(generator, registry, validateMissing, ModelOverides)` overload.
+`WoverModelProvider#addFromRegistry(generator, registry, validateMissing)` walks every block in a `BlockRegistry`
+and excludes it from vanilla's missing-model validation. To actually emit models per block, pass a
+`ModelOverides` set to the four-argument
+`addFromRegistry(generator, registry, validateMissing, ModelOverides)` overload. `ModelOverides.create()` builds
+an empty set, and:
+
+- `.override(block, provider)` registers a
+  [`BlockModelProvider`](../../../wover-block-api/src/client/java/de/ambertation/wover/datagen/api/provider/WoverModelProvider.java)
+  — a functional interface (nested in `ModelOverides`) with a single `void provideModels(Block block)` — that
+  generates that block's models;
+- `.overrideLike(block, copyFromBlock)` reuses another block's registered override;
+- `.ignore(block)` skips the block entirely.
+
+A block class does *not* get picked up by implementing an interface on itself; the override is registered on the
+`ModelOverides` set from your provider. If you'd rather attach model generation to a block type than to a
+provider, `wover-sets-api`'s `BlockModelTrait` (`provideBlockModels(key, block, generator)`) is the trait-based
+route.

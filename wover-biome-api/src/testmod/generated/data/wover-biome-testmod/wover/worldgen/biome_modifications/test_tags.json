@@ -1,0 +1,9 @@
+{
+  "biome_tags": [
+    "minecraft:has_structure/swamp_hut"
+  ],
+  "predicate": {
+    "type": "wover:in_dimension",
+    "dimension_key": "minecraft:the_nether"
+  }
+}

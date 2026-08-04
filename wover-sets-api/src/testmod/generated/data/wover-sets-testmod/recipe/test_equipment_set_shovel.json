@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "shovel",
+  "key": {
+    "#": "#minecraft:diamond_tool_materials",
+    "I": "minecraft:stone"
+  },
+  "pattern": [
+    "#",
+    "I",
+    "I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:test_equipment_set_shovel"
+  }
+}

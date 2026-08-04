@@ -1,0 +1,8 @@
+{
+  "type": "wover:wover_data",
+  "biome": "minecraft:crimson_forest",
+  "genChance": 0.01,
+  "generation_data": {
+    "intended_placement": "minecraft:is_nether"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_block.wover-sets-testmod.stony_weathered": {
+      "conditions": {
+        "items": [
+          {
+            "items": "wover-sets-testmod:stony_weathered"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "wover-sets-testmod:stonecutter_stony_weathered_stairs"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_block.wover-sets-testmod.stony_weathered"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "wover-sets-testmod:stonecutter_stony_weathered_stairs"
+    ]
+  }
+}

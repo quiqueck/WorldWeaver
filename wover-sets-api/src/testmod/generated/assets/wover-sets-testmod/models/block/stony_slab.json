@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "wover-sets-testmod:block/stony",
+    "side": "wover-sets-testmod:block/stony",
+    "top": "wover-sets-testmod:block/stony"
+  }
+}

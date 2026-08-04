@@ -6,13 +6,13 @@ cellular/Voronoi noise, a bounded-range random helper, and a three-axis (`Vec3i`
 WorldWeaver modules (`wover-generator-api`, `wover-surface-api`, `wover-feature-api`, ...) build their noise-driven
 biome maps, surface rules and placement modifiers on top of these classes.
 
-- **Gradle artifact:** `org.betterx:wover-math-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-math`)
 - **Depends on:** `wover-core-api`
 - **Java packages:**
-  - `org.betterx.wover.math.api`
-  - `org.betterx.wover.math.api.noise`
-  - `org.betterx.wover.math.api.random`
-  - `org.betterx.wover.math.api.valueproviders`
+  - `de.ambertation.wover.math.api`
+  - `de.ambertation.wover.math.api.noise`
+  - `de.ambertation.wover.math.api.random`
+  - `de.ambertation.wover.math.api.valueproviders`
 
 ## For Datapack Developers
 
@@ -21,7 +21,7 @@ biome maps, surface rules and placement modifiers on top of these classes.
 does not read or write any JSON at runtime. It is pure Java, consumed by other WorldWeaver modules and by mod
 code directly. If you are a datapack author, you can skip this page.
 
-One exception worth knowing about: [`Vec3iProvider`](../../wover-math-api/src/main/java/org/betterx/wover/math/api/valueproviders/Vec3iProvider.java)
+One exception worth knowing about: [`Vec3iProvider`](../../../wover-math-api/src/main/java/de/ambertation/wover/math/api/valueproviders/Vec3iProvider.java)
 exposes a `Codec`, which other modules embed into *their own* datapack-driven types (for example
 `wover-feature-api`'s `offset` placement modifier). That JSON format is documented on the wiki page of the module
 that owns it, not here.
@@ -32,11 +32,11 @@ that owns it, not here.
 
 | Class | Purpose |
 |---|---|
-| [`MathHelper`](../../wover-math-api/src/main/java/org/betterx/wover/math/api/MathHelper.java) | Static helpers: negative-safe `floor(double)`, `lengthSqr(x, y, z)`, and deterministic seed-hashing (`getSeed(...)`) from an `int`, or from a base seed plus 2D/3D coordinates. |
-| [`OpenSimplexNoise`](../../wover-math-api/src/main/java/org/betterx/wover/math/api/noise/OpenSimplexNoise.java) | Deterministic 2D/3D/4D gradient (OpenSimplex) noise, seeded via a `long` seed or a custom permutation table. `eval(...)` returns a value normalized to roughly `[-1, 1]`. |
-| [`VoronoiNoise`](../../wover-math-api/src/main/java/org/betterx/wover/math/api/noise/VoronoiNoise.java) | Cellular (Worley/Voronoi) noise over a seeded 3D grid of feature points: `sample(...)` returns the distance to the nearest point, `getRandom(...)` returns a `Random` seeded per-cell, `getPos(...)` locates the nearest (and an approximate second-nearest) feature point. |
-| [`RandomHelper`](../../wover-math-api/src/main/java/org/betterx/wover/math/api/random/RandomHelper.java) | `inRange(RandomSource, min, max)` — draws a `float` uniformly from `[min, max)`. |
-| [`Vec3iProvider`](../../wover-math-api/src/main/java/org/betterx/wover/math/api/valueproviders/Vec3iProvider.java) | A three-axis analogue of vanilla's `IntProvider`: samples x/y/z independently and combines them into a `Vec3i`. Ships a `Codec` (and a range-validating `codec(min, max)`) for embedding into other datapack-driven types. |
+| [`MathHelper`](../../../wover-math-api/src/main/java/de/ambertation/wover/math/api/MathHelper.java) | Static helpers: negative-safe `floor(double)`, `lengthSqr(x, y, z)`, and deterministic seed-hashing (`getSeed(...)`) from an `int`, or from a base seed plus 2D/3D coordinates. |
+| [`OpenSimplexNoise`](../../../wover-math-api/src/main/java/de/ambertation/wover/math/api/noise/OpenSimplexNoise.java) | Deterministic 2D/3D/4D gradient (OpenSimplex) noise, seeded via a `long` seed or a custom permutation table. `eval(...)` returns a value normalized to roughly `[-1, 1]`. |
+| [`VoronoiNoise`](../../../wover-math-api/src/main/java/de/ambertation/wover/math/api/noise/VoronoiNoise.java) | Cellular (Worley/Voronoi) noise over a seeded 3D grid of feature points: `sample(...)` returns the distance to the nearest point, `getRandom(...)` returns a `Random` seeded per-cell, `getPos(...)` locates the nearest (and an approximate second-nearest) feature point. |
+| [`RandomHelper`](../../../wover-math-api/src/main/java/de/ambertation/wover/math/api/random/RandomHelper.java) | `inRange(RandomSource, min, max)` — draws a `float` uniformly from `[min, max)`. |
+| [`Vec3iProvider`](../../../wover-math-api/src/main/java/de/ambertation/wover/math/api/valueproviders/Vec3iProvider.java) | A three-axis analogue of vanilla's `IntProvider`: samples x/y/z independently and combines them into a `Vec3i`. Ships a `Codec` (and a range-validating `codec(min, max)`) for embedding into other datapack-driven types. |
 
 ### Deterministic per-position seeds
 

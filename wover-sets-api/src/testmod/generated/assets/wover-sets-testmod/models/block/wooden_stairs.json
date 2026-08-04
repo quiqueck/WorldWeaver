@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "wover-sets-testmod:block/wooden_planks",
+    "side": "wover-sets-testmod:block/wooden_planks",
+    "top": "wover-sets-testmod:block/wooden_planks"
+  }
+}

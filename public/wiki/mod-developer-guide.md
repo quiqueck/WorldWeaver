@@ -11,11 +11,8 @@ repositories {
 }
 
 dependencies {
-    // depend only on the modules you actually need — Gradle will pull in their
-    // transitive WoVer dependencies automatically
-    modImplementation "org.betterx:wover-block-api:${project.wover_version}"
-    modImplementation "org.betterx:wover-biome-api:${project.wover_version}"
-    // ...
+    // WoVer publishes a single artifact; every wover-* module is bundled inside it
+    modImplementation "de.ambertation:worldweaver:${project.wover_version}"
 }
 ```
 
@@ -23,15 +20,18 @@ Add a matching entry to your `fabric.mod.json` so Fabric Loader enforces a compa
 
 ```json
 "depends": {
-  "worldweaver": "21.7.x"
+  "wover": "21.8.x"
 },
 "breaks": {
-  "worldweaver": "<21.7.0"
+  "wover": "<21.8.2"
 }
 ```
 
-Every WoVer module is also its own independent mod (own `fabric.mod.json`, own id like `wover-tag`, `wover-block`,
-...) so you can depend on exactly the subset you need instead of the full `worldweaver` bundle.
+There is one Gradle artifact, but each WoVer module is still its own independent mod at runtime (own
+`fabric.mod.json`, own id — `wover-tag`, `wover-block`, `wover-biome`, ...), jar-in-jar'd into the aggregate.
+So if your mod only touches one module you can narrow the Loader dependency to that module's id (e.g.
+`"depends": { "wover-block": "21.8.x" }`) instead of the umbrella `wover` id — but the Gradle coordinate is
+the same either way.
 
 ## 2. Module dependency order
 
@@ -49,8 +49,8 @@ common → core → { math, datagen, event } → { ui, tag } → item → block 
 
 ## 3. `ModCore` — identify your mod to WoVer
 
-Most WoVer builder APIs take a `ModCore` (`org.betterx.wover.core.api.ModCore`, from `wover-core-api`) so they
-know which namespace to create `ResourceLocation`s in and which logger to use. Create one instance per mod, in
+Most WoVer builder APIs take a `ModCore` (`de.ambertation.wover.core.api.ModCore`, from `wover-core-api`) so they
+know which namespace to create `Identifier`s in and which logger to use. Create one instance per mod, in
 your `ModInitializer`:
 
 ```java
@@ -60,7 +60,7 @@ public class MyMod implements ModInitializer {
     @Override
     public void onInitialize() {
         // register blocks/items/biomes/... here, using C.id("thing_name") /
-        // C.mk("thing_name") to build namespaced ResourceLocations
+        // C.mk("thing_name") to build namespaced Identifiers
     }
 }
 ```

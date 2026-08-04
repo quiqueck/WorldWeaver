@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "wover-sets-testmod:block/stony_brick_slab"
+    },
+    "type=double": {
+      "model": "wover-sets-testmod:block/stony_brick"
+    },
+    "type=top": {
+      "model": "wover-sets-testmod:block/stony_brick_slab_top"
+    }
+  }
+}

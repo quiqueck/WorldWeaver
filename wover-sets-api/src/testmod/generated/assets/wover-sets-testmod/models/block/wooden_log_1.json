@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "wover-sets-testmod:block/wooden_log_top",
+    "side": "wover-sets-testmod:block/wooden_log_side_mossy"
+  }
+}

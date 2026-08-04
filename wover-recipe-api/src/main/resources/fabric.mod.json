@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-recipe",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Recipe API",
     "description": "",
     "authors": [
@@ -17,13 +17,13 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverRecipe"
+            "de.ambertation.wover.entrypoint.LibWoverRecipe"
         ],
         "client": [
-            "org.betterx.wover.entrypoint.client.LibWoverRecipeClient"
+            "de.ambertation.wover.entrypoint.client.LibWoverRecipeClient"
         ],
         "fabric-datagen": [
-            "org.betterx.wover.recipe.datagen.LibWoverRecipeDatagen"
+            "de.ambertation.wover.recipe.datagen.LibWoverRecipeDatagen"
         ]
     },
     "mixins": [

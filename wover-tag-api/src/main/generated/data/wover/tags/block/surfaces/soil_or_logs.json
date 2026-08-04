@@ -1,0 +1,14 @@
+{
+  "values": [
+    "#minecraft:logs",
+    "#minecraft:planks",
+    {
+      "id": "#wover:surfaces/soil",
+      "required": false
+    },
+    {
+      "id": "#wover:surfaces/terrain",
+      "required": false
+    }
+  ]
+}

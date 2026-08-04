@@ -1,12 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.betterx.wover.block.mixin.client",
+  "package": "de.ambertation.wover.block.mixin.client",
   "compatibilityLevel": "JAVA_21",
+  "refmap": "client-wover-block-api-refmap.json",
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": [
+  "client": [
     "ModelProviderMixin"
   ]
 }

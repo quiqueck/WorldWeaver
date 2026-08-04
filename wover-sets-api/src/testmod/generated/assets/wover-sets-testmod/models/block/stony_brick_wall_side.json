@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/template_wall_side",
+  "textures": {
+    "wall": "wover-sets-testmod:block/stony_brick"
+  }
+}

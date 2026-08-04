@@ -5,15 +5,15 @@ standard `data/<namespace>/tags/<registry>/<path>.json` files. It wraps vanilla/
 set of `TagRegistry`s (one per taggable registry) so mod code never has to hand-build tag JSON or worry about
 merging elements contributed by several mods into the same tag.
 
-- **Gradle artifact:** `org.betterx:wover-tag-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-tag`)
 - **Depends on:** `wover-core-api`, `wover-datagen-api`, `wover-event-api`
 - **Java packages:**
-  - `org.betterx.wover.tag.api`
-  - `org.betterx.wover.tag.api.builder`
-  - `org.betterx.wover.tag.api.event`
-  - `org.betterx.wover.tag.api.event.context`
-  - `org.betterx.wover.tag.api.predefined`
-  - `org.betterx.wover.datagen.api` (adds `WoverTagProvider` to the datagen module's package)
+  - `de.ambertation.wover.tag.api`
+  - `de.ambertation.wover.tag.api.builder`
+  - `de.ambertation.wover.tag.api.event`
+  - `de.ambertation.wover.tag.api.event.context`
+  - `de.ambertation.wover.tag.api.predefined`
+  - `de.ambertation.wover.datagen.api` (adds `WoverTagProvider` to the datagen module's package)
 
 ## For Datapack Developers
 
@@ -54,7 +54,7 @@ with the standard vanilla content:
 
 ### Tags WoVer defines or reuses
 
-`org.betterx.wover.tag.api.predefined` ships a set of ready-made `TagKey` constants so mods sharing WorldWeaver
+`de.ambertation.wover.tag.api.predefined` ships a set of ready-made `TagKey` constants so mods sharing WorldWeaver
 don't reinvent the same conventions. They fall into three namespaces:
 
 - **`wover:...`** — tags defined by WorldWeaver itself (no other convention/mod owns them), e.g.
@@ -91,15 +91,15 @@ villagers recognize it as that workstation/POI.
 
 ### Getting a `TagKey` from a `TagRegistry`
 
-[`TagManager`](../../wover-tag-api/src/main/java/org/betterx/wover/tag/api/TagManager.java) is the entry point. It
-exposes a ready-made [`TagRegistry`](../../wover-tag-api/src/main/java/org/betterx/wover/tag/api/TagRegistry.java)
+[`TagManager`](../../../wover-tag-api/src/main/java/de/ambertation/wover/tag/api/TagManager.java) is the entry point. It
+exposes a ready-made [`TagRegistry`](../../../wover-tag-api/src/main/java/de/ambertation/wover/tag/api/TagRegistry.java)
 for each of the common taggable registries:
 
 | Field | Registry |
 |---|---|
 | `TagManager.BLOCKS` | `Block` |
 | `TagManager.ITEMS` | `Item` |
-| `TagManager.BIOMES` | `Biome` (a [`BiomeTagRegistry`](../../wover-tag-api/src/main/java/org/betterx/wover/tag/api/BiomeTagRegistry.java), which additionally exposes `makeStructureTag(...)`) |
+| `TagManager.BIOMES` | `Biome` (a [`BiomeTagRegistry`](../../../wover-tag-api/src/main/java/de/ambertation/wover/tag/api/BiomeTagRegistry.java), which additionally exposes `makeStructureTag(...)`) |
 | `TagManager.ENCHANTMENTS` | `Enchantment` |
 | `TagManager.ENTITY_TYPES` | `EntityType<?>` |
 
@@ -119,7 +119,7 @@ tag directory/`LocationProvider`).
 ### Adding elements: datagen (recommended)
 
 Elements should be added during datagen whenever possible. Subclass
-[`WoverTagProvider`](../../wover-tag-api/src/main/java/org/betterx/wover/datagen/api/WoverTagProvider.java) — its
+[`WoverTagProvider`](../../../wover-tag-api/src/main/java/de/ambertation/wover/datagen/api/WoverTagProvider.java) — its
 nested convenience classes `ForBlocks`, `ForItems`, `ForBiomes`, `ForEnchantments` and `ForEntityTypes` already
 bind to the matching built-in `TagRegistry`, so you only implement `prepareTags(...)`:
 
@@ -173,8 +173,8 @@ to disk at all.
 
 If a `Block` registered in the built-in `Block` registry, or an `Item` registered in the built-in `Item` registry,
 implements
-[`BlockTagDataProvider`](../../wover-tag-api/src/main/java/org/betterx/wover/tag/api/BlockTagDataProvider.java) or
-[`ItemTagDataProvider`](../../wover-tag-api/src/main/java/org/betterx/wover/tag/api/ItemTagDataProvider.java), the
+[`BlockTagDataProvider`](../../../wover-tag-api/src/main/java/de/ambertation/wover/tag/api/BlockTagDataProvider.java) or
+[`ItemTagDataProvider`](../../../wover-tag-api/src/main/java/de/ambertation/wover/tag/api/ItemTagDataProvider.java), the
 auto-provider machinery from `wover-datagen-api`/`wover-tag-api` calls its `addBlockTags(TagBuilder<Block>)` /
 `addItemTags(ItemTagBuilder)` automatically during datagen — you don't need to write a `WoverTagProvider` yourself
 just to tag your own blocks/items. `ItemTagBuilder` additionally offers `ItemLike`-based overloads of `add`/
@@ -194,7 +194,7 @@ TagManager.BLOCKS.bootstrapEvent().subscribe(ctx -> {
 
 ### Checking tags at runtime
 
-[`TagManager.isToolWithMineableTag(ItemStack stack, TagKey<Block> tag)`](../../wover-tag-api/src/main/java/org/betterx/wover/tag/api/TagManager.java)
+[`TagManager.isToolWithMineableTag(ItemStack stack, TagKey<Block> tag)`](../../../wover-tag-api/src/main/java/de/ambertation/wover/tag/api/TagManager.java)
 checks whether an `ItemStack`'s `TOOL` data component has a rule that is correct-for-drops against the given
 block-mineable tag — useful together with the `MineableTags` constants (`MineableTags.HAMMER`,
 `MineableTags.NEEDS_NETHERITE_TOOL`, ...).

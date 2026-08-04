@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "barrel",
+  "key": {
+    "#": "wover-sets-testmod:wooden_planks",
+    "S": "wover-sets-testmod:wooden_slab"
+  },
+  "pattern": [
+    "#S#",
+    "# #",
+    "#S#"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:wooden_barrel"
+  }
+}

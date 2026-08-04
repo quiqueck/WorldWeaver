@@ -1,0 +1,58 @@
+{
+  "variants": {
+    "axis=x": [
+      {
+        "model": "wover-sets-testmod:block/wooden_bark",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_mirrored",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_1",
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_1_mirrored",
+        "x": 90,
+        "y": 90
+      }
+    ],
+    "axis=y": [
+      {
+        "model": "wover-sets-testmod:block/wooden_bark"
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_mirrored"
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_1"
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_1_mirrored"
+      }
+    ],
+    "axis=z": [
+      {
+        "model": "wover-sets-testmod:block/wooden_bark",
+        "x": 90
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_mirrored",
+        "x": 90
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_1",
+        "x": 90
+      },
+      {
+        "model": "wover-sets-testmod:block/wooden_bark_1_mirrored",
+        "x": 90
+      }
+    ]
+  }
+}

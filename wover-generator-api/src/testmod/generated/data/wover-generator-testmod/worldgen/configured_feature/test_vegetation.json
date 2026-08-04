@@ -1,0 +1,90 @@
+{
+  "type": "minecraft:nether_forest_vegetation",
+  "config": {
+    "spread_height": 4,
+    "spread_width": 8,
+    "state_provider": {
+      "type": "minecraft:weighted_state_provider",
+      "entries": [
+        {
+          "data": {
+            "Name": "minecraft:short_grass"
+          },
+          "weight": 180
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "0"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "1"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "2"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "3"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "4"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "5"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "6"
+            }
+          },
+          "weight": 2
+        },
+        {
+          "data": {
+            "Name": "minecraft:wheat",
+            "Properties": {
+              "age": "7"
+            }
+          },
+          "weight": 2
+        }
+      ]
+    }
+  }
+}

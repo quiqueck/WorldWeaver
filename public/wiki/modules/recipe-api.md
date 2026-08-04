@@ -6,17 +6,17 @@ into brewing-stand recipes, and for generating recipe JSON at datagen time. It a
 extends the vanilla `RecipeManager` so mods can register extra recipes at runtime without a backing datapack
 file.
 
-- **Gradle artifact:** `org.betterx:wover-recipe-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-recipe`)
 - **Depends on:** `wover-core-api`, `wover-item-api`, `wover-block-api`, `wover-event-api`, `wover-tag-api`,
   `wover-datagen-api`
 - **Java packages:**
-  - `org.betterx.wover.recipe.api`
-  - `org.betterx.wover.potions.api`
-  - `org.betterx.wover.item.api.trait` (adds `ItemRecipeTrait` to the item-trait package owned by
+  - `de.ambertation.wover.recipe.api`
+  - `de.ambertation.wover.potions.api`
+  - `de.ambertation.wover.item.api.trait` (adds `ItemRecipeTrait` to the item-trait package owned by
     `wover-item-api`)
-  - `org.betterx.wover.block.api.trait` (adds `BlockRecipeTrait` to the block-trait package owned by
+  - `de.ambertation.wover.block.api.trait` (adds `BlockRecipeTrait` to the block-trait package owned by
     `wover-block-api`)
-  - `org.betterx.wover.datagen.api.provider` (adds `WoverRecipeProvider` to the datagen module's package)
+  - `de.ambertation.wover.datagen.api.provider` (adds `WoverRecipeProvider` to the datagen module's package)
 
 ## For Datapack Developers
 
@@ -209,7 +209,7 @@ RecipeBuilder.BOOTSTRAP_RECIPES.subscribe((ctx) -> {
 
 ### Recipe traits: auto-generating recipes for registered blocks/items
 
-`BlockRecipeTrait` (`org.betterx.wover.block.api.trait`) and `ItemRecipeTrait` (`org.betterx.wover.item.api.trait`)
+`BlockRecipeTrait` (`de.ambertation.wover.block.api.trait`) and `ItemRecipeTrait` (`de.ambertation.wover.item.api.trait`)
 let a `BlockDefinition`/`ItemDefinition` (from `wover-block-api`/`wover-item-api`) carry its own recipe factory,
 so the recipe is generated automatically instead of being written by hand in a separate provider:
 

@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "wover-block-testmod:block/test_block"
+  }
+}

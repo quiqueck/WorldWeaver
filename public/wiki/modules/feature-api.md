@@ -7,21 +7,21 @@ datapack format for either registry — both stay plain vanilla JSON. On top of 
 hand-write feature JSON or fight vanilla's generic-heavy `Feature`/`FeatureConfiguration`/`PlacementModifier`
 types.
 
-- **Gradle artifact:** `org.betterx:wover-feature-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-feature`)
 - **Depends on:** `wover-core-api`, `wover-event-api`, `wover-surface-api`, `wover-block-api`,
   `wover-structure-api`, `wover-math-api`
 - **Java packages:**
-  - `org.betterx.wover.feature.api` — `FeatureManager` (registering custom `Feature` types),
+  - `de.ambertation.wover.feature.api` — `FeatureManager` (registering custom `Feature` types),
     `FeatureUtils` (placing a `ConfiguredFeature` outside the normal worldgen pipeline), `Features` (WoVer's
     built-in `Feature` instances)
-  - `org.betterx.wover.feature.api.configured` — `ConfiguredFeatureKey`/`ConfiguredFeatureManager`
-  - `org.betterx.wover.feature.api.configured.configurators` — one builder interface per `ConfiguredFeature`
+  - `de.ambertation.wover.feature.api.configured` — `ConfiguredFeatureKey`/`ConfiguredFeatureManager`
+  - `de.ambertation.wover.feature.api.configured.configurators` — one builder interface per `ConfiguredFeature`
     type (vanilla and WoVer's own)
-  - `org.betterx.wover.feature.api.features` — WoVer's custom `Feature` implementations
-  - `org.betterx.wover.feature.api.features.config` — the `FeatureConfiguration`s for those features
-  - `org.betterx.wover.feature.api.placed` — `PlacedFeatureKey`/`PlacedConfiguredFeatureKey`/
+  - `de.ambertation.wover.feature.api.features` — WoVer's custom `Feature` implementations
+  - `de.ambertation.wover.feature.api.features.config` — the `FeatureConfiguration`s for those features
+  - `de.ambertation.wover.feature.api.placed` — `PlacedFeatureKey`/`PlacedConfiguredFeatureKey`/
     `PlacedFeatureManager`/`FeaturePlacementBuilder`
-  - `org.betterx.wover.feature.api.placed.modifiers` — WoVer's custom `PlacementModifier`s
+  - `de.ambertation.wover.feature.api.placed.modifiers` — WoVer's custom `PlacementModifier`s
 
 ## For Datapack Developers
 
@@ -63,8 +63,8 @@ Also unmodified vanilla format: a `feature` (`ConfiguredFeature` reference or in
 
 ### WoVer's `Feature` types
 
-Registered in `org.betterx.wover.feature.api.Features` / built by the matching configurator in
-`org.betterx.wover.feature.api.configured.configurators`. All are exposed as inline builders on
+Registered in `de.ambertation.wover.feature.api.Features` / built by the matching configurator in
+`de.ambertation.wover.feature.api.configured.configurators`. All are exposed as inline builders on
 `ConfiguredFeatureManager` (see below) and configured through `ConfiguredFeatureManager.<name>(id)`.
 
 | `type` id | `Feature` class | `FeatureConfiguration` | Configurator | Purpose |
@@ -76,7 +76,7 @@ Registered in `org.betterx.wover.feature.api.Features` / built by the matching c
 | `wover:pillar` | `PillarFeature` | `PillarFeatureConfig` | `AsPillar` | Grows a column of blocks in a direction until `allowedPlacement` rejects a position, transforming each block's state by height (see `KnownTransformers` below). |
 | `wover:template` | `TemplateFeature<TemplateFeatureConfig>` | `TemplateFeatureConfig` | `WithTemplates` | Picks a random `.nbt` template (weighted) and places it with a random rotation/mirror; templates are loaded from `data/<namespace>/structure/<path>.nbt`. |
 
-Besides these six registered `Feature` types, `org.betterx.wover.feature.api.configured.configurators` also
+Besides these six registered `Feature` types, `de.ambertation.wover.feature.api.configured.configurators` also
 has builders for **plain vanilla** `ConfiguredFeature` types, so you rarely need to write vanilla feature
 JSON by hand either: `ForSimpleBlock` (`minecraft:simple_block`), `AsOre` (`minecraft:ore`), `AsRandomSelect`
 (`minecraft:random_selector`), `AsMultiPlaceRandomSelect` (`minecraft:random_boolean_selector`-style multi
@@ -99,7 +99,7 @@ changes with height along the pillar:
 
 All registered under the `wover:` namespace (a few are additionally registered under BCLib's legacy
 namespace for datapack-compatibility, marked *legacy* below) in
-`org.betterx.wover.feature.impl.placed.modifiers.PlacementModifiersImpl`, and each has a matching builder
+`de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl`, and each has a matching builder
 method on `FeaturePlacementBuilder` (see below) so you normally never write these by hand.
 
 | `type` id | Class | Purpose |
@@ -234,7 +234,7 @@ to the active `BootstrapContext`) or `.directHolder()` (an unregistered, inline 
 `PlacedFeatureKey#setDecoration(GenerationStep.Decoration)` sets which `GenerationStep.Decoration` the
 feature is associated with when later added to a biome (default `VEGETAL_DECORATION` if never called);
 `getDecoration()` reads it back — this is what
-`org.betterx.wover.biome.api.modification.BiomeModification.Builder#addFeature(BasePlacedFeatureKey)` (see
+`de.ambertation.wover.biome.api.modification.BiomeModification.Builder#addFeature(BasePlacedFeatureKey)` (see
 the `wover-biome-api` wiki page) uses to pick the right `GenerationStep.Decoration` bucket automatically when
 you hand it a key instead of an explicit `(Decoration, Holder)` pair.
 
@@ -272,11 +272,11 @@ second `.inlinePlace()` places *that* patch.)
 `FeatureManager.register(location, feature)` / `register(ResourceKey<Feature<?>>, feature)` register a new
 `Feature<FC>` in `BuiltInRegistries.FEATURE` (`FeatureManager.createKey(location)` creates the key without
 registering). Most custom features only need a `FeatureConfiguration` (see
-`org.betterx.wover.feature.api.features.config`, e.g. `PlaceBlockFeatureConfig` as a base for "place one of
+`de.ambertation.wover.feature.api.features.config`, e.g. `PlaceBlockFeatureConfig` as a base for "place one of
 several weighted blocks" features) and a `Feature` subclass implementing `place(FeaturePlaceContext<FC>)`
-(see `org.betterx.wover.feature.api.features` for WoVer's own examples). If your feature should also be
+(see `de.ambertation.wover.feature.api.features` for WoVer's own examples). If your feature should also be
 placeable outside the normal worldgen pipeline (e.g. a sapling growing into a tree on bonemeal), implement
-`org.betterx.wover.feature.api.features.GrowableFeature<FC>` — `FeatureUtils.placeInWorld(configuredFeature,
+`de.ambertation.wover.feature.api.features.GrowableFeature<FC>` — `FeatureUtils.placeInWorld(configuredFeature,
 level, pos, random, unchanged)` (also reachable via `ConfiguredFeatureKey#placeInWorld(...)`) will call
 `grow(...)` instead of the normal `place(...)` whenever `unchanged` is `false`, unwrapping one level of
 `RandomPatchConfiguration` first if present.

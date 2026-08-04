@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-structure",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Structure API",
     "description": "",
     "authors": [
@@ -17,10 +17,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverStructure"
+            "de.ambertation.wover.entrypoint.LibWoverStructure"
         ],
         "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.StructureDatapackRegistryEntrypoint"
+            "de.ambertation.wover.entrypoint.StructureDatapackRegistryEntrypoint"
         ]
     },
     "mixins": [

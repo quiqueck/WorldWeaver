@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver",
     "description": "Unleash your world-building potential with WorldWeaver, a Minecraft utility mod for Fabric, simplifying tasks and enhancing the possibilities of data-driven world generation.",
     "authors": [
@@ -17,10 +17,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.Wover"
+            "de.ambertation.wover.entrypoint.Wover"
         ],
         "modmenu": [
-            "org.betterx.wover.entrypoint.client.ModMenuEntryPoint"
+            "de.ambertation.wover.entrypoint.client.ModMenuEntryPoint"
         ]
     },
     "accessWidener": "wover.accesswidener",
@@ -33,10 +33,10 @@
         ],
         "java": ">=21",
         "fabric-api": ">=0.100.0",
-        "wunderlib": "21.8.x"
+        "wunderlib": "21.800.x"
     },
     "breaks": {
-        "wunderlib": "<21.8.0"
+        "wunderlib": "<21.800.0"
     },
     "custom": {
         "wover": {

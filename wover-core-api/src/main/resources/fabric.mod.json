@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-core",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Core API",
     "description": "Provides Common functionality for our WorldWeaver Mods.",
     "authors": [
@@ -17,7 +17,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverCore"
+            "de.ambertation.wover.entrypoint.LibWoverCore"
         ]
     },
     "mixins": [

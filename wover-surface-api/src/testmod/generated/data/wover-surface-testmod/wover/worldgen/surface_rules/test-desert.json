@@ -1,0 +1,28 @@
+{
+  "biome": "minecraft:desert",
+  "priority": 1000,
+  "ruleSource": {
+    "type": "wover:switch_rule",
+    "collection": [
+      {
+        "type": "minecraft:block",
+        "result_state": {
+          "Name": "minecraft:deepslate",
+          "Properties": {
+            "axis": "y"
+          }
+        }
+      },
+      {
+        "type": "minecraft:block",
+        "result_state": {
+          "Name": "minecraft:blackstone"
+        }
+      }
+    ],
+    "selector": {
+      "type": "wover:rnd_int",
+      "range": 2
+    }
+  }
+}

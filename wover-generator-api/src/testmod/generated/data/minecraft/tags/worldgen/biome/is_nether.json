@@ -1,0 +1,8 @@
+{
+  "values": [
+    "wover-generator-testmod:nether_main_biome",
+    "wover-generator-testmod:nether_sub_biome",
+    "wover-generator-testmod:nether_test_biome",
+    "wover-generator-testmod:wastes_sub_biome"
+  ]
+}

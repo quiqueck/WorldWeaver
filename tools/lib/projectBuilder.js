@@ -91,7 +91,7 @@ export function create(options){
 
     const clientMixin = JSON.parse(loadAndReplace(Path.join(process.cwd(), 'include', 'mixin.json')))
     clientMixin.client = []
-    clientMixin.package = `org.betterx.wover.${options.namespace}.mixin.client`
+    clientMixin.package = `de.ambertation.wover.${options.namespace}.mixin.client`
 
     const accesswidener = loadAndReplace(Path.join(process.cwd(), 'include', 'mod.accesswidener'))
 
@@ -120,7 +120,7 @@ export function create(options){
     console.log(`  - Building main folder structure in '${basePath}'`)
     const mainPath = mksub(srcPath, 'main')
     const javaPath = mksub(mainPath, 'java')
-    const entryPath = mksub(javaPath, Path.join('org','betterx','wover','entrypoint'))
+    const entryPath = mksub(javaPath, Path.join('de','ambertation','wover','entrypoint'))
     const resourcesPath = mksub(mainPath, 'resources')
 
     if (fs.existsSync(Path.join(resourcesPath, 'fabric.mod.json'))){
@@ -130,7 +130,7 @@ export function create(options){
     }
 
     if (options.main){
-        const packagePath = mksub(javaPath, Path.join('org','betterx','wover', options.namespace))
+        const packagePath = mksub(javaPath, Path.join('de','ambertation','wover', options.namespace))
         const apiPath = mksub(packagePath, 'api')
         const implPath = mksub(packagePath, 'impl')
         const mixinPath = mksub(packagePath, 'mixin')
@@ -151,13 +151,13 @@ export function create(options){
         console.log(`  - Building client folder structure in '${basePath}'`)
         const clientPath = mksub(srcPath, 'client')
         const clientJavaPath = mksub(clientPath, 'java')
-        const clientEntryPath = mksub(clientJavaPath, 'org/betterx/wover/entrypoint/client')
-        const clientPackagePath = mksub(clientJavaPath, Path.join('org','betterx','wover', options.namespace))
+        const clientEntryPath = mksub(clientJavaPath, 'de/ambertation/wover/entrypoint/client')
+        const clientPackagePath = mksub(clientJavaPath, Path.join('de','ambertation','wover', options.namespace))
         const clientApiPath = mksub(clientPackagePath, Path.join('api', 'client'))
         const clientImplPath = mksub(clientPackagePath, Path.join('impl', 'client'))
         const clientMixinPath = mksub(clientPackagePath, Path.join('mixin', 'client'))
 
-        fabric.entrypoints.client = [`org.betterx.wover.entrypoint.client.${clientClass}`]
+        fabric.entrypoints.client = [`de.ambertation.wover.entrypoint.client.${clientClass}`]
         fabric.mixins.push(`wover.${options.namespace}.mixins.client.json`)
 
         console.log(`    - Adding client mixin config`)
@@ -171,9 +171,9 @@ export function create(options){
         console.log(`  - Building datagen folder structure in '${basePath}'`)
         const datagenPath = mksub(srcPath, 'datagen')
         const javaPath = mksub(datagenPath, 'java')
-        const entryPath = mksub(javaPath, `org/betterx/wover/${options.namespace}/datagen`)
+        const entryPath = mksub(javaPath, `de/ambertation/wover/${options.namespace}/datagen`)
 
-        fabric.entrypoints['fabric-datagen'] = [`org.betterx.wover.${options.namespace}.datagen.${datagenClass}`]
+        fabric.entrypoints['fabric-datagen'] = [`de.ambertation.wover.${options.namespace}.datagen.${datagenClass}`]
 
         console.log(`    - Adding datagen Entrypoint`)
         fs.writeFileSync(Path.join(entryPath, `${datagenClass}.java`), datagenJava)
@@ -190,7 +190,7 @@ export function create(options){
         console.log(`  - Building testmod folder structure in '${basePath}'`)
         const testPath = mksub(srcPath, 'testmod')
         const javaPath = mksub(testPath, 'java')
-        const entryPath = mksub(javaPath, Path.join('org','betterx','wover','testmod', 'entrypoint',))
+        const entryPath = mksub(javaPath, Path.join('de','ambertation','wover','testmod', 'entrypoint',))
         const resourcesPath = mksub(testPath, 'resources')
         if (fs.existsSync(Path.join(resourcesPath, 'fabric.mod.json'))){
             fabric = JSON.parse(loadAndReplaceTest(Path.join(resourcesPath, 'fabric.mod.json')))
@@ -201,19 +201,19 @@ export function create(options){
             console.log(`  - Building datagen testmod folder structure in '${basePath}'`)
             const datagenPath = mksub(srcPath, 'testmodDatagen')
             const javaPath = mksub(datagenPath, 'java')
-            const entryPath = mksub(javaPath, `org/betterx/wover/testmod/${options.namespace}/datagen`)
+            const entryPath = mksub(javaPath, `de/ambertation/wover/testmod/${options.namespace}/datagen`)
 
-            fabric.entrypoints['fabric-datagen'] = [`org.betterx.wover.testmod.${options.namespace}.datagen.${datagenTestClass}`]
+            fabric.entrypoints['fabric-datagen'] = [`de.ambertation.wover.testmod.${options.namespace}.datagen.${datagenTestClass}`]
 
             console.log(`    - Adding datagen Entrypoint`)
             fs.writeFileSync(Path.join(entryPath, `${datagenTestClass}.java`), datagenTestJava)
         }
 
         if (options.main || options.test){
-            const packagePath = mksub(javaPath, Path.join('org','betterx','wover', 'testmod', options.namespace))
+            const packagePath = mksub(javaPath, Path.join('de','ambertation','wover', 'testmod', options.namespace))
             const assetsPath = mksub(resourcesPath, `assets/wover-${options.namespace}-testmod`)
 
-            fabric.entrypoints.main = [`org.betterx.wover.testmod.entrypoint.${mainTestClass}`]
+            fabric.entrypoints.main = [`de.ambertation.wover.testmod.entrypoint.${mainTestClass}`]
 
             console.log(`    - Adding testmod Entrypoint`)
             fs.writeFileSync(Path.join(entryPath, `${mainTestClass}.java`), mainTestJava)
@@ -223,13 +223,13 @@ export function create(options){
             console.log(`  - Building client testmod folder structure in '${basePath}'`)
             const clientTestPath = mksub(srcPath, 'testmodClient')
             const javaPath = mksub(clientTestPath, 'java')
-            const entryPath = mksub(javaPath, Path.join('org','betterx','wover','testmod', 'entrypoint','client'))
-            const packagePath = mksub(javaPath, Path.join('org','betterx','wover', 'testmod', options.namespace, 'client'))
+            const entryPath = mksub(javaPath, Path.join('de','ambertation','wover','testmod', 'entrypoint','client'))
+            const packagePath = mksub(javaPath, Path.join('de','ambertation','wover', 'testmod', options.namespace, 'client'))
 
             console.log(`    - Adding client testmod Entrypoint`)
             fs.writeFileSync(Path.join(entryPath, `${clientTestClass}.java`), clientTestJava)
 
-            fabric.entrypoints.client = [`org.betterx.wover.testmod.entrypoint.client.${clientTestClass}`]
+            fabric.entrypoints.client = [`de.ambertation.wover.testmod.entrypoint.client.${clientTestClass}`]
         }
 
         console.log(`  - Adding fabric.mod.json for testmod`)

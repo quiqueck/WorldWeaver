@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-surface",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Surface API",
     "description": "Provides A Registry for SurfaceRules.",
     "authors": [
@@ -17,13 +17,13 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverSurface"
+            "de.ambertation.wover.entrypoint.LibWoverSurface"
         ],
         "fabric-datagen": [
-            "org.betterx.wover.surface.datagen.WoverSurfaceDatagen"
+            "de.ambertation.wover.surface.datagen.WoverSurfaceDatagen"
         ],
         "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.SurfaceDatapackRegistryEntrypoint"
+            "de.ambertation.wover.entrypoint.SurfaceDatapackRegistryEntrypoint"
         ]
     },
     "mixins": [

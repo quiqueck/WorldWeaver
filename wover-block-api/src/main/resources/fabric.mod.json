@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-block",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Block and Item API",
     "description": "",
     "authors": [
@@ -17,10 +17,13 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverBlock"
+            "de.ambertation.wover.entrypoint.LibWoverBlock"
         ],
         "client": [
-            "org.betterx.wover.entrypoint.client.LibWoverBlockClient"
+            "de.ambertation.wover.entrypoint.client.LibWoverBlockClient"
+        ],
+        "wover.client.traits": [
+            "de.ambertation.wover.block.impl.client.model.WoverBlockModelFactories"
         ]
     },
     "mixins": [

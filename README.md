@@ -31,22 +31,22 @@ repositories {
 ```
 dependencies {
     ...
-    modImplementation "org.betterx:worldweaver:${project.wover_version}"
+    modImplementation "de.ambertation:worldweaver:${project.wover_version}"
 }
 ```
 
-You should also add a dependency to `fabirc.mod.json`. WorldWeaver uses Semantic versioning, so adding the dependcy as
-follows
-should respect that and ensure that your mod is not loaded with an incompatible version of WorldWeaver:
+You should also add a dependency to `fabric.mod.json`. WorldWeaver uses Semantic versioning, so adding the
+dependency as follows should respect that and ensure that your mod is not loaded with an incompatible version of
+WorldWeaver:
 
 ```
 "depends": {
   ...
-  "worldweaver": "21.0.x"
+  "wover": "21.8.x"
 },
 "breaks": {
-  "worldweaver": "<21.0.13"
+  "wover": "<21.8.2"
 }
 ```
 
-In this example `21.0.13` is the WorldWeaver Version you are building against.
+In this example `21.8.2` is the WorldWeaver Version you are building against.

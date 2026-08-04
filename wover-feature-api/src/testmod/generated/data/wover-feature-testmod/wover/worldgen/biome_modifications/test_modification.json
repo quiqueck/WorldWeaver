@@ -1,0 +1,20 @@
+{
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "wover-feature-testmod:test_datagen"
+    ]
+  ],
+  "predicate": {
+    "type": "wover:is_biome",
+    "biome_key": "minecraft:desert"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "wover:wover_data",
+  "parent": "minecraft:end_highlands",
+  "biome": "minecraft:end_midlands",
+  "genChance": 0.05,
+  "generation_data": {
+    "intended_placement": "wover:is_end/midland"
+  }
+}

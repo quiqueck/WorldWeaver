@@ -17,13 +17,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.TestModWoverEvent"
+      "de.ambertation.wover.testmod.entrypoint.TestModWoverEvent"
     ],
     "client": [
-      "org.betterx.wover.testmod.entrypoint.client.TestModWoverEventClient"
+      "de.ambertation.wover.testmod.entrypoint.client.TestModWoverEventClient"
     ],
     "fabric-gametest": [
-      "org.betterx.wover.testmod.gametest.EventOrderGameTest"
+      "de.ambertation.wover.testmod.gametest.EventOrderGameTest"
     ]
   },
   "depends": {

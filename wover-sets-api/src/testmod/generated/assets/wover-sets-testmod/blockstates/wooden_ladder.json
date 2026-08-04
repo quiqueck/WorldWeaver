@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "wover-sets-testmod:block/wooden_ladder",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "wover-sets-testmod:block/wooden_ladder"
+    },
+    "facing=south": {
+      "model": "wover-sets-testmod:block/wooden_ladder",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "wover-sets-testmod:block/wooden_ladder",
+      "y": 270
+    }
+  }
+}

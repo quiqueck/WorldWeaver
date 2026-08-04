@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "wover-sets-testmod:block/wooden_crafting_table_bottom",
+    "east": "wover-sets-testmod:block/wooden_crafting_table_side",
+    "north": "wover-sets-testmod:block/wooden_crafting_table_front",
+    "particle": "wover-sets-testmod:block/wooden_crafting_table_front",
+    "south": "wover-sets-testmod:block/wooden_crafting_table_side",
+    "up": "wover-sets-testmod:block/wooden_crafting_table_top",
+    "west": "wover-sets-testmod:block/wooden_crafting_table_front"
+  }
+}

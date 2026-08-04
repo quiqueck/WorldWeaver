@@ -16,13 +16,13 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.TestModWoverPottable"
+      "de.ambertation.wover.testmod.entrypoint.TestModWoverPottable"
     ],
     "wover.datapack.registry": [
-      "org.betterx.wover.testmod.entrypoint.TestModPottableDatapackRegistryEntrypoint"
+      "de.ambertation.wover.testmod.entrypoint.TestModPottableDatapackRegistryEntrypoint"
     ],
     "fabric-gametest": [
-      "org.betterx.wover.testmod.gametest.PottableGameTest"
+      "de.ambertation.wover.testmod.gametest.PottableGameTest"
     ]
   },
   "depends": {

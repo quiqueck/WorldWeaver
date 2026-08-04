@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-biome",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Biome API",
     "description": "",
     "authors": [
@@ -17,10 +17,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverBiome"
+            "de.ambertation.wover.entrypoint.LibWoverBiome"
         ],
         "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.BiomeDatapackRegistryEntrypoint"
+            "de.ambertation.wover.entrypoint.BiomeDatapackRegistryEntrypoint"
         ]
     },
     "mixins": [

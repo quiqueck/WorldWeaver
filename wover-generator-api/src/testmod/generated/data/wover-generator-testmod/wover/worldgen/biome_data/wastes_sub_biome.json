@@ -1,0 +1,8 @@
+{
+  "type": "wover:wover_data",
+  "parent": "minecraft:nether_wastes",
+  "biome": "wover-generator-testmod:wastes_sub_biome",
+  "generation_data": {
+    "intended_placement": "minecraft:is_nether"
+  }
+}

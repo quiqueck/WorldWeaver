@@ -5,22 +5,22 @@ Datapack backed registry (`BiomeData`) that attaches extra, non-vanilla data to 
 does not invent a new format for the vanilla `Biome` registry itself — Biomes it creates are plain
 `data/<namespace>/worldgen/biome/*.json`, produced through datagen like any vanilla Biome.
 
-- **Gradle artifact:** `org.betterx:wover-biome-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-biome`)
 - **Depends on:** `wover-core-api`, `wover-event-api`, `wover-feature-api` (and, transitively,
   `wover-surface-api`, `wover-structure-api`, `wover-tag-api`)
 - **Java packages:**
-  - `org.betterx.wover.biome.api` — `BiomeManager` (main entry point), `BiomeKey` (handle for a Biome)
-  - `org.betterx.wover.biome.api.builder` — `BiomeBuilder`/`BiomeBootstrapContext`/`BiomeSurfaceRuleBuilder`,
+  - `de.ambertation.wover.biome.api` — `BiomeManager` (main entry point), `BiomeKey` (handle for a Biome)
+  - `de.ambertation.wover.biome.api.builder` — `BiomeBuilder`/`BiomeBootstrapContext`/`BiomeSurfaceRuleBuilder`,
     the fluent builders used to fill in a Biome's content
-  - `org.betterx.wover.biome.api.builder.event` — `OnBootstrapBiomes`, the subscriber type used to build
+  - `de.ambertation.wover.biome.api.builder.event` — `OnBootstrapBiomes`, the subscriber type used to build
     Biomes at runtime
-  - `org.betterx.wover.biome.api.data` — `BiomeData`/`BiomeDataRegistry`/`BiomeGenerationDataContainer`/
+  - `de.ambertation.wover.biome.api.data` — `BiomeData`/`BiomeDataRegistry`/`BiomeGenerationDataContainer`/
     `BiomeCodecRegistry`, the extra data attached to a Biome
-  - `org.betterx.wover.biome.api.modification` — `BiomeModification`/`BiomeModificationRegistry`, runtime
+  - `de.ambertation.wover.biome.api.modification` — `BiomeModification`/`BiomeModificationRegistry`, runtime
     modification of existing Biomes
-  - `org.betterx.wover.biome.api.modification.predicates` — `BiomePredicate`/`BiomePredicateRegistry`, the
+  - `de.ambertation.wover.biome.api.modification.predicates` — `BiomePredicate`/`BiomePredicateRegistry`, the
     conditions a `BiomeModification` is applied under
-  - `org.betterx.wover.datagen.api.provider` / `.provider.multi` — `WoverBiomeDataProvider`,
+  - `de.ambertation.wover.datagen.api.provider` / `.provider.multi` — `WoverBiomeDataProvider`,
     `WoverSurfaceRuleProvider`, `WoverBiomeProvider` datagen provider base classes (see the `wover-datagen-api`
     wiki page for the general provider/`PackBuilder` mechanics)
 
@@ -226,7 +226,7 @@ customized (fog density left at `1.0` and no climate parameters added).
 ### Looking up `BiomeData` at runtime
 
 ```java
-BiomeData data = BiomeManager.biomeData(new ResourceLocation("minecraft", "savanna"));
+BiomeData data = BiomeManager.biomeData(ResourceLocation.fromNamespaceAndPath("minecraft", "savanna"));
 // or, if you already have a Holder<Biome>:
 BiomeData data2 = BiomeManager.biomeDataForHolder(someBiomeHolder);
 ```
@@ -314,7 +314,7 @@ path; the JSON files it produces work without your mod code running at all.
 
 ### Datagen provider base classes
 
-`org.betterx.wover.datagen.api.provider` (this module) ships three thin `WoverRegistryContentProvider`
+`de.ambertation.wover.datagen.api.provider` (this module) ships three thin `WoverRegistryContentProvider`
 subclasses that pre-bind the registry key, plus one combined `WoverMultiProvider` — register any of them
 from your datagen entrypoint's `onInitializeProviders(PackBuilder)` the same way as any other
 `wover-datagen-api` provider (see that module's wiki page for the general mechanics):

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "brick",
+  "key": {
+    "*": "wover-sets-testmod:stony"
+  },
+  "pattern": [
+    "**",
+    "**"
+  ],
+  "result": {
+    "count": 4,
+    "id": "wover-sets-testmod:stony_brick"
+  }
+}

@@ -5,12 +5,12 @@ two small, symmetric registries — `PottablePlantRegistry` for the plant blocks
 soil blocks they can be potted on — plus a block-trait/datagen pair that lets a mod tag its own blocks and have
 the registry entries generated automatically, without writing a custom datagen provider.
 
-- **Gradle artifact:** `org.betterx:wover-pottable-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-pottable`)
 - **Depends on:** `wover-core-api`, `wover-block-api`, `wover-tag-api`, `wover-event-api`, `wover-datagen-api`
 - **Java packages:**
-  - `org.betterx.wover.pottable.api`
-  - `org.betterx.wover.pottable.api.datagen`
-  - `org.betterx.wover.pottable.api.trait`
+  - `de.ambertation.wover.pottable.api`
+  - `de.ambertation.wover.pottable.api.datagen`
+  - `de.ambertation.wover.pottable.api.trait`
 
 Note: this module only maintains the *registry data* (which blocks are pottable plants/soils, and which soils a
 given plant accepts). It does not itself contain any mixin or code that wires this data into vanilla's flower pot
@@ -60,9 +60,9 @@ datagen providers do it for you.
 
 ### Registering directly with `PottablePlantRegistry`/`PottableSoilRegistry`
 
-[`PottablePlantRegistry`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/PottablePlantRegistry.java)
+[`PottablePlantRegistry`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/PottablePlantRegistry.java)
 and
-[`PottableSoilRegistry`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/PottableSoilRegistry.java)
+[`PottableSoilRegistry`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/PottableSoilRegistry.java)
 expose static `register(...)` overloads, called from inside a
 `BootstrapContext<PottablePlant>`/`BootstrapContext<PottableSoil>` (e.g. your own `WoverRegistryContentProvider`):
 
@@ -94,16 +94,16 @@ Both `register` overloads accepting a `Block` resolve it to its `ResourceKey<Blo
 `block.builtInRegistryHolder().key()`; there's also a lowest-level overload on `PottablePlantRegistry` that takes
 a `ResourceKey<Block>` and an `Optional<TagKey<Block>>` directly, if you need it.
 
-The returned [`PottablePlant`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/PottablePlant.java)/
-[`PottableSoil`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/PottableSoil.java) wraps
+The returned [`PottablePlant`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/PottablePlant.java)/
+[`PottableSoil`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/PottableSoil.java) wraps
 just the block's `ResourceKey` (and, for plants, the optional soil tag); `PottablePlant#isValidSoil(Block)` checks
 whether a given soil block matches the plant's `validSoils` tag (always `true` if the plant has no restriction).
 
 ### Registering via the block trait (recommended)
 
-[`PottablePlantBlockTrait`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/trait/PottablePlantBlockTrait.java)
+[`PottablePlantBlockTrait`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/trait/PottablePlantBlockTrait.java)
 and
-[`PottableSoilBlockTrait`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/trait/PottableSoilBlockTrait.java)
+[`PottableSoilBlockTrait`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/trait/PottableSoilBlockTrait.java)
 plug into `wover-block-api`'s trait system (`BlockDefinition#addTrait(...)`, see the `block-api` wiki page). Attach
 them at the block's normal registration site:
 
@@ -133,6 +133,13 @@ public class MyBlocks {
 `PottableSoilBlockTrait.DEFAULT` is the single, shared soil trait instance (there's no per-block configuration for
 soils).
 
+Both traits are **"latest wins"** (`keepLatestOnly()`): a block has at most one pottable-plant and one
+pottable-soil trait, and adding the trait again replaces the previous one. This matters because a
+`PottablePlant`'s registry key is derived only from the block id, so one block can never produce more than one
+registry entry — writing
+`.addTrait(PottablePlantBlockTrait.any()).addTrait(PottablePlantBlockTrait.withSoils(MY_SOILS))` leaves the block
+restricted to `MY_SOILS`, not pottable on any soil.
+
 Then register the matching datagen provider(s) once, from your `WoverDataGenEntryPoint`:
 
 ```java
@@ -140,9 +147,9 @@ globalPack.addRegistryProvider(WoverPottablePlantRegistryProvider::new);
 globalPack.addRegistryProvider(WoverPottableSoilRegistryProvider::new);
 ```
 
-[`WoverPottablePlantRegistryProvider`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/datagen/WoverPottablePlantRegistryProvider.java)
+[`WoverPottablePlantRegistryProvider`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/datagen/WoverPottablePlantRegistryProvider.java)
 and
-[`WoverPottableSoilRegistryProvider`](../../wover-pottable-api/src/main/java/org/betterx/wover/pottable/api/datagen/WoverPottableSoilRegistryProvider.java)
+[`WoverPottableSoilRegistryProvider`](../../../wover-pottable-api/src/main/java/de/ambertation/wover/pottable/api/datagen/WoverPottableSoilRegistryProvider.java)
 scan every block registered through your mod's `BlockRegistry` (via
 `PottablePlantBlockTrait.bootstrapPottablePlants`/`PottableSoilBlockTrait.bootstrapPottableSoils`, which you can
 also call yourself from a custom provider if you need a filter other than "every block with the trait") and

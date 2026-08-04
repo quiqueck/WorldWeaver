@@ -1,0 +1,24 @@
+{
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:small_basalt_columns"
+    ]
+  ],
+  "predicate": {
+    "type": "wover:or",
+    "predicates": [
+      {
+        "type": "wover:is_biome",
+        "biome_key": "minecraft:beach"
+      },
+      {
+        "type": "wover:is_biome",
+        "biome_key": "minecraft:meadow"
+      }
+    ]
+  }
+}

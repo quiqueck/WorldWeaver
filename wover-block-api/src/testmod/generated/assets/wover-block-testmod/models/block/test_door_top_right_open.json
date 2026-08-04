@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_right_open",
+  "textures": {
+    "bottom": "wover-block-testmod:block/test_door_bottom",
+    "top": "wover-block-testmod:block/test_door_top"
+  }
+}

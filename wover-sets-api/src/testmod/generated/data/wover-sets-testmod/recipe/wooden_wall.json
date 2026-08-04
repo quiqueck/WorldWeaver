@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "wooden_wall",
+  "key": {
+    "*": "wover-sets-testmod:wooden_planks",
+    "|": "wover-sets-testmod:wooden_fence"
+  },
+  "pattern": [
+    "* *",
+    "|||"
+  ],
+  "result": {
+    "count": 6,
+    "id": "wover-sets-testmod:wooden_wall"
+  }
+}

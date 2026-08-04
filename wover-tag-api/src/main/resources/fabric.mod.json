@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-tag",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Tag API",
     "description": "",
     "authors": [
@@ -17,10 +17,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverTag"
+            "de.ambertation.wover.entrypoint.LibWoverTag"
         ],
         "fabric-datagen": [
-            "org.betterx.wover.tag.datagen.WoverTagDatagen"
+            "de.ambertation.wover.tag.datagen.WoverTagDatagen"
         ]
     },
     "mixins": [

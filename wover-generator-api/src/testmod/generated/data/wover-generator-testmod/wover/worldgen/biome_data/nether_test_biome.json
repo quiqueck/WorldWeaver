@@ -1,0 +1,20 @@
+{
+  "type": "wover:wover_data",
+  "biome": "wover-generator-testmod:nether_test_biome",
+  "fogDensity": 8.0,
+  "genChance": 2.0,
+  "generation_data": {
+    "intended_placement": "minecraft:is_nether",
+    "parameter_points": [
+      {
+        "continentalness": 0.0,
+        "depth": 0.0,
+        "erosion": 0.0,
+        "humidity": 0.0,
+        "offset": 0.0,
+        "temperature": 2.0,
+        "weirdness": 0.0
+      }
+    ]
+  }
+}

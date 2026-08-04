@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "wover-sets-testmod:block/stony_weathered",
+    "side": "wover-sets-testmod:block/stony_weathered",
+    "top": "wover-sets-testmod:block/stony_weathered"
+  }
+}

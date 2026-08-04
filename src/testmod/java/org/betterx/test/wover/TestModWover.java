@@ -1,6 +1,6 @@
 package org.betterx.test.wover;
 
-import org.betterx.wover.core.api.ModCore;
+import de.ambertation.wover.core.api.ModCore;
 
 import net.fabricmc.api.ModInitializer;
 

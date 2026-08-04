@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "group": "leggings",
+  "key": {
+    "#": "#minecraft:repairs_turtle_helmet"
+  },
+  "pattern": [
+    "###",
+    "# #",
+    "# #"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:test_equipment_set_leggings"
+  }
+}

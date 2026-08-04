@@ -1,0 +1,85 @@
+package de.ambertation.wover.feature.api.placed;
+
+import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator;
+
+import net.minecraft.core.Holder;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * A key for a {@link PlacedFeature} that can be used to reference the feature as well as
+ * use it to place a {@link ConfiguredFeature}.
+ * <p>
+ * If you do not call {@link #setDecoration(GenerationStep.Decoration)}, the feature is assigned
+ * to the {@link GenerationStep.Decoration#VEGETAL_DECORATION} step.
+ */
+public interface PlacedFeatureKey extends BasePlacedFeatureKey<PlacedFeatureKey> {
+
+
+    /**
+     * Creates a new builder for a {@link PlacedFeature}.
+     * <p>
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
+     * to add it to the registry.
+     *
+     * @param bootstrapContext The {@link BootstrapContext} to use
+     * @param key              The {@link ResourceKey} for the {@link ConfiguredFeature} to place
+     * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
+     */
+    public FeaturePlacementBuilder place(
+            BootstrapContext<PlacedFeature> bootstrapContext,
+            ResourceKey<ConfiguredFeature<?, ?>> key
+    );
+
+    /**
+     * Creates a new builder for a {@link PlacedFeature}.
+     * <p>
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
+     * to add it to the registry.
+     *
+     * @param bootstrapContext The {@link BootstrapContext} to use
+     * @param holder           The {@link Holder} for the {@link ConfiguredFeature} to place
+     * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
+     */
+    public FeaturePlacementBuilder place(
+            BootstrapContext<PlacedFeature> bootstrapContext,
+            Holder<ConfiguredFeature<?, ?>> holder
+    );
+
+    /**
+     * Creates a new builder for a {@link PlacedFeature}.
+     * <p>
+     * When configuration is finished, you should call {@link FeaturePlacementBuilder#register()}
+     * to add it to the registry.
+     *
+     * @param bootstrapContext The {@link BootstrapContext} to use
+     * @param key              The {@link ConfiguredFeature} to place. Will use the passed bootstrapContext
+     *                         to get the holder from the {@link ConfiguredFeatureKey}.
+     * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
+     */
+    public <B extends FeatureConfigurator<?, ?>> FeaturePlacementBuilder place(
+            @NotNull BootstrapContext<PlacedFeature> bootstrapContext,
+            ConfiguredFeatureKey<B> key
+    );
+
+    /**
+     * Starts a new anonymous (or inline) feature configuration.
+     * <p>
+     * When you finished configuration a feature, you need to call
+     * {@link FeatureConfigurator#inlinePlace()} to get to the placement phase.
+     * <p>
+     * When the Placement is done, you should call {@link FeaturePlacementBuilder#register()}
+     *
+     * @param bootstrapContext The {@link BootstrapContext} to use
+     * @return A {@link ConfiguredFeatureManager.InlineBuilder} start the
+     * configuration.
+     */
+    ConfiguredFeatureManager.InlineBuilder inlineConfiguration(@NotNull BootstrapContext<PlacedFeature> bootstrapContext);
+}

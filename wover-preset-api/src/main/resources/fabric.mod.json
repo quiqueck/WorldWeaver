@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-preset",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - World Preset API",
     "description": "",
     "authors": [
@@ -17,13 +17,13 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverWorldPreset"
+            "de.ambertation.wover.entrypoint.LibWoverWorldPreset"
         ],
         "client": [
-            "org.betterx.wover.entrypoint.client.LibWoverWorldPresetClient"
+            "de.ambertation.wover.entrypoint.client.LibWoverWorldPresetClient"
         ],
         "fabric-datagen": [
-            "org.betterx.wover.preset.datagen.WoverWorldPresetDatagen"
+            "de.ambertation.wover.preset.datagen.WoverWorldPresetDatagen"
         ]
     },
     "mixins": [

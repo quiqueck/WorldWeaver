@@ -6,21 +6,21 @@ Ties every other WoVer module together into two ready-made, fully datapack-confi
 in the dependency chain — it is what actually *places* the Biomes registered through `wover-biome-api` into a
 dimension, using the climate parameters/tags/presets/surface rules contributed by the modules it depends on.
 
-- **Gradle artifact:** `org.betterx:wover-generator-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-generator`)
 - **Depends on:** `wover-core-api`, `wover-event-api`, `wover-surface-api`, `wover-biome-api`,
   `wover-preset-api`, `wover-ui-api`, `wover-tag-api`
 - **Java packages:**
-  - `org.betterx.wover.generator.api.biomesource` — `WoverBiomeSource` (base class), `WoverBiomePicker`,
+  - `de.ambertation.wover.generator.api.biomesource` — `WoverBiomeSource` (base class), `WoverBiomePicker`,
     `WoverBiomeBuilder`, `WoverBiomeData`, `BiomeSourceManager`
-  - `org.betterx.wover.generator.api.biomesource.end` — `WoverEndConfig`, `BiomeDecider` (extension point
+  - `de.ambertation.wover.generator.api.biomesource.end` — `WoverEndConfig`, `BiomeDecider` (extension point
     for the End biome source)
-  - `org.betterx.wover.generator.api.biomesource.nether` — `WoverNetherConfig`
-  - `org.betterx.wover.generator.api.chunkgenerator` — `ChunkGeneratorManager`
-  - `org.betterx.wover.generator.api.map` — `BiomeMap`/`BiomeChunk`/`MapBuilderFunction`, the spatial biome
+  - `de.ambertation.wover.generator.api.biomesource.nether` — `WoverNetherConfig`
+  - `de.ambertation.wover.generator.api.chunkgenerator` — `ChunkGeneratorManager`
+  - `de.ambertation.wover.generator.api.map` — `BiomeMap`/`BiomeChunk`/`MapBuilderFunction`, the spatial biome
     distribution used by `WoverBiomeSource`
-  - `org.betterx.wover.generator.api.preset` — `WorldPresets`, WoVer's built-in `WorldPreset`s and helpers to
+  - `de.ambertation.wover.generator.api.preset` — `WorldPresets`, WoVer's built-in `WorldPreset`s and helpers to
     build a WoVer Nether/End `LevelStem`
-  - `org.betterx.wover.generator.api.client.biomesource.client` *(client-only)* — `BiomeSourceConfigPanel`,
+  - `de.ambertation.wover.generator.api.client.biomesource.client` *(client-only)* — `BiomeSourceConfigPanel`,
     `BiomeSourceWithConfigScreen`, the world-creation-screen settings panel extension point
 
 ## For Datapack Developers

@@ -17,16 +17,16 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "org.betterx.wover.testmod.entrypoint.TestModWoverWorldPreset"
+      "de.ambertation.wover.testmod.entrypoint.TestModWoverWorldPreset"
     ],
     "fabric-datagen": [
-      "org.betterx.wover.testmod.preset.datagen.TestModWoverWorldPresetDatagen"
+      "de.ambertation.wover.testmod.preset.datagen.TestModWoverWorldPresetDatagen"
     ],
     "client": [
-      "org.betterx.wover.testmod.entrypoint.client.TestModWoverWorldPresetClient"
+      "de.ambertation.wover.testmod.entrypoint.client.TestModWoverWorldPresetClient"
     ],
     "fabric-gametest": [
-      "org.betterx.wover.testmod.gametest.WorldPresetGameTest"
+      "de.ambertation.wover.testmod.gametest.WorldPresetGameTest"
     ]
   },
   "mixins": [],

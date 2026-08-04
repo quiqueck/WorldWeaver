@@ -1,0 +1,10 @@
+{
+  "values": [
+    "minecraft:basalt",
+    "minecraft:magma_block",
+    "minecraft:red_sand",
+    "minecraft:sculk",
+    "#wover:surfaces/nether/netherrack",
+    "#wover:surfaces/nether/stones"
+  ]
+}

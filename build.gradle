@@ -19,4 +19,6 @@ def getDependencies(project, List<String> depNames, configuration) {
 
 apply from: "functions.gradle"
 apply from: "common.gradle"
-apply from: "helper.gradle"
+apply from: "common-helper.gradle"
+apply from: "common-publish-maven.gradle"
+apply from: "common-publish-tag.gradle"

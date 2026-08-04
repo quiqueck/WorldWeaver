@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-feature",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Feature API",
     "description": "",
     "authors": [
@@ -17,10 +17,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverFeature"
+            "de.ambertation.wover.entrypoint.LibWoverFeature"
         ],
         "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.FeatureDatapackRegistryEntrypoint"
+            "de.ambertation.wover.entrypoint.FeatureDatapackRegistryEntrypoint"
         ]
     },
     "mixins": [

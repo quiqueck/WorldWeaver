@@ -1,0 +1,18 @@
+{
+  "type": "wover:random_nbt_structure",
+  "biomes": "#wover-structure-testmod:has_structure/rnd_structure",
+  "configs": {
+    "items": [
+      {
+        "value": {
+          "location": "wover-structure-testmod:simple",
+          "offset_y": 1
+        },
+        "weight": 2.0
+      }
+    ]
+  },
+  "placement": "nether_surface_flat_2",
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

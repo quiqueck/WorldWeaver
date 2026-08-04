@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-item",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Item API",
     "description": "",
     "authors": [
@@ -17,16 +17,19 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverItem"
+            "de.ambertation.wover.entrypoint.LibWoverItem"
         ],
         "client": [
-            "org.betterx.wover.entrypoint.client.LibWoverItemClient"
+            "de.ambertation.wover.entrypoint.client.LibWoverItemClient"
         ],
         "fabric-datagen": [
-            "org.betterx.wover.item.datagen.LibWoverItemDatagen"
+            "de.ambertation.wover.item.datagen.LibWoverItemDatagen"
         ],
         "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.ItemDatapackRegistryEntrypoint"
+            "de.ambertation.wover.entrypoint.ItemDatapackRegistryEntrypoint"
+        ],
+        "wover.client.traits": [
+            "de.ambertation.wover.item.impl.client.model.WoverItemModelFactories"
         ]
     },
     "mixins": [

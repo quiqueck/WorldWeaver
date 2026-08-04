@@ -5,12 +5,12 @@ Generic event-bus module for WorldWeaver. It provides a small, reusable `Event<T
 read-only snapshot of the currently active world (registries, storage access). Most other WorldWeaver modules
 depend on `wover-event-api` to hook into world startup.
 
-- **Gradle artifact:** `org.betterx:wover-event-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-events`)
 - **Depends on:** `wover-core-api`
 - **Java packages:**
-  - `org.betterx.wover.events.api`
-  - `org.betterx.wover.events.api.types`
-  - `org.betterx.wover.state.api`
+  - `de.ambertation.wover.events.api`
+  - `de.ambertation.wover.events.api.types`
+  - `de.ambertation.wover.state.api`
 
 ## For Datapack Developers
 
@@ -18,7 +18,7 @@ depend on `wover-event-api` to hook into world startup.
 `assets/wover-events/icon.png` and the mod's own `fabric.mod.json`/mixin configs). There is no JSON schema to write
 for this module; skip it unless you are writing Java code.
 
-The one exception is [`WorldDatapackConfig`](../../wover-event-api/src/main/java/org/betterx/wover/state/api/WorldDatapackConfig.java),
+The one exception is [`WorldDatapackConfig`](../../../wover-event-api/src/main/java/de/ambertation/wover/state/api/WorldDatapackConfig.java),
 which lets a *mod* register a `ConfigResource` that then gets merged from datapack JSON files contributed by other
 packs — but the JSON schema/location for such a resource is defined by whichever mod registers it, not by
 `wover-event-api` itself.
@@ -27,8 +27,8 @@ packs — but the JSON schema/location for such a resource is defined by whichev
 
 ### The `Event<T>` system
 
-[`Event<T>`](../../wover-event-api/src/main/java/org/betterx/wover/events/api/Event.java) is a collection of
-prioritized [`Subscriber`](../../wover-event-api/src/main/java/org/betterx/wover/events/api/Subscriber.java)s that
+[`Event<T>`](../../../wover-event-api/src/main/java/de/ambertation/wover/events/api/Event.java) is a collection of
+prioritized [`Subscriber`](../../../wover-event-api/src/main/java/de/ambertation/wover/events/api/Subscriber.java)s that
 get called when the event is emitted:
 
 | Member | Purpose |
@@ -39,7 +39,7 @@ get called when the event is emitted:
 Most `Event<T>` fields you will use are already created for you — either by `WorldLifecycle` (see below) or by
 another WorldWeaver module (e.g. `WorldPresetManager.BOOTSTRAP_WORLD_PRESETS`, `TagManager`'s bootstrap events).
 `wover-event-api` itself only ships the `Event`/`Subscriber` interfaces; the concrete implementation used
-throughout the codebase to back new events is `org.betterx.wover.events.impl.EventImpl`, which other modules
+throughout the codebase to back new events is `de.ambertation.wover.events.impl.EventImpl`, which other modules
 instantiate internally and expose through a public `Event<T>`-typed field, for example:
 
 ```java
@@ -55,8 +55,8 @@ public class MyRegistry {
 ```
 
 A `Subscriber` is usually a `@FunctionalInterface` with one method whose signature carries whatever data the event
-wants to pass along (see the interfaces in `org.betterx.wover.events.api.types` below). There is also
-[`ChainableSubscriber<R>`](../../wover-event-api/src/main/java/org/betterx/wover/events/api/ChainableSubscriber.java),
+wants to pass along (see the interfaces in `de.ambertation.wover.events.api.types` below). There is also
+[`ChainableSubscriber<R>`](../../../wover-event-api/src/main/java/de/ambertation/wover/events/api/ChainableSubscriber.java),
 used by events where each subscriber transforms a value and passes it on to the next subscriber (currently only
 `WorldLifecycle.ON_DIMENSION_LOAD`); the return value of the last subscriber in the chain becomes the event's
 result.
@@ -67,8 +67,8 @@ Subscribing is a simple method reference or lambda matching the `Subscriber` int
 how `wover-block-api`'s `PoiManagerImpl` reacts to `WorldLifecycle.BEFORE_CREATING_LEVELS`:
 
 ```java
-import org.betterx.wover.events.api.WorldLifecycle;
-import static org.betterx.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
+import de.ambertation.wover.events.api.WorldLifecycle;
+import static de.ambertation.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
 
 WorldLifecycle.BEFORE_CREATING_LEVELS.subscribe(
         PoiManagerImpl::finalizedWorldLoad,
@@ -88,15 +88,15 @@ private static void finalizedWorldLoad(
 `AbstractEvent.SYSTEM_PRIORITY` (100000000) is what WorldWeaver's own internal subscribers use so they consistently
 run before mod code; you normally don't need it unless you have a similar ordering requirement.
 
-> This page covers the common (server-side) events in `org.betterx.wover.events.api`, which is what almost every
+> This page covers the common (server-side) events in `de.ambertation.wover.events.api`, which is what almost every
 > mod hooks into. `wover-event-api` also ships a client-only counterpart,
-> `org.betterx.wover.events.api.client.ClientWorldLifecycle` (loading-screen, welcome-screen and
+> `de.ambertation.wover.events.api.client.ClientWorldLifecycle` (loading-screen, welcome-screen and
 > experimental-warning-screen events), under `src/client` — see its javadoc if you need to hook into the client's
 > world-creation UI flow.
 
 ### `WorldLifecycle`: world creation/loading events
 
-[`WorldLifecycle`](../../wover-event-api/src/main/java/org/betterx/wover/events/api/WorldLifecycle.java) exposes the
+[`WorldLifecycle`](../../../wover-event-api/src/main/java/de/ambertation/wover/events/api/WorldLifecycle.java) exposes the
 events fired while a world is created or loaded, all on the logical server (for single-player, that's the
 integrated server inside the client process). Based on the actual firing order recorded for this repo (see
 `Notes.md`) and the mixins that emit each event, a dedicated-server session fires them in this order:
@@ -122,9 +122,9 @@ from `BEFORE_LOADING_RESOURCES` through `BEFORE_CREATING_LEVELS` fires exactly o
 Example — running code once the registries are final and ready to read:
 
 ```java
-import org.betterx.wover.events.api.WorldLifecycle;
-import org.betterx.wover.events.api.types.OnMinecraftServerReady;
-import org.betterx.wover.state.api.WorldState;
+import de.ambertation.wover.events.api.WorldLifecycle;
+import de.ambertation.wover.events.api.types.OnMinecraftServerReady;
+import de.ambertation.wover.state.api.WorldState;
 
 public class MyModInit {
     public static void init() {
@@ -144,7 +144,7 @@ public class MyModInit {
 
 ### `WorldState`: reading the current world
 
-[`WorldState`](../../wover-event-api/src/main/java/org/betterx/wover/state/api/WorldState.java) is fed by the
+[`WorldState`](../../../wover-event-api/src/main/java/de/ambertation/wover/state/api/WorldState.java) is fed by the
 `WorldLifecycle` events above and gives you read-only access to the currently active world without having to thread
 a reference through your own code:
 
@@ -153,11 +153,11 @@ a reference through your own code:
 | `WorldState.registryAccess()` | The current `RegistryAccess`, set from `WORLD_REGISTRY_READY`. Only registries flagged `FINAL` are stored here. |
 | `WorldState.allStageRegistryAccess()` | Like `registryAccess()`, but also includes registries from the `PREPARATION` stage — use this if you need registry access very early (e.g. during tag loading). |
 | `WorldState.storageAccess()` | The current `LevelStorageSource.LevelStorageAccess`, set from `WORLD_FOLDER_READY`. |
-| `WorldState.getBiomeID(Biome)` | Looks up a biome's `ResourceLocation` via `allStageRegistryAccess()`; returns `null` (and logs an error) if it can't be resolved. |
+| `WorldState.getBiomeID(Biome)` | Looks up a biome's `Identifier` via `allStageRegistryAccess()`; returns `null` (and logs an error) if it can't be resolved. |
 
 ### `WorldConfig`: per-world mod data
 
-[`WorldConfig`](../../wover-event-api/src/main/java/org/betterx/wover/state/api/WorldConfig.java) lets a mod persist
+[`WorldConfig`](../../../wover-event-api/src/main/java/de/ambertation/wover/state/api/WorldConfig.java) lets a mod persist
 its own NBT data inside a world's save folder (under `<world>/data/<modid>.nbt`):
 
 ```java

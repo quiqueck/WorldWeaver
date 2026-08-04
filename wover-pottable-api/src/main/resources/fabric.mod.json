@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-pottable",
-    "version": "21.8.1",
+    "version": "21.800.0",
     "name": "WorldWeaver - Pottable API",
     "description": "Provides a datapack-driven registry for pottable plants and soils (e.g. for flower pots).",
     "authors": [
@@ -17,10 +17,10 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "org.betterx.wover.entrypoint.LibWoverPottable"
+            "de.ambertation.wover.entrypoint.LibWoverPottable"
         ],
         "wover.datapack.registry": [
-            "org.betterx.wover.entrypoint.PottableDatapackRegistryEntrypoint"
+            "de.ambertation.wover.entrypoint.PottableDatapackRegistryEntrypoint"
         ]
     },
     "accessWidener": "wover-pottable.accesswidener",

@@ -4,15 +4,15 @@ A small, mostly internal module that backs WorldWeaver's own client UI: the firs
 mod-update checker/notifier, and the client-only config values those screens read and write. Its Java-facing public
 API surface is intentionally tiny.
 
-- **Gradle artifact:** `org.betterx:wover-ui-api`
+- **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-ui`)
 - **Depends on:** `wover-core-api`, `wover-event-api`
 - **Java packages:**
-  - `org.betterx.wover.ui.api`
-  - `org.betterx.wover.config.api.client`
+  - `de.ambertation.wover.ui.api`
+  - `de.ambertation.wover.config.api.client`
 
-Note: this module also contains an `org.betterx.wover.ui.impl` / `org.betterx.wover.config.impl` package (the actual
+Note: this module also contains an `de.ambertation.wover.ui.impl` / `de.ambertation.wover.config.impl` package (the actual
 welcome/update screens, layout base class, and a cached-version-check config) and an
-`org.betterx.wover.ui.mixin(.client)` package (currently registering zero mixins). Those are internal implementation
+`de.ambertation.wover.ui.mixin(.client)` package (currently registering zero mixins). Those are internal implementation
 details of WorldWeaver's own UI, not a public API, and are not covered here.
 
 ## For Datapack Developers
@@ -30,7 +30,7 @@ mod-update checker and the client config it reads its settings from.
 
 ### Checking for mod updates: `VersionChecker`
 
-[`VersionChecker`](../../wover-ui-api/src/main/java/org/betterx/wover/ui/api/VersionChecker.java) periodically asks
+[`VersionChecker`](../../../wover-ui-api/src/main/java/de/ambertation/wover/ui/api/VersionChecker.java) periodically asks
 a WorldWeaver web service whether newer versions of the currently installed WorldWeaver-based mods are available. It
 is what powers the "Mod Updates" screen you see on startup, but the checking logic itself is reusable:
 
@@ -66,8 +66,8 @@ with it.
 
 ### Client-only settings: `ClientConfigs`
 
-[`ClientConfigs`](../../wover-ui-api/src/client/java/org/betterx/wover/config/api/client/ClientConfigs.java) exposes
-the singleton [`ClientConfig`](../../wover-ui-api/src/client/java/org/betterx/wover/config/api/client/ClientConfig.java)
+[`ClientConfigs`](../../../wover-ui-api/src/client/java/de/ambertation/wover/config/api/client/ClientConfigs.java) exposes
+the singleton [`ClientConfig`](../../../wover-ui-api/src/client/java/de/ambertation/wover/config/api/client/ClientConfig.java)
 instance (registered the same way `wover-core-api`'s `MainConfig` is, see [core-api](core-api.md)):
 
 ```java
@@ -87,7 +87,7 @@ ClientConfigs.saveConfigs(); // persists every registered config, not just CLIEN
 | `forceBetterXPreset` | Whether the BetterX world preset should be forced as the default for newly created worlds. |
 | `didPresentWelcomeScreen` | Internal, hidden-from-UI flag tracking whether the welcome screen was already shown. |
 
-Note that this is a **different** `config.api` package than `wover-core-api`'s `org.betterx.wover.config.api`
+Note that this is a **different** `config.api` package than `wover-core-api`'s `de.ambertation.wover.config.api`
 (which holds `Configs`, `MainConfig`, `DatapackConfigs`) — this module's config package is `config.api.client` and
 is client-only (`@Environment(EnvType.CLIENT)`), holding only the settings for WorldWeaver's own UI screens.
 
@@ -95,7 +95,7 @@ is client-only (`@Environment(EnvType.CLIENT)`), holding only the settings for W
 
 The actual welcome screen (`WelcomeScreen`), update screen (`UpdatesScreen`), their shared base class
 (`WoverLayoutScreen`), the client-side driver (`VersionCheckerClient`), and the cached last-check-result config
-(`CachedConfig`) all live under `org.betterx.wover.ui.impl(.client)` / `org.betterx.wover.config.impl` packages.
+(`CachedConfig`) all live under `de.ambertation.wover.ui.impl(.client)` / `de.ambertation.wover.config.impl` packages.
 They are built entirely for WorldWeaver's own bundled UI (using `wunderlib`'s layout components) and are not
 intended to be reused or extended by other mods — there is currently no supported way to add your own screen to
 WorldWeaver's startup-screen flow from outside this module.

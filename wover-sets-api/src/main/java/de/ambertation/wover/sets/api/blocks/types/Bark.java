@@ -1,0 +1,111 @@
+package de.ambertation.wover.sets.api.blocks.types;
+
+import de.ambertation.wover.block.api.BlockDefinition;
+import de.ambertation.wover.block.api.BlockRegistry;
+import de.ambertation.wover.block.api.model.ModelTraitLibrary;
+import de.ambertation.wover.block.api.trait.BlockTrait;
+import de.ambertation.wover.block.api.trait.BlockRecipeTrait;
+import de.ambertation.wover.block.api.trait.BlockTraitLookup;
+import de.ambertation.wover.block.api.trait.BlockTraits;
+import de.ambertation.wover.recipe.api.RecipeTraitLibrary;
+import de.ambertation.wover.sets.api.blocks.BlockSet;
+import de.ambertation.wover.sets.api.blocks.SlotType;
+import de.ambertation.wover.sets.api.blocks.WoodenBlockSet;
+import de.ambertation.wover.sets.api.blocks.WoodenSlotFromDefinition;
+
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+
+
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Builds the "bark"/"stripped bark" slot of a {@link de.ambertation.wover.sets.api.blocks.WoodenBlockSet}: a
+ * {@link RotatedPillarBlock} carrying {@link BlockTraits#BARK_BLOCK}, with a matching bark model (rotated pillar
+ * with side/end textures) and an auto-generated recipe converting to/from the set's log block.
+ */
+public class Bark extends WoodenSlotFromDefinition {
+    /** Flag bit marking this bark as strippable (see {@link BlockTraits#STRIPABLE}). */
+    public static final byte STRIPABLE_FLAG = 0x01;
+    /** Flag bit requesting a mirrored side texture on alternate faces. */
+    public static final byte MIRRORED_TEXTURE_FLAG = 0x02;
+    protected final byte flags;
+    protected final String[] alternativeTextureSuffixe;
+
+    /**
+     * @param stripable whether this bark can be stripped into {@link SlotType#STRIPPED_BARK}; also selects
+     *                  {@link SlotType#BARK} vs. {@link SlotType#STRIPPED_BARK} as the slot
+     */
+    public Bark(boolean stripable) {
+        this(stripable, false);
+    }
+
+    /**
+     * @param stripable                 whether this bark can be stripped; also selects
+     *                                  {@link SlotType#BARK} vs. {@link SlotType#STRIPPED_BARK} as the slot
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     */
+    public Bark(boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
+        this(stripable ? SlotType.BARK : SlotType.STRIPPED_BARK, stripable, mirroredTexture, alternativeTextureSuffixe);
+    }
+
+    /**
+     * @param slot                      the slot to register this bark under
+     * @param stripable                 whether this bark can be stripped
+     * @param mirroredTexture           whether the side texture should be mirrored on alternate faces
+     * @param alternativeTextureSuffixe extra texture suffix variants to generate alongside the default one
+     */
+    public Bark(SlotType slot, boolean stripable, boolean mirroredTexture, String... alternativeTextureSuffixe) {
+        super(slot);
+
+        byte flags = 0;
+        if (stripable) flags |= STRIPABLE_FLAG; // Set the stripable flag
+        if (mirroredTexture) flags |= MIRRORED_TEXTURE_FLAG; // Set the mirrored texture flag
+        this.flags = flags;
+
+        this.alternativeTextureSuffixe = alternativeTextureSuffixe;
+    }
+
+    @Override
+    protected BlockDefinition<?, ?> startBlockDefinition(
+            BlockRegistry registry,
+            @NotNull BlockSet<?> set,
+            String name
+    ) {
+        return registry.defineDefaultBlockWithProps(name, RotatedPillarBlock::new);
+    }
+
+    @Override
+    protected void addWoodSlotSpecificDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
+        if ((this.flags & STRIPABLE_FLAG) != 0) { // Is Stripable?
+            def.addTrait(BlockTraits.BARK_BLOCK.with((oldState) -> set
+                    .getBlockWithFallback(SlotType.STRIPPED_BARK, this.slot)
+                    .defaultBlockState()
+            ));
+        } else {
+            def.addTrait(BlockTraits.BARK_BLOCK);
+        }
+        def.addTags(set.logsBlocksTag)
+           .addItemTags(set.logsItemTag);
+    }
+
+    @Override
+    protected BlockTrait<Block, ?> buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
+        return ModelTraitLibrary.bark(
+                () -> set.getBlock(((this.flags & STRIPABLE_FLAG) != 0) ? SlotType.LOG : SlotType.STRIPPED_LOG),
+                (this.flags & MIRRORED_TEXTURE_FLAG) != 0,
+                this.alternativeTextureSuffixe
+        );
+    }
+
+    @Override
+    protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
+        final var stripable = (this.flags & STRIPABLE_FLAG) != 0;
+        // The Recipe is built before the block was created, so we need to defer the read
+        // of the material until the recipe is actually created
+        return RecipeTraitLibrary.bark(
+                set.recipeMaterial(stripable ? SlotType.LOG : SlotType.STRIPPED_LOG)
+        );
+    }
+}

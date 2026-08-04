@@ -35,8 +35,7 @@ logs/
 CHANGES.md
 modrinth.json
 node_modules/
-generated/.cache/
-generated/
+**/generated/.cache/
 /public/img/header_clean.png
 /public/img/icon.png
 /wover-block-api/minecraft/

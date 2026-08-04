@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "composter",
+  "key": {
+    "#": "wover-sets-testmod:wooden_slab"
+  },
+  "pattern": [
+    "# #",
+    "# #",
+    "###"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:wooden_composter"
+  }
+}

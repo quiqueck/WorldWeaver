@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/ladder",
+  "textures": {
+    "particle": "wover-sets-testmod:block/wooden_ladder",
+    "texture": "wover-sets-testmod:block/wooden_ladder"
+  }
+}

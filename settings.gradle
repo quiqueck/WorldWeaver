@@ -16,30 +16,12 @@ ext.knownWoverModules.each { module ->
     include module
 }
 
+apply from: "common-settings.gradle"
 
 // #### Custom Settings ####
 
-// Change the next line to disable local lib loading
+// Change the next line to disable local lib loading, even if the sibling folder exists
 def allowLocalLibUse = true
 
-//When true, the local lib is also used in commandline builds
-def allowLocalLibInConsoleMode = false
-
-def WunderLibPath = '../WunderLib'
-
 // #### Logic ####
-def isIDE = properties.containsKey('android.injected.invoked.from.ide')
-        || (System.getenv("XPC_SERVICE_NAME") ?: "").contains("intellij")
-        || (System.getenv("XPC_SERVICE_NAME") ?: "").contains(".idea")
-        || System.getenv("IDEA_INITIAL_DIRECTORY") != null
-
-println "IntelliJ: ${isIDE}"
-
-def WunderLibFolder = new File(WunderLibPath)
-if (allowLocalLibUse && (isIDE || allowLocalLibInConsoleMode) && WunderLibFolder.exists()) {
-    println "Using local WunderLib from '${WunderLibFolder}'"
-
-    include ':wunderlib'
-    project(":wunderlib").projectDir = WunderLibFolder
-    project(':wunderlib').buildFileName = './wunderlib-composit.gradle'
-}
+includeLocalLib('wunderlib', '../WunderLib', './wunderlib-composit.gradle', allowLocalLibUse)

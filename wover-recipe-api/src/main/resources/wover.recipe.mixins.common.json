@@ -1,12 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.betterx.wover.recipe.mixin",
+  "package": "de.ambertation.wover.recipe.mixin",
   "compatibilityLevel": "JAVA_21",
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "RecipeManagerMixin"
+    "RecipeManagerMixin",
+    "ServerAdvancementManagerMixin"
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "mossy",
+  "ingredients": [
+    "wover-sets-testmod:stony_brick",
+    "minecraft:moss_block"
+  ],
+  "result": {
+    "count": 1,
+    "id": "wover-sets-testmod:stony_weathered"
+  }
+}

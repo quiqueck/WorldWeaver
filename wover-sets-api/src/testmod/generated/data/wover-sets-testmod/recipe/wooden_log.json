@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "log",
+  "key": {
+    "#": "wover-sets-testmod:wooden_bark"
+  },
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "result": {
+    "count": 3,
+    "id": "wover-sets-testmod:wooden_log"
+  }
+}
