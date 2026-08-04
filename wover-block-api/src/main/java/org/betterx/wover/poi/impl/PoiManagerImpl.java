@@ -18,8 +18,10 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
@@ -126,6 +128,11 @@ public class PoiManagerImpl {
                     var registry = WorldState.registryAccess().registryOrThrow(tag.registry());
                     for (var block : registry.getTagOrEmpty(tag)) {
                         for (var state : block.value().getStateDefinition().getPossibleStates()) {
+                            if (state != null
+                                    && state.hasProperty(BedBlock.PART)
+                                    && state.getValue(BedBlock.PART) != BedPart.HEAD) {
+                                continue;
+                            }
                             PoiTypes.TYPE_BY_STATE.put(state, type);
                         }
                     }
