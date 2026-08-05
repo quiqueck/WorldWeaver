@@ -5,7 +5,7 @@ import de.ambertation.wover.state.impl.WorldStateImpl;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
@@ -56,21 +56,21 @@ public class WorldState {
     }
 
     /**
-     * Gets the {@link ResourceLocation} of a biome.
+     * Gets the {@link Identifier} of a biome.
      * <p>
      * This method uses #allStageRegistryAccess() to get query the biome registry.
      *
      * @param biome The biome to get the ID for.
-     * @return The {@link ResourceLocation} of the biome or null if the biome is null or the registry access is null.
+     * @return The {@link Identifier} of the biome or null if the biome is null or the registry access is null.
      */
-    public static @Nullable ResourceLocation getBiomeID(@Nullable Biome biome) {
+    public static @Nullable Identifier getBiomeID(@Nullable Biome biome) {
         final RegistryAccess access = allStageRegistryAccess();
-        final ResourceLocation id = access == null || biome == null
+        final Identifier id = access == null || biome == null
                 ? null
                 : access.lookupOrThrow(Registries.BIOME).getKey(biome);
 
         if (id == null) {
-            LibWoverEvents.C.log.error("Unable to get ResourceLocation for " + biome + ".");
+            LibWoverEvents.C.log.error("Unable to get Identifier for " + biome + ".");
         }
 
         return id;

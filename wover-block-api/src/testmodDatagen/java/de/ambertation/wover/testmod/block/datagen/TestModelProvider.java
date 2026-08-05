@@ -29,11 +29,11 @@ public class TestModelProvider extends WoverModelProvider {
 //
 //        blockStateModelGenerator.vanillaGenerator.createDoor(TestBlockRegistry.TEST_DOOR);
 
-//        ResourceLocation resourceLocation = ModelTemplates.WALL_POST.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
-//        ResourceLocation resourceLocation2 = ModelTemplates.WALL_LOW_SIDE.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
-//        ResourceLocation resourceLocation3 = ModelTemplates.WALL_TALL_SIDE.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
+//        Identifier resourceLocation = ModelTemplates.WALL_POST.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
+//        Identifier resourceLocation2 = ModelTemplates.WALL_LOW_SIDE.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
+//        Identifier resourceLocation3 = ModelTemplates.WALL_TALL_SIDE.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
 //        blockStateModelGenerator.acceptBlockState(BlockModelGenerators.createWall(TestBlockRegistry.TEST_WALL, resourceLocation, resourceLocation2, resourceLocation3));
-//        ResourceLocation resourceLocation4 = ModelTemplates.WALL_INVENTORY.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
+//        Identifier resourceLocation4 = ModelTemplates.WALL_INVENTORY.create(TestBlockRegistry.TEST_WALL, mappings, blockStateModelGenerator.modelOutput);
 //        blockStateModelGenerator.delegateItemModel(TestBlockRegistry.TEST_WALL, resourceLocation4);
     }
 

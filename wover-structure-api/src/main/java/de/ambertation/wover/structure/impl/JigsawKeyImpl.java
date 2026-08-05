@@ -5,7 +5,7 @@ import de.ambertation.wover.structure.api.builders.JigsawBuilder;
 import de.ambertation.wover.structure.impl.builders.JigsawBuilderImpl;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure;
@@ -16,7 +16,7 @@ public class JigsawKeyImpl
         extends StructureKeyImpl<JigsawStructure, JigsawBuilder, StructureKey.Jigsaw>
         implements StructureKey.Jigsaw {
     public JigsawKeyImpl(
-            @NotNull ResourceLocation structureId
+            @NotNull Identifier structureId
     ) {
         super(structureId);
     }

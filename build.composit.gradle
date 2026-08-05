@@ -2,11 +2,11 @@ plugins {
     id 'java'
     id 'idea'
     id 'eclipse'
-    id 'fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
 }
-archivesBaseName = project.archives_base_name
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
+base.archivesName = project.archives_base_name
+java.sourceCompatibility = JavaVersion.VERSION_25
+java.targetCompatibility = JavaVersion.VERSION_25
 
 
 def getDependencies(project, List<String> depNames, configuration) {

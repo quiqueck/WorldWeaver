@@ -9,7 +9,7 @@ import net.minecraft.core.*;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -156,13 +156,13 @@ public class DatapackRegistryBuilder {
     }
 
     /**
-     * Checks if a Registry with the given {@link ResourceLocation} was created with our
+     * Checks if a Registry with the given {@link Identifier} was created with our
      * {@link DatapackRegistryBuilder}.
      *
-     * @param registryId The {@link ResourceLocation} of the Registry
+     * @param registryId The {@link Identifier} of the Registry
      * @return {@code true} if the Registry is registered, {@code false} otherwise
      */
-    public static boolean isRegistered(ResourceLocation registryId) {
+    public static boolean isRegistered(Identifier registryId) {
         return DatapackRegistryBuilderImpl.isRegistered(registryId);
     }
 
@@ -282,7 +282,7 @@ public class DatapackRegistryBuilder {
      * @param <T>      The type of the Elements stored in the Registry
      * @return A new ResourceKey for a Registry
      */
-    public static <T> ResourceKey<Registry<T>> createRegistryKey(ResourceLocation location) {
+    public static <T> ResourceKey<Registry<T>> createRegistryKey(Identifier location) {
         return ResourceKey.createRegistryKey(location);
     }
 

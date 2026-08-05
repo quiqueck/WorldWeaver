@@ -4,7 +4,7 @@ import de.ambertation.wover.recipe.api.RecipeBuilder;
 import de.ambertation.wover.recipe.api.SmithingRecipeBuilder;
 
 import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SmithingTemplateItem;
@@ -19,7 +19,7 @@ public class SmithingRecipeBuilderImpl extends BaseRecipeBuilderImpl<SmithingRec
     protected CraftingRecipeBuilderImpl.IngredientFactory addon;
 
     public SmithingRecipeBuilderImpl(
-            @NotNull ResourceLocation id,
+            @NotNull Identifier id,
             @NotNull ItemLike output
     ) {
         super(id, output);
@@ -81,7 +81,7 @@ public class SmithingRecipeBuilderImpl extends BaseRecipeBuilderImpl<SmithingRec
         if (addon == null) {
             throwIllegalStateException("Addon must be set");
         }
-        if (output.getCount() != 1) {
+        if (outputCount != 1) {
             throwIllegalStateException("Output count must be 1");
         }
     }
@@ -93,7 +93,7 @@ public class SmithingRecipeBuilderImpl extends BaseRecipeBuilderImpl<SmithingRec
                 base.createIngredient(context),
                 addon.createIngredient(context),
                 category,
-                output.getItem()
+                outputItem
         );
 
         for (var item : unlocks.entrySet()) {

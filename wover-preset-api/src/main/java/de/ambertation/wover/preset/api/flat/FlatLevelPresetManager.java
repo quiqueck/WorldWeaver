@@ -6,7 +6,7 @@ import de.ambertation.wover.preset.impl.flat.FlatLevelPresetManagerImpl;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
@@ -40,7 +40,7 @@ public class FlatLevelPresetManager {
      * @param loc The location of the preset.
      * @return The key.
      */
-    public static ResourceKey<FlatLevelGeneratorPreset> createKey(ResourceLocation loc) {
+    public static ResourceKey<FlatLevelGeneratorPreset> createKey(Identifier loc) {
         return FlatLevelPresetManagerImpl.createKey(loc);
     }
 

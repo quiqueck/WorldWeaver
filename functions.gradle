@@ -1,5 +1,5 @@
 def moduleDependencies(project, List<String> depNames) {
-    def deps = getDependencies(project, depNames, 'namedElements')
+    def deps = getDependencies(project, depNames, 'dev')
     def depsClient = getDependencies(project, depNames, 'devClient')
 
     project.dependencies {
@@ -13,7 +13,7 @@ def moduleDependencies(project, List<String> depNames) {
 }
 
 def testDependencies(project, List<String> depNames) {
-    def deps = getDependencies(project, depNames, 'namedElements')
+    def deps = getDependencies(project, depNames, 'dev')
     def depsClient = getDependencies(project, depNames, 'devClient')
 
     project.dependencies {
@@ -28,7 +28,7 @@ def testDependencies(project, List<String> depNames) {
 }
 
 def datagenDependencies(project, List<String> depNames) {
-    def deps = getDependencies(project, depNames, 'namedElements')
+    def deps = getDependencies(project, depNames, 'dev')
     def depsClient = getDependencies(project, depNames, 'devClient')
 
     project.dependencies {

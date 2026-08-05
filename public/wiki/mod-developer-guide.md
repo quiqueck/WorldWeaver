@@ -20,17 +20,17 @@ Add a matching entry to your `fabric.mod.json` so Fabric Loader enforces a compa
 
 ```json
 "depends": {
-  "wover": "21.8.x"
+  "wover": "26.100.x"
 },
 "breaks": {
-  "wover": "<21.8.2"
+  "wover": "<26.100.0"
 }
 ```
 
 There is one Gradle artifact, but each WoVer module is still its own independent mod at runtime (own
 `fabric.mod.json`, own id — `wover-tag`, `wover-block`, `wover-biome`, ...), jar-in-jar'd into the aggregate.
 So if your mod only touches one module you can narrow the Loader dependency to that module's id (e.g.
-`"depends": { "wover-block": "21.8.x" }`) instead of the umbrella `wover` id — but the Gradle coordinate is
+`"depends": { "wover-block": "26.100.x" }`) instead of the umbrella `wover` id — but the Gradle coordinate is
 the same either way.
 
 ## 2. Module dependency order

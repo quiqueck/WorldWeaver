@@ -1,8 +1,8 @@
-archivesBaseName = "wover-common-api"
+base.archivesName = "wover-common-api"
 ext {
     baseNamespace = "common"
     baseClass = "WoverSurface"
 }
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }

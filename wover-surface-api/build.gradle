@@ -1,4 +1,4 @@
-archivesBaseName = "wover-surface-api"
+base.archivesName = "wover-surface-api"
 
 ext {
     baseNamespace = "surface"
@@ -6,7 +6,7 @@ ext {
 }
 
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 loom {

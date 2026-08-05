@@ -19,9 +19,16 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.Music;
+import net.minecraft.sounds.Musics;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.attribute.AmbientAdditionsSettings;
+import net.minecraft.world.attribute.AmbientMoodSettings;
+import net.minecraft.world.attribute.AmbientParticle;
+import net.minecraft.world.attribute.AmbientSounds;
+import net.minecraft.world.attribute.BackgroundMusic;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.block.Block;
@@ -32,6 +39,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link #register()}. There are two concrete builder families:
  * <ul>
  *     <li>{@link Vanilla} — defines a completely new, vanilla-style {@link Biome}, created through
- *     {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.ResourceLocation)}.</li>
+ *     {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.Identifier)}.</li>
  *     <li>{@link Wrapped} — only attaches {@link BiomeData} (fog density, climate parameters, intended
  *     placement) to an already existing Biome, created through
  *     {@link de.ambertation.wover.biome.api.BiomeManager#wrapped(ResourceKey)}.</li>
@@ -391,7 +399,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
      * terrain, ambience/fog colors, sounds, particles, mob spawns and features.
      * <p>
      * {@link Vanilla} is the concrete, instantiable version of this builder returned by
-     * {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.ResourceLocation)}.
+     * {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.Identifier)}.
      *
      * @param <B> The concrete builder type, used to return {@code this} with the correct type from every
      *            setter.
@@ -404,6 +412,18 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         private final BiomeSpecialEffects.Builder fx = new BiomeSpecialEffects.Builder();
         private final BiomeGenerationSettings.Builder generationSettings;
         private final MobSpawnSettings.Builder mobSpawnSettings = new MobSpawnSettings.Builder();
+
+        // In 26.1 the fog/sky/water-fog colors, ambient particles/sounds and background music were moved off
+        // BiomeSpecialEffects into per-biome EnvironmentAttributes; they are collected here and applied to the
+        // Biome.BiomeBuilder in buildBiome().
+        private int fogColor;
+        private int waterFogColor;
+        private int skyColor;
+        private @Nullable AmbientParticle ambientParticle;
+        private @Nullable Holder<SoundEvent> ambientLoop;
+        private @Nullable AmbientMoodSettings ambientMood;
+        private @Nullable AmbientAdditionsSettings ambientAdditions;
+        private @Nullable Music backgroundMusic;
 
         /**
          * Creates a new builder instance.
@@ -429,10 +449,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
                     bootstrapContext.lookup(Registries.CONFIGURED_CARVER)
             );
 
-            fx.fogColor(DEFAULT_FOG_COLOR);
-            fx.waterFogColor(DEFAULT_WATER_FOG_COLOR);
+            this.fogColor = DEFAULT_FOG_COLOR;
+            this.waterFogColor = DEFAULT_WATER_FOG_COLOR;
             fx.waterColor(DEFAULT_WATER_COLOR);
-            fx.skyColor(calculateSkyColor(temperature));
+            this.skyColor = calculateSkyColor(temperature);
         }
 
 
@@ -600,7 +620,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B fogColor(int color) {
-            fx.fogColor(color);
+            this.fogColor = color;
             return (B) this;
         }
 
@@ -613,7 +633,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B fogColor(int r, int g, int b) {
-            fx.fogColor(ColorHelper.color(r, g, b));
+            this.fogColor = ColorHelper.color(r, g, b);
             return (B) this;
         }
 
@@ -659,7 +679,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B waterFogColor(int color) {
-            fx.waterFogColor(color);
+            this.waterFogColor = color;
             return (B) this;
         }
 
@@ -682,7 +702,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B skyColor(int color) {
-            fx.skyColor(color);
+            this.skyColor = color;
             return (B) this;
         }
 
@@ -803,18 +823,18 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return this builder.
          */
         public B particles(ParticleOptions particle, float probability) {
-            particles(new AmbientParticleSettings(particle, probability));
+            particles(new AmbientParticle(particle, probability));
             return (B) this;
         }
 
         /**
          * Sets the ambient particles of the Biome.
          *
-         * @param ambientParticleSettings The particle settings.
+         * @param ambientParticle The particle settings.
          * @return This builder.
          */
-        public B particles(AmbientParticleSettings ambientParticleSettings) {
-            fx.ambientParticle(ambientParticleSettings);
+        public B particles(AmbientParticle ambientParticle) {
+            this.ambientParticle = ambientParticle;
             return (B) this;
         }
 
@@ -826,7 +846,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B loop(Holder<SoundEvent> holder) {
-            fx.ambientLoopSound(holder);
+            this.ambientLoop = holder;
             return (B) this;
         }
 
@@ -837,7 +857,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B mood(AmbientMoodSettings ambientMoodSettings) {
-            fx.ambientMoodSound(ambientMoodSettings);
+            this.ambientMood = ambientMoodSettings;
             return (B) this;
         }
 
@@ -876,7 +896,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B additions(AmbientAdditionsSettings ambientAdditionsSettings) {
-            fx.ambientAdditionsSound(ambientAdditionsSettings);
+            this.ambientAdditions = ambientAdditionsSettings;
             return (B) this;
         }
 
@@ -911,24 +931,38 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B music(@Nullable Music music) {
-            fx.backgroundMusic(music);
+            this.backgroundMusic = music;
             return (B) this;
         }
 
         /**
-         * Sets the background music of the Biome, using vanilla's default timings (a minimum delay of
-         * {@code 600} ticks, a maximum delay of {@code 2400} ticks) and replacing any currently playing music.
+         * Sets the background music of the Biome, using the same settings vanilla gives its own Biome music
+         * ({@link Musics#createGameMusic(Holder)}): a delay of {@code 12000} to {@code 24000} ticks between
+         * songs, and no interruption of music that is already playing.
+         * <p>
+         * The delay is what puts silence between songs - a Biome that wants its music to be more present
+         * than vanilla's should shorten it through {@link #music(Holder, int, int, boolean)} rather than
+         * removing it, or the dimension ends up with a continuous soundtrack.
          *
          * @param music The sound event.
          * @return This builder.
          * @see #music(Holder, int, int, boolean)
          */
         public B music(Holder<SoundEvent> music) {
-            return music(music, 600, 2400, true);
+            return music(Musics.createGameMusic(music));
         }
 
         /**
          * Sets the background music of the Biome.
+         * <p>
+         * {@code replaceCurrentMusic} makes the song interrupt whatever is already playing when the player
+         * walks in, which the game does by cutting the outgoing song off mid-note - there is no fade. Leave
+         * it off unless the abrupt stop at the Biome border is worth it.
+         * <p>
+         * With it off, {@code minDelay} is what decides whether a player passing through hears the song at
+         * all, because it only ever starts on the regular schedule. Note that the delay is re-rolled and
+         * kept at its lowest value every tick, so the wait settles near {@code minDelay} and {@code maxDelay}
+         * has little effect beyond the first moments of the countdown.
          *
          * @param music               The sound event.
          * @param minDelay            The minimum delay (in ticks) before the music starts playing.
@@ -1093,6 +1127,25 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             vanillaBuilder.specialEffects(fx.build());
             vanillaBuilder.mobSpawnSettings(mobSpawnSettings.build());
 
+            // 26.1: fog/sky/water-fog colors, ambient particles/sounds and background music are stored as
+            // per-biome EnvironmentAttributes rather than on BiomeSpecialEffects.
+            vanillaBuilder.setAttribute(EnvironmentAttributes.FOG_COLOR, fogColor);
+            vanillaBuilder.setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, waterFogColor);
+            vanillaBuilder.setAttribute(EnvironmentAttributes.SKY_COLOR, skyColor);
+            if (ambientParticle != null) {
+                vanillaBuilder.setAttribute(EnvironmentAttributes.AMBIENT_PARTICLES, List.of(ambientParticle));
+            }
+            if (ambientLoop != null || ambientMood != null || ambientAdditions != null) {
+                vanillaBuilder.setAttribute(EnvironmentAttributes.AMBIENT_SOUNDS, new AmbientSounds(
+                        Optional.ofNullable(ambientLoop),
+                        Optional.ofNullable(ambientMood),
+                        ambientAdditions == null ? List.of() : List.of(ambientAdditions)
+                ));
+            }
+            if (backgroundMusic != null) {
+                vanillaBuilder.setAttribute(EnvironmentAttributes.BACKGROUND_MUSIC, new BackgroundMusic(backgroundMusic));
+            }
+
             return vanillaBuilder.build();
         }
     }
@@ -1100,7 +1153,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
     /**
      * The concrete builder used to define a completely new, vanilla-style {@link Biome}.
      * <p>
-     * Returned by {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.ResourceLocation)}.
+     * Returned by {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.Identifier)}.
      */
     public abstract static class Vanilla extends VanillaBuilder<Vanilla> {
         /**

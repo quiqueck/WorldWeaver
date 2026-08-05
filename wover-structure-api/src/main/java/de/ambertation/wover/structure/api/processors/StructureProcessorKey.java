@@ -5,15 +5,15 @@ import de.ambertation.wover.structure.impl.processors.StructureProcessorBuilderI
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A wrapper around {@link ResourceKey} that identifies a {@link StructureProcessorList}. Create one with
- * {@link StructureProcessorManager#createKey(ResourceLocation)} (or the
- * {@link de.ambertation.wover.structure.api.StructureKeys#processor(ResourceLocation)} alias), then call
+ * {@link StructureProcessorManager#createKey(Identifier)} (or the
+ * {@link de.ambertation.wover.structure.api.StructureKeys#processor(Identifier)} alias), then call
  * {@link #bootstrap(BootstrapContext)} to start building the processor list.
  */
 public class StructureProcessorKey {
@@ -34,7 +34,7 @@ public class StructureProcessorKey {
         return new StructureProcessorBuilderImpl(key, context);
     }
 
-    StructureProcessorKey(@NotNull ResourceLocation location) {
+    StructureProcessorKey(@NotNull Identifier location) {
         this.key = ResourceKey.create(Registries.PROCESSOR_LIST, location);
     }
 }

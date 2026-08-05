@@ -16,7 +16,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -29,13 +29,13 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Main entry point to create and query {@link Biome}s.
  * <p>
- * Use {@link #vanilla(ResourceLocation)} to define a completely new Biome, or
+ * Use {@link #vanilla(Identifier)} to define a completely new Biome, or
  * {@link #wrapped(ResourceKey)} to attach additional {@link BiomeData} (fog density, climate parameters,
  * intended placement tag) to a Biome that already exists (for example a vanilla one). Both return a
  * {@link BiomeKey} whose {@link BiomeKey#bootstrap(de.ambertation.wover.biome.api.builder.BiomeBootstrapContext)}
  * method creates the fluent {@link BiomeBuilder} that fills in the Biome's content.
  * <p>
- * Once the world is loaded, {@link #biomeData(ResourceLocation)} and {@link #biomeDataForHolder(Holder)}
+ * Once the world is loaded, {@link #biomeData(Identifier)} and {@link #biomeDataForHolder(Holder)}
  * can be used to look up the {@link BiomeData} that was registered for a Biome.
  */
 public class BiomeManager {
@@ -67,7 +67,7 @@ public class BiomeManager {
      * @param location The location of the new Biome.
      * @return The key for the new Biome.
      */
-    public static BiomeKey<BiomeBuilder.Vanilla> vanilla(ResourceLocation location) {
+    public static BiomeKey<BiomeBuilder.Vanilla> vanilla(Identifier location) {
         return BiomeManagerImpl.vanilla(location);
     }
 
@@ -90,10 +90,10 @@ public class BiomeManager {
     /**
      * Get {@link BiomeData} for biome.
      *
-     * @param biome - {@link ResourceLocation} of the biome.
+     * @param biome - {@link Identifier} of the biome.
      * @return {@link BiomeData} or null if it was not found.
      */
-    public static @Nullable BiomeData biomeData(ResourceLocation biome) {
+    public static @Nullable BiomeData biomeData(Identifier biome) {
         return biomeData(WorldState.registryAccess(), biome);
     }
 
@@ -101,10 +101,10 @@ public class BiomeManager {
      * Get {@link BiomeData} for biome.
      *
      * @param registryAccess The RegistryAccess
-     * @param biome          - {@link ResourceLocation} of the biome.
+     * @param biome          - {@link Identifier} of the biome.
      * @return {@link BiomeData} or null if it was not found.
      */
-    public static BiomeData biomeData(HolderLookup.Provider registryAccess, ResourceLocation biome) {
+    public static BiomeData biomeData(HolderLookup.Provider registryAccess, Identifier biome) {
         if (registryAccess == null) return null;
 
         return registryAccess
@@ -136,7 +136,7 @@ public class BiomeManager {
     public static @Nullable BiomeData biomeDataForHolder(HolderLookup.Provider acc, Holder<Biome> biome) {
         if (acc != null) {
             final HolderLookup.RegistryLookup<BiomeData> reg = acc.lookupOrThrow(BiomeDataRegistry.BIOME_DATA_REGISTRY);
-            ResourceLocation id = biome.unwrapKey().map(ResourceKey::location).orElse(null);
+            Identifier id = biome.unwrapKey().map(ResourceKey::identifier).orElse(null);
             if (id != null) {
                 return reg.get(BiomeDataRegistry.createKey(id)).map(Holder.Reference::value).orElse(null);
             }

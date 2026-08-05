@@ -2,7 +2,7 @@ package de.ambertation.wover.config.api;
 
 import de.ambertation.wover.entrypoint.LibWoverCore;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 
@@ -36,7 +36,7 @@ public class DatapackConfigs {
          *             the resource.
          * @param root The root {@link JsonObject} of the loaded file.
          */
-        void onLoad(ResourceLocation id, JsonObject root);
+        void onLoad(Identifier id, JsonObject root);
     }
 
     /**
@@ -72,10 +72,10 @@ public class DatapackConfigs {
      */
     public void runForResource(
             ResourceManager manager,
-            ResourceLocation fileLocation,
+            Identifier fileLocation,
             DatapackConfigReloadHandler handler
     ) {
-        final Map<ResourceLocation, List<Resource>> aSet = manager.listResourceStacks(
+        final Map<Identifier, List<Resource>> aSet = manager.listResourceStacks(
                 "config",
                 id -> {
                     LibWoverCore.C.log.debug("Checking Resource from Datapack: '{}'", id);
@@ -95,7 +95,7 @@ public class DatapackConfigs {
      * @param manager  The {@link ResourceManager} to use
      * @param paths    A List of Paths to check
      * @param handler  A function to call for each found resource. The
-     *                 {@link ResourceLocation} is the id of the resource and the {@link JsonObject}
+     *                 {@link Identifier} is the id of the resource and the {@link JsonObject}
      *                 is the root of the stored json file. The namespace of the location identifies the
      *                 mod or datapack that is providing the config file.
      * @param finished A function to call when all resources have been processed.
@@ -106,7 +106,7 @@ public class DatapackConfigs {
             @Nullable DatapackConfigReloadHandler handler,
             @Nullable DatapackConfigFinished finished
     ) {
-        final Map<ResourceLocation, List<Resource>> aSet = manager.listResourceStacks(
+        final Map<Identifier, List<Resource>> aSet = manager.listResourceStacks(
                 "config",
                 id -> {
                     LibWoverCore.C.log.debug("Checking Resource from Datapack: '{}'", id);
@@ -120,10 +120,10 @@ public class DatapackConfigs {
     private static void runForSet(
             @Nullable DatapackConfigReloadHandler handler,
             @Nullable DatapackConfigFinished finished,
-            Map<ResourceLocation, List<Resource>> resources
+            Map<Identifier, List<Resource>> resources
     ) {
         if (handler != null) {
-            for (Map.Entry<ResourceLocation, List<Resource>> entry : resources.entrySet()) {
+            for (Map.Entry<Identifier, List<Resource>> entry : resources.entrySet()) {
                 for (Resource item : entry.getValue()) {
                     try (Reader reader = item.openAsReader()) {
                         final JsonObject obj = JsonParser.parseReader(reader).getAsJsonObject();

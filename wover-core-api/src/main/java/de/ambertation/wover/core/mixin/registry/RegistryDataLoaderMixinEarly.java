@@ -21,7 +21,7 @@ public class RegistryDataLoaderMixinEarly {
             ResourceKey<? extends Registry<?>> resourceKey,
             CallbackInfoReturnable<String> info
     ) {
-        if (DatapackRegistryBuilderImpl.isRegistered(resourceKey.location())) {
+        if (DatapackRegistryBuilderImpl.isRegistered(resourceKey.identifier())) {
             info.setReturnValue(info.getReturnValue());
         }
     }

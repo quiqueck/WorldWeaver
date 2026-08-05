@@ -10,11 +10,11 @@ import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public abstract class WoverWorldPresetProvider
         extends WoverRegistryContentProvider<WorldPreset>
-        implements WoverDataProvider.Secondary<FabricTagProvider<WorldPreset>> {
+        implements WoverDataProvider.Secondary<TagsProvider<WorldPreset>> {
     /**
      * Creates a new instance of {@link WoverWorldPresetProvider}.
      *
@@ -66,14 +66,14 @@ public abstract class WoverWorldPresetProvider
     protected abstract void prepareTags(TagBootstrapContext<WorldPreset> provider);
 
     /**
-     * Returns the {@link FabricTagProvider} for the {@link WorldPreset}s.
+     * Returns the {@link TagsProvider} for the {@link WorldPreset}s.
      *
      * @param output           The output to write the data to.
      * @param registriesFuture A future sent from the Fabric DataGen API
-     * @return A new {@link FabricTagProvider}
+     * @return A new {@link TagsProvider}
      */
-    public FabricTagProvider<WorldPreset> getSecondaryProvider(
-            FabricDataOutput output,
+    public TagsProvider<WorldPreset> getSecondaryProvider(
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new WorldPresetTagProvider(modCore).getProvider(output, registriesFuture);

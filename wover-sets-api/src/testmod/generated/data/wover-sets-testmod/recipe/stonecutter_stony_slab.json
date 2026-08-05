@@ -1,6 +1,5 @@
 {
   "type": "minecraft:stonecutting",
-  "group": "slab",
   "ingredient": "wover-sets-testmod:stony",
   "result": {
     "count": 2,

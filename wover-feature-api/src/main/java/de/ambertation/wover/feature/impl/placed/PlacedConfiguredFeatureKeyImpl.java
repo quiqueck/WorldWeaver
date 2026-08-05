@@ -10,7 +10,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
@@ -25,12 +25,12 @@ public class PlacedConfiguredFeatureKeyImpl extends BaseFeatureKeyImpl<PlacedCon
     @NotNull
     private final HolderProvider holderProvider;
 
-    public PlacedConfiguredFeatureKeyImpl(ResourceLocation featureId, ConfiguredFeatureKey<?> linked) {
+    public PlacedConfiguredFeatureKeyImpl(Identifier featureId, ConfiguredFeatureKey<?> linked) {
         super(featureId);
         this.holderProvider = linked::getHolder;
     }
 
-    public PlacedConfiguredFeatureKeyImpl(ResourceLocation featureId, ResourceKey<ConfiguredFeature<?, ?>> linked) {
+    public PlacedConfiguredFeatureKeyImpl(Identifier featureId, ResourceKey<ConfiguredFeature<?, ?>> linked) {
         super(featureId);
         this.holderProvider = (getter) -> ConfiguredFeatureManager.getHolder(getter, linked);
     }

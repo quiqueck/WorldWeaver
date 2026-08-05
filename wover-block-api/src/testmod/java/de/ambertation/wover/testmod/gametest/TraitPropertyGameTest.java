@@ -32,11 +32,11 @@ public class TraitPropertyGameTest {
             failures.add(name + ": expected a FlammableBlockRegistry entry (from FlammableBlockTrait) but found none");
             return;
         }
-        if (entry.getBurnChance() != burn) {
-            failures.add(name + ": expected burn chance " + burn + " but was " + entry.getBurnChance());
+        if (entry.getIgniteOdds() != burn) {
+            failures.add(name + ": expected burn chance " + burn + " but was " + entry.getIgniteOdds());
         }
-        if (entry.getSpreadChance() != spread) {
-            failures.add(name + ": expected spread chance " + spread + " but was " + entry.getSpreadChance());
+        if (entry.getBurnOdds() != spread) {
+            failures.add(name + ": expected spread chance " + spread + " but was " + entry.getBurnOdds());
         }
     }
 

@@ -11,11 +11,12 @@ import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
-import net.minecraft.client.renderer.block.model.VariantMutator;
+import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.renderer.special.ChestSpecialRenderer;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -39,13 +40,13 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
             final var logBlock = payload.logBlock();
             final var mirroredTexture = payload.mirroredTexture();
             final var alternativeTextureSuffixe = payload.alternativeTextureSuffixe();
-            final var textureResource = TextureMapping.getBlockTexture(logBlock.get());
+            final var textureResource = TextureMapping.getBlockTexture(logBlock.get()).sprite();
             final var textureMapping = new TextureMapping()
-                    .put(TextureSlot.SIDE, textureResource.withSuffix("_side"))
-                    .put(TextureSlot.END, textureResource.withSuffix("_side"));
+                    .put(TextureSlot.SIDE, new Material(textureResource.withSuffix("_side")))
+                    .put(TextureSlot.END, new Material(textureResource.withSuffix("_side")));
             final var alternatives = Arrays.stream(alternativeTextureSuffixe).map(suffix -> new TextureMapping()
-                                                   .put(TextureSlot.SIDE, textureResource.withSuffix("_side" + suffix))
-                                                   .put(TextureSlot.END, textureResource.withSuffix("_side" + suffix)))
+                                                   .put(TextureSlot.SIDE, new Material(textureResource.withSuffix("_side" + suffix)))
+                                                   .put(TextureSlot.END, new Material(textureResource.withSuffix("_side" + suffix))))
                                            .toArray(TextureMapping[]::new);
 
 
@@ -62,8 +63,8 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
                             .select(Direction.SOUTH, X_ROT_90.then(Y_ROT_180))
                             .select(Direction.WEST, X_ROT_90.then(Y_ROT_270))
                             .select(Direction.EAST, X_ROT_90.then(Y_ROT_90));
-            ResourceLocation openTopTexture = TextureMapping.getBlockTexture(block, "_top_open");
-            ResourceLocation closedModel = TexturedModel.CUBE_TOP_BOTTOM.create(
+            Material openTopTexture = TextureMapping.getBlockTexture(block, "_top_open");
+            Identifier closedModel = TexturedModel.CUBE_TOP_BOTTOM.create(
                     block,
                     generator.vanillaGenerator.modelOutput
             );
@@ -88,6 +89,14 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
             generator.createBookshelf(block, planksMaterial.get());
         });
 
+        ClientBlockModelRegistry.register(BlockModelKeys.SHELF, (key, block, generator, particleMaterial) -> {
+            generator.createShelf(block, particleMaterial.get());
+        });
+
+        ClientBlockModelRegistry.register(BlockModelKeys.CHISELED_BOOKSHELF, (key, block, generator, payload) -> {
+            generator.createChiseledBookshelf(block);
+        });
+
         ClientBlockModelRegistry.register(BlockModelKeys.PILLAR, (key, block, generator, payload) -> {
             generator.createRotatedPillar(block);
         });
@@ -101,14 +110,14 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
 
             generator.vanillaGenerator.createParticleOnlyBlock(chestBlock, planks);
             Item chestItem = chestBlock.asItem();
-            ResourceLocation itemModel = ModelTemplates.CHEST_INVENTORY.create(
+            Identifier itemModel = ModelTemplates.CHEST_INVENTORY.create(
                     chestItem,
                     TextureMapping.particle(planks),
                     generator.modelOutput()
             );
             ItemModel.Unbaked itemModelUnbaked = ItemModelUtils.specialModel(
                     itemModel,
-                    new ChestSpecialRenderer.Unbaked(key.location())
+                    new ChestSpecialRenderer.Unbaked(key.identifier())
             );
             generator.vanillaGenerator.itemModelOutput.accept(chestItem, itemModelUnbaked);
             generator.markItemModelProvided(chestBlock);
@@ -117,13 +126,13 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
         ClientBlockModelRegistry.register(BlockModelKeys.LOG, (key, block, generator, payload) -> {
             final var mirroredTexture = payload.mirroredTexture();
             final var alternativeTextureSuffixe = payload.alternativeTextureSuffixe();
-            final var textureResource = TextureMapping.getBlockTexture(block);
+            final var textureResource = TextureMapping.getBlockTexture(block).sprite();
             final var textureMapping = new TextureMapping()
-                    .put(TextureSlot.SIDE, textureResource.withSuffix("_side"))
-                    .put(TextureSlot.END, textureResource.withSuffix("_top"));
+                    .put(TextureSlot.SIDE, new Material(textureResource.withSuffix("_side")))
+                    .put(TextureSlot.END, new Material(textureResource.withSuffix("_top")));
             final var alternatives = Arrays.stream(alternativeTextureSuffixe).map(suffix -> new TextureMapping()
-                                                   .put(TextureSlot.SIDE, textureResource.withSuffix("_side" + suffix))
-                                                   .put(TextureSlot.END, textureResource.withSuffix("_top")))
+                                                   .put(TextureSlot.SIDE, new Material(textureResource.withSuffix("_side" + suffix)))
+                                                   .put(TextureSlot.END, new Material(textureResource.withSuffix("_top"))))
                                            .toArray(TextureMapping[]::new);
 
             generator.createLog(block, mirroredTexture, textureMapping, alternatives);
@@ -194,7 +203,7 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
         });
 
         ClientBlockModelRegistry.register(BlockModelKeys.CHAIN, (key, chainBlock, generator, payload) -> {
-            generator.createChainModel(chainBlock, TextureMapping.getBlockTexture(chainBlock));
+            generator.createChainModel(chainBlock, TextureMapping.getBlockTexture(chainBlock).sprite());
         });
 
         ClientBlockModelRegistry.register(BlockModelKeys.BARS, (key, barsBlock, generator, payload) -> {
@@ -233,7 +242,7 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
         ClientBlockModelRegistry.register(BlockModelKeys.EXTERNAL_MODEL, (key, block, generator, payload) -> {
             generator.excludeBlockFromValidation(block);
             if (block.asItem() != Items.AIR) {
-                generator.delegateItemModel(block, key.location().withPrefix("item/"));
+                generator.delegateItemModel(block, key.identifier().withPrefix("item/"));
             }
         });
 

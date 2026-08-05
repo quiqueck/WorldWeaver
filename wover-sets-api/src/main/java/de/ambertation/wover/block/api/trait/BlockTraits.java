@@ -108,6 +108,17 @@ public class BlockTraits {
      */
     public static final GenericBlockTrait.BuilderWithDefaults BOOK_SHELF = BookshelfBlockBuilder.BUILDER;
     /**
+     * Configures a block as a shelf (the wall-mounted, three-slot display shelf added in 1.21.9): joins
+     * {@code #minecraft:wooden_shelves} - which is what lets a powered row of them connect into a side chain -
+     * and becomes a valid host for the vanilla {@code SHELF} block entity.
+     */
+    public static final GenericBlockTrait.BuilderWithDefaults SHELF_BLOCK = ShelfBlockBuilder.BUILDER;
+    /**
+     * Configures a block as a chiseled bookshelf: a valid host for the vanilla {@code CHISELED_BOOKSHELF}
+     * block entity, with vanilla's silk-touch-only loot table.
+     */
+    public static final GenericBlockTrait.BuilderWithDefaults CHISELED_BOOK_SHELF = ChiseledBookshelfBlockBuilder.BUILDER;
+    /**
      * Configures a block as a button.
      */
     public static final GenericBlockTrait.BuilderWithDefaults BUTTON_BLOCK = ButtonBlockBuilder.BUILDER;

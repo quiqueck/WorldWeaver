@@ -6,23 +6,26 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Helper class until FAPI integrates <a href="https://github.com/FabricMC/fabric/pull/2369">this PR</a>
  */
 public class TheEndBiomesHelper {
+    // 26.1 registry loading is async + parallel - add() is reached from TheEndBiomesMixin, which
+    // hooks Fabric's TheEndBiomes.addXBiome() entry points that every mod registering custom End
+    // biomes calls, so both the outer map and each per-tag Set (mutated across many add() calls,
+    // potentially concurrently for the same tag) need to be thread-safe.
     @ApiStatus.Internal
-    private static Map<TagKey, Set<ResourceKey<Biome>>> END_BIOMES = new HashMap<>();
+    private static Map<TagKey, Set<ResourceKey<Biome>>> END_BIOMES = new ConcurrentHashMap<>();
 
     @ApiStatus.Internal
     public static void add(TagKey<Biome> type, ResourceKey<Biome> biome) {
         if (biome == null) return;
-        END_BIOMES.computeIfAbsent(type, t -> new HashSet<>()).add(biome);
+        END_BIOMES.computeIfAbsent(type, t -> ConcurrentHashMap.newKeySet()).add(biome);
     }
 
     private static boolean has(TagKey<Biome> type, ResourceKey<Biome> biome) {

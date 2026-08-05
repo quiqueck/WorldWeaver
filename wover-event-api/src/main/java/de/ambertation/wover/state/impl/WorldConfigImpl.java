@@ -12,7 +12,7 @@ import de.ambertation.wover.events.impl.EventImpl;
 import de.ambertation.wover.legacy.api.LegacyHelper;
 import de.ambertation.wover.util.Pair;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;

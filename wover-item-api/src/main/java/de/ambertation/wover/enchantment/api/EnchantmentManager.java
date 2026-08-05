@@ -10,7 +10,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.enchantment.Enchantment;
 
 import java.util.function.UnaryOperator;
@@ -69,7 +69,7 @@ public class EnchantmentManager {
      * @param enchantmentId The resource location identifying the enchantment
      * @return A new enchantment key instance
      */
-    public static EnchantmentKey createKey(ResourceLocation enchantmentId) {
+    public static EnchantmentKey createKey(Identifier enchantmentId) {
         return new EnchantmentKeyImpl(ResourceKey.create(Registries.ENCHANTMENT, enchantmentId));
     }
 
@@ -86,7 +86,7 @@ public class EnchantmentManager {
      * @return The registered data component type
      */
     public static <T> DataComponentType<T> registerEffectComponent(
-            ResourceLocation componentId,
+            Identifier componentId,
             UnaryOperator<DataComponentType.Builder<T>> builderConfigurator
     ) {
         return Registry.register(

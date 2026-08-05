@@ -140,7 +140,7 @@ public class PottablePlantBlockTrait extends BlockTraitImpl<Block, GenericBlockT
 
                     PottablePlantRegistry.register(
                             ctx,
-                            PottablePlantRegistry.createKey(e.getKey().location()),
+                            PottablePlantRegistry.createKey(e.getKey().identifier()),
                             e.getKey(),
                             plantTrait.validSoils
                     );

@@ -1,4 +1,4 @@
-archivesBaseName = "wover-pottable-api"
+base.archivesName = "wover-pottable-api"
 
 ext {
     baseNamespace = "pottable"
@@ -6,7 +6,7 @@ ext {
 }
 
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 loom {

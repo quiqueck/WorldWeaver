@@ -9,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
@@ -212,8 +213,8 @@ public class PillarFeatureConfig implements FeatureConfiguration {
      */
     public static final Codec<PillarFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance
             .group(
-                    IntProvider.CODEC.fieldOf("min_height").forGetter(o -> o.minHeight),
-                    IntProvider.CODEC.fieldOf("max_height").forGetter(o -> o.maxHeight),
+                    IntProviders.CODEC.fieldOf("min_height").forGetter(o -> o.minHeight),
+                    IntProviders.CODEC.fieldOf("max_height").forGetter(o -> o.maxHeight),
                     Direction.CODEC.fieldOf("direction").orElse(Direction.UP).forGetter(o -> o.direction),
                     BlockPredicate.CODEC.fieldOf("allowed_placement").forGetter(o -> o.allowedPlacement),
                     BlockStateProvider.CODEC.fieldOf("state").forGetter(o -> o.stateProvider),
@@ -288,8 +289,14 @@ public class PillarFeatureConfig implements FeatureConfiguration {
      * @param currentHeight height in the pillar where the BlockState is requested for.
      * @return the BlockState for the given height.
      */
-    public BlockState transform(int currentHeight, int maxHeight, BlockPos pos, RandomSource rnd) {
-        BlockState state = stateProvider.getState(rnd, pos);
+    public BlockState transform(
+            int currentHeight,
+            int maxHeight,
+            BlockPos pos,
+            RandomSource rnd,
+            WorldGenLevel level
+    ) {
+        BlockState state = stateProvider.getState(level, rnd, pos);
         return transformer.stateTransform.apply(currentHeight, maxHeight, state, pos, rnd);
     }
 }

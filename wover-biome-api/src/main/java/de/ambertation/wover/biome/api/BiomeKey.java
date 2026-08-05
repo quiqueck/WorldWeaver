@@ -13,7 +13,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link ResourceKey} of the matching {@link BiomeData} entry, and acts as the entry point for
  * creating the {@link BiomeBuilder} that fills in the actual content of the Biome.
  * <p>
- * Instances are created through {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(ResourceLocation)}
+ * Instances are created through {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(Identifier)}
  * (a fully custom, vanilla-style Biome) or
  * {@link de.ambertation.wover.biome.api.BiomeManager#wrapped(ResourceKey)} (attaching {@link BiomeData} to an
  * already existing Biome, for example one added by vanilla or another mod).
@@ -118,7 +118,7 @@ public abstract class BiomeKey<B extends BiomeBuilder<B>> {
      *
      * @param location The location of the Biome.
      */
-    protected BiomeKey(@NotNull ResourceLocation location) {
+    protected BiomeKey(@NotNull Identifier location) {
         this.key = BiomeManagerImpl.createKey(location);
         this.dataKey = BiomeDataRegistry.createKey(location);
     }

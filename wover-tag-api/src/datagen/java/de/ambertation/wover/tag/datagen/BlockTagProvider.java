@@ -153,6 +153,11 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
                 CommonBlockTags.NETHER_TERRAIN,
                 net.minecraft.tags.BlockTags.NYLIUM
         );
+        // SCULK_LIKE is deliberately NOT nested here. It is a material family, not a terrain one: it holds
+        // vanilla sculk (an overworld block) and everything shaped like it, including decorative members
+        // such as geodes that are no more "the ground" than a stalactite is. A mod whose sculk-like block
+        // really is nether ground puts it in NETHER_TERRAIN itself - which is what BetterNether's gloomsculk
+        // floor blocks do.
         ctx.addOptional(
                 CommonBlockTags.NETHER_TERRAIN,
                 CommonBlockTags.NETHERRACK,
@@ -206,7 +211,8 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
                 Blocks.BAMBOO_SAPLING,
                 Blocks.MANGROVE_PROPAGULE
         );
-        ctx.add(CommonBlockTags.PLANT, CommonBlockTags.SAPLINGS, CommonBlockTags.VINE);
+        ctx.add(CommonBlockTags.VINES, Blocks.VINE, Blocks.TWISTING_VINES, Blocks.WEEPING_VINES);
+        ctx.add(CommonBlockTags.PLANT, CommonBlockTags.SAPLINGS, CommonBlockTags.VINES);
         ctx.add(
                 CommonBlockTags.PLANT,
                 Blocks.MANGROVE_LEAVES,

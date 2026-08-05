@@ -159,9 +159,9 @@ public class CommonBlockTags {
      */
     public static final TagKey<Block> PLANT = TagManager.BLOCKS.makeWorldWeaverTag("vegetation/plant");
     /**
-     * {@code wover:vegetation/vine}
+     * {@code wover:vegetation/vines}
      */
-    public static final TagKey<Block> VINE = TagManager.BLOCKS.makeWorldWeaverTag("vegetation/vine");
+    public static final TagKey<Block> VINES = TagManager.BLOCKS.makeWorldWeaverTag("vegetation/vines");
 
 
     /**

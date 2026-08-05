@@ -21,7 +21,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.SurfaceRuleData;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -37,7 +37,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
         InjectableSurfaceRules<WoverChunkGenerator>,
         EnforceableChunkGenerator<WoverChunkGenerator>,
         RebuildableFeaturesPerStep<WoverChunkGenerator> {
-    public static final ResourceLocation ID = LibWoverWorldGenerator.C.id("betterx");
+    public static final Identifier ID = LibWoverWorldGenerator.C.id("betterx");
 
     protected static final NoiseSettings NETHER_NOISE_SETTINGS_AMPLIFIED = NoiseSettings.create(0, 256, 1, 4);
     public static final ResourceKey<NoiseGeneratorSettings> AMPLIFIED_NETHER = ResourceKey.create(
@@ -133,7 +133,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
             Registry<LevelStem> dimensionRegistry
     ) {
         LibWoverWorldGenerator.C.log.info("Enforcing Correct Generator for " + dimensionKey
-                .location()
+                .identifier()
                 .toString() + ".");
 
         ChunkGenerator referenceGenerator = this;
@@ -177,10 +177,10 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                 NETHER_NOISE_SETTINGS_AMPLIFIED,
                 Blocks.NETHERRACK.defaultBlockState(),
                 Blocks.LAVA.defaultBlockState(),
-                NoiseRouterData.noNewCaves(
+                netherNoNewCaves(
                         densityGetter,
                         bootstapContext.lookup(Registries.NOISE),
-                        NoiseRouterData.slideNetherLike(densityGetter, 0, 256)
+                        slideNetherLike(densityGetter, 0, 256)
                 ),
                 SurfaceRuleData.nether(),
                 List.of(),
@@ -198,6 +198,57 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                 dimensionKey,
                 generatorSettings(),
                 this.getBiomeSource()
+        );
+    }
+
+    // 26.1 removed NoiseRouterData.noNewCaves / made slideNetherLike private. Reconstructed here to
+    // preserve the exact amplified_nether noise_router that was generated before (height 256 nether slide).
+    private static final ResourceKey<DensityFunction> BASE_3D_NOISE_NETHER = ResourceKey.create(
+            Registries.DENSITY_FUNCTION,
+            Identifier.withDefaultNamespace("nether/base_3d_noise")
+    );
+
+    private static DensityFunction slideNetherLike(HolderGetter<DensityFunction> functions, int minY, int height) {
+        DensityFunction caves = new DensityFunctions.HolderHolder(functions.getOrThrow(BASE_3D_NOISE_NETHER));
+        // mirrors NoiseRouterData.slide(caves, minY, height, 24, 0, 0.9375, -8, 24, 2.5)
+        DensityFunction topFactor = DensityFunctions.yClampedGradient(minY + height - 24, minY + height, 1.0, 0.0);
+        DensityFunction noiseValue = DensityFunctions.lerp(topFactor, 0.9375, caves);
+        DensityFunction bottomFactor = DensityFunctions.yClampedGradient(minY - 8, minY + 24, 0.0, 1.0);
+        return DensityFunctions.lerp(bottomFactor, 2.5, noiseValue);
+    }
+
+    private static NoiseRouter netherNoNewCaves(
+            HolderGetter<DensityFunction> functions,
+            HolderGetter<net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters> noises,
+            DensityFunction slide
+    ) {
+        DensityFunction temperature = DensityFunctions.shiftedNoise2d(
+                DensityFunctions.zero(), DensityFunctions.zero(), 0.25, noises.getOrThrow(Noises.TEMPERATURE_NETHER)
+        );
+        DensityFunction vegetation = DensityFunctions.shiftedNoise2d(
+                DensityFunctions.zero(), DensityFunctions.zero(), 0.25, noises.getOrThrow(Noises.VEGETATION_NETHER)
+        );
+        // mirrors NoiseRouterData.postProcess(slide)
+        DensityFunction fullNoise = DensityFunctions.mul(
+                DensityFunctions.interpolated(DensityFunctions.blendDensity(slide)),
+                DensityFunctions.constant(0.64)
+        ).squeeze();
+        return new NoiseRouter(
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                temperature,
+                vegetation,
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                fullNoise,
+                DensityFunctions.zero(),
+                DensityFunctions.zero(),
+                DensityFunctions.zero()
         );
     }
 }

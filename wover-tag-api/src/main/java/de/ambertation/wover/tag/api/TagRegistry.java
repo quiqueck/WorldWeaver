@@ -7,7 +7,7 @@ import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -25,19 +25,19 @@ import org.jetbrains.annotations.ApiStatus;
  */
 public interface TagRegistry<T, P extends TagBootstrapContext<T>> {
     /**
-     * Used to lookup the {@link ResourceLocation} of an element.
+     * Used to lookup the {@link Identifier} of an element.
      *
      * @param <T> The type of the element.
      */
     @FunctionalInterface
     interface LocationProvider<T> {
         /**
-         * Get the {@link ResourceLocation} of an element.
+         * Get the {@link Identifier} of an element.
          *
          * @param item The element.
-         * @return the {@link ResourceLocation} of the element.
+         * @return the {@link Identifier} of the element.
          */
-        ResourceLocation get(T item);
+        Identifier get(T item);
     }
 
     /**
@@ -85,10 +85,10 @@ public interface TagRegistry<T, P extends TagBootstrapContext<T>> {
     /**
      * Get or create a {@link TagKey}.
      *
-     * @param id - {@link ResourceLocation} of the tag;
+     * @param id - {@link Identifier} of the tag;
      * @return the corresponding TagKey {@link TagKey<T>}.
      */
-    TagKey<T> makeTag(ResourceLocation id);
+    TagKey<T> makeTag(Identifier id);
 
     /**
      * An event that is fired when the tags for this registry are beeing loaded.

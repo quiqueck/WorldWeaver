@@ -4,7 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -75,24 +75,24 @@ public class StructureGameTest {
         final List<String> failures = new ArrayList<>();
 
         for (String id : DATAPACK_STRUCTURES) {
-            if (!structures.containsKey(ResourceLocation.parse(id))) {
+            if (!structures.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected structure loaded from datapack JSON but it is missing");
             }
         }
 
         for (String id : DATAPACK_STRUCTURE_SETS) {
-            if (!structureSets.containsKey(ResourceLocation.parse(id))) {
+            if (!structureSets.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected structure_set loaded from datapack JSON but it is missing");
             }
         }
 
-        if (!structureTypes.containsKey(ResourceLocation.parse(PROGRAMMATIC_STRUCTURE_TYPE))) {
+        if (!structureTypes.containsKey(Identifier.parse(PROGRAMMATIC_STRUCTURE_TYPE))) {
             failures.add(PROGRAMMATIC_STRUCTURE_TYPE
                     + ": expected structure type registered programmatically at mod-init but it is missing");
         }
 
         // Negative guard: an id the testmod never registers must not be present.
-        if (structures.containsKey(ResourceLocation.parse(ABSENT_STRUCTURE))) {
+        if (structures.containsKey(Identifier.parse(ABSENT_STRUCTURE))) {
             failures.add(ABSENT_STRUCTURE + ": unexpectedly present - the containsKey assertions are not meaningful");
         }
 

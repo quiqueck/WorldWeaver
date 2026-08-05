@@ -186,7 +186,7 @@ interface on your `Block` and it gets picked up" path — register the provider 
 `WoverDataProvider`.
 
 [`LootTableManager`](../../../wover-block-api/src/main/java/de/ambertation/wover/loot/api/LootTableManager.java)
-builds the keys: `getBlockLootTableKey(ResourceKey<Block>)` (or `getBlockLootTableKey(ModCore, ResourceLocation)`) for a
+builds the keys: `getBlockLootTableKey(ResourceKey<Block>)` (or `getBlockLootTableKey(ModCore, Identifier)`) for a
 block's standard `blocks/<name>` table, and `createLootTableKey(ModCore, String)` for a free-standing one.
 
 [`LootLookupProvider`](../../../wover-block-api/src/main/java/de/ambertation/wover/loot/api/LootLookupProvider.java)

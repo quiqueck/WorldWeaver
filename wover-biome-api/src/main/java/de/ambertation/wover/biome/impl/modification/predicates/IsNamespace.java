@@ -20,6 +20,6 @@ public record IsNamespace(String namespace) implements BiomePredicate {
 
     @Override
     public boolean test(Context ctx) {
-        return ctx.biomeKey.location().getNamespace().equals(namespace);
+        return ctx.biomeKey.identifier().getNamespace().equals(namespace);
     }
 }

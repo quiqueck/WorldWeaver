@@ -13,7 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.TagLoader;
 import net.minecraft.world.entity.EntityType;
@@ -100,9 +100,9 @@ public class TagManagerImpl {
     }
 
     @ApiStatus.Internal
-    public static Map<ResourceLocation, List<TagLoader.EntryWithSource>> didLoadTagMap(
+    public static Map<Identifier, List<TagLoader.EntryWithSource>> didLoadTagMap(
             String directory,
-            Map<ResourceLocation, List<TagLoader.EntryWithSource>> tagsMap
+            Map<Identifier, List<TagLoader.EntryWithSource>> tagsMap
     ) {
         TagRegistryImpl<?, ?> type = TYPES.get(directory);
         if (type != null) {
@@ -123,18 +123,18 @@ public class TagManagerImpl {
         return tagsMap;
     }
 
-    final static private ResourceLocation NO_TAG = LibWoverTag.C.mk("no_tag");
+    final static private Identifier NO_TAG = LibWoverTag.C.mk("no_tag");
 
     public static <T> StreamCodec<RegistryFriendlyByteBuf, TagKey<T>> streamCodec(ResourceKey<Registry<T>> registry) {
         return new StreamCodec<RegistryFriendlyByteBuf, TagKey<T>>() {
 
             public TagKey<T> decode(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-                ResourceLocation location = ResourceLocation.STREAM_CODEC.decode(registryFriendlyByteBuf);
+                Identifier location = Identifier.STREAM_CODEC.decode(registryFriendlyByteBuf);
                 return TagKey.create(registry, location.equals(NO_TAG) ? null : location);
             }
 
             public void encode(RegistryFriendlyByteBuf registryFriendlyByteBuf, TagKey<T> tag) {
-                ResourceLocation.STREAM_CODEC.encode(registryFriendlyByteBuf, tag == null ? NO_TAG : tag.location());
+                Identifier.STREAM_CODEC.encode(registryFriendlyByteBuf, tag == null ? NO_TAG : tag.location());
             }
         };
     }

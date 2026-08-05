@@ -5,7 +5,7 @@ import de.ambertation.wover.structure.impl.StructureManagerImpl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -46,7 +46,7 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
      */
     public RandomNbtStructurePiece(
             StructureTemplateManager manager,
-            ResourceLocation nbtLocation,
+            Identifier nbtLocation,
             StructurePlaceSettings placeSettings,
             BlockPos templatePosition,
             boolean keepAir

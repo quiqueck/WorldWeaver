@@ -4,7 +4,7 @@ import de.ambertation.wover.surface.impl.conditions.MaterialConditionRegistryImp
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +22,7 @@ public class ConditionManager {
      * @return the new key of the condition
      */
     public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> register(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<? extends SurfaceRules.ConditionSource> codec
     ) {
         return MaterialConditionRegistryImpl.register(MaterialConditionRegistryImpl.createKey(location), codec);
@@ -49,7 +49,7 @@ public class ConditionManager {
      * @return the key
      */
     @NotNull
-    public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> createKey(ResourceLocation location) {
+    public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> createKey(Identifier location) {
         return MaterialConditionRegistryImpl.createKey(location);
     }
 }

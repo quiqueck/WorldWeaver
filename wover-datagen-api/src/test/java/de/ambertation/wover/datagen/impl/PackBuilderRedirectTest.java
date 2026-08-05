@@ -8,7 +8,7 @@ import de.ambertation.wover.entrypoint.LibWoverDatagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Pure-logic JUnit tests for the auto-provider <b>redirector</b> bookkeeping in
  * {@link PackBuilderImpl#instantiateAutoProvider(WoverDataProvider)} /
  * {@link PackBuilderImpl#addProviderWithRedirect(WoverDataProvider)}. They only touch the value-type
- * {@link net.minecraft.resources.ResourceLocation}-free path (no {@code DataProvider} is ever run), so
+ * {@link net.minecraft.resources.Identifier}-free path (no {@code DataProvider} is ever run), so
  * they need no Minecraft bootstrap and run via {@code ./gradlew :wover-datagen-api:test}.
  * <p>
  * This mechanism is the gate that decides <em>which</em> registered providers actually reach a Datapack.
@@ -65,7 +65,7 @@ class PackBuilderRedirectTest {
         }
 
         @Override
-        public DataProvider getProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        public DataProvider getProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
             return null;
         }
 
@@ -84,7 +84,7 @@ class PackBuilderRedirectTest {
         }
 
         @Override
-        public DataProvider getProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        public DataProvider getProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
             return null;
         }
 
@@ -98,7 +98,7 @@ class PackBuilderRedirectTest {
     // A redirector that suppresses every incoming provider by returning null.
     private static final class SuppressingRedirector implements WoverDataProvider<DataProvider>, WoverAutoProvider.WithRedirect {
         @Override
-        public DataProvider getProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        public DataProvider getProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
             return null;
         }
 
@@ -117,7 +117,7 @@ class PackBuilderRedirectTest {
         }
 
         @Override
-        public DataProvider getProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        public DataProvider getProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
             return null;
         }
 
@@ -137,7 +137,7 @@ class PackBuilderRedirectTest {
         }
 
         @Override
-        public T getProvider(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        public T getProvider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
             return inner.getProvider(output, registries);
         }
     }

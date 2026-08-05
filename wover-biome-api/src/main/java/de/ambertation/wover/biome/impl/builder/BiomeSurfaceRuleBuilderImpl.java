@@ -23,7 +23,7 @@ public class BiomeSurfaceRuleBuilderImpl<B extends BiomeBuilder<B>> extends Surf
     }
 
     public void register(@NotNull BootstrapContext<AssignedSurfaceRule> ctx) {
-        final ResourceKey<AssignedSurfaceRule> ruleKey = SurfaceRuleRegistry.createKey(this.biomeKey.location());
+        final ResourceKey<AssignedSurfaceRule> ruleKey = SurfaceRuleRegistry.createKey(this.biomeKey.identifier());
         SurfaceRuleRegistryImpl.register(ctx, ruleKey, biomeKey, getRuleSource(), sortPriority);
     }
 

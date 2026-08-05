@@ -1,9 +1,7 @@
 {
   "type": "minecraft:stonecutting",
-  "group": "stairs",
   "ingredient": "wover-sets-testmod:stony_weathered",
   "result": {
-    "count": 1,
     "id": "wover-sets-testmod:stony_weathered_stairs"
   }
 }

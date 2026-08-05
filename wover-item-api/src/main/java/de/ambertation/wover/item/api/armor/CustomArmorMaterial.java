@@ -4,7 +4,7 @@ import de.ambertation.wover.tag.api.TagManager;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -59,7 +59,7 @@ public class CustomArmorMaterial {
      * @param materialLocation The resource location identifying this armor material
      * @return A new builder instance
      */
-    public static CustomArmorMaterial.Builder start(ResourceLocation materialLocation) {
+    public static CustomArmorMaterial.Builder start(Identifier materialLocation) {
         return new CustomArmorMaterial.Builder(materialLocation);
     }
 
@@ -71,7 +71,7 @@ public class CustomArmorMaterial {
      * All properties are validated before the material is built.
      */
     public static class Builder {
-        private final ResourceLocation location;
+        private final Identifier location;
         private final EnumMap<ArmorType, Integer> defense;
         private int enchantmentValue;
         private Holder<SoundEvent> equipSound;
@@ -82,7 +82,7 @@ public class CustomArmorMaterial {
         private ResourceKey<EquipmentAsset> assetId;
         private EquipmentAssetSpec equipmentAsset;
 
-        private Builder(ResourceLocation materialLocation) {
+        private Builder(Identifier materialLocation) {
             this.location = materialLocation;
             this.defense = new EnumMap<>(ArmorType.class);
         }
@@ -246,7 +246,7 @@ public class CustomArmorMaterial {
          * the explicit one from {@link #assetId(ResourceKey)}, or the one auto-derived from the material's
          * location in {@link #build()}).
          *
-         * <p>Use this for combinations {@link #humanoidEquipmentAsset()} and {@link #wingsEquipmentAsset(ResourceLocation)}
+         * <p>Use this for combinations {@link #humanoidEquipmentAsset()} and {@link #wingsEquipmentAsset(Identifier)}
          * don't cover directly, e.g. a chestplate whose equipment asset also needs a {@code wings} layer:
          * <pre class="java">
          * .equipmentAsset(spec -> spec
@@ -270,7 +270,7 @@ public class CustomArmorMaterial {
          * armor material needs.
          *
          * @return This builder instance for chaining
-         * @see #humanoidEquipmentAsset(ResourceLocation)
+         * @see #humanoidEquipmentAsset(Identifier)
          */
         public Builder humanoidEquipmentAsset() {
             return humanoidEquipmentAsset(location);
@@ -283,7 +283,7 @@ public class CustomArmorMaterial {
          * @param texture The texture id to use for both layers
          * @return This builder instance for chaining
          */
-        public Builder humanoidEquipmentAsset(ResourceLocation texture) {
+        public Builder humanoidEquipmentAsset(Identifier texture) {
             this.equipmentAsset = EquipmentAssetSpec.create().addHumanoidLayers(texture);
             return this;
         }
@@ -295,7 +295,7 @@ public class CustomArmorMaterial {
          * @param texture The texture id to use for the wings layer
          * @return This builder instance for chaining
          */
-        public Builder wingsEquipmentAsset(ResourceLocation texture) {
+        public Builder wingsEquipmentAsset(Identifier texture) {
             this.equipmentAsset = EquipmentAssetSpec.create().addWingsLayer(texture);
             return this;
         }

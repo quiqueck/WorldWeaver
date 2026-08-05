@@ -9,12 +9,12 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.FeatureTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import com.google.common.base.Suppliers;
@@ -91,9 +91,12 @@ public class GenerationSettingsWorker {
     }
 
     private List<ConfiguredFeature<?, ?>> createFlowerFeatures() {
+        // 26.1: Feature.FLOWER was removed; the bone-meal/flower feature list is now derived by filtering on
+        // the FeatureTags.CAN_SPAWN_FROM_BONE_MEAL tag (matching BiomeGenerationSettings#boneMealFeatures).
         return getFlatFeatureStream()
                 .flatMap(PlacedFeature::getFeatures)
-                .filter((configured) -> configured.feature() == Feature.FLOWER)
+                .filter((feature) -> feature.is(FeatureTags.CAN_SPAWN_FROM_BONE_MEAL))
+                .map(Holder::value)
                 .collect(ImmutableList.toImmutableList());
     }
 

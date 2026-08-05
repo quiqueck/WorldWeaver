@@ -5,14 +5,14 @@ import de.ambertation.wover.tabs.api.interfaces.CreativeTabPredicate;
 import de.ambertation.wover.tabs.api.interfaces.CreativeTabsBuilderWithTab;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 
 import org.jetbrains.annotations.NotNull;
 
 public class CreativeTabBuilderImpl implements CreativeTabBuilder {
     private final String name;
-    private final ResourceLocation id;
+    private final Identifier id;
     private ItemLike icon;
     private CreativeTabPredicate predicate = item -> true;
     private Component title;

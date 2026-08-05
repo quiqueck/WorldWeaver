@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A {@link BasePlacedFeatureKey} that places one specific, already known {@link ConfiguredFeature}.
  * <p>
- * Instances are created with {@link PlacedFeatureManager#createKey(net.minecraft.resources.ResourceLocation, net.minecraft.resources.ResourceKey)}
+ * Instances are created with {@link PlacedFeatureManager#createKey(net.minecraft.resources.Identifier, net.minecraft.resources.ResourceKey)}
  * or one of its overloads, so unlike {@link PlacedFeatureKey} you do not need to pass a
  * {@link ConfiguredFeature} reference to every {@code place(...)} call.
  */

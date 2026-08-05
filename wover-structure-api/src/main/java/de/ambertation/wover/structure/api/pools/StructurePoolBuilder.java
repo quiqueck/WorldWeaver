@@ -4,7 +4,7 @@ import de.ambertation.wover.structure.api.processors.StructureProcessorKey;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
  * {@link StructurePoolKey#bootstrap(net.minecraft.data.worldgen.BootstrapContext)}.
  * <p>
  * A pool needs at least one element (added via {@link #add(Function, int)}, {@link #addFeature},
- * {@link #startSingle(ResourceLocation)}/{@link #startSingleEnd(ResourceLocation)}/
- * {@link #startLegacySingle(ResourceLocation)}, or {@link #addEmptyElement(int)}) before it can be
+ * {@link #startSingle(Identifier)}/{@link #startSingleEnd(Identifier)}/
+ * {@link #startLegacySingle(Identifier)}, or {@link #addEmptyElement(int)}) before it can be
  * {@link #register() registered}. If no {@link #terminator(StructurePoolKey) terminator} is set, one is
  * created automatically ({@link #emptyTerminator()}).
  */
@@ -49,7 +49,7 @@ public interface StructurePoolBuilder {
     Holder<StructureTemplatePool> directHolder();
 
     /**
-     * Adds a custom {@link StructurePoolElement} to the pool. Prefer {@link #startSingle(ResourceLocation)}
+     * Adds a custom {@link StructurePoolElement} to the pool. Prefer {@link #startSingle(Identifier)}
      * or {@link #addFeature} for the common cases.
      *
      * @param element A factory that creates the element from this pool's {@link StructureTemplatePool.Projection}
@@ -139,20 +139,20 @@ public interface StructurePoolBuilder {
      * @return A builder for the new element
      */
     @NotNull
-    ElementBuilder startSingle(@NotNull ResourceLocation nbtLocation);
+    ElementBuilder startSingle(@NotNull Identifier nbtLocation);
 
     /**
-     * Like {@link #startSingle(ResourceLocation)}, but creates an End-specific
+     * Like {@link #startSingle(Identifier)}, but creates an End-specific
      * {@code SingleEndPoolElement} that is exempt from the End's "empty chunk" generation rules.
      *
      * @param nbtLocation The location of the {@code .nbt} template
      * @return A builder for the new element
      */
     @NotNull
-    ElementBuilder startSingleEnd(@NotNull ResourceLocation nbtLocation);
+    ElementBuilder startSingleEnd(@NotNull Identifier nbtLocation);
 
     /**
-     * Like {@link #startSingle(ResourceLocation)}, but creates a legacy
+     * Like {@link #startSingle(Identifier)}, but creates a legacy
      * {@link net.minecraft.world.level.levelgen.structure.pools.LegacySinglePoolElement} (used by
      * structures that predate liquid settings on template pool elements).
      *
@@ -160,7 +160,7 @@ public interface StructurePoolBuilder {
      * @return A builder for the new element
      */
     @NotNull
-    ElementBuilder startLegacySingle(@NotNull ResourceLocation nbtLocation);
+    ElementBuilder startLegacySingle(@NotNull Identifier nbtLocation);
 
     /**
      * Adds an empty ({@link StructurePoolElement#empty()}) element to the pool.

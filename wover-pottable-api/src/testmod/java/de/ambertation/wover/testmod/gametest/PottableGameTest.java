@@ -15,7 +15,7 @@ import de.ambertation.wover.testmod.entrypoint.TestModWoverPottable;
 import net.minecraft.core.Registry;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
@@ -51,8 +51,8 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
  */
 public class PottableGameTest {
     // An id that is never registered anywhere - the registry must NOT contain it.
-    private static final ResourceLocation ABSENT_PLANT =
-            ResourceLocation.parse("wover-pottable-testmod:absent-plant");
+    private static final Identifier ABSENT_PLANT =
+            Identifier.parse("wover-pottable-testmod:absent-plant");
 
     @GameTest
     public void pottablePlantAndSoilResolveAtRuntime(GameTestHelper helper) {
@@ -65,16 +65,16 @@ public class PottableGameTest {
         // Positive: the injected plant resolves and still maps to the FERN block.
         final Optional<PottablePlant> plant = plants.getOptional(TestModWoverPottable.TEST_PLANT);
         if (plant.isEmpty()) {
-            failures.add(TestModWoverPottable.TEST_PLANT.location()
+            failures.add(TestModWoverPottable.TEST_PLANT.identifier()
                     + ": expected pottable plant registered via addBootstrap but it is missing");
         } else {
             if (!plant.get().block.equals(Blocks.FERN.builtInRegistryHolder().key())) {
-                failures.add(TestModWoverPottable.TEST_PLANT.location()
-                        + ": plant->block mapping drifted, expected minecraft:fern but was " + plant.get().block.location());
+                failures.add(TestModWoverPottable.TEST_PLANT.identifier()
+                        + ": plant->block mapping drifted, expected minecraft:fern but was " + plant.get().block.identifier());
             }
             // Empty validSoils means "any registered soil" - the PODZOL soil must be accepted.
             if (!plant.get().isValidSoil(Blocks.PODZOL)) {
-                failures.add(TestModWoverPottable.TEST_PLANT.location()
+                failures.add(TestModWoverPottable.TEST_PLANT.identifier()
                         + ": expected plant with empty validSoils to accept the PODZOL soil, but it did not");
             }
         }
@@ -82,11 +82,11 @@ public class PottableGameTest {
         // Positive: the injected soil resolves and still maps to the PODZOL block.
         final Optional<PottableSoil> soil = soils.getOptional(TestModWoverPottable.TEST_SOIL);
         if (soil.isEmpty()) {
-            failures.add(TestModWoverPottable.TEST_SOIL.location()
+            failures.add(TestModWoverPottable.TEST_SOIL.identifier()
                     + ": expected pottable soil registered via addBootstrap but it is missing");
         } else if (!soil.get().block.equals(Blocks.PODZOL.builtInRegistryHolder().key())) {
-            failures.add(TestModWoverPottable.TEST_SOIL.location()
-                    + ": soil->block mapping drifted, expected minecraft:podzol but was " + soil.get().block.location());
+            failures.add(TestModWoverPottable.TEST_SOIL.identifier()
+                    + ": soil->block mapping drifted, expected minecraft:podzol but was " + soil.get().block.identifier());
         }
 
         // Negative: an id nobody registered must not be present.
@@ -126,10 +126,10 @@ public class PottableGameTest {
      * it only makes the key <em>object</em> unique.
      * <p>
      * That is why "latest wins" is asserted in both directions ({@code DOUBLE_TRAIT_PLANT} must accept
-     * {@code COARSE_DIRT} and must reject {@code STONE}) rather than just checking the entry exists: the
+     * {@code COARSE_DIRT} and must reject {@code PODZOL}) rather than just checking the entry exists: the
      * regression leaves a perfectly valid entry in place, it is merely pottable on <em>any</em> soil instead
      * of the tag the author last asked for. A presence-only check passes straight through it - verified by
-     * reverting the fix, which leaves all four entries present and fails only on the {@code STONE} half.
+     * reverting the fix, which leaves all four entries present and fails only on the {@code PODZOL} half.
      */
     @GameTest
     public void traitDrivenEntriesAreRegisteredOncePerBlock(GameTestHelper helper) {
@@ -171,8 +171,8 @@ public class PottableGameTest {
                             failures.add("DOUBLE_TRAIT_PLANT: expected COARSE_DIRT (in minecraft:dirt) to be"
                                     + " a valid soil, but it was rejected");
                         }
-                        if (plant.isValidSoil(Blocks.STONE)) {
-                            failures.add("DOUBLE_TRAIT_PLANT: STONE is not in minecraft:dirt and must be"
+                        if (plant.isValidSoil(Blocks.PODZOL)) {
+                            failures.add("DOUBLE_TRAIT_PLANT: PODZOL is not in minecraft:dirt and must be"
                                     + " rejected - the latest trait's restriction is not in effect");
                         }
                     }
@@ -223,13 +223,13 @@ public class PottableGameTest {
     ) {
         final var blockKey = block.builtInRegistryHolder().key();
         final Optional<PottablePlant> plant =
-                plants.getOptional(PottablePlantRegistry.createKey(blockKey.location()));
+                plants.getOptional(PottablePlantRegistry.createKey(blockKey.identifier()));
         if (plant.isEmpty()) {
             failures.add(name + ": expected the PottablePlantBlockTrait sweep to register an entry for "
-                    + blockKey.location() + ", but none is present");
+                    + blockKey.identifier() + ", but none is present");
         } else if (!plant.get().block.equals(blockKey)) {
-            failures.add(name + ": entry points at " + plant.get().block.location()
-                    + " instead of " + blockKey.location());
+            failures.add(name + ": entry points at " + plant.get().block.identifier()
+                    + " instead of " + blockKey.identifier());
         }
         return plant;
     }
@@ -243,13 +243,13 @@ public class PottableGameTest {
     ) {
         final var blockKey = block.builtInRegistryHolder().key();
         final Optional<PottableSoil> soil =
-                soils.getOptional(PottableSoilRegistry.createKey(blockKey.location()));
+                soils.getOptional(PottableSoilRegistry.createKey(blockKey.identifier()));
         if (soil.isEmpty()) {
             failures.add(name + ": expected the PottableSoilBlockTrait sweep to register an entry for "
-                    + blockKey.location() + ", but none is present");
+                    + blockKey.identifier() + ", but none is present");
         } else if (!soil.get().block.equals(blockKey)) {
-            failures.add(name + ": entry points at " + soil.get().block.location()
-                    + " instead of " + blockKey.location());
+            failures.add(name + ": entry points at " + soil.get().block.identifier()
+                    + " instead of " + blockKey.identifier());
         }
     }
 
@@ -261,7 +261,7 @@ public class PottableGameTest {
      * path, which never touches {@link de.ambertation.wover.pottable.impl.PottablePlantImpl#CODEC}
      * nor the directory {@code RegistryDataLoader} derives from the registry key. Both of those are
      * exactly the things a Minecraft update can move silently: the codec still compiles when a field
-     * is dropped, and the elements directory is computed from the registry's {@code ResourceLocation}
+     * is dropped, and the elements directory is computed from the registry's {@code Identifier}
      * rather than being written down anywhere. So this test reads back the two entries shipped as
      * real files under this testmod's {@code data/} directory:
      * <ul>
@@ -270,9 +270,9 @@ public class PottableGameTest {
      *   <li>{@code json-soil} -&gt; {@link Blocks#COARSE_DIRT}.</li>
      * </ul>
      * The {@code valid_soils} assertions are deliberately two-sided. {@code minecraft:dirt} contains
-     * {@code COARSE_DIRT} but <em>not</em> {@code STONE}, and an absent {@code valid_soils} means
+     * {@code COARSE_DIRT} but <em>not</em> {@code PODZOL}, and an absent {@code valid_soils} means
      * "any soil". So a codec that silently dropped the optional tag would still produce a resolvable
-     * entry and still pass a positive-only check - it would only show up as {@code STONE} suddenly
+     * entry and still pass a positive-only check - it would only show up as {@code PODZOL} suddenly
      * being accepted. Checking both directions is what makes this catch that.
      */
     @GameTest
@@ -285,30 +285,30 @@ public class PottableGameTest {
 
         final Optional<PottablePlant> plant = plants.getOptional(TestModWoverPottable.JSON_PLANT);
         if (plant.isEmpty()) {
-            failures.add(TestModWoverPottable.JSON_PLANT.location()
+            failures.add(TestModWoverPottable.JSON_PLANT.identifier()
                     + ": expected the plant shipped as a datapack JSON file to be loaded, but it is missing."
                     + " Either the elements directory derived from the registry key moved, or the file is"
                     + " no longer picked up as a datapack at all");
         } else {
             if (!plant.get().block.equals(Blocks.DEAD_BUSH.builtInRegistryHolder().key())) {
-                failures.add(TestModWoverPottable.JSON_PLANT.location()
+                failures.add(TestModWoverPottable.JSON_PLANT.identifier()
                         + ": plant->block mapping drifted, expected minecraft:dead_bush but was "
-                        + plant.get().block.location());
+                        + plant.get().block.identifier());
             }
             if (plant.get().validSoils.isEmpty()) {
-                failures.add(TestModWoverPottable.JSON_PLANT.location()
+                failures.add(TestModWoverPottable.JSON_PLANT.identifier()
                         + ": the optional valid_soils field was dropped while decoding, expected the"
                         + " minecraft:dirt tag but got an empty Optional");
             } else {
                 if (!plant.get().isValidSoil(Blocks.COARSE_DIRT)) {
-                    failures.add(TestModWoverPottable.JSON_PLANT.location()
+                    failures.add(TestModWoverPottable.JSON_PLANT.identifier()
                             + ": expected COARSE_DIRT (a member of minecraft:dirt) to be a valid soil");
                 }
-                // The negative half: STONE is NOT in minecraft:dirt, so a plant that had lost its
+                // The negative half: PODZOL is NOT in minecraft:dirt, so a plant that had lost its
                 // valid_soils restriction would wrongly accept it.
-                if (plant.get().isValidSoil(Blocks.STONE)) {
-                    failures.add(TestModWoverPottable.JSON_PLANT.location()
-                            + ": STONE is not in minecraft:dirt, so it must NOT be a valid soil -"
+                if (plant.get().isValidSoil(Blocks.PODZOL)) {
+                    failures.add(TestModWoverPottable.JSON_PLANT.identifier()
+                            + ": PODZOL is not in minecraft:dirt, so it must NOT be a valid soil -"
                             + " the valid_soils restriction is not being honoured");
                 }
             }
@@ -316,12 +316,12 @@ public class PottableGameTest {
 
         final Optional<PottableSoil> soil = soils.getOptional(TestModWoverPottable.JSON_SOIL);
         if (soil.isEmpty()) {
-            failures.add(TestModWoverPottable.JSON_SOIL.location()
+            failures.add(TestModWoverPottable.JSON_SOIL.identifier()
                     + ": expected the soil shipped as a datapack JSON file to be loaded, but it is missing");
         } else if (!soil.get().block.equals(Blocks.COARSE_DIRT.builtInRegistryHolder().key())) {
-            failures.add(TestModWoverPottable.JSON_SOIL.location()
+            failures.add(TestModWoverPottable.JSON_SOIL.identifier()
                     + ": soil->block mapping drifted, expected minecraft:coarse_dirt but was "
-                    + soil.get().block.location());
+                    + soil.get().block.identifier());
         }
 
         if (!failures.isEmpty()) {

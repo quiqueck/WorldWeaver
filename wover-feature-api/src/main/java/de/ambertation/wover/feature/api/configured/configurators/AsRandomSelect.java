@@ -3,7 +3,7 @@ package de.ambertation.wover.feature.api.configured.configurators;
 import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.RandomSelectorFeature;
 import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -16,7 +16,7 @@ public interface AsRandomSelect extends FeatureConfigurator<RandomFeatureConfigu
      * Adds a feature to the random selection.
      *
      * @param feature The feature to add. A {@link PlacedFeatureKey} can be created using
-     *                {@link de.ambertation.wover.feature.api.placed.PlacedFeatureManager#createKey(ResourceLocation)}
+     *                {@link de.ambertation.wover.feature.api.placed.PlacedFeatureManager#createKey(Identifier)}
      * @param weight  The weight of the feature
      * @return the same instance
      */

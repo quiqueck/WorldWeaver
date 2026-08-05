@@ -4,12 +4,12 @@ import de.ambertation.wover.recipe.api.BaseRecipeBuilder;
 import de.ambertation.wover.recipe.api.RecipeBuilder;
 
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,17 +33,23 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     protected RecipeCategory category;
     protected String group;
     protected boolean shouldUnlockAdvancements;
-    protected final @NotNull ItemStack output;
+    protected final @NotNull Item outputItem;
+    protected int outputCount;
     protected final @NotNull ResourceKey<Recipe<?>> key;
 
-    protected BaseRecipeBuilderImpl(@NotNull ResourceLocation key, @NotNull ItemLike output) {
-        this(key, new ItemStack(output, 1));
+    protected BaseRecipeBuilderImpl(@NotNull Identifier key, @NotNull ItemLike output) {
+        this(key, output.asItem(), 1);
     }
 
-    protected BaseRecipeBuilderImpl(@NotNull ResourceLocation key, @NotNull ItemStack output) {
+    protected BaseRecipeBuilderImpl(@NotNull Identifier key, @NotNull ItemStack output) {
+        this(key, output.getItem(), output.getCount());
+    }
+
+    private BaseRecipeBuilderImpl(@NotNull Identifier key, @NotNull Item outputItem, int outputCount) {
         this.key = ResourceKey.create(Registries.RECIPE, key);
         this.category = RecipeCategory.MISC;
-        this.output = output;
+        this.outputItem = outputItem;
+        this.outputCount = outputCount;
         this.unlocks = new HashMap<>();
         this.shouldUnlockAdvancements = true;
     }
@@ -58,7 +64,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     }
 
     public I outputCount(int count) {
-        this.output.setCount(count);
+        this.outputCount = count;
         return (I) this;
     }
 
@@ -173,7 +179,7 @@ public abstract class BaseRecipeBuilderImpl<I extends BaseRecipeBuilder<I>> impl
     }
 
     protected void validate() {
-        if (output.getCount() <= 0) {
+        if (outputCount <= 0) {
             throwIllegalStateException("Output-Count is zero");
         }
         if (category == null) {

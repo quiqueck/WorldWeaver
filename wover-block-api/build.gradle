@@ -1,4 +1,4 @@
-archivesBaseName = "wover-block-api"
+base.archivesName = "wover-block-api"
 
 ext {
     baseNamespace = "block"
@@ -6,11 +6,15 @@ ext {
 }
 
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 loom {
     accessWidenerPath = file('src/main/resources/wover-block.accesswidener')
 }
 
-moduleDependencies(project, ['wover-core-api', 'wover-tag-api', 'wover-event-api', 'wover-item-api', 'wover-datagen-api'])
+// wover-loot-api holds de.ambertation.wover.loot.api - the datagen loot helpers this module's block loot
+// providers use, plus the runtime loot-table appending API. It is declared through moduleDependencies, which
+// uses `api`, so downstream modules and mods keep seeing those classes exactly as they did while the package
+// still lived in this module.
+moduleDependencies(project, ['wover-core-api', 'wover-tag-api', 'wover-event-api', 'wover-item-api', 'wover-datagen-api', 'wover-loot-api'])

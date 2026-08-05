@@ -10,7 +10,7 @@ import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
@@ -57,7 +57,7 @@ public class AsSequenceImpl extends FeatureConfiguratorImpl<SequenceFeatureConfi
     }
 
     public static class Key extends ConfiguredFeatureKey<AsSequence> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

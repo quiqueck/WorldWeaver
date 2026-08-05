@@ -89,7 +89,7 @@ public class PottableSoilBlockTrait extends BlockTraitImpl<Block, GenericBlockTr
                     if (runtimeTraits == null) return;
                     PottableSoilRegistry.register(
                             ctx,
-                            PottableSoilRegistry.createKey(e.getKey().location()),
+                            PottableSoilRegistry.createKey(e.getKey().identifier()),
                             e.getKey()
                     );
                 });

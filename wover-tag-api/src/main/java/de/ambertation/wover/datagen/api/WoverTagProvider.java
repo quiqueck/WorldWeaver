@@ -11,8 +11,9 @@ import de.ambertation.wover.tag.impl.TagManagerImpl;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.tags.TagAppender;
+import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -20,8 +21,8 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A {@link FabricTagProvider} that writes tags to the data directory.
+ * A {@link FabricTagsProvider} that writes tags to the data directory.
  * <p>
  * This class does interface with the Tag API. It allows you to
  * bootstrap Tags and serialize them to disk. Only tags that are
@@ -39,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <T> the taggable type
  * @param <P> the bootstrap context type
  */
-public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> implements WoverDataProvider<FabricTagProvider<T>> {
+public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> implements WoverDataProvider<TagsProvider<T>> {
     /**
      * All allowed namespaces for this tag provider.
      * <p>
@@ -163,16 +164,16 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
     }
 
     /**
-     * Tests whether the given {@link ResourceLocation} should be added to the tag.
+     * Tests whether the given {@link Identifier} should be added to the tag.
      * <p>
-     * The default implementation will return true if the {@link ResourceLocation}
+     * The default implementation will return true if the {@link Identifier}
      * is included in the {@link #modIDs} list, or if the {@link #modIDs} list is
      * {@code null}.
      *
-     * @param loc the {@link ResourceLocation} to test
-     * @return {@code true} if the {@link ResourceLocation} is allowed
+     * @param loc the {@link Identifier} to test
+     * @return {@code true} if the {@link Identifier} is allowed
      */
-    protected boolean shouldAdd(ResourceLocation loc) {
+    protected boolean shouldAdd(Identifier loc) {
         return modIDs == null || modIDs.contains(loc.getNamespace());
     }
 
@@ -216,11 +217,11 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
     }
 
     @Override
-    public FabricTagProvider<T> getProvider(
-            FabricDataOutput output,
+    public TagsProvider<T> getProvider(
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
-        return new FabricTagProvider<T>(output, tagRegistry.registryKey(), registriesFuture) {
+        return new FabricTagsProvider<T>(output, tagRegistry.registryKey(), registriesFuture) {
             @Override
             public String getName() {
                 return getTitle() + " (" + super.getName() + ")";
@@ -256,6 +257,12 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
                         return;
                     }
 
+                    //Use Fabric's TagAppender (from FabricTagsProvider#builder) rather than the
+                    //raw TagBuilder. The appender is interface-injected with Fabric's
+                    //setReplace/forceAddTag helpers. forceAddTag writes a *required* tag
+                    //reference (identical JSON to a plain required tag entry) but marks it as
+                    //"forced" so 26.1's stricter TagsProvider validation does not reject
+                    //references to vanilla/cross-provider tags that are not part of this run.
                     TagAppender<ResourceKey<T>, T> builder = this.builder(tag);
                     builder.setReplace(replaceOriginalTags());
 

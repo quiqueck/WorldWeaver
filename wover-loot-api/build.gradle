@@ -1,0 +1,12 @@
+base.archivesName = "wover-loot-api"
+
+ext {
+    baseNamespace = "loot"
+    baseClass = "LibWoverLoot"
+}
+
+dependencies {
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+moduleDependencies(project, ['wover-core-api', 'wover-tag-api', 'wover-event-api', 'wover-datagen-api'])

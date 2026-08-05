@@ -31,7 +31,7 @@
                   "block": "wover-block-testmod:test_block",
                   "condition": "minecraft:block_state_property",
                   "properties": {
-                    "age": "3"
+                    "age": "2"
                   }
                 }
               ],
@@ -51,7 +51,7 @@
                     "block": "wover-block-testmod:test_block",
                     "condition": "minecraft:block_state_property",
                     "properties": {
-                      "age": "3"
+                      "age": "2"
                     }
                   }
                 }
@@ -65,7 +65,7 @@
                   "block": "wover-block-testmod:test_block",
                   "condition": "minecraft:block_state_property",
                   "properties": {
-                    "age": "3"
+                    "age": "2"
                   }
                 }
               ],
@@ -79,7 +79,7 @@
                   "block": "wover-block-testmod:test_block",
                   "condition": "minecraft:block_state_property",
                   "properties": {
-                    "age": "2"
+                    "age": "1"
                   }
                 }
               ],
@@ -96,7 +96,7 @@
                   "block": "wover-block-testmod:test_block",
                   "condition": "minecraft:block_state_property",
                   "properties": {
-                    "age": "1"
+                    "age": "0"
                   }
                 }
               ],
@@ -144,7 +144,7 @@
               "block": "wover-block-testmod:test_block",
               "condition": "minecraft:block_state_property",
               "properties": {
-                "age": "3"
+                "age": "2"
               }
             }
           ]

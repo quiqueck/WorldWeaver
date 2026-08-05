@@ -226,7 +226,7 @@ customized (fog density left at `1.0` and no climate parameters added).
 ### Looking up `BiomeData` at runtime
 
 ```java
-BiomeData data = BiomeManager.biomeData(ResourceLocation.fromNamespaceAndPath("minecraft", "savanna"));
+BiomeData data = BiomeManager.biomeData(Identifier.fromNamespaceAndPath("minecraft", "savanna"));
 // or, if you already have a Holder<Biome>:
 BiomeData data2 = BiomeManager.biomeDataForHolder(someBiomeHolder);
 ```

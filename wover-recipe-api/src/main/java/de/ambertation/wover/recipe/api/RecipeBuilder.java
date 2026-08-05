@@ -12,7 +12,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -127,7 +127,7 @@ public class RecipeBuilder {
      * @param output The recipe's output item.
      * @return The new builder.
      */
-    public static CraftingRecipeBuilder crafting(ResourceLocation id, ItemLike output) {
+    public static CraftingRecipeBuilder crafting(Identifier id, ItemLike output) {
         return new CraftingRecipeBuilderImpl(id, output);
     }
 
@@ -138,7 +138,7 @@ public class RecipeBuilder {
      * @param output The recipe's output item.
      * @return The new builder.
      */
-    public static StonecutterRecipeBuilder stonecutting(ResourceLocation id, ItemLike output) {
+    public static StonecutterRecipeBuilder stonecutting(Identifier id, ItemLike output) {
         return new StonecutterRecipeBuilderImpl(id, output);
     }
 
@@ -149,7 +149,7 @@ public class RecipeBuilder {
      * @param output The recipe's output item.
      * @return The new builder.
      */
-    public static SmithingRecipeBuilder smithing(ResourceLocation id, ItemLike output) {
+    public static SmithingRecipeBuilder smithing(Identifier id, ItemLike output) {
         return new SmithingRecipeBuilderImpl(id, output);
     }
 
@@ -161,7 +161,7 @@ public class RecipeBuilder {
      * @param output The recipe's output item.
      * @return The new builder.
      */
-    public static CookingRecipeBuilder cooking(ResourceLocation id, ItemLike output) {
+    public static CookingRecipeBuilder cooking(Identifier id, ItemLike output) {
         return new CookingRecipeBuilderImpl(id, output, false, false, false, false);
     }
 
@@ -174,7 +174,7 @@ public class RecipeBuilder {
      * @return The new builder.
      */
     public static CookingRecipeBuilder cookableFood(
-            ResourceLocation id,
+            Identifier id,
             ItemLike output
     ) {
         return new CookingRecipeBuilderImpl(id, output, false, true, true, false);
@@ -187,7 +187,7 @@ public class RecipeBuilder {
      * @param output The recipe's output item.
      * @return The new builder.
      */
-    public static CookingRecipeBuilder smelting(ResourceLocation id, ItemLike output) {
+    public static CookingRecipeBuilder smelting(Identifier id, ItemLike output) {
         return new CookingRecipeBuilderImpl(id, output, false, false, false, true);
     }
 
@@ -199,7 +199,7 @@ public class RecipeBuilder {
      * @return The new builder.
      */
     public static CookingRecipeBuilder blasting(
-            ResourceLocation id,
+            Identifier id,
             ItemLike output
     ) {
         return new CookingRecipeBuilderImpl(id, output, true, false, false, true);
@@ -213,7 +213,7 @@ public class RecipeBuilder {
      * @return The new builder.
      */
     public static CookingRecipeBuilder smoker(
-            ResourceLocation id,
+            Identifier id,
             ItemLike output
     ) {
         return new CookingRecipeBuilderImpl(id, output, false, false, true, false);
@@ -227,14 +227,14 @@ public class RecipeBuilder {
      * @return The new builder.
      */
     public static CookingRecipeBuilder campfire(
-            ResourceLocation id,
+            Identifier id,
             ItemLike output
     ) {
         return new CookingRecipeBuilderImpl(id, output, false, true, false, false);
     }
 
     private static CraftingRecipeBuilder copySmithingTemplateBase(
-            ResourceLocation id,
+            Identifier id,
             ItemLike filler,
             ItemLike output
     ) {
@@ -259,7 +259,7 @@ public class RecipeBuilder {
      * @return The new builder, ready to be built.
      */
     public static CraftingRecipeBuilder copySmithingTemplate(
-            ResourceLocation id,
+            Identifier id,
             CopySmithingTemplateCostLevel costLevel,
             ItemLike outputTemplate,
             ItemLike centerIngredient
@@ -280,7 +280,7 @@ public class RecipeBuilder {
      * @return The new builder, ready to be built.
      */
     public static CraftingRecipeBuilder copySmithingTemplate(
-            ResourceLocation id,
+            Identifier id,
             CopySmithingTemplateCostLevel costLevel,
             ItemLike outputTemplate,
             TagKey<Item> centerIngredient

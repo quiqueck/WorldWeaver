@@ -11,7 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.entity.EntityType;
@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link BiomePredicateRegistry}.
  * <p>
  * If you need to, you can add custom predicates as well using
- * {@link BiomePredicateRegistry#register(ResourceLocation, KeyDispatchDataCodec)}.
+ * {@link BiomePredicateRegistry#register(Identifier, KeyDispatchDataCodec)}.
  */
 public interface BiomePredicate {
     /**

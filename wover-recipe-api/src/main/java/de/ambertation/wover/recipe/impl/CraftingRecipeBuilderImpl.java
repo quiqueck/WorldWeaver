@@ -6,7 +6,7 @@ import de.ambertation.wover.recipe.api.RecipeMaterial;
 
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,7 +27,7 @@ public class CraftingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CraftingRec
     protected boolean showNotification;
     protected final Map<Character, IngredientFactory> materials;
 
-    public CraftingRecipeBuilderImpl(ResourceLocation id, ItemLike output) {
+    public CraftingRecipeBuilderImpl(Identifier id, ItemLike output) {
         super(id, output);
         this.showNotification = true;
         this.materials = new HashMap<>();
@@ -147,7 +147,7 @@ public class CraftingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CraftingRec
     }
 
     private void buildShaped(RecipeBuilder.Context context) {
-        var builder = ShapedRecipeBuilder.shaped(context.itemLookup(), category, output.getItem(), output.getCount());
+        var builder = ShapedRecipeBuilder.shaped(context.itemLookup(), category, outputItem, outputCount);
 
         for (Map.Entry<Character, IngredientFactory> mat : materials.entrySet()) {
             builder.define(mat.getKey(), mat.getValue().createIngredient(context));
@@ -170,8 +170,8 @@ public class CraftingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CraftingRec
         var builder = ShapelessRecipeBuilder.shapeless(
                 context.itemLookup(),
                 category,
-                output.getItem(),
-                output.getCount()
+                outputItem,
+                outputCount
         );
 
         for (Map.Entry<Character, IngredientFactory> mat : materials.entrySet()) {

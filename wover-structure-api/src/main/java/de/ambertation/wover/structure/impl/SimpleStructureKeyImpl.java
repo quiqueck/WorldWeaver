@@ -6,7 +6,7 @@ import de.ambertation.wover.structure.api.builders.StructureBuilder;
 import de.ambertation.wover.structure.impl.builders.StructureBuilderImpl;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 
@@ -18,7 +18,7 @@ public class SimpleStructureKeyImpl<S extends Structure>
     @NotNull
     public final StructureTypeKey<S> typeKey;
 
-    public SimpleStructureKeyImpl(@NotNull ResourceLocation loc, @NotNull StructureTypeKey<S> type) {
+    public SimpleStructureKeyImpl(@NotNull Identifier loc, @NotNull StructureTypeKey<S> type) {
         super(loc);
         this.typeKey = type;
     }

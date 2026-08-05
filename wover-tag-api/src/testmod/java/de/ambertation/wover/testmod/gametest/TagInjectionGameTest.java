@@ -3,7 +3,7 @@ package de.ambertation.wover.testmod.gametest;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -34,11 +34,11 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
 public class TagInjectionGameTest {
     private static final TagKey<Block> AA = TagKey.create(
             Registries.BLOCK,
-            ResourceLocation.parse("wover-tag-testmod:aa")
+            Identifier.parse("wover-tag-testmod:aa")
     );
     private static final TagKey<Block> BB = TagKey.create(
             Registries.BLOCK,
-            ResourceLocation.parse("wover-tag-testmod:bb")
+            Identifier.parse("wover-tag-testmod:bb")
     );
 
     @GameTest

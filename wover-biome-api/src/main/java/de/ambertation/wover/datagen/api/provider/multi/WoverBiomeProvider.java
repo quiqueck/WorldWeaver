@@ -15,7 +15,7 @@ import de.ambertation.wover.surface.api.AssignedSurfaceRule;
 import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public abstract class WoverBiomeProvider extends AbstractMultiProvider {
      * @param modCore    The {@link ModCore} of the Mod.
      * @param providerId The id of the provider. Every Provider (for the same Registry)
      */
-    public WoverBiomeProvider(@NotNull ModCore modCore, ResourceLocation providerId) {
+    public WoverBiomeProvider(@NotNull ModCore modCore, Identifier providerId) {
         super(modCore, providerId);
     }
 

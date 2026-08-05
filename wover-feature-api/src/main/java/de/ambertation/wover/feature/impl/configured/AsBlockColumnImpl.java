@@ -7,7 +7,7 @@ import de.ambertation.wover.feature.api.configured.configurators.AsBlockColumn;
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -160,7 +160,7 @@ public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfig
     }
 
     public static class Key extends ConfiguredFeatureKey<AsBlockColumn> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

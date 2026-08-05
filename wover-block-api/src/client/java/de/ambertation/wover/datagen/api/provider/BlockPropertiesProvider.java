@@ -1,16 +1,16 @@
 package de.ambertation.wover.datagen.api.provider;
 
+import de.ambertation.wover.block.api.render.RenderLayerBinding;
+import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverDataProvider;
 
-import com.google.common.hash.Hashing;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -20,7 +20,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+
+import com.google.common.hash.Hashing;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -28,12 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.ToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -156,10 +153,23 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
 
     @Override
     public DataProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new Provider(output);
+    }
+
+    private static String renderLayer(Block block) {
+        return BlockTrait.runtimeTraits(block)
+                         .filter(trait -> trait.is(RenderLayerBinding.RENDER_LAYER_KEY))
+                         .filter(trait -> trait instanceof RenderLayerBinding)
+                         .map(trait -> ((RenderLayerBinding) trait).layer())
+                         .findFirst()
+                         .map(layer -> switch (layer) {
+                             case CUTOUT -> "CUTOUT";
+                             case TRANSLUCENT -> "TRANSLUCENT";
+                         })
+                         .orElse("SOLID");
     }
 
     private static boolean hasCollision(Block block) {
@@ -259,59 +269,48 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
         }
     }
 
-    private static String lineFor(ResourceLocation id, Block block) {
+    private static String lineFor(Identifier id, Block block) {
         final BlockState state = block.defaultBlockState();
         // Locale-independent formatting throughout (String.valueOf / Float.toString use '.', never a locale
         // decimal comma), so the file is byte-identical regardless of the machine's default locale.
-        return id
-                + "  class=" + block.getClass().getSimpleName()
-                + "  destroyTime=" + block.defaultDestroyTime()
-                // A destroy time of exactly 0 means the block breaks instantly (no mining
-                // progress); surfaced explicitly so the audit shows instabreak changes.
-                + "  instabreak=" + (block.defaultDestroyTime() == 0.0F)
-                + "  resistance=" + block.getExplosionResistance()
-                + "  reqTool=" + state.requiresCorrectToolForDrops()
-                // Aggregated across all states (see aggregateInt); uniform blocks keep their historical single value.
-                + "  mapColor=" + aggregateInt(block, BlockPropertiesProvider::mapColorId, -1)
-                + "  instrument=" + state.instrument().name()
-                + "  sound=" + soundName(block)
-                + "  friction=" + block.getFriction()
-                + "  speed=" + block.getSpeedFactor()
-                + "  jump=" + block.getJumpFactor()
-                + "  ignitedByLava=" + state.ignitedByLava()
-                // Aggregated across all states so a lightLevel(state -> LIT ? 15 : 0) block shows a range, not 0.
-                + "  lightEmission=" + aggregateInt(block, BlockState::getLightEmission, 0)
-                + "  replaceable=" + state.canBeReplaced()
-                // Whether the block has the vanilla WATERLOGGED state property (can hold water).
-                + "  waterlogged=" + state.hasProperty(BlockStateProperties.WATERLOGGED)
-                + "  randomlyTicks=" + state.isRandomlyTicking()
-                + "  hasCollision=" + hasCollision(block)
-                + "  canOcclude=" + state.canOcclude()
-                // The effective chunk render layer (SOLID/CUTOUT/TRANSLUCENT), read from the vanilla registry
-                // that both the RenderLayerProvider scan and the RENDER_LAYER trait populate via
-                // BlockRenderLayerMap - so migrating a block from the interface to the trait shows up here as a
-                // diff only if the layer actually changed. Datagen always runs client-side, so this is safe.
-                + "  renderLayer=" + ItemBlockRenderTypes.getChunkRenderType(state).name()
-                // --- WP0.2 additions ---
-                + "  pushReaction=" + state.getPistonPushReaction().name()
-                + "  offsetType=" + offsetType(block)
-                + "  forceSolidOn=" + forceSolid(block, FORCE_SOLID_ON_FIELD)
-                + "  forceSolidOff=" + forceSolid(block, FORCE_SOLID_OFF_FIELD)
-                + "  dynamicShape=" + block.hasDynamicShape()
-                + "  spawnTerrainParticles=" + state.shouldSpawnTerrainParticles()
-                // Default-state predicate columns, each probed against EmptyBlockGetter (err on throw).
-                + "  isSuffocating=" + predicate(BlockState::isSuffocating, state)
-                + "  isViewBlocking=" + predicate(BlockState::isViewBlocking, state)
-                + "  isRedstoneConductor=" + predicate(BlockState::isRedstoneConductor, state)
-                + "  hasPostProcess=" + predicate(BlockState::hasPostProcess, state)
-                + "  emissiveRendering=" + predicate(BlockState::emissiveRendering, state)
-                + "  isValidSpawn=" + validSpawn(state);
+        return "{\"id\":\"" + id + "\""
+                + ",\"class\":\"" + block.getClass().getSimpleName() + "\""
+                + ",\"destroyTime\":\"" + block.defaultDestroyTime() + "\""
+                + ",\"instabreak\":\"" + (block.defaultDestroyTime() == 0.0F) + "\""
+                + ",\"resistance\":\"" + block.getExplosionResistance() + "\""
+                + ",\"reqTool\":\"" + state.requiresCorrectToolForDrops() + "\""
+                + ",\"mapColor\":\"" + aggregateInt(block, BlockPropertiesProvider::mapColorId, -1) + "\""
+                + ",\"instrument\":\"" + state.instrument().name() + "\""
+                + ",\"sound\":\"" + soundName(block) + "\""
+                + ",\"friction\":\"" + block.getFriction() + "\""
+                + ",\"speed\":\"" + block.getSpeedFactor() + "\""
+                + ",\"jump\":\"" + block.getJumpFactor() + "\""
+                + ",\"ignitedByLava\":\"" + state.ignitedByLava() + "\""
+                + ",\"lightEmission\":\"" + aggregateInt(block, BlockState::getLightEmission, 0) + "\""
+                + ",\"replaceable\":\"" + state.canBeReplaced() + "\""
+                + ",\"waterlogged\":\"" + state.hasProperty(BlockStateProperties.WATERLOGGED) + "\""
+                + ",\"randomlyTicks\":\"" + state.isRandomlyTicking() + "\""
+                + ",\"hasCollision\":\"" + hasCollision(block) + "\""
+                + ",\"canOcclude\":\"" + state.canOcclude() + "\""
+                + ",\"renderLayer\":\"" + renderLayer(block) + "\""
+                + ",\"pushReaction\":\"" + state.getPistonPushReaction().name() + "\""
+                + ",\"offsetType\":\"" + offsetType(block) + "\""
+                + ",\"forceSolidOn\":\"" + forceSolid(block, FORCE_SOLID_ON_FIELD) + "\""
+                + ",\"forceSolidOff\":\"" + forceSolid(block, FORCE_SOLID_OFF_FIELD) + "\""
+                + ",\"dynamicShape\":\"" + block.hasDynamicShape() + "\""
+                + ",\"spawnTerrainParticles\":\"" + state.shouldSpawnTerrainParticles() + "\""
+                + ",\"isSuffocating\":\"" + predicate(BlockState::isSuffocating, state) + "\""
+                + ",\"isViewBlocking\":\"" + predicate(BlockState::isViewBlocking, state) + "\""
+                + ",\"isRedstoneConductor\":\"" + predicate(BlockState::isRedstoneConductor, state) + "\""
+                + ",\"hasPostProcess\":\"" + predicate((s, g, p) -> s.getPostProcessPos(g, p) != null, state) + "\""
+                + ",\"emissiveRendering\":\"" + predicate(BlockState::emissiveRendering, state) + "\""
+                + ",\"isValidSpawn\":\"" + validSpawn(state) + "\"}";
     }
 
     private class Provider implements DataProvider {
-        private final FabricDataOutput output;
+        private final FabricPackOutput output;
 
-        private Provider(FabricDataOutput output) {
+        private Provider(FabricPackOutput output) {
             this.output = output;
         }
 
@@ -319,14 +318,15 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
         public @NotNull CompletableFuture<?> run(@NotNull CachedOutput writer) {
             final List<String> lines = new ArrayList<>();
             for (Block block : BuiltInRegistries.BLOCK) {
-                final ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
+                final Identifier id = BuiltInRegistries.BLOCK.getKey(block);
+                if (!id.getNamespace().equals(modCore.namespace)) continue;
                 lines.add(lineFor(id, block));
             }
             // Sorting by the full line orders by the (unique) id prefix, so the file is fully deterministic.
             Collections.sort(lines);
 
-            final byte[] bytes = (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8);
-            final Path path = output.getOutputFolder().resolve("block_properties.txt");
+            final byte[] bytes = ("[\n" + String.join(",\n", lines) + "\n]\n").getBytes(StandardCharsets.UTF_8);
+            final Path path = output.getOutputFolder().resolve("block_properties.json");
             try {
                 writer.writeIfNeeded(path, bytes, Hashing.sha1().hashBytes(bytes));
             } catch (IOException e) {

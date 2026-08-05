@@ -2,12 +2,12 @@ package de.ambertation.wover.tag.impl;
 
 import de.ambertation.wover.tag.api.event.context.TagElementWrapper;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagEntry;
 
 import java.util.Objects;
 
-public record TagElementWrapperImpl<T>(ResourceLocation id, boolean tag,
+public record TagElementWrapperImpl<T>(Identifier id, boolean tag,
                                        boolean required) implements TagElementWrapper<T> {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();

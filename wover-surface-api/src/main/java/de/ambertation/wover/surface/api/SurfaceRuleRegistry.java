@@ -11,7 +11,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
@@ -58,7 +58,7 @@ public class SurfaceRuleRegistry {
      * @return The ResourceKey
      */
     public static ResourceKey<AssignedSurfaceRule> createKey(
-            ResourceLocation ruleID
+            Identifier ruleID
     ) {
         return SurfaceRuleRegistryImpl.createKey(ruleID);
     }

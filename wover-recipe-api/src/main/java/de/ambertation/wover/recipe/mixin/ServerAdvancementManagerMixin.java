@@ -7,7 +7,7 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementTree;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -57,7 +57,7 @@ public class ServerAdvancementManagerMixin {
     // `advancements` is the ImmutableMap apply() just built; it has to be rebuilt to be extended. The tree is
     // mutated in place through its own addAll().
     @Shadow
-    private Map<ResourceLocation, AdvancementHolder> advancements;
+    private Map<Identifier, AdvancementHolder> advancements;
 
     @Shadow
     private AdvancementTree tree;
@@ -69,7 +69,7 @@ public class ServerAdvancementManagerMixin {
     @Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V",
             at = @At("TAIL"))
     void wover_addRuntimeRecipeAdvancements(
-            Map<ResourceLocation, Advancement> loaded,
+            Map<Identifier, Advancement> loaded,
             ResourceManager resourceManager,
             ProfilerFiller profilerFiller,
             CallbackInfo ci
@@ -78,7 +78,7 @@ public class ServerAdvancementManagerMixin {
                 RecipeRuntimeProviderImpl.takeContributedAdvancements(this.registries);
         if (contributed.isEmpty()) return;
 
-        final Map<ResourceLocation, AdvancementHolder> merged = new LinkedHashMap<>(this.advancements);
+        final Map<Identifier, AdvancementHolder> merged = new LinkedHashMap<>(this.advancements);
         final List<AdvancementHolder> added = new ArrayList<>(contributed.size());
         for (AdvancementHolder holder : contributed) {
             if (merged.putIfAbsent(holder.id(), holder) == null) added.add(holder);

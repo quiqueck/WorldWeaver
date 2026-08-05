@@ -5,7 +5,7 @@ import de.ambertation.wover.config.api.DatapackConfigs;
 import de.ambertation.wover.events.api.Event;
 import de.ambertation.wover.events.api.WorldLifecycle;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.flag.FeatureFlagSet;
 
@@ -58,7 +58,7 @@ public class WorldDatapackConfigImpl {
     final List<LoadedItem> resources = new LinkedList<>();
 
     private record LoadedItem(
-            ResourceLocation resource,
+            Identifier resource,
             JsonObject object,
             ConfigResource cfg,
             int initialPriority,
@@ -80,7 +80,7 @@ public class WorldDatapackConfigImpl {
         }
     }
 
-    private void processBiomeConfigs(ResourceLocation resourceLocation, JsonObject jsonObject) {
+    private void processBiomeConfigs(Identifier resourceLocation, JsonObject jsonObject) {
         int priority = Event.DEFAULT_PRIORITY;
         boolean defaultPriority = true;
         if (jsonObject.has("priority") && jsonObject.get("priority").isJsonPrimitive() && jsonObject

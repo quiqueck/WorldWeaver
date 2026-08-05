@@ -3,7 +3,7 @@ package de.ambertation.wover.generator.api.chunkgenerator;
 import de.ambertation.wover.generator.impl.chunkgenerator.ChunkGeneratorManagerImpl;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
 /**
@@ -32,7 +32,7 @@ public class ChunkGeneratorManager {
      * @param location The id the {@link ChunkGenerator} type is registered under.
      * @param codec    The {@link MapCodec} used to (de)serialize the {@link ChunkGenerator}.
      */
-    public static void register(ResourceLocation location, MapCodec<ChunkGenerator> codec) {
+    public static void register(Identifier location, MapCodec<ChunkGenerator> codec) {
         ChunkGeneratorManagerImpl.register(location, codec);
     }
 }

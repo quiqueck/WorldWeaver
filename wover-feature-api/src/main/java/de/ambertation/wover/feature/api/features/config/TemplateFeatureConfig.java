@@ -6,7 +6,7 @@ import de.ambertation.wover.util.RandomizedWeightedList;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Mirror;
@@ -17,7 +17,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
  * Config for a {@link de.ambertation.wover.feature.api.features.TemplateFeature}. The Configuration
  * holds a weighted list of {@link FeatureTemplateImpl}s that will be placed at random.
  * <p>
- * Structures are identified by {@link ResourceLocation}s. The structure
+ * Structures are identified by {@link Identifier}s. The structure
  * is loaded from a datapack at {@code data/<namespace>/structure/<path>.nbt}.
  */
 public class TemplateFeatureConfig implements FeatureConfiguration {
@@ -83,7 +83,7 @@ public class TemplateFeatureConfig implements FeatureConfiguration {
          *
          * @return the location
          */
-        ResourceLocation getLocation();
+        Identifier getLocation();
 
         /**
          * Places the structure in the world. The structure is placed with the given rotation and mirror. The bottom

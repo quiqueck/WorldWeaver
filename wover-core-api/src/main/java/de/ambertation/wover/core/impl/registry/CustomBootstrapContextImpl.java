@@ -7,8 +7,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,11 @@ public abstract class CustomBootstrapContextImpl<T> {
 
     }
 
-    private static final Map<ResourceKey<Registry<?>>, ContextData<?, ?>> CONTEXT_OBJECTS = new HashMap<>();
+    // 26.1 loads worldgen registries in parallel: distinct registries (biome_data, biome_modifications,
+    // surface_rules, ...) bootstrap on different worker threads, so this map is touched concurrently.
+    // ConcurrentHashMap makes computeIfAbsent thread-safe; per-ContextData mutations are guarded by a
+    // synchronized(contextObject) block below.
+    private static final Map<ResourceKey<Registry<?>>, ContextData<?, ?>> CONTEXT_OBJECTS = new ConcurrentHashMap<>();
 
 
     @SuppressWarnings("unchecked")
@@ -39,23 +43,30 @@ public abstract class CustomBootstrapContextImpl<T> {
             @NotNull Supplier<C> contextSupplier
     ) {
         final ContextData<T, C> contextObject = getContextObject(registryKey);
-        if (lookupContext == null) return contextObject.bootstrapContext;
+        // The check-then-set on lastGetter/bootstrapContext must be atomic per registry: under 26.1's
+        // parallel registry loading the same registry can be initialized from more than one thread.
+        synchronized (contextObject) {
+            if (lookupContext == null) return contextObject.bootstrapContext;
 
-        final HolderGetter<T> biomeGetter = lookupContext.lookup(registryKey);
-        if (biomeGetter != contextObject.lastGetter || contextObject.bootstrapContext == null) {
-            contextObject.lastGetter = biomeGetter;
+            final HolderGetter<T> biomeGetter = lookupContext.lookup(registryKey);
+            if (biomeGetter != contextObject.lastGetter || contextObject.bootstrapContext == null) {
+                contextObject.lastGetter = biomeGetter;
 
-            contextObject.bootstrapContext = contextSupplier.get();
-            contextObject.bootstrapContext.setLookupContext(lookupContext);
-            contextObject.bootstrapContext.onBootstrapContextChange(contextObject.bootstrapContext);
-        } else {
-            contextObject.bootstrapContext.setLookupContext(lookupContext);
+                contextObject.bootstrapContext = contextSupplier.get();
+                contextObject.bootstrapContext.setLookupContext(lookupContext);
+                contextObject.bootstrapContext.onBootstrapContextChange(contextObject.bootstrapContext);
+            } else {
+                contextObject.bootstrapContext.setLookupContext(lookupContext);
+            }
+
+            return contextObject.bootstrapContext;
         }
-
-        return contextObject.bootstrapContext;
     }
 
     public static <T> void finalize(@NotNull ResourceKey<Registry<T>> registryKey) {
-        getContextObject(registryKey).bootstrapContext = null;
+        final ContextData<?, ?> contextObject = getContextObject(registryKey);
+        synchronized (contextObject) {
+            contextObject.bootstrapContext = null;
+        }
     }
 }

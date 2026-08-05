@@ -12,27 +12,21 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.util.valueproviders.FloatProvider;
+import net.minecraft.util.valueproviders.FloatProviders;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
-
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 public class ThresholdConditionImpl extends SurfaceNoiseCondition {
-    /**
-     * One {@link Context} per noise seed, shared by every evaluation of this condition.
-     * <p>
-     * Concurrent, because worldgen evaluates surface rules on several chunk worker threads at once and
-     * this is reached through {@code computeIfAbsent}. Doing that on a plain {@code HashMap} from more
-     * than one thread can lose an entry or corrupt the table outright, which is a data race rather than
-     * merely a source of non-determinism.
-     */
+    // 26.1 registry loading is async + parallel - a plain HashMap here was racing across worker
+    // threads and intermittently crashing with a ConcurrentModificationException.
     private static final Map<Long, Context> NOISES = new ConcurrentHashMap<>();
     public static final MapCodec<ThresholdConditionImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
             .group(
                     Codec.LONG.fieldOf("seed").forGetter(p -> p.noiseContext.seed),
                     Codec.DOUBLE.fieldOf("threshold").orElse(0.0).forGetter(p -> p.threshold),
-                    FloatProvider.CODEC.fieldOf("roughness").orElse(ConstantFloat.of(0)).forGetter(p -> p.roughness),
+                    FloatProviders.CODEC.fieldOf("roughness").orElse(ConstantFloat.of(0)).forGetter(p -> p.roughness),
                     Codec.DOUBLE.fieldOf("scale_x").orElse(0.1).forGetter(p -> p.scaleX),
                     Codec.DOUBLE.fieldOf("scale_z").orElse(0.1).forGetter(p -> p.scaleZ)
             )

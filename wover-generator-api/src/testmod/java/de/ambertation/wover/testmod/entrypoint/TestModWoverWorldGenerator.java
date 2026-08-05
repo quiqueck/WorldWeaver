@@ -16,7 +16,7 @@ import de.ambertation.wover.preset.api.WorldPresetManager;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -62,11 +62,11 @@ public class TestModWoverWorldGenerator implements ModInitializer {
         Map<ResourceKey<Biome>, Integer> testMap = new HashMap<>();
         ResourceKey<Biome> k2 = ResourceKey.create(
                 Registries.BIOME,
-                ResourceLocation.parse(Biomes.NETHER_WASTES.location().toString())
+                Identifier.parse(Biomes.NETHER_WASTES.identifier().toString())
         );
         ResourceKey<Biome> k3 = ResourceKey.create(
                 Registries.BIOME,
-                ResourceLocation.parse(Biomes.NETHER_WASTES.location().toString())
+                Identifier.parse(Biomes.NETHER_WASTES.identifier().toString())
         );
         testMap.put(Biomes.NETHER_WASTES, 10);
         testMap.put(k2, 20);

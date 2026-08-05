@@ -5,7 +5,7 @@ import de.ambertation.wover.entrypoint.LibWoverStructure;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 
@@ -17,14 +17,14 @@ public class StructurePoolElementTypeManagerImpl {
 
 
     public static <P extends StructurePoolElement> StructurePoolElementType<P> register(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<P> codec
     ) {
         return Registry.register(BuiltInRegistries.STRUCTURE_POOL_ELEMENT, location, () -> codec);
     }
 
     public static <P extends StructurePoolElement> StructurePoolElementType<P> registerLegacy(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<P> codec
     ) {
         final StructurePoolElementType<P> res = register(location, codec);

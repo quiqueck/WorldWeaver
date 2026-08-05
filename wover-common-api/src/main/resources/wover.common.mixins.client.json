@@ -3,7 +3,6 @@
   "minVersion": "0.8",
   "package": "de.ambertation.wover.common.mixin.client",
   "compatibilityLevel": "JAVA_21",
-  "refmap": "client-wover-common-api-refmap.json",
   "injectors": {
     "defaultRequire": 1
   },

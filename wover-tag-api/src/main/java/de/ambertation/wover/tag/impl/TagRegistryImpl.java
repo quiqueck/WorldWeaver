@@ -12,7 +12,7 @@ import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -43,18 +43,18 @@ public abstract class TagRegistryImpl<T, P extends TagBootstrapContext<T>> imple
     }
 
     public TagKey<T> makeCommonTag(String name) {
-        return makeTag(ResourceLocation.fromNamespaceAndPath("c", name));
+        return makeTag(Identifier.fromNamespaceAndPath("c", name));
     }
 
     public TagKey<T> makeFabricTag(String name) {
-        return makeTag(ResourceLocation.fromNamespaceAndPath("fabric", name));
+        return makeTag(Identifier.fromNamespaceAndPath("fabric", name));
     }
 
     public TagKey<T> makeTag(ModCore mod, String name) {
         return makeTag(mod.id(name));
     }
 
-    public TagKey<T> makeTag(ResourceLocation id) {
+    public TagKey<T> makeTag(Identifier id) {
         final TagKey<T> tag = TagKey.create(registryKey, id);
         initializeTag(tag);
         return tag;
@@ -105,7 +105,7 @@ public abstract class TagRegistryImpl<T, P extends TagBootstrapContext<T>> imple
                     registry.key(),
                     Registries.tagsDirPath(registry.key()),
                     (T element) -> {
-                        ResourceLocation id = registry.getKey(element);
+                        Identifier id = registry.getKey(element);
                         if (id != registry.getDefaultKey()) {
                             return id;
                         }
@@ -116,7 +116,7 @@ public abstract class TagRegistryImpl<T, P extends TagBootstrapContext<T>> imple
         }
 
         @Override
-        public TagKey<T> makeTag(ResourceLocation id) {
+        public TagKey<T> makeTag(Identifier id) {
             TagKey<T> tag = TagKey.create(registry.key(), id);
 
             initializeTag(tag);

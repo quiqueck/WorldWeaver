@@ -5,7 +5,6 @@ import de.ambertation.wover.events.impl.WorldLifecycleImpl;
 
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.world.level.storage.LevelStorageSource;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,8 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
-
 @Environment(EnvType.CLIENT)
 @Mixin(value = CreateWorldScreen.class, priority = 4095)
 public abstract class CreateWorldScreenMixin {
@@ -25,7 +22,7 @@ public abstract class CreateWorldScreenMixin {
     public abstract WorldCreationUiState getUiState();
 
     @Inject(method = "createNewWorld", at = @At("RETURN"))
-    private void wover_captureRegistry(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+    private void wover_captureRegistry(CallbackInfoReturnable<Boolean> cir) {
         WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(
                 this.getUiState()
                     .getSettings()

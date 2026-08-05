@@ -697,7 +697,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D noCollission() {
-        queueProperty((properties) -> properties.noCollission());
+        queueProperty((properties) -> properties.noCollision());
         return (D) this;
     }
 
@@ -982,7 +982,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D hasPostProcess(BlockBehaviour.StatePredicate predicate) {
-        queueProperty((properties) -> properties.hasPostProcess(predicate));
+        queueProperty((properties) -> properties.postProcess((state, getter, pos) -> predicate.test(state, getter, pos) ? pos : null));
         return (D) this;
     }
 

@@ -9,8 +9,9 @@ Use the following order to upgrade the single packages (based on inter-dependenc
 * **wover-event** (depends on _wover-core_)
 * **wover-ui** (depends on _wover-core_ and _wover-event_)
 * **wover-tag** (depends on _wover-core_, _wover-datagen_ and _wover-event_)
+* **wover-loot** (depends on _wover-core_, _wover-tag_, _wover-event_ and _wover-datagen_)
 * **wover-item** (depends on _wover-core_, _wover-tag_ and _wover-event_)
-* **wover-block** (depends on _wover-core_, _wover-tag_ and _wover-item_)
+* **wover-block** (depends on _wover-core_, _wover-tag_, _wover-item_ and _wover-loot_)
 * **wover-recipe** (depends on _wover-core_, _wover-event-api_, _wover-block_ and _wover-item_)
 * **wover-sets** (depends on _wover-core_, _wover-block_, _wover-item_ and _wover-recipe_)
 * **wover-preset** (depends on _wover-core_, _wover-tag_ and _wover-event_)
@@ -31,11 +32,20 @@ grep "Emitting event:"
 
 #### Server
 
+The parenthesized value after `WORLD_FOLDER_READY` / `WORLD_REGISTRY_READY` is a per-run object id and
+changes on every launch; it is written as `<id>` below. Both sequences were verified with
+`./gradlew :runServer` on 26.1 and on 26.3 — the emitted order is identical on both. The headless Fabric
+gametest path emits the same sequence.
+
+##### new World
+
 ```
-(wover-events) (DEBUG) Emitting event: WORLD_FOLDER_READY (484b8cee, world)
-(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (84553a4, PREPARATION)
+(wover-events) (DEBUG) Emitting event: WORLD_FOLDER_READY (<id>, world)
+(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (<id>, LOADING)
+(wover-events) (DEBUG) Emitting event: CREATED_NEW_WORLD_FOLDER
+(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (<id>, PREPARATION)
 (wover-events) (DEBUG) Emitting event: BEFORE_LOADING_RESOURCES
-(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (11941b73, FINAL)
+(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (<id>, FINAL)
 (wover-events) (DEBUG) Emitting event: RESOURCES_LOADED
 (wover-events) (DEBUG) Emitting event: ON_DIMENSION_LOAD
 (wover-events) (DEBUG) Emitting event: MINECRAFT_SERVER_READY
@@ -44,6 +54,29 @@ grep "Emitting event:"
 (wover-events) (DEBUG) Emitting event: SERVER_LEVEL_READY
 (wover-events) (DEBUG) Emitting event: SERVER_LEVEL_READY
 ```
+
+##### existing World
+
+Identical to the above, minus `CREATED_NEW_WORLD_FOLDER`:
+
+```
+(wover-events) (DEBUG) Emitting event: WORLD_FOLDER_READY (<id>, world)
+(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (<id>, LOADING)
+(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (<id>, PREPARATION)
+(wover-events) (DEBUG) Emitting event: BEFORE_LOADING_RESOURCES
+(wover-events) (DEBUG) Emitting event: WORLD_REGISTRY_READY (<id>, FINAL)
+(wover-events) (DEBUG) Emitting event: RESOURCES_LOADED
+(wover-events) (DEBUG) Emitting event: ON_DIMENSION_LOAD
+(wover-events) (DEBUG) Emitting event: MINECRAFT_SERVER_READY
+(wover-events) (DEBUG) Emitting event: BEFORE_CREATING_LEVELS
+(wover-events) (DEBUG) Emitting event: SERVER_LEVEL_READY
+(wover-events) (DEBUG) Emitting event: SERVER_LEVEL_READY
+(wover-events) (DEBUG) Emitting event: SERVER_LEVEL_READY
+```
+
+The `WORLD_REGISTRY_READY (LOADING)` emission comes from
+`wover-event-api/src/main/java/de/ambertation/wover/events/mixin/world_registry/WorldLoaderMixin.java`
+(`@ModifyArg` on `lambda$load$1`), which is present identically on 26.1 and 26.3.
 
 #### Client
 

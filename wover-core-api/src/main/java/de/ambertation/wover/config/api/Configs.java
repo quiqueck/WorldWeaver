@@ -4,7 +4,7 @@ import de.ambertation.wunderlib.configs.AbstractConfig;
 import de.ambertation.wover.config.impl.ConfigsImpl;
 import de.ambertation.wover.core.api.ModCore;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * <p>
  * Mods that want to expose configuration options should create a subclass of {@link AbstractConfig} (for example
  * a {@code ConfigFile}, see {@link MainConfig} for an example) and register it here with one of the
- * {@link #register} methods. Once registered, the config can be looked up again with {@link #get(ResourceLocation)}
+ * {@link #register} methods. Once registered, the config can be looked up again with {@link #get(Identifier)}
  * and saved together with all other registered configs using {@link #saveConfigs()}.
  * <p>
  * WorldWeaver's own general configuration is exposed as {@link #MAIN}.
@@ -86,7 +86,7 @@ public class Configs {
      * @param <T>       The type of the config that is looked up.
      * @return The config instance, or {@code null} if no config was registered for the given location.
      */
-    public static <T extends AbstractConfig<?>> T get(ResourceLocation location) {
+    public static <T extends AbstractConfig<?>> T get(Identifier location) {
         return ConfigsImpl.get(location);
     }
 }

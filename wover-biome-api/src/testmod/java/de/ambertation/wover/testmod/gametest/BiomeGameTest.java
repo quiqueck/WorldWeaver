@@ -9,7 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.ArrayList;
@@ -86,29 +86,29 @@ public class BiomeGameTest {
         final List<String> failures = new ArrayList<>();
 
         for (String id : DATAPACK_BIOMES) {
-            if (!biomes.containsKey(ResourceLocation.parse(id))) {
+            if (!biomes.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected biome loaded from datapack JSON but it is missing");
             }
         }
 
         for (String id : DATAPACK_BIOME_DATA) {
-            if (!biomeData.containsKey(ResourceLocation.parse(id))) {
+            if (!biomeData.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected BiomeData loaded from datapack JSON but it is missing");
             }
         }
 
         for (String id : DATAPACK_BIOME_MODIFICATIONS) {
-            if (!biomeModifications.containsKey(ResourceLocation.parse(id))) {
+            if (!biomeModifications.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected biome modification loaded from datapack JSON but it is missing");
             }
         }
 
-        if (!biomeModifications.containsKey(ResourceLocation.parse(INJECTED_BIOME_MODIFICATION))) {
+        if (!biomeModifications.containsKey(Identifier.parse(INJECTED_BIOME_MODIFICATION))) {
             failures.add(INJECTED_BIOME_MODIFICATION + ": expected modification injected via BOOTSTRAP_BIOME_MODIFICATION_REGISTRY but it is missing");
         }
 
         // Negative guard: an id the testmod never registers must not be present.
-        if (biomes.containsKey(ResourceLocation.parse(ABSENT_BIOME))) {
+        if (biomes.containsKey(Identifier.parse(ABSENT_BIOME))) {
             failures.add(ABSENT_BIOME + ": unexpectedly present - the containsKey assertions are not meaningful");
         }
 

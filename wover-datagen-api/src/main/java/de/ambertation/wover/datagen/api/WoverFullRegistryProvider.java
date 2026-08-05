@@ -10,7 +10,7 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 
 import java.util.List;
@@ -122,7 +122,7 @@ public abstract class WoverFullRegistryProvider<T> extends WoverRegistryProvider
     @ApiStatus.Internal
     @Override
     public FabricDynamicRegistryProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new FabricDynamicRegistryProvider(output, registriesFuture) {
@@ -131,13 +131,13 @@ public abstract class WoverFullRegistryProvider<T> extends WoverRegistryProvider
                 final var registry = registries.lookupOrThrow(registryKey);
                 final long countAll = registry.listElementIds().count();
                 var filtered = registry.listElementIds()
-                                       .filter(key -> validNamespace.test(key.location().getNamespace()))
+                                       .filter(key -> validNamespace.test(key.identifier().getNamespace()))
                                        .map(registry::getOrThrow)
                                        .filter(Holder.Reference::isBound)
                                        .toList();
                 final long filteredCount = filtered.size();
                 filtered.forEach(holder -> entries.add(holder.key(), holder.value()));
-                modCore.log.info("[" + filteredCount + " / " + countAll + "] " + registryKey.location());
+                modCore.log.info("[" + filteredCount + " / " + countAll + "] " + registryKey.identifier());
             }
 
             @Override

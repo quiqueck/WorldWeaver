@@ -10,7 +10,9 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.util.valueproviders.FloatProvider;
+import net.minecraft.util.valueproviders.FloatProviders;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
@@ -115,19 +117,19 @@ public class ExtendXYZ extends PlacementModifier {
      */
     public static final MapCodec<ExtendXYZ> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance
             .group(
-                    IntProvider.codec(0, 16)
+                    IntProviders.codec(0, 16)
                                .fieldOf("radius")
                                .forGetter(cfg -> cfg.radius),
-                    FloatProvider.codec(0, 2)
+                    FloatProviders.codec(0, 2)
                                  .optionalFieldOf("center_density", ConstantFloat.of(1))
                                  .forGetter(cfg -> cfg.centerDensity),
-                    FloatProvider.codec(0, 2)
+                    FloatProviders.codec(0, 2)
                                  .optionalFieldOf("border_density", ConstantFloat.of(0.05f))
                                  .forGetter(cfg -> cfg.borderDensity),
                     Codec.BOOL
                             .optionalFieldOf("square", false)
                             .forGetter(cfg -> cfg.square),
-                    FloatProvider.codec(0.0f, 30.0f)
+                    FloatProviders.codec(0.0f, 30.0f)
                                  .optionalFieldOf("height", ConstantFloat.of(1.0f))
                                  .forGetter(cfg -> cfg.heightScale),
                     HeightPropagation.CODEC

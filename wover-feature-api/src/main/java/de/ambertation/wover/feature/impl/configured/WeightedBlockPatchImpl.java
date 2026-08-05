@@ -6,17 +6,19 @@ import de.ambertation.wover.feature.api.configured.configurators.WeightedBlockPa
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.RandomPatchFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
+import de.ambertation.wover.feature.impl.random.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// Compat shim for the vanilla-removed random_patch feature (see WeightedBlockPatch); intentionally implements
+// the deprecated API.
+@SuppressWarnings("removal")
 public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchConfiguration, RandomPatchFeature, WeightedBlockPatch> implements WeightedBlockPatch {
 
     private BlockPredicate groundType = null;
@@ -103,12 +105,12 @@ public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchCon
 
     @Override
     protected @NotNull RandomPatchFeature getFeature() {
-        return (RandomPatchFeature) Feature.RANDOM_PATCH;
+        return de.ambertation.wover.feature.impl.FeatureManagerImpl.RANDOM_PATCH;
     }
 
 
     public static class Key extends ConfiguredFeatureKey<WeightedBlockPatch> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 
@@ -119,7 +121,7 @@ public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchCon
     }
 
     public static class KeyBonemeal extends ConfiguredFeatureKey<WeightedBlockPatch> {
-        public KeyBonemeal(ResourceLocation id) {
+        public KeyBonemeal(Identifier id) {
             super(id);
         }
 

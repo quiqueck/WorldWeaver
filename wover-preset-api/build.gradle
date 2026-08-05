@@ -1,10 +1,10 @@
-archivesBaseName = "wover-preset-api"
+base.archivesName = "wover-preset-api"
 ext {
     baseNamespace = "preset"
     baseClass = "WoverWorldPreset"
 }
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 loom {

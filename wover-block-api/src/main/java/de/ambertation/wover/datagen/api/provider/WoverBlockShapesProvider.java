@@ -9,7 +9,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -56,7 +56,7 @@ public class WoverBlockShapesProvider implements WoverDataProvider<DataProvider>
 
     @Override
     public DataProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new Provider(output);
@@ -137,7 +137,7 @@ public class WoverBlockShapesProvider implements WoverDataProvider<DataProvider>
         return sb.append(']').toString();
     }
 
-    private static void appendLines(List<String> out, ResourceLocation id, Block block) {
+    private static void appendLines(List<String> out, Identifier id, Block block) {
         final List<BlockState> states = block.getStateDefinition().getPossibleStates();
         final String first = shapesFor(states.get(0));
         boolean uniform = true;
@@ -158,9 +158,9 @@ public class WoverBlockShapesProvider implements WoverDataProvider<DataProvider>
     }
 
     private class Provider implements DataProvider {
-        private final FabricDataOutput output;
+        private final FabricPackOutput output;
 
-        private Provider(FabricDataOutput output) {
+        private Provider(FabricPackOutput output) {
             this.output = output;
         }
 
@@ -169,14 +169,14 @@ public class WoverBlockShapesProvider implements WoverDataProvider<DataProvider>
             // Collect the mod-namespace blocks, sorted by id; per-block lines preserve getPossibleStates() order.
             final TreeMap<String, Block> byId = new TreeMap<>();
             for (Block block : BuiltInRegistries.BLOCK) {
-                final ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
+                final Identifier id = BuiltInRegistries.BLOCK.getKey(block);
                 if (!id.getNamespace().equals(modCore.namespace)) continue;
                 byId.put(id.toString(), block);
             }
 
             final List<String> lines = new ArrayList<>();
             for (Map.Entry<String, Block> entry : byId.entrySet()) {
-                appendLines(lines, ResourceLocation.parse(entry.getKey()), entry.getValue());
+                appendLines(lines, Identifier.parse(entry.getKey()), entry.getValue());
             }
 
             final byte[] bytes = (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8);

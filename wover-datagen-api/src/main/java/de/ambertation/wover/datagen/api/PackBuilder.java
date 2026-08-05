@@ -4,7 +4,7 @@ import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.impl.PackBuilderImpl;
 
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A builder for a Datapack. This class is used to manage the content of the Datapack.
  * <p>
- * You can create new Instances of this class using {@link WoverDataGenEntryPoint#addDatapack(ResourceLocation)}
+ * You can create new Instances of this class using {@link WoverDataGenEntryPoint#addDatapack(Identifier)}
  */
 public class PackBuilder extends PackBuilderImpl {
     /**
@@ -28,17 +28,17 @@ public class PackBuilder extends PackBuilderImpl {
     public final ModCore modCore;
 
     /**
-     * The {@link ResourceLocation} of the Datapack or {@code null} if it is the global
+     * The {@link Identifier} of the Datapack or {@code null} if it is the global
      * Datapack.
      */
     @Nullable
-    public final ResourceLocation location;
+    public final Identifier location;
 
     FabricDataGenerator.Pack pack;
     DatapackBootstrap datapackBootstrap;
 
 
-    PackBuilder(@NotNull ModCore modCore, @Nullable ResourceLocation location) {
+    PackBuilder(@NotNull ModCore modCore, @Nullable Identifier location) {
         super();
         this.location = location;
         this.modCore = modCore;
@@ -150,12 +150,12 @@ public class PackBuilder extends PackBuilderImpl {
          *
          * @param fabricDataGenerator The Fabric Datagenerator
          * @param pack                The Datapack
-         * @param location            The {@link ResourceLocation} of the Datapack
+         * @param location            The {@link Identifier} of the Datapack
          */
         void bootstrap(
                 FabricDataGenerator fabricDataGenerator,
                 FabricDataGenerator.Pack pack,
-                ResourceLocation location
+                Identifier location
         );
     }
 

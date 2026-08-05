@@ -10,7 +10,7 @@ import de.ambertation.wover.util.RandomizedWeightedList;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,14 +28,14 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
 
     @Override
     public WithTemplates add(
-            ResourceLocation location
+            Identifier location
     ) {
         return add(location, 0, 1.0f);
     }
 
     @Override
     public WithTemplates add(
-            ResourceLocation location,
+            Identifier location,
             float weight
     ) {
         return add(location, 0, weight);
@@ -43,7 +43,7 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
 
     @Override
     public WithTemplates add(
-            ResourceLocation location,
+            Identifier location,
             int offsetY,
             float weight
     ) {
@@ -64,7 +64,7 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
     }
 
     public static class Key extends ConfiguredFeatureKey<WithTemplates> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

@@ -120,6 +120,12 @@ public class RecipeRuntimeProviderImpl {
         pendingAdvancements = new Contribution(registries, List.copyOf(advancements));
 
         if (!didInit[0]) return loaded;
+        // Must stay RecipeMap.create: Fabric's recipe synchronisation attaches its serializer index to
+        // whatever that factory returns, and the map handed back here is the one RecipeManager keeps. A map
+        // built any other way (its own constructor, some future builder) carries a null index, and every
+        // joining player then dies inside RecipeSyncImpl#sendRecipes with nothing pointing back to here.
+        // 26.3 lost this overload and has to fold the contribution into the lookup instead - see the
+        // RecipeLookups class on that branch.
         return RecipeMap.create(recipeHolders);
     }
 

@@ -6,12 +6,13 @@ import de.ambertation.wover.events.impl.EventImpl;
 import de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator;
 import de.ambertation.wover.feature.impl.placed.FeaturePlacementBuilderImpl;
 
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -51,7 +52,7 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
      */
     @NotNull
     public static ResourceKey<ConfiguredFeature<?, ?>> createKey(
-            @NotNull ResourceLocation id
+            @NotNull Identifier id
     ) {
         return ResourceKey.create(
                 Registries.CONFIGURED_FEATURE,
@@ -115,9 +116,13 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
         }
         ConfiguredFeature<FC, F> cFeature = build();
 
+        // Use the 3-arg register overload: under 26.1's async registry loading, another registry
+        // (e.g. biome_modifications) may look up this feature's holder first, creating an *unbound*
+        // reference. The 2-arg register would then no-op; the 3-arg overload binds the pending reference.
         return bootstrapContext.register(
                 key,
-                cFeature
+                cFeature,
+                Lifecycle.stable()
         );
     }
 
@@ -147,7 +152,7 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
         FC config = createConfiguration();
 
         if (config == null) {
-            throw new IllegalStateException("Feature configuration for " + key.location() + " can not be null!");
+            throw new IllegalStateException("Feature configuration for " + key.identifier() + " can not be null!");
         }
 
         return new ConfiguredFeature<>(getFeature(), config);
@@ -156,7 +161,7 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
     void throwStateError(String message) {
         throw new IllegalStateException(message + (key == null
                 ? ""
-                : ("(" + key.location() + ")")
+                : ("(" + key.identifier() + ")")
         ));
     }
 }

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(LootItemFunction.class)
 public interface LootItemFunctionMixin {
     @ModifyArg(
-            method = "method_514",
+            method = "lambda$decorate$0",
             at = @At(value = "INVOKE", target = "Ljava/util/function/BiFunction;apply(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"),
             index = 0
     )

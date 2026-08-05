@@ -6,7 +6,7 @@ import de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructure;
 import de.ambertation.wover.structure.impl.builders.RandomNbtBuilderImpl;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 
@@ -16,7 +16,7 @@ public class RandomNbtKeyImpl
         extends StructureKeyImpl<RandomNbtStructure, RandomNbtBuilder, StructureKey.RandomNbt>
         implements StructureKey.RandomNbt {
     public RandomNbtKeyImpl(
-            @NotNull ResourceLocation structureId
+            @NotNull Identifier structureId
     ) {
         super(structureId);
     }

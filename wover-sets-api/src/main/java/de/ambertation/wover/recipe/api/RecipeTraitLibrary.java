@@ -5,6 +5,7 @@ import de.ambertation.wover.block.impl.trait.BlockRecipeTraitBuilder;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 import de.ambertation.wover.item.api.trait.ItemRecipeTrait;
 import de.ambertation.wover.item.impl.trait.ItemRecipeTraitBuilder;
+import de.ambertation.wover.sets.api.blocks.SlotType;
 import de.ambertation.wover.tag.api.predefined.CommonItemTags;
 
 import net.minecraft.data.recipes.RecipeCategory;
@@ -54,7 +55,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(sourceMaterial, "planks", "source");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(4)
                             .shapeless()
                             .addMaterial('#', sourceMaterial)
@@ -91,7 +92,7 @@ public class RecipeTraitLibrary {
                     if (withStonecutter) {
                         RecipeBuilder
                                 .stonecutting(
-                                        key.location().withPrefix("stonecutter_"),
+                                        key.identifier().withPrefix("stonecutter_"),
                                         block
                                 )
                                 .input(planksMaterial)
@@ -101,7 +102,7 @@ public class RecipeTraitLibrary {
                     }
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(6)
                             .shape("###")
                             .addMaterial('#', planksMaterial)
@@ -124,7 +125,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(barkMaterial, "log", "bark");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("##", "##")
                             .addMaterial('#', barkMaterial)
                             .outputCount(3)
@@ -147,7 +148,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(logMaterial, "bark", "log");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("##", "##")
                             .addMaterial('#', logMaterial)
                             .outputCount(3)
@@ -173,7 +174,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(slabMaterial, "barrel", "slab");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("#S#", "# #", "#S#")
                             .addMaterial('#', planksMaterial)
                             .addMaterial('S', slabMaterial)
@@ -196,7 +197,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "boat", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), item)
+                            .crafting(key.identifier(), item)
                             .shape("# #", "###")
                             .addMaterial('#', planksMaterial)
                             .group("boat")
@@ -218,7 +219,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "bookshelf", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("###", "PPP", "###")
                             .addMaterial('#', planksMaterial)
                             .addMaterial('P', Items.BOOK)
@@ -229,6 +230,58 @@ public class RecipeTraitLibrary {
         );
     }
 
+
+    /**
+     * A vanilla-style shelf recipe: 6 shelves from two rows of three stripped logs with an empty row between
+     * them (see {@code RecipeProvider#shelf}).
+     *
+     * @param strippedLogMaterial the stripped log material this recipe consumes
+     * @return the recipe trait
+     */
+    public static BlockRecipeTrait shelf(RecipeMaterial strippedLogMaterial) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(strippedLogMaterial, "shelf", "stripped log");
+
+                    RecipeBuilder
+                            .crafting(key.identifier(), block)
+                            .outputCount(6)
+                            .shape("###", "   ", "###")
+                            .addMaterial('#', strippedLogMaterial)
+                            .group("shelf")
+                            .category(RecipeCategory.DECORATIONS)
+                            .build(context);
+                }
+        );
+    }
+
+    /**
+     * A vanilla-style chiseled bookshelf recipe: two rows of planks around a row of slabs.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @param slabMaterial   the slab material this recipe consumes
+     * @return the recipe trait
+     */
+    public static BlockRecipeTrait chiseledBookshelf(
+            RecipeMaterial planksMaterial,
+            RecipeMaterial slabMaterial
+    ) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "chiseled bookshelf", "planks");
+                    validOrThrow(slabMaterial, "chiseled bookshelf", "slab");
+
+                    RecipeBuilder
+                            .crafting(key.identifier(), block)
+                            .shape("###", "SSS", "###")
+                            .addMaterial('#', planksMaterial)
+                            .addMaterial('S', slabMaterial)
+                            .group("chiseled_bookshelf")
+                            .category(RecipeCategory.BUILDING_BLOCKS)
+                            .build(context);
+                }
+        );
+    }
 
     /**
      * A recipe stacking 2 slabs into a rotated pillar block, plus an optional stonecutting recipe from a source
@@ -247,12 +300,12 @@ public class RecipeTraitLibrary {
                         validOrThrow(stoneMaterial, "pillar", "stone");
 
                         RecipeBuilder
-                                .stonecutting(key.location().withPrefix("_stonecutting"), block)
+                                .stonecutting(key.identifier().withPrefix("_stonecutting"), block)
                                 .input(stoneMaterial)
                                 .build(context);
                     }
 
-                    RecipeBuilder.crafting(key.location(), block)
+                    RecipeBuilder.crafting(key.identifier(), block)
                                  .shape("#", "#")
                                  .addMaterial('#', slabMaterial)
                                  .group("end_pillar")
@@ -284,7 +337,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "button", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shapeless()
                             .addMaterial('#', planksMaterial)
                             .group(group)
@@ -306,7 +359,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "chest", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("###", "# #", "###")
                             .addMaterial('#', planksMaterial)
                             .group("chest")
@@ -330,7 +383,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(chestMaterial, "chestBoat", "chest");
 
                     RecipeBuilder
-                            .crafting(key.location(), item)
+                            .crafting(key.identifier(), item)
                             .shapeless()
                             .addMaterial('C', chestMaterial)
                             .addMaterial('#', boatMaterial)
@@ -353,7 +406,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(slabMaterial, "composter", "slab");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("# #", "# #", "###")
                             .addMaterial('#', slabMaterial)
                             .group("composter")
@@ -375,7 +428,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "craftingTable", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("##", "##")
                             .addMaterial('#', planksMaterial)
                             .group("crafting_table")
@@ -397,7 +450,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "door", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(3)
                             .shape("##", "##", "##")
                             .addMaterial('#', planksMaterial)
@@ -420,7 +473,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "fence", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(3)
                             .shape("#I#", "#I#")
                             .addMaterial('#', planksMaterial)
@@ -444,7 +497,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "gate", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("I#I", "I#I")
                             .addMaterial('#', planksMaterial)
                             .addMaterial('I', Items.STICK)
@@ -467,11 +520,11 @@ public class RecipeTraitLibrary {
                     validOrThrow(strippedLogMaterial, "hangingSign", "stripped_log");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(3)
                             .shape("I I", "###", "###")
                             .addMaterial('#', strippedLogMaterial)
-                            .addMaterial('I', Items.CHAIN)
+                            .addMaterial('I', Items.IRON_CHAIN)
                             .group("hanging_sign")
                             .category(RecipeCategory.DECORATIONS)
                             .build(context);
@@ -491,7 +544,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "sign", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(3)
                             .shape("###", "###", " I ")
                             .addMaterial('#', planksMaterial)
@@ -515,7 +568,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "ladder", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(3).shape("I I", "I#I", "I I")
                             .addMaterial('#', planksMaterial)
                             .addMaterial('I', Items.STICK)
@@ -538,7 +591,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "plate", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("##")
                             .addMaterial('#', planksMaterial)
                             .group("pressure_plate")
@@ -574,7 +627,7 @@ public class RecipeTraitLibrary {
                     if (withStonecutter) {
                         RecipeBuilder
                                 .stonecutting(
-                                        key.location().withPrefix("stonecutter_"),
+                                        key.identifier().withPrefix("stonecutter_"),
                                         block
                                 )
                                 .input(planksMaterial)
@@ -584,7 +637,7 @@ public class RecipeTraitLibrary {
                     }
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(4)
                             .shape("#  ", "## ", "###")
                             .addMaterial('#', planksMaterial)
@@ -618,7 +671,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(planksMaterial, "trapdoor", "planks");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(2).shape("###", "###")
                             .addMaterial('#', planksMaterial)
                             .group(group)
@@ -641,7 +694,7 @@ public class RecipeTraitLibrary {
 
                     RecipeBuilder
                             .stonecutting(
-                                    key.location().withPrefix("stonecutter_"),
+                                    key.identifier().withPrefix("stonecutter_"),
                                     block
                             )
                             .input(sourceMaterial)
@@ -650,7 +703,7 @@ public class RecipeTraitLibrary {
                             .build(context);
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(6)
                             .shape("***", "***")
                             .addMaterial('*', sourceMaterial)
@@ -675,7 +728,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(fenceMaterial, "wall", "fence");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(6)
                             .shape("* *", "|||")
                             .addMaterial('*', planksMaterial)
@@ -702,7 +755,7 @@ public class RecipeTraitLibrary {
                     if (withStonecutter) {
                         RecipeBuilder
                                 .stonecutting(
-                                        key.location().withPrefix("stonecutter_"),
+                                        key.identifier().withPrefix("stonecutter_"),
                                         block
                                 )
                                 .input(sourceMaterial)
@@ -712,7 +765,7 @@ public class RecipeTraitLibrary {
                     }
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(4)
                             .shape("**", "**")
                             .addMaterial('*', sourceMaterial)
@@ -738,7 +791,7 @@ public class RecipeTraitLibrary {
                     if (withStonecutter) {
                         RecipeBuilder
                                 .stonecutting(
-                                        key.location().withPrefix("stonecutter_"),
+                                        key.identifier().withPrefix("stonecutter_"),
                                         block
                                 )
                                 .input(sourceMaterial)
@@ -748,7 +801,7 @@ public class RecipeTraitLibrary {
                     }
 
                     RecipeBuilder
-                            .blasting(key.location(), block)
+                            .blasting(key.identifier(), block)
                             .input(sourceMaterial)
                             .experience(0.1f)
                             .cookingTime(200)
@@ -771,7 +824,7 @@ public class RecipeTraitLibrary {
 
                     RecipeBuilder
                             .stonecutting(
-                                    key.location().withPrefix("stonecutter_"),
+                                    key.identifier().withPrefix("stonecutter_"),
                                     block
                             )
                             .input(sourceMaterial)
@@ -797,7 +850,7 @@ public class RecipeTraitLibrary {
 
                     RecipeBuilder
                             .crafting(
-                                    key.location().withSuffix("_from_moss_block"),
+                                    key.identifier().withSuffix("_from_moss_block"),
                                     block
                             )
                             .shapeless()
@@ -809,7 +862,7 @@ public class RecipeTraitLibrary {
 
                     RecipeBuilder
                             .crafting(
-                                    key.location().withSuffix("_from_vine"),
+                                    key.identifier().withSuffix("_from_vine"),
                                     block
                             )
                             .shapeless()
@@ -829,7 +882,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(nuggetMaterial, "chain", "nugget");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .shape("N", "#", "N")
                             .addMaterial('#', ingotMaterial)
                             .addMaterial('N', nuggetMaterial)
@@ -845,7 +898,7 @@ public class RecipeTraitLibrary {
                     validOrThrow(ingotMaterial, "chain", "ingot");
 
                     RecipeBuilder
-                            .crafting(key.location(), block)
+                            .crafting(key.identifier(), block)
                             .outputCount(16)
                             .shape("###", "###")
                             .addMaterial('#', ingotMaterial)

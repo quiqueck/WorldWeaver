@@ -2,7 +2,7 @@ package de.ambertation.wover.tag.mixin;
 
 import de.ambertation.wover.tag.impl.TagManagerImpl;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagLoader;
 
@@ -25,7 +25,7 @@ public class TagLoaderMixin {
     @Inject(method = "load", at = @At(value = "RETURN"))
     public void wover_modifyTags(
             ResourceManager resourceManager,
-            CallbackInfoReturnable<Map<ResourceLocation, List<TagLoader.EntryWithSource>>> cir
+            CallbackInfoReturnable<Map<Identifier, List<TagLoader.EntryWithSource>>> cir
     ) {
         TagManagerImpl.didLoadTagMap(directory, cir.getReturnValue());
     }

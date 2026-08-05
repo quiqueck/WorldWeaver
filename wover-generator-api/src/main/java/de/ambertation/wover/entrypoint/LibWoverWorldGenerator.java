@@ -1,6 +1,5 @@
 package de.ambertation.wover.entrypoint;
 
-import de.ambertation.wover.config.api.Configs;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.generator.api.preset.WorldPresets;
 import de.ambertation.wover.generator.impl.biomesource.BiomeSourceManagerImpl;
@@ -17,10 +16,13 @@ public class LibWoverWorldGenerator implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        if (!ModCore.isClient() && Configs.MAIN.forceDefaultWorldPresetOnServer.get()) {
+        // A dedicated server with no "level-type" in its server.properties should come up on our
+        // preset - DedicatedServerPropertiesMixin writes this default into a freshly generated file.
+        // This only decides the *default*; a level-type that is present is always honoured.
+        if (!ModCore.isClient()) {
             WorldPresetManager.suggestDefault(WorldPresets.WOVER_WORLD, 2000);
         }
-        
+
         PresetRegistryImpl.ensureStaticallyLoaded();
         WoverBiomeDataImpl.initialize();
         BiomeSourceManagerImpl.initialize();

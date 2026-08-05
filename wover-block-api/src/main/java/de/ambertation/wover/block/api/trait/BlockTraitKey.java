@@ -8,7 +8,7 @@ import java.util.Objects;
 
 /**
  * Uniquely identifies a {@link BlockTrait}/{@link BlockTraitBuilder} pair by namespace and path, similar to
- * a {@link net.minecraft.resources.ResourceLocation}. Instances are interned - {@link #of(ModCore, String)}
+ * a {@link net.minecraft.resources.Identifier}. Instances are interned - {@link #of(ModCore, String)}
  * returns the same instance for the same namespace/path combination.
  */
 public final class BlockTraitKey {

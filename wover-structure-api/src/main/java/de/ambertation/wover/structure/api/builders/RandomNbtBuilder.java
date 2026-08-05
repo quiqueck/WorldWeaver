@@ -3,11 +3,11 @@ package de.ambertation.wover.structure.api.builders;
 import de.ambertation.wover.structure.api.structures.StructurePlacement;
 import de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructure;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * A {@link BaseStructureBuilder} for {@link RandomNbtStructure}s — structures that, at generation time,
- * pick one of several {@code .nbt} templates (added via {@link #addElement(ResourceLocation, int, double)})
+ * pick one of several {@code .nbt} templates (added via {@link #addElement(Identifier, int, double)})
  * at random (weighted) and place it using a {@link StructurePlacement} strategy. Created via
  * {@link de.ambertation.wover.structure.api.StructureKey.RandomNbt#bootstrap}.
  */
@@ -41,5 +41,5 @@ public interface RandomNbtBuilder extends BaseStructureBuilder<RandomNbtStructur
      * @param weight    The relative weight used when randomly selecting between multiple elements
      * @return This builder instance, for chaining
      */
-    RandomNbtBuilder addElement(ResourceLocation elementId, int yOffset, double weight);
+    RandomNbtBuilder addElement(Identifier elementId, int yOffset, double weight);
 }

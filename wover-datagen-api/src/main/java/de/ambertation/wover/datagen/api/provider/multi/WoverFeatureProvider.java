@@ -8,7 +8,7 @@ import de.ambertation.wover.datagen.api.provider.WoverConfiguredFeatureProvider;
 import de.ambertation.wover.datagen.api.provider.WoverPlacedFeatureProvider;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
@@ -34,7 +34,7 @@ public abstract class WoverFeatureProvider extends AbstractMultiProvider {
      * @param providerId The id of the provider. Every Provider (for the same Registry)
      *                   needs a unique id.
      */
-    public WoverFeatureProvider(@NotNull ModCore modCore, @NotNull ResourceLocation providerId) {
+    public WoverFeatureProvider(@NotNull ModCore modCore, @NotNull Identifier providerId) {
         super(modCore, providerId);
     }
 

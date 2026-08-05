@@ -9,11 +9,11 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 
 import java.util.LinkedList;
@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
  *     for each of them.</li>
  *     <li><b>Datapack Abstraction</b>: Mods can ship with multiple (optional) Data or ResourcePacks. By
  *     overriding {@link #onInitializeProviders(PackBuilder)} you can create custom Datapacks using the
- *     {@link #addDatapack(ResourceLocation)} Method.
+ *     {@link #addDatapack(Identifier)} Method.
  * <p>
  *     Every Datapack (like the global one) can have a set of {@link WoverRegistryProvider}s that will
  *     serialize the content to the Datapack. You can also specify a
@@ -65,14 +65,14 @@ import org.jetbrains.annotations.Nullable;
  * <pre class="java"> public class MyMod implements ModInitializer {
  *     public static final ModCore C = ModCore.create("my-mod");
  *
- *     public static final ResourceLocation OPTIONAL_PACK = C.addDatapack(
+ *     public static final Identifier OPTIONAL_PACK = C.addDatapack(
  *             "optional-pack",
  *             ResourcePackActivationType.NORMAL
  *     );
  *     /*...*&#47;
  * }</pre>
  * This is needed in the main Entrypoint for fabric to recognize and automatically
- * provide the Datapack. It will also create a unique {@link ResourceLocation}
+ * provide the Datapack. It will also create a unique {@link Identifier}
  * we can use to reference the Datapack.
  * <p>
  * Next, we create a new class that extends {@link WoverDataGenEntryPoint}. This will
@@ -87,7 +87,7 @@ import org.jetbrains.annotations.Nullable;
  *     private void onInitializeOptionalDatapack(
  *             FabricDataGenerator fabricDataGenerator,
  *             FabricDataGenerator.Pack pack,
- *             ResourceLocation location
+ *             Identifier location
  *     ) {
  *         // Nothing to do here, we only use content from a registry provider
  *     }
@@ -163,10 +163,10 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
     /**
      * Creates a new {@link PackBuilder} for an additional Datapack.
      *
-     * @param location The {@link ResourceLocation} of the Datapack
+     * @param location The {@link Identifier} of the Datapack
      * @return The new {@link PackBuilder} for the Datapack
      */
-    protected PackBuilder addDatapack(ResourceLocation location) {
+    protected PackBuilder addDatapack(Identifier location) {
         PackBuilder res = new PackBuilder(modCore(), location);
         builders.add(res);
         return res;
@@ -178,7 +178,7 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
      * for additional Datapacks.
      *
      * @param globalPack The {@link PackBuilder} for the global Datapack
-     * @see #addDatapack(ResourceLocation)
+     * @see #addDatapack(Identifier)
      */
     protected abstract void onInitializeProviders(PackBuilder globalPack);
 
@@ -210,13 +210,13 @@ public abstract class WoverDataGenEntryPoint implements DataGeneratorEntrypoint 
 
     private FabricDataGenerator.Pack createBuiltinDatapack(
             FabricDataGenerator generator,
-            ResourceLocation location
+            Identifier location
     ) {
         FabricDataGenerator.Pack pack = generator.createBuiltinResourcePack(location);
 
         //add a pack description
         pack.addProvider(
-                (FabricDataOutput packOutput) -> PackMetadataGenerator.forFeaturePack(
+                (FabricPackOutput packOutput) -> PackMetadataGenerator.forFeaturePack(
                         packOutput,
                         Component.translatable("pack." + location.getNamespace() + "." + location.getPath() + ".description")
                 )

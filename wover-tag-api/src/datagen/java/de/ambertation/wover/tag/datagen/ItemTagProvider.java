@@ -34,14 +34,13 @@ public class ItemTagProvider extends WoverTagProvider.ForItems {
         );
         ctx.add(CommonItemTags.CHEST, Items.CHEST);
 
-        // c:tools/shears is Wover's tag, not the Fabric convention one - the convention tag is
-        // c:tools/shear (singular), so nothing was ever putting vanilla shears in here. That mattered
-        // beyond the tag itself: BCLib's shears.MatchToolMixin rewrites every vanilla
-        // MatchTool(minecraft:shears) predicate into "is in c:tools/shears", so an empty tag silently
-        // disabled shears on every leaves/cobweb/grass loot table, vanilla ones included. Add the vanilla
-        // item, and pull in the convention tag optionally so third-party shears keep working.
+        // c:tools/shear is the Fabric convention tag, and the one BCLib's shears.MatchToolMixin rewrites
+        // every vanilla MatchTool(minecraft:shears) predicate into - so if it comes up empty, shears stop
+        // working on every leaves/cobweb/grass loot table in the game, vanilla ones included. Vanilla
+        // shears are written in here rather than left to fabric-convention-tags, so a setup without that
+        // module still resolves; #fabric:shears is folded in optionally for anything still on the older tag.
         ctx.add(CommonItemTags.SHEARS, Items.SHEARS);
-        ctx.addOptional(CommonItemTags.SHEARS, CommonItemTags.FABRIC_SHEAR_TOOLS, ToolTags.FABRIC_SHEARS);
+        ctx.addOptional(CommonItemTags.SHEARS, ToolTags.FABRIC_SHEARS);
 
         ctx.add(CommonItemTags.IRON_INGOTS, Items.IRON_INGOT);
         ctx.add(CommonItemTags.FURNACES, Blocks.FURNACE.asItem());

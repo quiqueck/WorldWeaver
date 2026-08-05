@@ -6,7 +6,7 @@ import de.ambertation.wover.feature.api.configured.configurators.NetherForrestVe
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -104,7 +104,7 @@ public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherF
     }
 
     public static class Key extends ConfiguredFeatureKey<NetherForrestVegetation> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 
@@ -115,7 +115,7 @@ public class NetherForrestVegetationImpl extends FeatureConfiguratorImpl<NetherF
     }
 
     public static class KeyBonemeal extends ConfiguredFeatureKey<NetherForrestVegetation> {
-        public KeyBonemeal(ResourceLocation id) {
+        public KeyBonemeal(Identifier id) {
             super(id);
         }
 

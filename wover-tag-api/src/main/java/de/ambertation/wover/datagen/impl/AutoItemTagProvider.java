@@ -51,7 +51,7 @@ public class AutoItemTagProvider extends WoverTagProvider.ForItems implements Wo
                 .stream()
                 .filter(entry -> {
                     assert modIDs != null;
-                    return modIDs.contains(entry.getKey().location().getNamespace());
+                    return modIDs.contains(entry.getKey().identifier().getNamespace());
                 })
                 .forEach(entry -> addBlockItemTags(provider, entry.getKey(), entry.getValue()));
 
@@ -60,7 +60,7 @@ public class AutoItemTagProvider extends WoverTagProvider.ForItems implements Wo
                 .stream()
                 .filter(entry -> {
                     assert modIDs != null;
-                    return modIDs.contains(entry.getKey().location().getNamespace());
+                    return modIDs.contains(entry.getKey().identifier().getNamespace());
                 })
                 .forEach(entry -> addItemTags(provider, entry.getKey(), entry.getValue()));
     }

@@ -9,14 +9,14 @@ import de.ambertation.wover.events.api.types.OnBootstrapRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 /**
  * Provides a Datapack backed registry for {@link BiomeData}.
  * <p>
  * Every {@link BiomeData} entry uses the same location as the {@link net.minecraft.world.level.biome.Biome}
- * it belongs to — use {@link #createKey(ResourceKey)}/{@link #createKey(ResourceLocation)} to derive the
+ * it belongs to — use {@link #createKey(ResourceKey)}/{@link #createKey(Identifier)} to derive the
  * matching {@link BiomeData} key from a Biome key/location, or {@link #createBiomeKey(ResourceKey)} for the
  * reverse direction.
  */
@@ -45,7 +45,7 @@ public class BiomeDataRegistry {
      * @return The ResourceKey
      */
     public static ResourceKey<BiomeData> createKey(
-            ResourceLocation dataID
+            Identifier dataID
     ) {
         return BiomeDataRegistryImpl.createKey(dataID);
     }
@@ -59,7 +59,7 @@ public class BiomeDataRegistry {
     public static ResourceKey<BiomeData> createKey(
             ResourceKey<Biome> biomeKey
     ) {
-        return BiomeDataRegistryImpl.createKey(biomeKey.location());
+        return BiomeDataRegistryImpl.createKey(biomeKey.identifier());
     }
 
 
@@ -72,6 +72,6 @@ public class BiomeDataRegistry {
     public static ResourceKey<Biome> createBiomeKey(
             ResourceKey<BiomeData> biomeDataKey
     ) {
-        return ResourceKey.create(Registries.BIOME, biomeDataKey.location());
+        return ResourceKey.create(Registries.BIOME, biomeDataKey.identifier());
     }
 }

@@ -89,6 +89,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
+    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
     public WeightedBlockPatch randomBlockPatch() {
         final var res = new WeightedBlockPatchImpl(null, null);
         res.setTransitive(bootstapContext, key);
@@ -96,6 +97,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
+    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
     public WeightedBlockPatch bonemealPatch() {
         final var res = new WeightedBlockPatchImpl(null, null);
         res.likeDefaultBonemeal();
@@ -132,6 +134,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
+    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
     public RandomPatch randomPatch() {
         final var res = new RandomPatchImpl(null, null);
         res.setTransitive(bootstapContext, key);

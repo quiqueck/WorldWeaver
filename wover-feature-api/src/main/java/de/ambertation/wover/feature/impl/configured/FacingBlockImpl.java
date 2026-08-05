@@ -10,7 +10,7 @@ import de.ambertation.wover.feature.api.features.config.PlaceFacingBlockConfig;
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -120,7 +120,7 @@ public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockCon
     }
 
     public static class Key extends ConfiguredFeatureKey<FacingBlock> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

@@ -5,7 +5,7 @@ import de.ambertation.wover.feature.api.configured.configurators.AsOre;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -79,7 +79,7 @@ public class AsOreImpl extends FeatureConfiguratorImpl<OreConfiguration, OreFeat
     }
 
     public static class Key extends ConfiguredFeatureKey<AsOre> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

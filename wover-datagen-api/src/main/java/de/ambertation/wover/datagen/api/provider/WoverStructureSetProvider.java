@@ -5,7 +5,7 @@ import de.ambertation.wover.datagen.api.WoverRegistryContentProvider;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +34,7 @@ public abstract class WoverStructureSetProvider extends WoverRegistryContentProv
      */
     public WoverStructureSetProvider(
             @NotNull ModCore modCore,
-            @NotNull ResourceLocation providerId
+            @NotNull Identifier providerId
     ) {
         super(modCore, providerId.toString() + " (Structure Sets)", Registries.STRUCTURE_SET);
     }

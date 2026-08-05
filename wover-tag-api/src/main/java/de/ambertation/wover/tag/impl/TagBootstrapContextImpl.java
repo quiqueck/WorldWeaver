@@ -6,7 +6,7 @@ import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 import de.ambertation.wover.tag.api.event.context.TagElementWrapper;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 
 import java.util.Comparator;
@@ -83,7 +83,7 @@ public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implem
     protected void add(TagKey<T> tagID, boolean optional, T... elements) {
         TagSet<T> set = getSetForTag(tagID);
         for (T element : elements) {
-            final ResourceLocation id = tagRegistry.locationProvider.get(element);
+            final Identifier id = tagRegistry.locationProvider.get(element);
             if (id != null) {
                 final TagElementWrapperImpl<T> wrapper = new TagElementWrapperImpl<>(id, false, !optional);
                 set.add(wrapper);
@@ -118,7 +118,7 @@ public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implem
     protected void add(TagKey<T> tagID, boolean optional, TagKey<T>... tagElements) {
         final TagSet<T> set = getSetForTag(tagID);
         for (TagKey<T> element : tagElements) {
-            final ResourceLocation id = element.location();
+            final Identifier id = element.location();
             if (id != null) {
                 final TagElementWrapperImpl<T> wrapper = new TagElementWrapperImpl<>(id, true, !optional);
                 set.add(wrapper);
@@ -144,7 +144,7 @@ public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implem
         synchronized (this) {
             final TagSet<T> set = getSetForTag(tagID);
             for (ResourceKey<T> element : elements) {
-                final ResourceLocation id = element.location();
+                final Identifier id = element.identifier();
 
                 if (id != null) {
                     final TagElementWrapperImpl<T> wrapper = new TagElementWrapperImpl<>(id, false, !optional);
@@ -157,7 +157,7 @@ public class TagBootstrapContextImpl<T, P extends TagBootstrapContext<T>> implem
 
     public boolean contains(TagKey<T> tagID, T element) {
         final TagSet<T> set = getSetForTag(tagID);
-        final ResourceLocation id = tagRegistry.locationProvider.get(element);
+        final Identifier id = tagRegistry.locationProvider.get(element);
         if (id != null) {
             for (var entry : set)
                 if (!entry.tag()) {

@@ -4,7 +4,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -89,25 +89,25 @@ public class FeatureGameTest {
         final List<String> failures = new ArrayList<>();
 
         for (String id : DATAPACK_CONFIGURED_FEATURES) {
-            if (!configuredFeatures.containsKey(ResourceLocation.parse(id))) {
+            if (!configuredFeatures.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected configured_feature loaded from datapack JSON but it is missing");
             }
         }
 
         for (String id : DATAPACK_PLACED_FEATURES) {
-            if (!placedFeatures.containsKey(ResourceLocation.parse(id))) {
+            if (!placedFeatures.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected placed_feature loaded from datapack JSON but it is missing");
             }
         }
 
         for (String id : PROGRAMMATIC_FEATURE_TYPES) {
-            if (!featureTypes.containsKey(ResourceLocation.parse(id))) {
+            if (!featureTypes.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected feature type registered programmatically at class-init but it is missing");
             }
         }
 
         // Negative guard: an id the testmod never registers must not be present.
-        if (configuredFeatures.containsKey(ResourceLocation.parse(ABSENT_CONFIGURED_FEATURE))) {
+        if (configuredFeatures.containsKey(Identifier.parse(ABSENT_CONFIGURED_FEATURE))) {
             failures.add(ABSENT_CONFIGURED_FEATURE + ": unexpectedly present - the containsKey assertions are not meaningful");
         }
 

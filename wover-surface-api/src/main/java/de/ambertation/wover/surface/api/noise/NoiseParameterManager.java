@@ -5,7 +5,7 @@ import de.ambertation.wover.surface.impl.noise.NoiseRegistryImpl;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
 /**
@@ -24,7 +24,7 @@ public class NoiseParameterManager {
     /**
      * Key for a Noise function with custom Parameters
      */
-    public static ResourceKey<NormalNoise.NoiseParameters> createKey(ResourceLocation loc) {
+    public static ResourceKey<NormalNoise.NoiseParameters> createKey(Identifier loc) {
         return NoiseRegistryImpl.createKey(loc);
     }
 

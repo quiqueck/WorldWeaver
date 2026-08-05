@@ -4,7 +4,7 @@ import de.ambertation.wover.surface.impl.rules.MaterialRuleRegistryImpl;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,7 @@ public class MaterialRuleManager {
      * @return The key for the rule source.
      */
     public static ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> register(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<? extends SurfaceRules.RuleSource> rule
     ) {
         return MaterialRuleRegistryImpl.register(MaterialRuleRegistryImpl.createKey(location), rule);
@@ -48,7 +48,7 @@ public class MaterialRuleManager {
      * @return The key for the rule source.
      */
     @NotNull
-    public static ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> createKey(ResourceLocation location) {
+    public static ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> createKey(Identifier location) {
         return MaterialRuleRegistryImpl.createKey(location);
     }
 

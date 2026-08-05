@@ -9,7 +9,7 @@ import de.ambertation.wover.feature.api.features.config.PillarFeatureConfig;
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.block.Block;
@@ -124,7 +124,7 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
     }
 
     public static class Key extends ConfiguredFeatureKey<AsPillar> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

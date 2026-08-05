@@ -7,7 +7,7 @@ import de.ambertation.wover.entrypoint.LibWoverBiome;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.KeyDispatchDataCodec;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -20,7 +20,7 @@ public class BiomePredicateRegistryImpl {
 
     public static MapCodec<? extends BiomePredicate> register(
             Registry<MapCodec<? extends BiomePredicate>> registry,
-            ResourceLocation location,
+            Identifier location,
             KeyDispatchDataCodec<? extends BiomePredicate> keyDispatchDataCodec
     ) {
         return Registry.register(registry, location, keyDispatchDataCodec.codec());

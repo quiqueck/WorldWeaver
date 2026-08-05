@@ -26,7 +26,9 @@ public interface BiomeGenerationSettingsAccessor {
     @Accessor("featureSet")
     void wover_setFeatureSet(Supplier<Set<PlacedFeature>> featureSet);
 
-    @Accessor("flowerFeatures")
+    // 26.1 renamed BiomeGenerationSettings.flowerFeatures to boneMealFeatures; the accessor method name is
+    // kept for API compatibility with downstream callers.
+    @Accessor("boneMealFeatures")
     void wover_setFlowerFeatures(Supplier<List<ConfiguredFeature<?, ?>>> flowerFeatures);
 
     @Accessor("carvers")

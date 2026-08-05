@@ -11,7 +11,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +31,13 @@ public class StructureProcessorManager {
             StructureProcessorManagerImpl.BOOTSTRAP_STRUCTURE_PROCESSORS;
 
     /**
-     * Creates a {@link StructurePoolKey} for the given {@link ResourceLocation}.
+     * Creates a {@link StructurePoolKey} for the given {@link Identifier}.
      *
      * @param location The location of the {@link StructureProcessorList}
      * @return The {@link StructureSetKey}
      */
     public static StructureProcessorKey createKey(
-            ResourceLocation location
+            Identifier location
     ) {
         return new StructureProcessorKey(location);
     }

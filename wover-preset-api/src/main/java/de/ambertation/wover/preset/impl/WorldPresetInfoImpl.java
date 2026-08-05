@@ -94,11 +94,11 @@ public class WorldPresetInfoImpl implements WorldPresetInfo {
 
     @Override
     public @Nullable ResourceKey<WorldPreset> getPresetOverride(ResourceKey<LevelStem> key) {
-        if (key.location().equals(LevelStem.OVERWORLD.location()))
+        if (key.identifier().equals(LevelStem.OVERWORLD.identifier()))
             return overworldPreset();
-        if (key.location().equals(LevelStem.NETHER.location()))
+        if (key.identifier().equals(LevelStem.NETHER.identifier()))
             return netherPreset();
-        if (key.location().equals(LevelStem.END.location()))
+        if (key.identifier().equals(LevelStem.END.identifier()))
             return endPreset();
         return null;
     }

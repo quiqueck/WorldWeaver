@@ -109,23 +109,25 @@ public abstract class PlaceBlockFeatureConfig implements FeatureConfiguration {
     /**
      * Returns a random {@link BlockState} from the {@link #stateProvider}.
      *
+     * @param level  The world the state is requested for.
      * @param random The random source to use.
      * @param pos    The position to get the state for.
      * @return The random state.
      */
-    public BlockState getRandomBlock(RandomSource random, BlockPos pos) {
-        return this.stateProvider.getState(random, pos);
+    public BlockState getRandomBlock(WorldGenLevel level, RandomSource random, BlockPos pos) {
+        return this.stateProvider.getState(level, random, pos);
     }
 
     /**
-     * Places a block. This will select a random state using {@link #getRandomBlock(RandomSource, BlockPos)}
+     * Places a block. This will select a random state using
+     * {@link #getRandomBlock(WorldGenLevel, RandomSource, BlockPos)}
      * and the call {@link #placeBlock(FeaturePlaceContext, WorldGenLevel, BlockPos, BlockState)}.
      *
      * @param ctx The context
      * @return {@code true} if the block was placed, {@code false} otherwise.
      */
     public boolean place(FeaturePlaceContext<? extends PlaceBlockFeatureConfig> ctx) {
-        BlockState state = getRandomBlock(ctx.random(), ctx.origin());
+        BlockState state = getRandomBlock(ctx.level(), ctx.random(), ctx.origin());
         return placeBlock(ctx, ctx.level(), ctx.origin(), state);
     }
 

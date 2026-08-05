@@ -47,7 +47,7 @@ public class AutoBlockTagProvider extends WoverTagProvider.ForBlocks implements 
         BuiltInRegistries.BLOCK
                 .entrySet()
                 .stream()
-                .filter(entry -> modIDs.contains(entry.getKey().location().getNamespace()))
+                .filter(entry -> modIDs.contains(entry.getKey().identifier().getNamespace()))
                 .forEach(entry -> {
                     addBlockTags(provider, entry.getKey(), entry.getValue());
                 });

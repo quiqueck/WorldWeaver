@@ -85,7 +85,7 @@ public class SquareBiomeMap implements BiomeMap {
         SquareBiomeChunk chunk = maps.get(cpos);
         if (chunk == null) {
             synchronized (random) {
-                random.setLargeFeatureWithSalt(0, cpos.x, cpos.z, 0);
+                random.setLargeFeatureWithSalt(0, cpos.x(), cpos.z(), 0);
                 chunk = new SquareBiomeChunk(random, picker);
             }
             maps.put(cpos, chunk);
@@ -133,7 +133,7 @@ public class SquareBiomeMap implements BiomeMap {
         SquareBiomeChunk chunk = maps.get(cpos);
         if (chunk == null) {
             synchronized (random) {
-                random.setLargeFeatureWithSalt(0, cpos.x, cpos.z, 0);
+                random.setLargeFeatureWithSalt(0, cpos.x(), cpos.z(), 0);
                 chunk = new SquareBiomeChunk(random, picker);
             }
             maps.put(cpos, chunk);

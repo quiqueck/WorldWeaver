@@ -18,7 +18,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.tags.TagKey;
@@ -96,7 +96,7 @@ public class BiomeModificationRegistryImpl {
         for (ResourceKey<Biome> biomeKey : keys) {
             BiomePredicate.Context context = BiomePredicate.Context.of(registryAccess, biomeKey);
             if (context == null) {
-                LibWoverBiome.C.log.warn("Failed to get biome context for {}", biomeKey.location());
+                LibWoverBiome.C.log.warn("Failed to get biome context for {}", biomeKey.identifier());
                 continue;
             }
 
@@ -180,7 +180,7 @@ public class BiomeModificationRegistryImpl {
     }
 
     public static ResourceKey<BiomeModification> createKey(
-            ResourceLocation modificationID
+            Identifier modificationID
     ) {
         return ResourceKey.create(
                 BiomeModificationRegistry.BIOME_MODIFICATION_REGISTRY,

@@ -13,7 +13,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -41,17 +41,17 @@ public class PlacedFeatureManager {
             PlacedFeatureManagerImpl.BOOTSTRAP_PLACED_FEATURES;
 
     /**
-     * Creates a {@link PlacedFeatureKey} for the given {@link ResourceLocation}.
+     * Creates a {@link PlacedFeatureKey} for the given {@link Identifier}.
      *
      * @param location The location of the {@link PlacedFeature}
      * @return The {@link PlacedFeatureKey}
      */
-    public static PlacedFeatureKey createKey(ResourceLocation location) {
+    public static PlacedFeatureKey createKey(Identifier location) {
         return new PlacedFeatureKeyImpl(location);
     }
 
     /**
-     * Creates a {@link PlacedFeatureKey} for the given {@link ResourceLocation}. The resulting
+     * Creates a {@link PlacedFeatureKey} for the given {@link Identifier}. The resulting
      * {@link PlacedFeatureKey} will place the {@link ConfiguredFeature} referenced by the given
      * {@link ResourceKey}.
      *
@@ -64,7 +64,7 @@ public class PlacedFeatureManager {
      */
     public static <FC extends FeatureConfiguration, F extends Feature<FC>, B extends FeatureConfigurator<FC, F>> PlacedConfiguredFeatureKey
     createKey(
-            ResourceLocation location,
+            Identifier location,
             ResourceKey<ConfiguredFeature<?, ?>> configured
     ) {
         return new PlacedConfiguredFeatureKeyImpl(location, configured);
@@ -72,7 +72,7 @@ public class PlacedFeatureManager {
 
 
     /**
-     * Creates a {@link PlacedFeatureKey} for the given {@link ResourceLocation}. The resulting
+     * Creates a {@link PlacedFeatureKey} for the given {@link Identifier}. The resulting
      * {@link PlacedFeatureKey} will place the {@link ConfiguredFeature} referenced by the given
      * {@link ConfiguredFeatureKey}.
      *
@@ -83,7 +83,7 @@ public class PlacedFeatureManager {
      */
     public static <B extends FeatureConfigurator<?, ?>> PlacedConfiguredFeatureKey
     createKey(
-            ResourceLocation location,
+            Identifier location,
             ConfiguredFeatureKey<B> configuredFeatureKey
     ) {
         return new PlacedConfiguredFeatureKeyImpl(location, configuredFeatureKey);
@@ -102,7 +102,7 @@ public class PlacedFeatureManager {
     createKey(
             ConfiguredFeatureKey<B> configuredFeatureKey
     ) {
-        return new PlacedConfiguredFeatureKeyImpl(configuredFeatureKey.key.location(), configuredFeatureKey);
+        return new PlacedConfiguredFeatureKeyImpl(configuredFeatureKey.key.identifier(), configuredFeatureKey);
     }
 
     /**

@@ -6,7 +6,7 @@ import de.ambertation.wover.item.impl.trait.ItemTraitImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -109,7 +109,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
             ResourceKey<Item> itemKey,
             ItemDefinition.ItemFactory<I, D> itemFactory
     ) {
-        assert (registry.C.namespace.equals(itemKey.location().getNamespace()));
+        assert (registry.C.namespace.equals(itemKey.identifier().getNamespace()));
         this.itemKey = itemKey;
         this.properties = new Item.Properties().setId(this.itemKey);
         this.itemFactory = itemFactory;
@@ -665,7 +665,7 @@ public abstract class ItemDefinition<I extends Item, D extends ItemDefinition<I,
      *
      * @return The resource location of the item's model
      */
-    public ResourceLocation effectiveModel() {
+    public Identifier effectiveModel() {
         return this.properties.effectiveModel();
     }
 

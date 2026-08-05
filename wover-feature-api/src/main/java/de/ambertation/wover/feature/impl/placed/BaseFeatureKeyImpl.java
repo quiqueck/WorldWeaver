@@ -9,7 +9,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -22,7 +22,7 @@ public class BaseFeatureKeyImpl<K extends BasePlacedFeatureKey<K>> implements Ba
 
     protected GenerationStep.Decoration decoration = GenerationStep.Decoration.VEGETAL_DECORATION;
 
-    BaseFeatureKeyImpl(ResourceLocation featureId) {
+    BaseFeatureKeyImpl(Identifier featureId) {
         this.key = ResourceKey.create(Registries.PLACED_FEATURE, featureId);
     }
 

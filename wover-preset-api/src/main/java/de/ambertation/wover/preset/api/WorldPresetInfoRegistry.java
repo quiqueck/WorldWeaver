@@ -12,7 +12,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import java.util.Optional;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * {@link WorldPresetInfo} entries live in their own datapack registry
  * ({@link #WORLD_PRESET_INFO_REGISTRY}), keyed under the same location as the {@link WorldPreset} they
- * describe (see {@link #createKey(ResourceLocation)}). Use {@link #getFor(WorldPreset)} (or one of its
+ * describe (see {@link #createKey(Identifier)}). Use {@link #getFor(WorldPreset)} (or one of its
  * overloads) to look up the info for a given preset; presets without a registered entry fall back to a
  * default {@link WorldPresetInfo}.
  */
@@ -53,7 +53,7 @@ public class WorldPresetInfoRegistry {
      * @return the key
      */
     public static ResourceKey<WorldPresetInfo> createKey(
-            ResourceLocation ruleID
+            Identifier ruleID
     ) {
         return WorldPresetInfoRegistryImpl.createKey(ruleID);
     }
@@ -69,7 +69,7 @@ public class WorldPresetInfoRegistry {
     public static ResourceKey<WorldPresetInfo> createKey(
             ResourceKey<WorldPreset> ruleID
     ) {
-        return createKey(ruleID.location());
+        return createKey(ruleID.identifier());
     }
 
     /**
@@ -90,7 +90,7 @@ public class WorldPresetInfoRegistry {
             LibWoverWorldPreset.C.LOG.error("WorldPresetInfoRegistry: Registry not read");
             return WorldPresetInfoImpl.DEFAULT;
         }
-        final var info = infos.getValue(key.location());
+        final var info = infos.getValue(key.identifier());
         if (info == null) return WorldPresetInfoImpl.DEFAULT;
         return info;
     }

@@ -10,11 +10,11 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
 import com.google.gson.JsonElement;
 
@@ -99,7 +99,7 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
      */
     @Override
     public DataProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new LootTableProvider(output, registriesFuture);
@@ -108,11 +108,11 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
     //Based on Fabrics SimpleLootTableProvider. The generate method in that class does not provide access
     //to a HolderLookup.Provider, which is required to get enchantments from the registry.
     private class LootTableProvider implements DataProvider {
-        protected final FabricDataOutput output;
+        protected final FabricPackOutput output;
         private final CompletableFuture<HolderLookup.Provider> registryLookup;
 
         public LootTableProvider(
-                FabricDataOutput output,
+                FabricPackOutput output,
                 CompletableFuture<HolderLookup.Provider> registryLookup
         ) {
             this.output = output;
@@ -121,15 +121,15 @@ public abstract class WoverLootTableProvider implements WoverDataProvider<DataPr
 
         @Override
         public @NotNull CompletableFuture<?> run(@NotNull CachedOutput writer) {
-            final HashMap<ResourceLocation, LootTable> builders = new HashMap<>();
+            final HashMap<Identifier, LootTable> builders = new HashMap<>();
 
             return registryLookup.thenCompose(lookup -> {
                 boostrap(
                         lookup, (registryKey, builder) -> {
-                            if (builders.containsKey(registryKey.location()))
-                                throw new IllegalStateException("Duplicate loot table for " + registryKey.location());
+                            if (builders.containsKey(registryKey.identifier()))
+                                throw new IllegalStateException("Duplicate loot table for " + registryKey.identifier());
 
-                            builders.put(registryKey.location(), builder.setParamSet(lootContextType).build());
+                            builders.put(registryKey.identifier(), builder.setParamSet(lootContextType).build());
                         }
                 );
 

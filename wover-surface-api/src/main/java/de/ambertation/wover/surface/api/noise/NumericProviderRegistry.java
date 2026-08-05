@@ -8,7 +8,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Registry for custom Numeric Providers. Numeric Providers can generate number sequences
@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
  * default Numeric Providers. It is not loaded from datapacks.
  * <p>
  * You can however add your own Numeric Providers to this registry while your mod is initialized using
- * the {@link #register(ResourceLocation, MapCodec)} method.
+ * the {@link #register(Identifier, MapCodec)} method.
  */
 public class NumericProviderRegistry {
     /**
@@ -40,7 +40,7 @@ public class NumericProviderRegistry {
      * @param location The location of the Numeric Provider.
      * @return The ResourceKey for the Numeric Provider.
      */
-    public static ResourceKey<MapCodec<? extends NumericProvider>> createKey(ResourceLocation location) {
+    public static ResourceKey<MapCodec<? extends NumericProvider>> createKey(Identifier location) {
         return ResourceKey.create(NUMERIC_PROVIDER_REGISTRY, location);
     }
 
@@ -67,7 +67,7 @@ public class NumericProviderRegistry {
      * @return The newly created ResourceKey for the Numeric Provider.
      */
     public static ResourceKey<MapCodec<? extends NumericProvider>> register(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<? extends NumericProvider> codec
     ) {
         return register(createKey(location), codec);

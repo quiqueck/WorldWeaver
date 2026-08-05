@@ -8,7 +8,7 @@ import de.ambertation.wover.entrypoint.LibWoverBiome;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.KeyDispatchDataCodec;
 
 import java.util.function.Function;
@@ -26,7 +26,7 @@ public class BiomeCodecRegistryImpl {
 
     public static MapCodec<? extends BiomeData> register(
             Registry<MapCodec<? extends BiomeData>> registry,
-            ResourceLocation location,
+            Identifier location,
             KeyDispatchDataCodec<? extends BiomeData> keyDispatchDataCodec
     ) {
         return BuiltInRegistryManager.register(registry, location, keyDispatchDataCodec.codec());

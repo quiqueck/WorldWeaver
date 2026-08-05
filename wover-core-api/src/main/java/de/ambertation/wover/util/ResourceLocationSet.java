@@ -2,12 +2,12 @@ package de.ambertation.wover.util;
 
 import de.ambertation.wover.core.api.ModCore;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashSet;
 
 /**
- * A set of resource locations that can contain wildcard locations. A wildcard location is a {@link ResourceLocation}
+ * A set of resource locations that can contain wildcard locations. A wildcard location is a {@link Identifier}
  * with a regular namespace and {@code *} as the path. For example, {@code minecraft:*} is a wildcard location for all
  * resources in the {@code minecraft} namespace.
  * <p>
@@ -15,7 +15,7 @@ import java.util.HashSet;
  * First, it checks if the location is contained as is in the set. If not, it checks if the namespace of the location
  * is contained in the set. If not, it returns false.
  */
-public class ResourceLocationSet extends HashSet<ResourceLocation> {
+public class ResourceLocationSet extends HashSet<Identifier> {
     /**
      * Returns true if this set contains the specified element or a wildcard location for the element's namespace.
      *
@@ -24,13 +24,13 @@ public class ResourceLocationSet extends HashSet<ResourceLocation> {
      */
     @Override
     public boolean contains(Object o) {
-        if (o instanceof ResourceLocation location) {
+        if (o instanceof Identifier location) {
             return containsResource(location);
         }
         return super.contains(o);
     }
 
-    private boolean containsResource(ResourceLocation o) {
+    private boolean containsResource(Identifier o) {
         if (!super.contains(o)) {
             return super.stream().anyMatch(location -> {
                 if (location.getPath().equals(WildcardResourceLocation.CATCH_ALL_PATH)) {
@@ -52,19 +52,19 @@ public class ResourceLocationSet extends HashSet<ResourceLocation> {
         private static String[] parse(String string, String c) {
             String[] parts = string.split(c, 2);
             if (parts.length == 2) return parts;
-            return new String[]{ResourceLocation.DEFAULT_NAMESPACE, string};
+            return new String[]{Identifier.DEFAULT_NAMESPACE, string};
         }
 
-        public static ResourceLocation forAllFrom(ModCore mod) {
-            return ResourceLocation.fromNamespaceAndPath(mod.namespace, CATCH_ALL_PATH);
+        public static Identifier forAllFrom(ModCore mod) {
+            return Identifier.fromNamespaceAndPath(mod.namespace, CATCH_ALL_PATH);
         }
 
-        public static ResourceLocation parse(String string) {
+        public static Identifier parse(String string) {
             final var decomposed = parse(string, ":");
             if (decomposed[1].equals("*")) {
-                return ResourceLocation.fromNamespaceAndPath(decomposed[0], CATCH_ALL_PATH);
+                return Identifier.fromNamespaceAndPath(decomposed[0], CATCH_ALL_PATH);
             } else {
-                return ResourceLocation.fromNamespaceAndPath(decomposed[0], decomposed[1]);
+                return Identifier.fromNamespaceAndPath(decomposed[0], decomposed[1]);
             }
         }
     }

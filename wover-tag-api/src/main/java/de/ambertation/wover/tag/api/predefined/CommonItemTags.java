@@ -29,21 +29,16 @@ public class CommonItemTags {
      */
     public static final TagKey<Item> CHEST = TagManager.ITEMS.makeCommonTag("chests");
     /**
-     * {@code c:tools/shears}
-     * <p>
-     * Wover's own shears tag, and the one {@code MatchTool} predicates are widened to (see BCLib's
-     * {@code shears.MatchToolMixin}). It is <em>not</em> the Fabric convention tag - that one is
-     * {@link #FABRIC_SHEAR_TOOLS} ({@code c:tools/shear}, singular) - so this tag has to pull vanilla
-     * shears and the convention tag in explicitly, which {@code ItemTagProvider} does.
-     */
-    public static final TagKey<Item> SHEARS = TagManager.ITEMS.makeCommonTag("tools/shears");
-    /**
      * {@code c:tools/shear} - the Fabric convention tag (singular), populated by
      * fabric-convention-tags-v2 with {@code minecraft:shears} and by any mod following the convention.
-     * Folded into {@link #SHEARS} as an optional entry rather than used directly, so that a setup
-     * without fabric-convention-tags still resolves.
+     * <p>
+     * Also the tag {@code MatchTool} predicates are widened to (see BCLib's
+     * {@code shears.MatchToolMixin}), so every leaves/cobweb/grass loot table in the game keys off it.
+     * Wover used to carry a second tag of its own beside this one ({@code c:tools/shears}, plural) and
+     * fold the convention tag into it; that only meant third-party shears reached us through an extra
+     * indirection and pack authors had two near-identical tags to choose between.
      */
-    public static final TagKey<Item> FABRIC_SHEAR_TOOLS = TagManager.ITEMS.makeCommonTag("tools/shear");
+    public static final TagKey<Item> SHEARS = TagManager.ITEMS.makeCommonTag("tools/shear");
     /**
      * {@code wover:furnaces}
      */

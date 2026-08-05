@@ -7,7 +7,7 @@ import de.ambertation.wover.potions.impl.PotionManagerImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.alchemy.Potion;
@@ -46,7 +46,7 @@ public class PotionManager {
      * @param potion The potion to register.
      * @return The holder for the newly registered potion.
      */
-    public static Holder<Potion> registerPotion(ResourceLocation id, Potion potion) {
+    public static Holder<Potion> registerPotion(Identifier id, Potion potion) {
         return Registry.registerForHolder(BuiltInRegistries.POTION, id, potion);
     }
 

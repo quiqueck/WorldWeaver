@@ -3,7 +3,7 @@ package de.ambertation.wover.testmod.gametest;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,9 @@ public class SetGameTest {
             "wover-sets-testmod:wooden_door",
             "wover-sets-testmod:wooden_trapdoor",
             "wover-sets-testmod:wooden_button",
-            "wover-sets-testmod:wooden_wall"
+            "wover-sets-testmod:wooden_wall",
+            "wover-sets-testmod:wooden_shelf",
+            "wover-sets-testmod:wooden_chiseled_bookshelf"
     );
 
     // Set members are also given a BlockItem, so the same ids must resolve in the ITEM registry.
@@ -49,16 +51,16 @@ public class SetGameTest {
         final List<String> failures = new ArrayList<>();
 
         for (String id : EXPECTED_BLOCKS) {
-            if (!BuiltInRegistries.BLOCK.containsKey(ResourceLocation.parse(id))) {
+            if (!BuiltInRegistries.BLOCK.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected set member block missing from BuiltInRegistries.BLOCK");
             }
         }
         for (String id : EXPECTED_ITEMS) {
-            if (!BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(id))) {
+            if (!BuiltInRegistries.ITEM.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected set member item missing from BuiltInRegistries.ITEM");
             }
         }
-        if (BuiltInRegistries.BLOCK.containsKey(ResourceLocation.parse(NOT_A_MEMBER))) {
+        if (BuiltInRegistries.BLOCK.containsKey(Identifier.parse(NOT_A_MEMBER))) {
             failures.add(NOT_A_MEMBER + ": a non-member block unexpectedly exists (test would pass vacuously)");
         }
 

@@ -11,7 +11,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
@@ -40,7 +40,7 @@ public class WorldPresetsManagerImpl {
         );
     }
 
-    public static ResourceKey<WorldPreset> createKey(ResourceLocation loc) {
+    public static ResourceKey<WorldPreset> createKey(Identifier loc) {
         return ResourceKey.create(Registries.WORLD_PRESET, loc);
     }
 

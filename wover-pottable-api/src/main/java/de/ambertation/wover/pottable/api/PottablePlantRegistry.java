@@ -7,8 +7,8 @@ import de.ambertation.wover.pottable.impl.PottablePlantRegistryImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 
@@ -39,7 +39,7 @@ public class PottablePlantRegistry {
      * @param id The ID of the PottablePlant
      * @return The ResourceKey
      */
-    public static ResourceKey<PottablePlant> createKey(ResourceLocation id) {
+    public static ResourceKey<PottablePlant> createKey(Identifier id) {
         return PottablePlantRegistryImpl.createKey(id);
     }
 

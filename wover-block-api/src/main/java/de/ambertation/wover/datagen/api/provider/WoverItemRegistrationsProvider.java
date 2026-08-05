@@ -5,17 +5,18 @@ import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverDataProvider;
 import de.ambertation.wover.item.api.trait.ItemTrait;
 
-import com.google.common.hash.Hashing;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.ComposterBlock;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+
+import com.google.common.hash.Hashing;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +55,7 @@ public class WoverItemRegistrationsProvider implements WoverDataProvider<DataPro
 
     @Override
     public DataProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new Provider(output);
@@ -74,22 +75,22 @@ public class WoverItemRegistrationsProvider implements WoverDataProvider<DataPro
 
     private static float compostableTraitChance(Item item) {
         return ItemTrait.runtimeTraits(item)
-                         .filter(CompostableTrait.class::isInstance)
-                         .map(CompostableTrait.class::cast)
-                         .map(CompostableTrait::compostChance)
-                         .findFirst()
-                         .orElse(-1.0f);
+                        .filter(CompostableTrait.class::isInstance)
+                        .map(CompostableTrait.class::cast)
+                        .map(CompostableTrait::compostChance)
+                        .findFirst()
+                        .orElse(-1.0f);
     }
 
-    private String lineFor(ResourceLocation id, Item item) {
-        return id
-                + "  compostable=" + compostable(item);
+    private String lineFor(Identifier id, Item item) {
+        return "{\"id\":\"" + id + "\""
+                + ",\"compostable\":\"" + compostable(item) + "\"}";
     }
 
     private class Provider implements DataProvider {
-        private final FabricDataOutput output;
+        private final FabricPackOutput output;
 
-        private Provider(FabricDataOutput output) {
+        private Provider(FabricPackOutput output) {
             this.output = output;
         }
 
@@ -97,15 +98,15 @@ public class WoverItemRegistrationsProvider implements WoverDataProvider<DataPro
         public @NotNull CompletableFuture<?> run(@NotNull CachedOutput writer) {
             final List<String> lines = new ArrayList<>();
             for (Item item : BuiltInRegistries.ITEM) {
-                final ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+                final Identifier id = BuiltInRegistries.ITEM.getKey(item);
                 if (!id.getNamespace().equals(modCore.namespace)) continue;
                 lines.add(lineFor(id, item));
             }
             // Sorting by the full line orders by the (unique) id prefix, so the file is fully deterministic.
             Collections.sort(lines);
 
-            final byte[] bytes = (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8);
-            final Path path = output.getOutputFolder().resolve("item_registrations.txt");
+            final byte[] bytes = ("[\n" + String.join(",\n", lines) + "\n]\n").getBytes(StandardCharsets.UTF_8);
+            final Path path = output.getOutputFolder().resolve("item_registrations.json");
             try {
                 writer.writeIfNeeded(path, bytes, Hashing.sha1().hashBytes(bytes));
             } catch (IOException e) {

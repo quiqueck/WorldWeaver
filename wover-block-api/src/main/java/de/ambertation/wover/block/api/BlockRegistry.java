@@ -126,7 +126,7 @@ public abstract class BlockRegistry {
     }
 
     public @NotNull ResourceKey<Item> blockItemKey(@NotNull ResourceKey<Block> blockKey) {
-        return ResourceKey.create(BuiltInRegistries.ITEM.key(), blockKey.location());
+        return ResourceKey.create(BuiltInRegistries.ITEM.key(), blockKey.identifier());
     }
 
     /**
@@ -347,7 +347,7 @@ public abstract class BlockRegistry {
         if (block.defaultBlockState().ignitedByLava()
                 && FlammableBlockRegistry.getDefaultInstance()
                                          .get(block)
-                                         .getBurnChance() == 0) {
+                                         .getIgniteOdds() == 0) {
             FlammableBlockRegistry.getDefaultInstance().add(block, burn, spread);
         }
     }

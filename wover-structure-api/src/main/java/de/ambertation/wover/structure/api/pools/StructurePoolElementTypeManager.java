@@ -3,7 +3,7 @@ package de.ambertation.wover.structure.api.pools;
 import de.ambertation.wover.structure.impl.pools.StructurePoolElementTypeManagerImpl;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementType;
 
@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElementTy
  */
 public class StructurePoolElementTypeManager {
     /**
-     * Registers a new {@link StructurePoolElementType} for the given {@link ResourceLocation}.
+     * Registers a new {@link StructurePoolElementType} for the given {@link Identifier}.
      *
      * @param location The location of the {@link StructurePoolElementType}
      * @param codec    The {@link MapCodec} used to (de)serialize the {@link StructurePoolElement}
@@ -21,7 +21,7 @@ public class StructurePoolElementTypeManager {
      * @return The registered {@link StructurePoolElementType}
      */
     public static <P extends StructurePoolElement> StructurePoolElementType<P> register(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<P> codec
     ) {
         return StructurePoolElementTypeManagerImpl.register(location, codec);

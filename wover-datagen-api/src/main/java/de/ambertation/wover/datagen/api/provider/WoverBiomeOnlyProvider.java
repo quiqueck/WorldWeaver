@@ -5,7 +5,7 @@ import de.ambertation.wover.datagen.api.WoverRegistryContentProvider;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ public abstract class WoverBiomeOnlyProvider extends WoverRegistryContentProvide
      */
     public WoverBiomeOnlyProvider(
             @NotNull ModCore modCore,
-            @NotNull ResourceLocation providerId
+            @NotNull Identifier providerId
     ) {
         super(modCore, providerId.toString() + " (Biome)", Registries.BIOME);
     }

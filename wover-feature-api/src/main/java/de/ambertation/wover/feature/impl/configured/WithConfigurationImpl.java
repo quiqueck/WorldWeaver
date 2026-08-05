@@ -5,7 +5,7 @@ import de.ambertation.wover.feature.api.configured.configurators.WithConfigurati
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -64,7 +64,7 @@ public class WithConfigurationImpl<F extends Feature<FC>, FC extends FeatureConf
     public static class Key<F extends Feature<FC>, FC extends FeatureConfiguration> extends ConfiguredFeatureKey<WithConfiguration<F, FC>> {
         private final F feature;
 
-        public Key(ResourceLocation id, F feature) {
+        public Key(Identifier id, F feature) {
             super(id);
             this.feature = feature;
         }

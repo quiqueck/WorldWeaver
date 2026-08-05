@@ -9,7 +9,7 @@ import de.ambertation.wover.structure.api.sets.StructureSetManager;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
@@ -24,55 +24,55 @@ import org.jetbrains.annotations.NotNull;
  */
 public class StructureKeys {
     /**
-     * Alias for {@link StructureSetManager#createKey(ResourceLocation)}.
+     * Alias for {@link StructureSetManager#createKey(Identifier)}.
      *
      * @param location The location of the {@link StructureSet}
      * @return The {@link StructureSetKey}
      */
-    public static StructureSetKey set(ResourceLocation location) {
+    public static StructureSetKey set(Identifier location) {
         return StructureSetManager.createKey(location);
     }
 
     /**
-     * Alias for {@link StructureSetManager#createKey(ResourceLocation)}.
+     * Alias for {@link StructureSetManager#createKey(Identifier)}.
      *
      * @param structure The structure this set is for
      * @return The {@link StructureSetKey}
      */
     public static StructureSetKey set(StructureKey<?, ?, ?> structure) {
-        return set(structure.key().location());
+        return set(structure.key().identifier());
     }
 
     /**
-     * Alias for {@link StructureProcessorManager#createKey(ResourceLocation)}.
+     * Alias for {@link StructureProcessorManager#createKey(Identifier)}.
      *
      * @param location The location of the {@link StructureProcessorList}
      * @return The {@link StructureProcessorKey}
      */
-    public static StructureProcessorKey processor(ResourceLocation location) {
+    public static StructureProcessorKey processor(Identifier location) {
         return StructureProcessorManager.createKey(location);
     }
 
     /**
-     * Alias for {@link StructurePoolManager#createKey(ResourceLocation)}.
+     * Alias for {@link StructurePoolManager#createKey(Identifier)}.
      *
      * @param location The location of the {@link StructureTemplatePool}
      * @return The {@link StructureSetKey}
      */
     public static StructurePoolKey pool(
-            ResourceLocation location
+            Identifier location
     ) {
         return StructurePoolManager.createKey(location);
     }
 
     /**
-     * Alias for {@link StructureManager#structure(ResourceLocation, StructureTypeKey.StructureFactory, MapCodec)}.
+     * Alias for {@link StructureManager#structure(Identifier, StructureTypeKey.StructureFactory, MapCodec)}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
     public static <S extends Structure> StructureKey.Simple<S> structure(
-            ResourceLocation location,
+            Identifier location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
             @NotNull MapCodec<S> codec
     ) {
@@ -80,53 +80,53 @@ public class StructureKeys {
     }
 
     /**
-     * Alias for {@link StructureManager#structure(ResourceLocation, StructureTypeKey.StructureFactory)}.
+     * Alias for {@link StructureManager#structure(Identifier, StructureTypeKey.StructureFactory)}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
     public static <S extends Structure> StructureKey.Simple<S> structure(
-            ResourceLocation location,
+            Identifier location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory
     ) {
         return StructureManager.structure(location, structureFactory);
     }
 
     /**
-     * Alias for {@link StructureManager#structure(ResourceLocation, StructureTypeKey)}.
+     * Alias for {@link StructureManager#structure(Identifier, StructureTypeKey)}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
     public static <S extends Structure> StructureKey.Simple<S> structure(
-            ResourceLocation location,
+            Identifier location,
             @NotNull StructureTypeKey<S> type
     ) {
         return StructureManager.structure(location, type);
     }
 
     /**
-     * Alias for {@link StructureManager#jigsaw(ResourceLocation)}.
+     * Alias for {@link StructureManager#jigsaw(Identifier)}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey.Jigsaw jigsaw(ResourceLocation location) {
+    public static <S extends Structure> StructureKey.Jigsaw jigsaw(Identifier location) {
         return StructureManager.jigsaw(location);
     }
 
     /**
-     * Alias for {@link StructureManager#randomNbt(ResourceLocation)}.
+     * Alias for {@link StructureManager#randomNbt(Identifier)}.
      *
      * @param location The location of the {@link Structure}
      * @return The {@link StructureKey}
      */
-    public static <S extends Structure> StructureKey.RandomNbt randomNbt(ResourceLocation location) {
+    public static <S extends Structure> StructureKey.RandomNbt randomNbt(Identifier location) {
         return StructureManager.randomNbt(location);
     }
 
     /**
-     * Alias for {@link StructureManager#registerType(ResourceLocation, StructureTypeKey.StructureFactory)}.
+     * Alias for {@link StructureManager#registerType(Identifier, StructureTypeKey.StructureFactory)}.
      *
      * @param location         The location of the {@link StructureTypeKey}
      * @param structureFactory The {@link StructureTypeKey.StructureFactory}
@@ -134,14 +134,14 @@ public class StructureKeys {
      * @return The {@link StructureTypeKey}
      */
     public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
-            @NotNull ResourceLocation location,
+            @NotNull Identifier location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory
     ) {
         return StructureManager.registerType(location, structureFactory);
     }
 
     /**
-     * Alias for {@link StructureManager#registerType(ResourceLocation, StructureTypeKey.StructureFactory, MapCodec)}.
+     * Alias for {@link StructureManager#registerType(Identifier, StructureTypeKey.StructureFactory, MapCodec)}.
      *
      * @param location         The location of the {@link StructureTypeKey}
      * @param structureFactory The {@link StructureTypeKey.StructureFactory}
@@ -150,7 +150,7 @@ public class StructureKeys {
      * @return The {@link StructureTypeKey}
      */
     public static <S extends Structure> @NotNull StructureTypeKey<S> registerType(
-            @NotNull ResourceLocation location,
+            @NotNull Identifier location,
             @NotNull StructureTypeKey.StructureFactory<S> structureFactory,
             @NotNull MapCodec<S> codec
     ) {
@@ -158,14 +158,14 @@ public class StructureKeys {
     }
 
     /**
-     * Alias for {@link StructureManager#registerPiece(ResourceLocation, StructurePieceType)}.
+     * Alias for {@link StructureManager#registerPiece(Identifier, StructurePieceType)}.
      *
      * @param location  The location of the {@link net.minecraft.world.level.levelgen.structure.StructurePiece}
      * @param pieceType The {@link StructurePieceType} to register
      * @return The {@link StructurePieceType}
      */
     public static @NotNull StructurePieceType registerPiece(
-            @NotNull ResourceLocation location,
+            @NotNull Identifier location,
             @NotNull StructurePieceType pieceType
     ) {
         return StructureManager.registerPiece(location, pieceType);

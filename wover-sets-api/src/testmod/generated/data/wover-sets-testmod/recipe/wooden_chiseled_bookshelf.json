@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "group": "chiseled_bookshelf",
+  "key": {
+    "#": "wover-sets-testmod:wooden_planks",
+    "S": "wover-sets-testmod:wooden_slab"
+  },
+  "pattern": [
+    "###",
+    "SSS",
+    "###"
+  ],
+  "result": {
+    "id": "wover-sets-testmod:wooden_chiseled_bookshelf"
+  }
+}

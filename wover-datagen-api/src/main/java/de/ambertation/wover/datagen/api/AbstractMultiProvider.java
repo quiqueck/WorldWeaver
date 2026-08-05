@@ -2,7 +2,7 @@ package de.ambertation.wover.datagen.api;
 
 import de.ambertation.wover.core.api.ModCore;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,7 @@ public abstract class AbstractMultiProvider implements WoverMultiProvider {
     /**
      * The id of the provider. Every Provider (for the same Registry) needs a unique id.
      */
-    protected final ResourceLocation providerId;
+    protected final Identifier providerId;
 
     /**
      * Creates a new instance of {@link AbstractMultiProvider} using a default provider id
@@ -37,7 +37,7 @@ public abstract class AbstractMultiProvider implements WoverMultiProvider {
      * @param providerId The id of the provider. Every Provider (for the same Registry)
      *                   needs a unique id.
      */
-    public AbstractMultiProvider(@NotNull ModCore modCore, @NotNull ResourceLocation providerId) {
+    public AbstractMultiProvider(@NotNull ModCore modCore, @NotNull Identifier providerId) {
         this.modCore = modCore;
         this.providerId = providerId;
     }

@@ -10,8 +10,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
@@ -55,7 +55,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see ForSimpleBlock
      */
-    public static ConfiguredFeatureKey<ForSimpleBlock> simple(ResourceLocation id) {
+    public static ConfiguredFeatureKey<ForSimpleBlock> simple(Identifier id) {
         return new ForSimpleBlockImpl.Key(id);
     }
 
@@ -65,8 +65,15 @@ public abstract class ConfiguredFeatureManager {
      * @param id the id of the {@link ConfiguredFeature}
      * @return the new key
      * @see RandomPatch
+     * deprecated: Vanilla removed the {@code random_patch} configured-feature type in Minecraft 26.1.
+     * Use {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
+     * FeaturePlacementBuilder.scatter(tries, xzSpread, ySpread, filter)} on a {@code simple_block} placed
+     * feature instead ({@code CountPlacement.of(tries)} + {@code RandomOffsetPlacement.of(xz, y)} + an optional
+     * {@code BlockPredicateFilter} + {@code BiomeFilter}). The {@code wover:random_patch} compat shim keeps this
+     * functional until removal. See {@link RandomPatch} for details.
      */
-    public static ConfiguredFeatureKey<RandomPatch> randomPatch(ResourceLocation id) {
+    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
+    public static ConfiguredFeatureKey<RandomPatch> randomPatch(Identifier id) {
         return new RandomPatchImpl.Key(id);
     }
 
@@ -77,7 +84,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see AsOre
      */
-    public static ConfiguredFeatureKey<AsOre> ore(ResourceLocation id) {
+    public static ConfiguredFeatureKey<AsOre> ore(Identifier id) {
         return new AsOreImpl.Key(id);
     }
 
@@ -91,7 +98,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see AsPillar
      */
-    public static ConfiguredFeatureKey<AsPillar> pillar(ResourceLocation id) {
+    public static ConfiguredFeatureKey<AsPillar> pillar(Identifier id) {
         return new AsPillarImpl.Key(id);
     }
 
@@ -105,7 +112,7 @@ public abstract class ConfiguredFeatureManager {
      * @see AsSequence
      * @see de.ambertation.wover.feature.api.features.SequenceFeature
      */
-    public static ConfiguredFeatureKey<AsSequence> sequence(ResourceLocation id) {
+    public static ConfiguredFeatureKey<AsSequence> sequence(Identifier id) {
         return new AsSequenceImpl.Key(id);
     }
 
@@ -119,7 +126,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see AsBlockColumn
      */
-    public static ConfiguredFeatureKey<AsBlockColumn> blockColumn(ResourceLocation id) {
+    public static ConfiguredFeatureKey<AsBlockColumn> blockColumn(Identifier id) {
         return new AsBlockColumnImpl.Key(id);
     }
 
@@ -133,7 +140,7 @@ public abstract class ConfiguredFeatureManager {
      * @see WithTemplates
      * @see de.ambertation.wover.feature.api.features.TemplateFeature
      */
-    public static ConfiguredFeatureKey<WithTemplates> templates(ResourceLocation id) {
+    public static ConfiguredFeatureKey<WithTemplates> templates(Identifier id) {
         return new WithTemplatesImpl.Key(id);
     }
 
@@ -144,7 +151,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see NetherForrestVegetation
      */
-    public static ConfiguredFeatureKey<NetherForrestVegetation> netherForrestVegetation(ResourceLocation id) {
+    public static ConfiguredFeatureKey<NetherForrestVegetation> netherForrestVegetation(Identifier id) {
         return new NetherForrestVegetationImpl.Key(id);
     }
 
@@ -159,7 +166,7 @@ public abstract class ConfiguredFeatureManager {
      * @see WithConfiguration
      */
     public static <F extends Feature<FC>, FC extends FeatureConfiguration> ConfiguredFeatureKey<WithConfiguration<F, FC>> configuration(
-            ResourceLocation id,
+            Identifier id,
             F feature
     ) {
         return new WithConfigurationImpl.Key<>(id, feature);
@@ -171,21 +178,27 @@ public abstract class ConfiguredFeatureManager {
      * @param id the id of the {@link ConfiguredFeature}
      * @return the new key
      */
-    public static ConfiguredFeatureKey<FacingBlock> facingBlock(ResourceLocation id) {
+    public static ConfiguredFeatureKey<FacingBlock> facingBlock(Identifier id) {
         return new FacingBlockImpl.Key(id);
     }
 
     /**
      * Places blocks (by weight) randomly in a patch
      * <p>
-     * This is a simplified version of {@link #randomPatch(ResourceLocation)}, as it will
+     * This is a simplified version of {@link #randomPatch(Identifier)}, as it will
      * only place blocks, not features.
      *
      * @param id the id of the {@link ConfiguredFeature}
      * @return the new key
      * @see WeightedBlockPatch
+     * @deprecated Backed by the {@code random_patch} type removed by vanilla in Minecraft 26.1. Use
+     * {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
+     * FeaturePlacementBuilder.scatter(...)} on a {@code simple_block} placed feature instead (see
+     * {@link WeightedBlockPatch}). The {@code wover:random_patch} compat shim keeps this functional until
+     * removal.
      */
-    public static ConfiguredFeatureKey<WeightedBlockPatch> randomBlockPatch(ResourceLocation id) {
+    @Deprecated(since = "26.1.0", forRemoval = true)
+    public static ConfiguredFeatureKey<WeightedBlockPatch> randomBlockPatch(Identifier id) {
         return new WeightedBlockPatchImpl.Key(id);
     }
 
@@ -196,8 +209,14 @@ public abstract class ConfiguredFeatureManager {
      * @param id the id of the {@link ConfiguredFeature}
      * @return the new key
      * @see WeightedBlockPatch
+     * deprecated: Backed by the {@code random_patch} type removed by vanilla in Minecraft 26.1. Use
+     * {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
+     * FeaturePlacementBuilder.scatter(...)} on a {@code simple_block} placed feature instead (see
+     * {@link WeightedBlockPatch}). The {@code wover:random_patch} compat shim keeps this functional until
+     * removal.
      */
-    public static ConfiguredFeatureKey<WeightedBlockPatch> bonemeal(ResourceLocation id) {
+    //@Deprecated(since = "26.1.0", forRemoval = true)
+    public static ConfiguredFeatureKey<WeightedBlockPatch> bonemeal(Identifier id) {
         return new WeightedBlockPatchImpl.KeyBonemeal(id);
     }
 
@@ -209,7 +228,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see WeightedBlockPatch
      */
-    public static ConfiguredFeatureKey<NetherForrestVegetation> bonemealNetherForrest(ResourceLocation id) {
+    public static ConfiguredFeatureKey<NetherForrestVegetation> bonemealNetherForrest(Identifier id) {
         return new NetherForrestVegetationImpl.KeyBonemeal(id);
     }
 
@@ -220,7 +239,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see WeightedBlock
      */
-    public static ConfiguredFeatureKey<WeightedBlock> randomBlock(ResourceLocation id) {
+    public static ConfiguredFeatureKey<WeightedBlock> randomBlock(Identifier id) {
         return new WeightedBlockImpl.Key(id);
     }
 
@@ -231,7 +250,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see AsRandomSelect
      */
-    public static ConfiguredFeatureKey<AsRandomSelect> randomFeature(ResourceLocation id) {
+    public static ConfiguredFeatureKey<AsRandomSelect> randomFeature(Identifier id) {
         return new AsRandomSelectImpl.Key(id);
     }
 
@@ -243,7 +262,7 @@ public abstract class ConfiguredFeatureManager {
      * @return the new key
      * @see AsMultiPlaceRandomSelect
      */
-    public static ConfiguredFeatureKey<AsMultiPlaceRandomSelect> multiPlaceRandomFeature(ResourceLocation id) {
+    public static ConfiguredFeatureKey<AsMultiPlaceRandomSelect> multiPlaceRandomFeature(Identifier id) {
         return new AsMultiPlaceRandomSelectImpl.Key(id);
     }
 
@@ -255,42 +274,42 @@ public abstract class ConfiguredFeatureManager {
          * Creates a new ore feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#ore(ResourceLocation)
+         * @see ConfiguredFeatureManager#ore(Identifier)
          */
         AsOre ore();
         /**
          * Creates a new pillar feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#pillar(ResourceLocation)
+         * @see ConfiguredFeatureManager#pillar(Identifier)
          */
         AsPillar pillar();
         /**
          * Creates a new sequence feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#sequence(ResourceLocation)
+         * @see ConfiguredFeatureManager#sequence(Identifier)
          */
         AsSequence sequence();
         /**
          * Creates a new block column feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#blockColumn(ResourceLocation)
+         * @see ConfiguredFeatureManager#blockColumn(Identifier)
          */
         AsBlockColumn blockColumn();
         /**
          * Creates a new template feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#templates(ResourceLocation)
+         * @see ConfiguredFeatureManager#templates(Identifier)
          */
         WithTemplates templates();
         /**
          * Creates a new nether forrest vegetation feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#netherForrestVegetation(ResourceLocation)
+         * @see ConfiguredFeatureManager#netherForrestVegetation(Identifier)
          */
         NetherForrestVegetation netherForrestVegetation();
         /**
@@ -300,7 +319,7 @@ public abstract class ConfiguredFeatureManager {
          * @param <F>     the feature type
          * @param <FC>    the feature configuration type
          * @return the new builder
-         * @see ConfiguredFeatureManager#configuration(ResourceLocation, Feature)
+         * @see ConfiguredFeatureManager#configuration(Identifier, Feature)
          */
         <F extends Feature<FC>, FC extends FeatureConfiguration> WithConfiguration<F, FC> withFeature(F feature);
 
@@ -319,57 +338,72 @@ public abstract class ConfiguredFeatureManager {
          * Creates a new oriented block feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#facingBlock(ResourceLocation)
+         * @see ConfiguredFeatureManager#facingBlock(Identifier)
          */
         FacingBlock facingBlock();
         /**
          * Creates a new random block patch feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#randomBlockPatch(ResourceLocation)
+         * @see ConfiguredFeatureManager#randomBlockPatch(Identifier)
+         * deprecated: Backed by the {@code random_patch} type removed by vanilla in Minecraft 26.1; use
+         * {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
+         * FeaturePlacementBuilder.scatter(...)} on a {@code simple_block} placed feature instead (see
+         * {@link WeightedBlockPatch}).
          */
+        //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
         WeightedBlockPatch randomBlockPatch();
         /**
          * Creates a new bonemeal patch feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#bonemeal(ResourceLocation)
+         * @see ConfiguredFeatureManager#bonemeal(Identifier)
+         * deprecated: Backed by the {@code random_patch} type removed by vanilla in Minecraft 26.1; use
+         * {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
+         * FeaturePlacementBuilder.scatter(...)} on a {@code simple_block} placed feature instead (see
+         * {@link WeightedBlockPatch}).
          */
+        //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
         WeightedBlockPatch bonemealPatch();
         /**
          * Creates a randomized block feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#randomBlock(ResourceLocation)
+         * @see ConfiguredFeatureManager#randomBlock(Identifier)
          */
         WeightedBlock randomBlock();
         /**
          * Creates a randomized feature feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#randomFeature(ResourceLocation)
+         * @see ConfiguredFeatureManager#randomFeature(Identifier)
          */
         AsRandomSelect randomFeature();
         /**
          * Creates a randomized feature feature with custom placement modificators.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#multiPlaceRandomFeature(ResourceLocation)
+         * @see ConfiguredFeatureManager#multiPlaceRandomFeature(Identifier)
          */
         AsMultiPlaceRandomSelect multiPlaceRandomFeature();
         /**
          * Creates a new simple block feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#simple(ResourceLocation)
+         * @see ConfiguredFeatureManager#simple(Identifier)
          */
         ForSimpleBlock simple();
         /**
          * Creates a new random patch feature.
          *
          * @return the new builder
-         * @see ConfiguredFeatureManager#randomPatch(ResourceLocation)
+         * @see ConfiguredFeatureManager#randomPatch(Identifier)
+         * deprecated: Vanilla removed the {@code random_patch} type in Minecraft 26.1; use
+         * {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
+         * FeaturePlacementBuilder.scatter(...)} on a {@code simple_block} placed feature instead (see
+         * {@link RandomPatch}).
          */
+        //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
         RandomPatch randomPatch();
     }
 

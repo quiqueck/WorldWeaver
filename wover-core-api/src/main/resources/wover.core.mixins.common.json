@@ -10,6 +10,8 @@
     "registry.MappedRegistryMixin",
     "registry.RegistryDataLoaderMixin",
     "registry.RegistryDataLoaderMixinEarly",
+    "registry.RegistryLoadTaskAccessor",
+    "registry.ResourceManagerRegistryLoadTaskMixin",
     "registry.VanillaRegistriesMixin"
   ]
 }

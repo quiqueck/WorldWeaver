@@ -4,13 +4,13 @@ import de.ambertation.wunderlib.ui.vanilla.LayoutScreenWithIcon;
 import de.ambertation.wover.entrypoint.LibWoverUi;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.NotNull;
 
 public abstract class WoverLayoutScreen extends LayoutScreenWithIcon {
-    public static final ResourceLocation WOVER_LOGO_LOCATION = LibWoverUi.C.id("icon.png");
-    public static final ResourceLocation WOVER_LOGO_WHITE_LOCATION = LibWoverUi.C.id("icon_bright.png");
+    public static final Identifier WOVER_LOGO_LOCATION = LibWoverUi.C.id("icon.png");
+    public static final Identifier WOVER_LOGO_WHITE_LOCATION = LibWoverUi.C.id("icon_bright.png");
 
     public WoverLayoutScreen(
             Component component

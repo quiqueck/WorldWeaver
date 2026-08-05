@@ -31,7 +31,7 @@ public class ChunkGeneratorHelper {
                     var message = e.getMessage();
                     LibWoverBiome.C.LOG.error("Failed to rebuild features per step", e);
                     for (Holder<Biome> biome : biomeSource.possibleBiomes()) {
-                        var loc = biome.unwrapKey().orElseThrow().location().toString();
+                        var loc = biome.unwrapKey().orElseThrow().identifier().toString();
                         if (!message.contains(loc)) continue;
                         var res = biome.value().getGenerationSettings();
                         LibWoverBiome.C.LOG.verbose(loc);
@@ -44,7 +44,7 @@ public class ChunkGeneratorHelper {
                                         .get(i)
                                         .unwrapKey()
                                         .orElseThrow()
-                                        .location()
+                                        .identifier()
                                         .toString());
                             }
                         }

@@ -16,7 +16,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 if [ -z "${JAVA_HOME:-}" ] && command -v /usr/libexec/java_home >/dev/null 2>&1; then
-    JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || true)"
+    JAVA_HOME="$(/usr/libexec/java_home -v 25 2>/dev/null || true)"
     export JAVA_HOME
 fi
 

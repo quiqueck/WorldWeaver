@@ -1,4 +1,4 @@
-archivesBaseName = "wover-datagen-api"
+base.archivesName = "wover-datagen-api"
 
 ext {
     baseNamespace = "datagen"
@@ -6,7 +6,7 @@ ext {
 }
 
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 loom {

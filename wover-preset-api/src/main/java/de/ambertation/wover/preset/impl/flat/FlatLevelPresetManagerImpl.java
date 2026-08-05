@@ -11,7 +11,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
@@ -30,7 +30,7 @@ public class FlatLevelPresetManagerImpl {
     public static final EventImpl<OnBootstrapFlatLevelPresets> BOOTSTRAP_FLAT_LEVEL_PRESETS = new EventImpl<>(
             "BOOTSTRAP_FLAT_LEVEL_PRESETS");
 
-    public static ResourceKey<FlatLevelGeneratorPreset> createKey(ResourceLocation loc) {
+    public static ResourceKey<FlatLevelGeneratorPreset> createKey(Identifier loc) {
         return ResourceKey.create(Registries.FLAT_LEVEL_GENERATOR_PRESET, loc);
     }
 

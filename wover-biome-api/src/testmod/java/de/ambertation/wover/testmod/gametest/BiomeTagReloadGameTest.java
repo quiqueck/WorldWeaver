@@ -7,7 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagLoader;
 import net.minecraft.world.level.biome.Biome;
 
@@ -41,7 +41,7 @@ public class BiomeTagReloadGameTest {
     // didLoadTagMap is a no-op for an unknown directory, which would make this test vacuous.
     private static final String BIOME_TAG_DIRECTORY = "tags/worldgen/biome";
 
-    private static final ResourceLocation ABSENT_TAG = ResourceLocation.parse("wover-biome-testmod:does_not_exist_tag");
+    private static final Identifier ABSENT_TAG = Identifier.parse("wover-biome-testmod:does_not_exist_tag");
 
     @GameTest
     public void biomeTagsSurviveARepeatedTagLoad(GameTestHelper helper) {
@@ -60,20 +60,20 @@ public class BiomeTagReloadGameTest {
                 .getOrThrow(TestModWoverBiome.UNTAGGED_BIOME);
 
         if (!tagged.is(TestModWoverBiome.RUNTIME_BIOME_TAG)) {
-            failures.add(TestModWoverBiome.TAGGED_BIOME.location()
+            failures.add(TestModWoverBiome.TAGGED_BIOME.identifier()
                     + ": expected in the runtime-only biome tag after the initial tag load, but it is missing");
         }
         if (untagged.is(TestModWoverBiome.RUNTIME_BIOME_TAG)) {
-            failures.add(TestModWoverBiome.UNTAGGED_BIOME.location()
+            failures.add(TestModWoverBiome.UNTAGGED_BIOME.identifier()
                     + ": must NOT be in the runtime-only biome tag (the tag assertions are not meaningful)");
         }
 
         // 2. Re-run the tag phase twice, the way /reload does. Before the fix the first of these threw a
         //    NullPointerException because the context had already been invalidated at startup.
-        final ResourceLocation runtimeTag = TestModWoverBiome.RUNTIME_BIOME_TAG.location();
+        final Identifier runtimeTag = TestModWoverBiome.RUNTIME_BIOME_TAG.location();
         final List<Integer> entryCounts = new ArrayList<>();
         for (int pass = 1; pass <= 2; pass++) {
-            final Map<ResourceLocation, List<TagLoader.EntryWithSource>> tagMap
+            final Map<Identifier, List<TagLoader.EntryWithSource>> tagMap
                     = TagManagerImpl.didLoadTagMap(BIOME_TAG_DIRECTORY, new HashMap<>());
 
             final List<TagLoader.EntryWithSource> entries = tagMap.get(runtimeTag);

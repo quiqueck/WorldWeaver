@@ -7,7 +7,7 @@ import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.RandomSelectorFeature;
@@ -64,7 +64,7 @@ public class AsRandomSelectImpl extends FeatureConfiguratorImpl<RandomFeatureCon
     }
 
     public static class Key extends ConfiguredFeatureKey<AsRandomSelect> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

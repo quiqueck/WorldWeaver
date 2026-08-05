@@ -8,7 +8,7 @@ import de.ambertation.wover.testmod.item.TestItemRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -37,7 +37,7 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
  */
 public class ItemGameTest {
     // Namespace comes from ModCore.create("wover-item-testmod") in TestModWoverItem.
-    private static final ResourceLocation ENCHANTED_AXE_ID = ResourceLocation.parse("wover-item-testmod:enchanted_axe");
+    private static final Identifier ENCHANTED_AXE_ID = Identifier.parse("wover-item-testmod:enchanted_axe");
     // Level EnchantedAxe.setupItemStack applies (EnchantmentUtils.enchantInWorld(..., SHARPNESS, 5, ...)).
     private static final int EXPECTED_SHARPNESS = 5;
 

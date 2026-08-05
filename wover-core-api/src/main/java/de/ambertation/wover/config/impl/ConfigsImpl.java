@@ -4,14 +4,14 @@ import de.ambertation.wunderlib.configs.AbstractConfig;
 import de.ambertation.wover.config.api.Configs;
 import de.ambertation.wover.core.api.ModCore;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class ConfigsImpl {
-    private static final Map<ResourceLocation, AbstractConfig<?>> CONFIGS = new Hashtable<>();
+    private static final Map<Identifier, AbstractConfig<?>> CONFIGS = new Hashtable<>();
 
     public static <T extends AbstractConfig<?>> T register(
             ModCore mod,
@@ -36,7 +36,7 @@ public class ConfigsImpl {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends AbstractConfig<?>> T get(ResourceLocation location) {
+    public static <T extends AbstractConfig<?>> T get(Identifier location) {
         return (T) CONFIGS.get(location);
     }
 }

@@ -1,6 +1,6 @@
 package de.ambertation.wover.tag.api.event.context;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagEntry;
 
 /**
@@ -12,11 +12,11 @@ import net.minecraft.tags.TagEntry;
  */
 public interface TagElementWrapper<T> {
     /**
-     * The {@link ResourceLocation} of the element to add to the tag.
+     * The {@link Identifier} of the element to add to the tag.
      *
-     * @return The {@link ResourceLocation} of the element to add to the tag.
+     * @return The {@link Identifier} of the element to add to the tag.
      */
-    ResourceLocation id();
+    Identifier id();
     /**
      * Whether the element is a tag or not.
      *

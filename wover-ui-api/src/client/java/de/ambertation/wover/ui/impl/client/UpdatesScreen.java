@@ -12,11 +12,11 @@ import de.ambertation.wover.entrypoint.LibWoverUi;
 import de.ambertation.wover.ui.api.VersionChecker;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Environment(EnvType.CLIENT)
 public class UpdatesScreen extends WoverLayoutScreen {
-    static final ResourceLocation UPDATE_LOGO_LOCATION = LibWoverUi.C.mk("icon_updater.png");
+    static final Identifier UPDATE_LOGO_LOCATION = LibWoverUi.C.mk("icon_updater.png");
 
     public UpdatesScreen(@NotNull Runnable onClose) {
         super(onClose, Component.translatable("wover.updates.title"), 10, 10, 10);
@@ -42,7 +42,7 @@ public class UpdatesScreen extends WoverLayoutScreen {
         Minecraft.getInstance().setScreen(new UpdatesScreen(Minecraft.getInstance().screen));
     }
 
-    public ResourceLocation getUpdaterIcon(ModCore core) {
+    public Identifier getUpdaterIcon(ModCore core) {
         if (core.namespace.equals(LibWoverUi.C.namespace)) {
             return UPDATE_LOGO_LOCATION;
         }
@@ -71,7 +71,7 @@ public class UpdatesScreen extends WoverLayoutScreen {
         VersionChecker.forEachUpdate((mod, cur, updated) -> {
             ModCore core = ModCore.create(mod);
             ModContainer nfo = core.modContainer;
-            ResourceLocation icon = getUpdaterIcon(core);
+            Identifier icon = getUpdaterIcon(core);
             HorizontalStack row = rows.addRow(fixed(320), fit()).centerHorizontal();
             if (icon != null) {
                 row.addImage(Value.fit(), Value.fit(), icon, Size.of(32));
@@ -152,7 +152,7 @@ public class UpdatesScreen extends WoverLayoutScreen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackgroundLayer(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         guiGraphics.fill(0, 0, width, height, 0xBD343444);
     }
 }

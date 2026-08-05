@@ -4,7 +4,7 @@ import de.ambertation.wover.generator.impl.biomesource.BiomeSourceManagerImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -33,7 +33,7 @@ public class BiomeSourceManager {
      * @param location The id the {@link BiomeSource} type is registered under.
      * @param codec    The {@link MapCodec} used to (de)serialize the {@link BiomeSource}.
      */
-    public static void register(ResourceLocation location, MapCodec<BiomeSource> codec) {
+    public static void register(Identifier location, MapCodec<BiomeSource> codec) {
         BiomeSourceManagerImpl.register(location, codec);
     }
 
@@ -69,7 +69,7 @@ public class BiomeSourceManager {
      * @param tag The tag to get the excluded biomes for.
      * @return A set of biomes that are excluded for the given tag.
      */
-    public static Set<ResourceLocation> getExcludedBiomes(TagKey<Biome> tag) {
+    public static Set<Identifier> getExcludedBiomes(TagKey<Biome> tag) {
         return BiomeSourceManagerImpl.getExcludedBiomes(tag);
     }
 }

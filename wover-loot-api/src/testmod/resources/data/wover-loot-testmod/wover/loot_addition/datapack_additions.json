@@ -1,0 +1,78 @@
+{
+  "additions": [
+    {
+      "target": "minecraft:chests/jungle_temple",
+      "operations": [
+        {
+          "type": "add_pool",
+          "pools": {
+            "rolls": 1.0,
+            "entries": [
+              {
+                "type": "minecraft:item",
+                "name": "minecraft:barrier"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "target": "wover-loot-testmod:chests/does_not_exist",
+      "required": false,
+      "operations": [
+        {
+          "type": "add_pool",
+          "pools": {
+            "rolls": 1.0,
+            "entries": [
+              {
+                "type": "minecraft:item",
+                "name": "minecraft:barrier"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "target": "minecraft:chests/igloo_chest",
+      "operations": [
+        {
+          "type": "add_entries",
+          "pool": "every",
+          "entries": {
+            "type": "minecraft:item",
+            "name": "minecraft:jigsaw",
+            "weight": 1
+          }
+        }
+      ]
+    },
+    {
+      "target": "minecraft:chests/underwater_ruin_big",
+      "operations": [
+        {
+          "type": "add_condition",
+          "pool": "every",
+          "condition": {
+            "condition": "minecraft:random_chance",
+            "chance": 0.0
+          }
+        },
+        {
+          "type": "add_pool",
+          "pools": {
+            "rolls": 1.0,
+            "entries": [
+              {
+                "type": "minecraft:item",
+                "name": "minecraft:structure_block"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

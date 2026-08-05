@@ -5,7 +5,7 @@ import de.ambertation.wover.item.api.model.ItemModelBinding;
 import de.ambertation.wover.item.api.model.ItemModelKey;
 import de.ambertation.wover.item.api.model.ItemModelKeys;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
@@ -65,6 +65,31 @@ public class ModelTraitLibrary {
         return bind(BlockModelKeys.BOOKSHELF, planksMaterial);
     }
 
+    /**
+     * A vanilla-style shelf model: the six part models (body, unpowered, unconnected, left, center, right)
+     * plus the inventory model, dispatched by a multipart blockstate over facing/powered/side-chain. All of
+     * them read the block's own {@code block/<name>} texture, which is the packed 32x32 sheet vanilla uses
+     * for every shelf face (see {@code minecraft:block/oak_shelf}).
+     *
+     * @param particleMaterial the block whose texture the shelf's break/step particles use. It has to be a
+     *                         block with a texture under its own bare name (planks, not a {@code _side}/
+     *                         {@code _top} pillar like a log); vanilla uses the stripped log, whose texture
+     *                         happens to be flat.
+     */
+    public static BlockModelBinding shelf(Supplier<Block> particleMaterial) {
+        return bind(BlockModelKeys.SHELF, particleMaterial);
+    }
+
+    /**
+     * A vanilla-style chiseled bookshelf model: the body and inventory models plus the twelve
+     * empty/occupied book-slot overlays, dispatched by a multipart blockstate over facing and the six
+     * {@code slot_N_occupied} properties. Textures are the block's own {@code _top}/{@code _side}/
+     * {@code _empty}/{@code _occupied} variants.
+     */
+    public static BlockModelBinding chiseledBookshelf() {
+        return bind(BlockModelKeys.CHISELED_BOOKSHELF, null);
+    }
+
     /** A vanilla-style rotated pillar model. */
     public static BlockModelBinding pillar() {
         return bind(BlockModelKeys.PILLAR, null);
@@ -76,7 +101,7 @@ public class ModelTraitLibrary {
     }
 
     /** The chest-special-renderer id used for chests built through {@link #chest}. */
-    public static ResourceLocation chestRendered = LibWoverBlock.C.mk("wooden_chest");
+    public static Identifier chestRendered = LibWoverBlock.C.mk("wooden_chest");
 
     /** A vanilla-style chest model (particle-only block + special-renderer item model). */
     public static BlockModelBinding chest(Supplier<Block> planksMaterial) {
@@ -199,12 +224,12 @@ public class ModelTraitLibrary {
     }
 
     /** Like {@link #externalModel()}, but the item model points at an explicit model location. */
-    public static BlockModelBinding externalModelDelegatedItem(Supplier<ResourceLocation> itemModel) {
+    public static BlockModelBinding externalModelDelegatedItem(Supplier<Identifier> itemModel) {
         return bind(BlockModelKeys.EXTERNAL_MODEL_DELEGATED_ITEM_LOCATION, itemModel);
     }
 
     /** A hand-authored blockstate/model with a generated flat item model (from an optional texture). */
-    public static BlockModelBinding externalModelFlatItem(@Nullable Supplier<ResourceLocation> itemTexture) {
+    public static BlockModelBinding externalModelFlatItem(@Nullable Supplier<Identifier> itemTexture) {
         return bind(BlockModelKeys.EXTERNAL_MODEL_FLAT_ITEM, itemTexture);
     }
 

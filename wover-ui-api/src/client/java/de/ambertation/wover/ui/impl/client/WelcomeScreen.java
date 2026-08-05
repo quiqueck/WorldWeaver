@@ -8,19 +8,19 @@ import de.ambertation.wover.entrypoint.LibWoverUi;
 import de.ambertation.wover.events.impl.client.ClientWorldLifecycleImpl;
 import de.ambertation.wover.ui.api.VersionChecker;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.NotNull;
 
 public class WelcomeScreen extends WoverLayoutScreen {
-    public static final ResourceLocation BETTERX_LOCATION = LibWoverUi.C.id("betterx.png");
-    public static final ResourceLocation HEADER = LibWoverUi.C.id("header.png");
-    public static final ResourceLocation ICON_BETTERNETHER = LibWoverUi.C.id("icon_betternether.png");
-    public static final ResourceLocation ICON_BETTEREND = LibWoverUi.C.id("icon_betterend.png");
-    public static final ResourceLocation ICON_BCLIB = LibWoverUi.C.id("icon_bclib.png");
+    public static final Identifier BETTERX_LOCATION = LibWoverUi.C.id("betterx.png");
+    public static final Identifier HEADER = LibWoverUi.C.id("header.png");
+    public static final Identifier ICON_BETTERNETHER = LibWoverUi.C.id("icon_betternether.png");
+    public static final Identifier ICON_BETTEREND = LibWoverUi.C.id("icon_betterend.png");
+    public static final Identifier ICON_BCLIB = LibWoverUi.C.id("icon_bclib.png");
 
     public WelcomeScreen(@NotNull Runnable onClose) {
         super(onClose, translatable("wover.welcome.title"));
@@ -128,7 +128,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
         return VerticalScroll.create(fill(), fill(), content).setScrollerPadding(0);
     }
 
-    private void addSeparator(VerticalStack innerContent, ResourceLocation image) {
+    private void addSeparator(VerticalStack innerContent, Identifier image) {
         final int sepWidth = (int) (427 / 1.181) / 2;
         HorizontalStack separator = new HorizontalStack(fit(), fit()).centerHorizontal();
         separator.addHLine(fixed((sepWidth - 32) / 2), fixed(32)).centerVertical();
@@ -146,7 +146,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
     }
 
     @Override
-    public void renderBackgroundLayer(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackgroundLayer(GuiGraphicsExtractor guiGraphics, int i, int j, float f) {
         guiGraphics.fill(0, 0, width, height, 0xBD343444);
 //        Rectangle BANNER_UV = new Rectangle(0, 0, 427, 100);
 //        Size BANNER_RESOURCE_SIZE = BANNER_UV.size();

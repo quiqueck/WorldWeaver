@@ -4,12 +4,12 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.advancements.criterion.RecipeUnlockedTrigger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
@@ -68,7 +68,7 @@ public class RecipeGameTest {
 
         if (!failures.isEmpty()) {
             final List<String> present = new ArrayList<>();
-            recipeManager.getRecipes().forEach(h -> present.add(h.id().location().toString()));
+            recipeManager.getRecipes().forEach(h -> present.add(h.id().identifier().toString()));
             helper.fail(Component.literal(
                     "Recipe-manager regression:\n - " + String.join("\n - ", failures)
                             + "\n\nRecipes actually present: " + present
@@ -81,22 +81,22 @@ public class RecipeGameTest {
 
     private static boolean hasRecipe(RecipeManager recipeManager, String id) {
         final ResourceKey<Recipe<?>> key = ResourceKey.create(
-                Registries.RECIPE, ResourceLocation.parse(id)
+                Registries.RECIPE, Identifier.parse(id)
         );
         return recipeManager.byKey(key).isPresent();
     }
 
-    // The unlock advancement the vanilla recipe builder mints for INJECTED_RECIPE: the recipe id with
+    // The unlock advancement RecipeUnlockAdvancementBuilder mints for INJECTED_RECIPE: the recipe id with
     // "recipes/<category folder>/" prefixed to its path. The testmod recipe leaves the category at its
     // default, RecipeCategory.MISC, whose folder name is "misc".
     private static final String UNLOCK_ADVANCEMENT =
             "wover-recipe-testmod:recipes/misc/test_diamoan_recipe";
 
     // Every recipe advancement vanilla generates hangs under this root, which vanilla's own datapack ships.
-    private static final ResourceLocation ROOT_RECIPE_ADVANCEMENT =
-            ResourceLocation.withDefaultNamespace("recipes/root");
+    private static final Identifier ROOT_RECIPE_ADVANCEMENT =
+            Identifier.withDefaultNamespace("recipes/root");
 
-    // The criterion name the vanilla recipe builder uses for the minecraft:recipe_unlocked trigger.
+    // The criterion name RecipeUnlockAdvancementBuilder uses for the minecraft:recipe_unlocked trigger.
     private static final String HAS_THE_RECIPE = "has_the_recipe";
 
     /**
@@ -128,7 +128,7 @@ public class RecipeGameTest {
         final List<String> failures = new ArrayList<>();
 
         final ResourceKey<Recipe<?>> recipeKey = ResourceKey.create(
-                Registries.RECIPE, ResourceLocation.parse(INJECTED_RECIPE)
+                Registries.RECIPE, Identifier.parse(INJECTED_RECIPE)
         );
         final RecipeHolder<?> recipeHolder = server.getRecipeManager().byKey(recipeKey).orElse(null);
         if (recipeHolder == null) {
@@ -139,7 +139,7 @@ public class RecipeGameTest {
             return;
         }
 
-        final ResourceLocation advancementId = ResourceLocation.parse(UNLOCK_ADVANCEMENT);
+        final Identifier advancementId = Identifier.parse(UNLOCK_ADVANCEMENT);
         final ServerAdvancementManager advancements = server.getAdvancements();
         final AdvancementHolder advancement = advancements.get(advancementId);
 

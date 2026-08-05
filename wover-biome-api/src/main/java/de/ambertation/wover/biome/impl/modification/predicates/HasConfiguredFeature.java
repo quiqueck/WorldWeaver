@@ -31,6 +31,7 @@ public record HasConfiguredFeature(ResourceKey<ConfiguredFeature<?, ?>> key) imp
             for (Holder<PlacedFeature> holders : featuresForStep) {
                 if (holders.value()
                            .getFeatures()
+                           .map(Holder::value)
                            .map(ctx.configuredFeatures::getResourceKey)
                            .filter(Optional::isPresent)
                            .map(Optional::get)

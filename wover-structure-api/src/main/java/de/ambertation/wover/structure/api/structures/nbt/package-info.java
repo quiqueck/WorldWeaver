@@ -8,6 +8,6 @@
  * ({@link de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructurePiece}) it generates.
  * <p>
  * Build one via {@link de.ambertation.wover.structure.api.builders.RandomNbtBuilder}, created through
- * {@link de.ambertation.wover.structure.api.StructureManager#randomNbt(net.minecraft.resources.ResourceLocation)}.
+ * {@link de.ambertation.wover.structure.api.StructureManager#randomNbt(net.minecraft.resources.Identifier)}.
  */
 package de.ambertation.wover.structure.api.structures.nbt;

@@ -8,7 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight;
@@ -30,7 +30,7 @@ public class JigsawBuilderImpl
         extends BaseStructureBuilderImpl<JigsawStructure, JigsawBuilder, StructureKey.Jigsaw>
         implements JigsawBuilder {
     private Holder<StructureTemplatePool> startPool;
-    private Optional<ResourceLocation> startJigsawName;
+    private Optional<Identifier> startJigsawName;
     private int maxDepth;
     private HeightProvider startHeight;
     private boolean useExpansionHack;
@@ -82,7 +82,7 @@ public class JigsawBuilderImpl
     }
 
     @Override
-    public JigsawBuilder startJigsawName(ResourceLocation value) {
+    public JigsawBuilder startJigsawName(Identifier value) {
         this.startJigsawName = Optional.of(value);
         return this;
     }
@@ -139,7 +139,7 @@ public class JigsawBuilderImpl
     @Override
     protected Structure build() {
         if (startPool == null) {
-            throw new IllegalStateException("Start pool must be set for " + key.key().location());
+            throw new IllegalStateException("Start pool must be set for " + key.key().identifier());
         }
 
         return new JigsawStructure(
@@ -150,7 +150,7 @@ public class JigsawBuilderImpl
                 startHeight,
                 useExpansionHack,
                 projectStartToHeightmap,
-                maxDistanceFromCenter,
+                new JigsawStructure.MaxDistance(maxDistanceFromCenter),
                 aliasBindings == null ? List.of() : aliasBindings,
                 dimensionPadding,
                 liquidSettings

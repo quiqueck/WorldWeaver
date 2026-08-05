@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
@@ -34,7 +35,7 @@ public class Extend extends PlacementModifier {
                             .fieldOf("direction")
                             .orElse(Direction.DOWN)
                             .forGetter(cfg -> cfg.direction),
-                    IntProvider.codec(0, 16)
+                    IntProviders.codec(0, 16)
                                .fieldOf("length")
                                .orElse(UniformInt.of(0, 3))
                                .forGetter(cfg -> cfg.length)

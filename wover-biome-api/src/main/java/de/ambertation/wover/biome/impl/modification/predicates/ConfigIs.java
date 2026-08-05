@@ -8,14 +8,14 @@ import de.ambertation.wover.entrypoint.LibWoverCore;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.KeyDispatchDataCodec;
 
-public record ConfigIs(ResourceLocation configFile, String path, String key,
+public record ConfigIs(Identifier configFile, String path, String key,
                        String testValue) implements BiomePredicate {
     public static final MapCodec<ConfigIs> DIRECT_CODEC = RecordCodecBuilder.mapCodec(instance -> instance
             .group(
-                    ResourceLocation.CODEC.fieldOf("config_file").forGetter(ConfigIs::configFile),
+                    Identifier.CODEC.fieldOf("config_file").forGetter(ConfigIs::configFile),
                     Codec.STRING.fieldOf("path").forGetter(ConfigIs::path),
                     Codec.STRING.fieldOf("key").forGetter(ConfigIs::key),
                     Codec.STRING.fieldOf("value").forGetter(ConfigIs::testValue)

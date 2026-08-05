@@ -12,7 +12,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -100,12 +100,12 @@ public abstract class StructureKeyImpl<
     /**
      * For internal use only. Use {@link StructureManager} instead.
      * <p>
-     * Creates a new {@link StructureKey} with the given {@link ResourceLocation}.
+     * Creates a new {@link StructureKey} with the given {@link Identifier}.
      *
      * @param structureId The structure id
      */
     @ApiStatus.Internal
-    protected StructureKeyImpl(@NotNull ResourceLocation structureId) {
+    protected StructureKeyImpl(@NotNull Identifier structureId) {
         this.key = ResourceKey.create(Registries.STRUCTURE, structureId);
         this.decoration = GenerationStep.Decoration.SURFACE_STRUCTURES;
     }

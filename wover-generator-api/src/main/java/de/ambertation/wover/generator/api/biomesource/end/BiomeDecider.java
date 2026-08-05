@@ -9,7 +9,7 @@ import de.ambertation.wover.generator.impl.biomesource.end.WoverEndBiomeSource;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -51,27 +51,27 @@ public abstract class BiomeDecider {
     /**
      * Register a high priority Decider for the {@link WoverEndBiomeSource}.
      * Normally you should not need to register a high priority decider and instead use
-     * {@link BiomeDecider#registerDecider(ResourceLocation, BiomeDecider)}.
+     * {@link BiomeDecider#registerDecider(Identifier, BiomeDecider)}.
      * BetterEnd (for example) will add
      *
-     * @param location The {@link ResourceLocation} for the decider
+     * @param location The {@link Identifier} for the decider
      * @param decider  The initial decider Instance. Each Instance of the {@link WoverEndBiomeSource}
      *                 will call {@link BiomeDecider#createInstance(WoverBiomeSource)} to build a
      *                 new instance of this decider
      */
-    public static void registerHighPriorityDecider(ResourceLocation location, BiomeDecider decider) {
+    public static void registerHighPriorityDecider(Identifier location, BiomeDecider decider) {
         BiomeDeciderImpl.registerHighPriorityDecider(location, decider);
     }
 
     /**
      * Register a new Decider for the {@link WoverEndBiomeSource}
      *
-     * @param location The {@link ResourceLocation} for the decider
+     * @param location The {@link Identifier} for the decider
      * @param decider  The initial decider Instance. Each Instance of the {@link WoverEndBiomeSource}
      *                 will call {@link BiomeDecider#createInstance(WoverBiomeSource)} to build a
      *                 new instance of this decider
      */
-    public static void registerDecider(ResourceLocation location, BiomeDecider decider) {
+    public static void registerDecider(Identifier location, BiomeDecider decider) {
         BiomeDeciderImpl.registerDecider(location, decider);
     }
 

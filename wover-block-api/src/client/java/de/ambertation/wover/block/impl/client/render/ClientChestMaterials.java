@@ -4,7 +4,7 @@ import de.ambertation.wover.block.api.render.ChestRendererBinding;
 import de.ambertation.wover.block.api.trait.BlockTrait;
 
 import static net.minecraft.client.renderer.Sheets.CHEST_MAPPER;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.Block;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Client-side derivation of the single/left/right chest render {@link Material}s for a custom chest block. This
+ * Client-side derivation of the single/left/right chest render {@link SpriteId}s for a custom chest block. This
  * is the {@code net.minecraft.client.renderer.Sheets#CHEST_MAPPER} computation the former
  * {@code ChestRenderTrait.configure(...)} ran at registration time; it now runs lazily (and is cached) for any
  * block carrying the common {@link ChestRendererBinding}, and {@code SheetsMixin} reads it at render time.
@@ -30,7 +30,7 @@ public final class ClientChestMaterials {
      * @param left   the left half of a double chest
      * @param right  the right half of a double chest
      */
-    public record ChestMaterialSet(Material single, Material left, Material right) {
+    public record ChestMaterialSet(SpriteId single, SpriteId left, SpriteId right) {
     }
 
     private static final Map<Block, ChestMaterialSet> CACHE = new ConcurrentHashMap<>();

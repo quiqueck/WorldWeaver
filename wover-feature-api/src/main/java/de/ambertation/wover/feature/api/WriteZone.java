@@ -64,8 +64,8 @@ public record WriteZone(int minX, int minZ, int maxX, int maxZ) {
     /**
      * The zone the given level currently permits.
      * <p>
-     * This branch's {@code WorldGenRegion} has no {@code isWithinWriteZone(BlockPos)} to probe with
-     * either: its only public write-side check is {@code ensureCanWrite(BlockPos)}, and that one calls
+     * On 26.1 {@code WorldGenRegion} has no {@code isWithinWriteZone(BlockPos)} to probe with: its only
+     * public write-side check is {@code ensureCanWrite(BlockPos)}, and that one calls
      * {@code Util.logAndPauseIfInIde(...)} when it fails, so it cannot be used as a quiet predicate - it
      * would spam the log and pause the game in a dev environment. {@code ensureCanWrite} itself, though,
      * compares the same {@code distanceX}/{@code distanceZ} against
@@ -73,21 +73,19 @@ public record WriteZone(int minX, int minZ, int maxX, int maxZ) {
      * than needing to be probed: {@code generatingStep} is a private field on {@code WorldGenRegion}
      * widened here to {@code ChunkStep}, whose {@code blockStateWriteRadius()} is a public record
      * accessor.
-     * <p>
-     * One further wrinkle on this branch: {@code ChunkPos} is a plain class here, not a record, so its
-     * coordinates are read as the public fields {@code x}/{@code z} rather than through {@code x()}/
-     * {@code z()} accessor methods.
      */
     public static WriteZone of(LevelAccessor level) {
         if (!(level instanceof WorldGenRegion region)) {
             return UNBOUNDED;
         }
-        final int centerX = region.getCenter().x;
-        final int centerZ = region.getCenter().z;
+        final int centerX = region.getCenter().x();
+        final int centerZ = region.getCenter().z();
         // Clamped at zero because the field can legitimately be -1: ChunkStep.Builder defaults it to
-        // that and only the steps that actually write blocks ever set it. A negative radius would make
-        // minX greater than maxX, so contains() would be false everywhere and a feature would draw
-        // nothing at all rather than being confined to the chunk it is decorating.
+        // that and only the steps that actually write blocks ever set it. 26.3's probing loop had that
+        // floor implicitly - it starts at 0 and only ever grows - so without the clamp this is the one
+        // place the two implementations would disagree, and it would disagree badly: a negative radius
+        // makes minX greater than maxX, so contains() is false everywhere and a feature draws nothing
+        // at all rather than being confined to the chunk it is decorating.
         final int radius = Math.max(0, region.generatingStep.blockStateWriteRadius());
         return new WriteZone(
                 SectionPos.sectionToBlockCoord(centerX - radius),

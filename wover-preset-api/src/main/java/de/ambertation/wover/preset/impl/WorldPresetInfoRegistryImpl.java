@@ -9,7 +9,7 @@ import de.ambertation.wover.preset.api.WorldPresetInfoRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -34,7 +34,7 @@ public class WorldPresetInfoRegistryImpl {
     }
 
     public static ResourceKey<WorldPresetInfo> createKey(
-            ResourceLocation ruleID
+            Identifier ruleID
     ) {
         return ResourceKey.create(
                 WorldPresetInfoRegistry.WORLD_PRESET_INFO_REGISTRY,
@@ -49,11 +49,11 @@ public class WorldPresetInfoRegistryImpl {
             @NotNull WorldPresetInfo info
     ) {
         if (info == null) {
-            throw new IllegalStateException("World preset info is not set for world preset '" + key.location() + "'");
+            throw new IllegalStateException("World preset info is not set for world preset '" + key.identifier() + "'");
         }
 
         return ctx.register(
-                createKey(key.location()),
+                createKey(key.identifier()),
                 info
         );
     }

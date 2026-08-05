@@ -11,7 +11,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
@@ -32,13 +32,13 @@ public class StructureSetManager {
             StructureSetManagerImpl.BOOTSTRAP_STRUCTURE_SETS;
 
     /**
-     * Creates a {@link StructureSetKey} for the given {@link ResourceLocation}.
+     * Creates a {@link StructureSetKey} for the given {@link Identifier}.
      *
      * @param location The location of the {@link StructureSet}
      * @return The {@link StructureSetKey}
      */
     public static StructureSetKey createKey(
-            ResourceLocation location
+            Identifier location
     ) {
         return new StructureSetKey(location);
     }
@@ -53,7 +53,7 @@ public class StructureSetManager {
     public static StructureSetKey createKey(
             StructureKey<?, ?, ?> structure
     ) {
-        return createKey(structure.key().location());
+        return createKey(structure.key().identifier());
     }
 
     /**

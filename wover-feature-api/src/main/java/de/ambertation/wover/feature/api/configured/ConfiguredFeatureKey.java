@@ -11,7 +11,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -38,7 +38,7 @@ public abstract class ConfiguredFeatureKey<B extends FeatureConfigurator<?, ?>> 
      *
      * @param id The id of the {@link ConfiguredFeature}
      */
-    protected ConfiguredFeatureKey(@NotNull ResourceLocation id) {
+    protected ConfiguredFeatureKey(@NotNull Identifier id) {
         this(FeatureConfiguratorImpl.createKey(id));
     }
 

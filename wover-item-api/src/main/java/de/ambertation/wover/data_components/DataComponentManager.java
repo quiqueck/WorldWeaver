@@ -4,7 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 
 import java.util.function.UnaryOperator;
@@ -60,7 +60,7 @@ public class DataComponentManager {
      * @return The registered data component type
      */
     public static <T> DataComponentType<T> registerDataComponent(
-            ResourceLocation componentId,
+            Identifier componentId,
             UnaryOperator<DataComponentType.Builder<T>> builderConfigurator
     ) {
         return Registry.register(
@@ -81,7 +81,7 @@ public class DataComponentManager {
      * @param attribute   The attribute instance to register
      * @return A holder reference to the registered attribute
      */
-    public static Holder<Attribute> registerAttribute(ResourceLocation attributeId, Attribute attribute) {
+    public static Holder<Attribute> registerAttribute(Identifier attributeId, Attribute attribute) {
         return Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, attributeId, attribute);
     }
 }

@@ -7,7 +7,7 @@ import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.packs.resources.CloseableResourceManager;
-import net.minecraft.world.level.storage.WorldData;
+import net.minecraft.world.level.storage.LevelDataAndDimensions;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ public class WorldStemMixin {
             CloseableResourceManager closeableResourceManager,
             ReloadableServerResources reloadableServerResources,
             LayeredRegistryAccess layeredRegistryAccess,
-            WorldData worldData,
+            LevelDataAndDimensions.WorldDataAndGenSettings worldDataAndGenSettings,
             CallbackInfo ci
     ) {
         WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(

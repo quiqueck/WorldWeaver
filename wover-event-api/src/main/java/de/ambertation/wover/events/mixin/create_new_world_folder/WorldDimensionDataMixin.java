@@ -8,7 +8,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
@@ -61,7 +61,7 @@ public class WorldDimensionDataMixin {
                                                                      .orElseThrow();
 
         Optional<ResourceKey<WorldPreset>> presetKey = Optional
-                .ofNullable(ResourceLocation.tryParse(this.levelType))
+                .ofNullable(Identifier.tryParse(this.levelType))
                 .map((resourceLocation) -> ResourceKey.create(
                         Registries.WORLD_PRESET,
                         resourceLocation

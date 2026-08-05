@@ -10,7 +10,7 @@ import de.ambertation.wover.util.Triple;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -166,7 +166,7 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     }
 
     public static class Key extends ConfiguredFeatureKey<AsMultiPlaceRandomSelect> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

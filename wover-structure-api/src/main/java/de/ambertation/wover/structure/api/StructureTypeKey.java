@@ -1,7 +1,7 @@
 package de.ambertation.wover.structure.api;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureType;
 
@@ -12,9 +12,9 @@ import org.jetbrains.annotations.NotNull;
  * Wraps a registered {@link StructureType} for a custom {@link Structure} subclass together with the
  * {@link StructureFactory} used to instantiate it.
  * <p>
- * Instances are created with {@link StructureManager#registerType(ResourceLocation, StructureFactory)} or
- * {@link StructureManager#registerType(ResourceLocation, StructureFactory, MapCodec)}, or implicitly by
- * {@link StructureManager#structure(ResourceLocation, StructureFactory)}.
+ * Instances are created with {@link StructureManager#registerType(Identifier, StructureFactory)} or
+ * {@link StructureManager#registerType(Identifier, StructureFactory, MapCodec)}, or implicitly by
+ * {@link StructureManager#structure(Identifier, StructureFactory)}.
  *
  * @param <S> The {@link Structure} type
  */
@@ -42,8 +42,8 @@ public class StructureTypeKey<S extends Structure> {
     }
 
     /**
-     * For internal use only. Use {@link StructureManager#registerType(ResourceLocation, StructureFactory, MapCodec)}
-     * to explicitly register and create a key. Or {@link StructureManager#structure(ResourceLocation, StructureFactory, MapCodec)}
+     * For internal use only. Use {@link StructureManager#registerType(Identifier, StructureFactory, MapCodec)}
+     * to explicitly register and create a key. Or {@link StructureManager#structure(Identifier, StructureFactory, MapCodec)}
      * to implicitly register and create a key that will be used by a structure.
      *
      * @param type             the structure type

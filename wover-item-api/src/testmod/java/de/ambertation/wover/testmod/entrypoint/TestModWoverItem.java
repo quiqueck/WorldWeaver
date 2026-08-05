@@ -11,7 +11,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -39,7 +39,7 @@ public class TestModWoverItem implements ModInitializer {
             .createKey(C.mk("breaker_enchant"));
 
 
-    private static Holder<Attribute> register(ResourceLocation string, Attribute attribute) {
+    private static Holder<Attribute> register(Identifier string, Attribute attribute) {
         return Registry.registerForHolder(BuiltInRegistries.ATTRIBUTE, string, attribute);
     }
 
@@ -74,7 +74,7 @@ public class TestModWoverItem implements ModInitializer {
                     .withEffect(
                             EnchantmentEffectComponents.ATTRIBUTES,
                             new EnchantmentAttributeEffect(
-                                    OBSIDIAN_BLOCK_BREAK_SPEED.unwrapKey().orElseThrow().location(),
+                                    OBSIDIAN_BLOCK_BREAK_SPEED.unwrapKey().orElseThrow().identifier(),
                                     OBSIDIAN_BLOCK_BREAK_SPEED,
                                     new LevelBasedValue.Lookup(List.of(6f, 12f, 18f), new LevelBasedValue.LevelsSquared(9.0F)),
                                     AttributeModifier.Operation.ADD_VALUE

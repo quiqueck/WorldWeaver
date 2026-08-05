@@ -6,7 +6,7 @@ import de.ambertation.wover.entrypoint.LibWoverBlock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicateType;
 
@@ -17,7 +17,7 @@ public class BlockPredicatesImpl {
     );
 
     public static <P extends BlockPredicate> BlockPredicateType<P> register(
-            ResourceLocation location,
+            Identifier location,
             MapCodec<P> codec
     ) {
         return Registry.register(BuiltInRegistries.BLOCK_PREDICATE_TYPE, location, () -> codec);

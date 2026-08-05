@@ -1,6 +1,6 @@
 package de.ambertation.wover.item.api.armor;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import java.util.Map;
  * writes it to {@code assets/<namespace>/equipment/<path>.json}.
  *
  * @see CustomArmorMaterial.Builder#humanoidEquipmentAsset()
- * @see CustomArmorMaterial.Builder#wingsEquipmentAsset(ResourceLocation)
+ * @see CustomArmorMaterial.Builder#wingsEquipmentAsset(Identifier)
  * @see CustomArmorMaterial.Builder#equipmentAsset(java.util.function.Consumer)
  */
 public final class EquipmentAssetSpec {
@@ -45,12 +45,12 @@ public final class EquipmentAssetSpec {
     /**
      * A single layer entry - mirrors vanilla's {@code EquipmentClientInfo.Layer}.
      *
-     * @param texture          The texture {@link ResourceLocation} for this layer
+     * @param texture          The texture {@link Identifier} for this layer
      * @param usePlayerTexture Whether the player's own skin should be blended in (used by elytra wings)
      * @param dyeable          Whether this layer supports leather-style dyeing
      */
-    public record Layer(ResourceLocation texture, boolean usePlayerTexture, boolean dyeable) {
-        public Layer(ResourceLocation texture) {
+    public record Layer(Identifier texture, boolean usePlayerTexture, boolean dyeable) {
+        public Layer(Identifier texture) {
             this(texture, false, false);
         }
     }
@@ -93,19 +93,19 @@ public final class EquipmentAssetSpec {
      * @param texture The texture to use for both layers
      * @return This instance, for chaining
      */
-    public EquipmentAssetSpec addHumanoidLayers(ResourceLocation texture) {
+    public EquipmentAssetSpec addHumanoidLayers(Identifier texture) {
         return addHumanoidLayers(texture, false);
     }
 
     /**
-     * Same as {@link #addHumanoidLayers(ResourceLocation)}, but also marks the layers as leather-style
+     * Same as {@link #addHumanoidLayers(Identifier)}, but also marks the layers as leather-style
      * dyeable.
      *
      * @param texture The texture to use for both layers
      * @param dyeable Whether the layers should support leather-style dyeing
      * @return This instance, for chaining
      */
-    public EquipmentAssetSpec addHumanoidLayers(ResourceLocation texture, boolean dyeable) {
+    public EquipmentAssetSpec addHumanoidLayers(Identifier texture, boolean dyeable) {
         addLayers(LayerType.HUMANOID, new Layer(texture, false, dyeable));
         addLayers(LayerType.HUMANOID_LEGGINGS, new Layer(texture, false, dyeable));
         return this;
@@ -118,7 +118,7 @@ public final class EquipmentAssetSpec {
      * @param texture The texture to use for the wings layer
      * @return This instance, for chaining
      */
-    public EquipmentAssetSpec addWingsLayer(ResourceLocation texture) {
+    public EquipmentAssetSpec addWingsLayer(Identifier texture) {
         return addLayers(LayerType.WINGS, new Layer(texture, true, false));
     }
 

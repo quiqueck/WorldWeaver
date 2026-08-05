@@ -18,7 +18,7 @@ import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Objects;
@@ -107,7 +107,7 @@ public class BiomeManagerImpl {
     }
 
     public static ResourceKey<Biome> createKey(
-            ResourceLocation biomeID
+            Identifier biomeID
     ) {
         return ResourceKey.create(
                 Registries.BIOME,
@@ -115,12 +115,12 @@ public class BiomeManagerImpl {
         );
     }
 
-    public static BiomeKey<BiomeBuilder.Vanilla> vanilla(ResourceLocation location) {
+    public static BiomeKey<BiomeBuilder.Vanilla> vanilla(Identifier location) {
         return new VanillaKeyImpl(location);
     }
 
 
     public static BiomeKey<BiomeBuilder.Wrapped> wrapped(@NotNull ResourceKey<Biome> key) {
-        return new WrappedKeyImpl(key.location());
+        return new WrappedKeyImpl(key.identifier());
     }
 }

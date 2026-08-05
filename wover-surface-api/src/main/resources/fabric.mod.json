@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-surface",
-    "version": "21.800.0",
+    "version": "26.101.0",
     "name": "WorldWeaver - Surface API",
     "description": "Provides A Registry for SurfaceRules.",
     "authors": [
@@ -31,14 +31,14 @@
     ],
     "accessWidener": "wover-surface.accesswidener",
     "depends": {
-        "fabricloader": ">=0.16.0",
+        "fabricloader": ">=0.19.0",
         "minecraft": [
-            "1.21.6",
-            "1.21.7",
-            "1.21.8"
+            "26.1",
+            "26.1.1",
+            "26.1.2"
         ],
-        "java": ">=21",
-        "fabric-api": ">=0.100.0"
+        "java": ">=25",
+        "fabric-api": ">=0.155.0"
     },
     "custom": {
         "modmenu": {

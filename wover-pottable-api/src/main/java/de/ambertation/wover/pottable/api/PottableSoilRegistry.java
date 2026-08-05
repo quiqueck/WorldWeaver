@@ -7,8 +7,8 @@ import de.ambertation.wover.pottable.impl.PottableSoilRegistryImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +37,7 @@ public class PottableSoilRegistry {
      * @param id The ID of the PottableSoil
      * @return The ResourceKey
      */
-    public static ResourceKey<PottableSoil> createKey(ResourceLocation id) {
+    public static ResourceKey<PottableSoil> createKey(Identifier id) {
         return PottableSoilRegistryImpl.createKey(id);
     }
 

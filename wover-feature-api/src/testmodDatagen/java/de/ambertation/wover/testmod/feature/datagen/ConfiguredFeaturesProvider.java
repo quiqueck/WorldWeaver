@@ -32,6 +32,11 @@ public class ConfiguredFeaturesProvider extends WoverRegistryContentProvider<Con
                 .block(Blocks.REDSTONE_BLOCK)
                 .register();
 
+        // Intentionally kept on the deprecated wover:random_patch shim: this provider bootstraps the
+        // CONFIGURED_FEATURE registry, whereas the replacement scatter(...) API is placement-based (produces a
+        // PLACED feature). Keeping this here (and patch_basalt_stalactite below) preserves compile+runtime
+        // coverage of the vendored random_patch shim until it is removed. Placement-based usages were migrated
+        // to FeaturePlacementBuilder.scatter(...) in PlacedFeatureProvider (inline_feature_all).
         TestModWoverFeature.TEST_RANDOM_SIMPLE
                 .bootstrap(context)
                 .block(Blocks.AMETHYST_BLOCK)

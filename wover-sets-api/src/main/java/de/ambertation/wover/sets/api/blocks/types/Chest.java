@@ -12,6 +12,7 @@ import de.ambertation.wover.sets.api.blocks.BlockSet;
 import de.ambertation.wover.sets.api.blocks.SlotFromDefinition;
 import de.ambertation.wover.sets.api.blocks.SlotType;
 
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -40,7 +41,12 @@ public class Chest extends SlotFromDefinition {
     ) {
         return registry.defineDefaultBlock(
                 name,
-                (def) -> new ChestBlock(() -> BlockEntityType.CHEST, def.getProperties())
+                (def) -> new ChestBlock(
+                        () -> BlockEntityType.CHEST,
+                        SoundEvents.CHEST_OPEN,
+                        SoundEvents.CHEST_CLOSE,
+                        def.getProperties()
+                )
         );
     }
 

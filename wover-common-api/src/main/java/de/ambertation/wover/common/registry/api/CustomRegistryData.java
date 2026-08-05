@@ -1,6 +1,6 @@
 package de.ambertation.wover.common.registry.api;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -14,9 +14,9 @@ import org.jetbrains.annotations.Nullable;
 public interface CustomRegistryData {
     class DataKey<T> {
         public @NotNull
-        final ResourceLocation id;
+        final Identifier id;
 
-        private DataKey(@NotNull ResourceLocation id) {
+        private DataKey(@NotNull Identifier id) {
             this.id = id;
         }
 
@@ -40,7 +40,7 @@ public interface CustomRegistryData {
      * @param <T> The Data Type
      * @return The DataKey
      */
-    static <T> DataKey<T> createKey(ResourceLocation id) {
+    static <T> DataKey<T> createKey(Identifier id) {
         return new DataKey<>(id);
     }
 
@@ -61,7 +61,7 @@ public interface CustomRegistryData {
      * @param <T> The Data Type
      * @return The Data
      */
-    <T> @Nullable T wover_computeDataIfAbsent(@NotNull DataKey<T> id, @NotNull Function<ResourceLocation, T> fkt);
+    <T> @Nullable T wover_computeDataIfAbsent(@NotNull DataKey<T> id, @NotNull Function<Identifier, T> fkt);
 
     /**
      * Put custom Data into the Registry.

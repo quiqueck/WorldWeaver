@@ -8,7 +8,7 @@ import de.ambertation.wover.surface.api.SurfaceRuleRegistry;
 import de.ambertation.wover.util.PriorityLinkedList;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 
@@ -17,7 +17,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 
 public class TestModWoverSurface implements ModInitializer {
     public static final ModCore C = ModCore.create("wover-surface-testmod");
-    public static final ResourceLocation ADDON_PACK = C.addDatapack(
+    public static final Identifier ADDON_PACK = C.addDatapack(
             "testpack",
             ResourcePackActivationType.DEFAULT_ENABLED
     );

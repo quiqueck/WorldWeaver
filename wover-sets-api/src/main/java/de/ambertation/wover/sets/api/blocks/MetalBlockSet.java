@@ -40,7 +40,7 @@ public abstract class MetalBlockSet<S extends MetalBlockSet<S>> extends BlockSet
         if (setType == null) {
             var builder = BlockSetTypeBuilder.copyOf(BlockSetType.IRON);
             SoundType setTypeSound = setTypeSound();
-            if (setTypeSound != null) builder.soundGroup(setTypeSound);
+            if (setTypeSound != null) builder.soundType(setTypeSound);
             setType = builder.register(this.C.id(this.baseName));
         }
 

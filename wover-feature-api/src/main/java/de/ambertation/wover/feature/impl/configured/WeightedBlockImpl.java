@@ -5,7 +5,7 @@ import de.ambertation.wover.feature.api.configured.configurators.WeightedBlock;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
@@ -34,7 +34,7 @@ public class WeightedBlockImpl extends WeightedBaseBlockImpl<SimpleBlockConfigur
     }
 
     public static class Key extends ConfiguredFeatureKey<WeightedBlock> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

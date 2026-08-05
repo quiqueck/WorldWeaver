@@ -13,7 +13,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * Generates {@code assets/<namespace>/equipment/<path>.json} files for every {@link EquipmentAssetSpec}
  * registered through {@link EquipmentAssetRegistry} - typically populated by
  * {@link de.ambertation.wover.item.api.armor.CustomArmorMaterial.Builder}'s {@code humanoidEquipmentAsset()} /
- * {@code wingsEquipmentAsset(ResourceLocation)} / {@code equipmentAsset(Consumer)} methods.
+ * {@code wingsEquipmentAsset(Identifier)} / {@code equipmentAsset(Consumer)} methods.
  *
  * <p>This mirrors vanilla's own (client-only) {@code EquipmentAssetProvider} almost exactly - same
  * {@link PackOutput.Target#RESOURCE_PACK}/{@code "equipment"} path provider, same {@link EquipmentClientInfo#CODEC}
@@ -73,7 +73,7 @@ public class WoverEquipmentAssetProvider implements WoverDataProvider<DataProvid
 
     @Override
     public DataProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new Provider(output, modCore);
@@ -83,7 +83,7 @@ public class WoverEquipmentAssetProvider implements WoverDataProvider<DataProvid
         private final PackOutput.PathProvider pathProvider;
         private final ModCore modCore;
 
-        private Provider(FabricDataOutput output, ModCore modCore) {
+        private Provider(FabricPackOutput output, ModCore modCore) {
             this.pathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "equipment");
             this.modCore = modCore;
         }
@@ -92,7 +92,7 @@ public class WoverEquipmentAssetProvider implements WoverDataProvider<DataProvid
         public @NotNull CompletableFuture<?> run(@NotNull CachedOutput cache) {
             final Map<ResourceKey<EquipmentAsset>, EquipmentClientInfo> equipmentAssets = new HashMap<>();
             EquipmentAssetRegistry.entries().forEach((assetId, spec) -> {
-                if (!assetId.location().getNamespace().equals(modCore.namespace)) return;
+                if (!assetId.identifier().getNamespace().equals(modCore.namespace)) return;
                 equipmentAssets.put(assetId, convert(spec));
             });
             return DataProvider.saveAll(cache, EquipmentClientInfo.CODEC, pathProvider::json, equipmentAssets);

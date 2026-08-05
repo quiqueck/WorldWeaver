@@ -8,6 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.world.flag.FeatureFlagSet;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,7 +29,7 @@ public class ReloadableServerResourcesMixin {
             List<Registry.PendingTags<?>> list,
             FeatureFlagSet featureFlagSet,
             Commands.CommandSelection commandSelection,
-            int i,
+            PermissionSet permissionSet,
             Executor executor,
             Executor executor2,
             CallbackInfoReturnable<CompletableFuture<ReloadableServerResources>> cir

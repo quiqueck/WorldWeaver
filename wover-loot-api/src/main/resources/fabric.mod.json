@@ -1,0 +1,44 @@
+{
+    "schemaVersion": 1,
+    "id": "wover-loot",
+    "version": "26.101.0",
+    "name": "WorldWeaver - Loot API",
+    "description": "Datagen helpers for block loot tables, and a runtime API for appending pools and entries to loot tables that already exist - in Java or from a datapack.",
+    "authors": [
+        "Quiqueck"
+    ],
+    "contact": {
+        "homepage": "https://github.com/quiqueck/WorldWeaver",
+        "sources": "https://github.com/quiqueck/WorldWeaver",
+        "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+    },
+    "license": "MIT",
+    "icon": "assets/wover-loot/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "de.ambertation.wover.entrypoint.LibWoverLoot"
+        ]
+    },
+    "mixins": [
+        "wover.loot.mixins.common.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.19.0",
+        "minecraft": [
+            "26.1",
+            "26.1.1",
+            "26.1.2"
+        ],
+        "java": ">=25",
+        "fabric-api": ">=0.155.0"
+    },
+    "custom": {
+        "modmenu": {
+            "badges": [
+                "library"
+            ],
+            "parent": "wover"
+        }
+    }
+}

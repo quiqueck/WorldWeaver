@@ -8,7 +8,7 @@ import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 
 import java.util.concurrent.CompletableFuture;
@@ -68,7 +68,7 @@ public abstract class WoverRegistryProvider<T> implements WoverDataProvider<Fabr
      * @return A new {@link FabricDynamicRegistryProvider} that lists all elements
      */
     public abstract FabricDynamicRegistryProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     );
 

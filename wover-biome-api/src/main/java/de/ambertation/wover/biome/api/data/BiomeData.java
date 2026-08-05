@@ -30,10 +30,10 @@ import org.jetbrains.annotations.Nullable;
  * data — see the {@link #codec} family of methods and {@link BiomeCodecRegistry}.
  * <p>
  * Instances are normally not created directly; use {@link de.ambertation.wover.biome.api.builder.BiomeBuilder}
- * (through {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.ResourceLocation)}
+ * (through {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(net.minecraft.resources.Identifier)}
  * or {@link de.ambertation.wover.biome.api.BiomeManager#wrapped(ResourceKey)}) instead. Once the world is
  * loaded, look up the {@link BiomeData} for a Biome using
- * {@link de.ambertation.wover.biome.api.BiomeManager#biomeData(ResourceLocation)} or
+ * {@link de.ambertation.wover.biome.api.BiomeManager#biomeData(Identifier)} or
  * {@link de.ambertation.wover.biome.api.BiomeManager#biomeDataForHolder(Holder)}.
  */
 public class BiomeData {
@@ -117,7 +117,7 @@ public class BiomeData {
      * This is the base overload of a family of {@code codec} methods that let a {@link BiomeData} subclass
      * add up to thirteen additional {@link RecordCodecBuilder} fields ({@code p4}...{@code p16}) on top of
      * the base fields, matched by a factory function taking the corresponding number of arguments. Use
-     * {@link BiomeCodecRegistry#register(ResourceLocation, KeyDispatchDataCodec)} to make the resulting codec
+     * {@link BiomeCodecRegistry#register(Identifier, KeyDispatchDataCodec)} to make the resulting codec
      * available for datapack loading.
      *
      * @param factory The factory that creates the subtype instance from the decoded fields.
@@ -758,7 +758,7 @@ public class BiomeData {
         if (biomeA == null || biomeB == null) return false;
 
 
-        return biomeA.location().equals(biomeB.location());
+        return biomeA.identifier().equals(biomeB.identifier());
     }
 
     /**

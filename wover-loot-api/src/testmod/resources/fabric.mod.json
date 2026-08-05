@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "wover-loot-testmod",
+  "version": "26.100.1",
+  "name": "WorldWeaver - Loot (TestMod)",
+  "description": "",
+  "authors": [
+    "Quiqueck"
+  ],
+  "contact": {
+    "homepage": "https://github.com/quiqueck/WorldWeaver",
+    "sources": "https://github.com/quiqueck/WorldWeaver",
+    "issues": "https://github.com/quiqueck/WorldWeaver/issues"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "de.ambertation.wover.testmod.entrypoint.TestModWoverLoot"
+    ],
+    "fabric-gametest": [
+      "de.ambertation.wover.testmod.gametest.LootAppenderGameTest",
+      "de.ambertation.wover.testmod.gametest.LootContainerGameTest",
+      "de.ambertation.wover.testmod.gametest.LootDatapackAdditionGameTest"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": [
+        "26.1",
+        "26.1.1",
+        "26.1.2"
+    ],
+    "java": ">=25",
+    "fabric-api": ">=0.155.0"
+  }
+}

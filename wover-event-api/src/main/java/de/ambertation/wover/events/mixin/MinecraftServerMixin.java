@@ -9,9 +9,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
-import net.minecraft.server.level.progress.ChunkProgressListener;
-import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
+import net.minecraft.server.level.progress.LevelLoadListener;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 
@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.Proxy;
+import java.util.Optional;
 
 //priority needs to be low, to ensure that our modifications are applied before fabric
 //otherwise other mods, that for example modify all nether biomes will generate a feature order cycle
@@ -52,10 +53,12 @@ public class MinecraftServerMixin {
             LevelStorageSource.LevelStorageAccess levelStorageAccess,
             PackRepository packRepository,
             WorldStem worldStem,
+            Optional<GameRules> gameRules,
             Proxy proxy,
             DataFixer dataFixer,
             Services services,
-            ChunkProgressListenerFactory chunkProgressListenerFactory,
+            LevelLoadListener levelLoadListener,
+            boolean bl,
             CallbackInfo ci
     ) {
         //in most cases this call is redundant, as we already captured the registries from the
@@ -80,7 +83,7 @@ public class MinecraftServerMixin {
      * in {@link net.fabricmc.fabric.mixin.biome.modification.MinecraftServerMixin}
      */
     @Inject(method = "createLevels", at = @At(value = "HEAD"))
-    private void wover_biomesReady(ChunkProgressListener worldGenerationProgressListener, CallbackInfo ci) {
+    private void wover_biomesReady(CallbackInfo ci) {
         //in most cases this call is redundant, as we already captured the registries from the
         // world stem, but just in case...
         WorldLifecycleImpl.WORLD_REGISTRY_READY.emit(registries.compositeAccess(), OnRegistryReady.Stage.FINAL);

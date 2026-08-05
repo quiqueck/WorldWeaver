@@ -2,22 +2,24 @@ package de.ambertation.wover.datagen.api.provider;
 
 import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.api.trait.CompostableTrait;
+import de.ambertation.wover.block.api.trait.behaviour.FuelBlockTrait;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverDataProvider;
 
-import com.google.common.hash.Hashing;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ComposterBlock;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+
+import com.google.common.hash.Hashing;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -62,7 +64,7 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
 
     @Override
     public DataProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new Provider(output);
@@ -71,7 +73,7 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
     private static String flammable(Block block) {
         final FlammableBlockRegistry.Entry entry = FlammableBlockRegistry.getDefaultInstance().get(block);
         if (entry == null) return "-";
-        return entry.getBurnChance() + "/" + entry.getSpreadChance();
+        return entry.getIgniteOdds() + "/" + entry.getBurnOdds();
     }
 
     private static String compostable(Block block) {
@@ -102,21 +104,28 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
      * during construction there. So fuel registrations are not observable at datagen time and this is emitted as
      * {@code ?} for every block rather than faked.
      */
-    private static String fuel(Block block) {
-        return "?";
+    private String fuel(Block block) {
+        var fuelTrait = (FuelBlockTrait) (BlockTrait.runtimeTraits(block)
+                                                    .filter(FuelBlockTrait.class::isInstance)
+                                                    .findAny().orElse(null));
+
+        if (fuelTrait != null) {
+            return "" + fuelTrait.ticks;
+        }
+        return "-";
     }
 
-    private String lineFor(ResourceLocation id, Block block) {
-        return id
-                + "  flammable=" + flammable(block)
-                + "  compostable=" + compostable(block)
-                + "  fuel=" + fuel(block);
+    private String lineFor(Identifier id, Block block) {
+        return "{\"id\":\"" + id + "\""
+                + ",\"flammable\":\"" + flammable(block) + "\""
+                + ",\"compostable\":\"" + compostable(block) + "\""
+                + ",\"fuel\":\"" + fuel(block) + "\"}";
     }
 
     private class Provider implements DataProvider {
-        private final FabricDataOutput output;
+        private final FabricPackOutput output;
 
-        private Provider(FabricDataOutput output) {
+        private Provider(FabricPackOutput output) {
             this.output = output;
         }
 
@@ -124,15 +133,15 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
         public @NotNull CompletableFuture<?> run(@NotNull CachedOutput writer) {
             final List<String> lines = new ArrayList<>();
             for (Block block : BuiltInRegistries.BLOCK) {
-                final ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
+                final Identifier id = BuiltInRegistries.BLOCK.getKey(block);
                 if (!id.getNamespace().equals(modCore.namespace)) continue;
                 lines.add(lineFor(id, block));
             }
             // Sorting by the full line orders by the (unique) id prefix, so the file is fully deterministic.
             Collections.sort(lines);
 
-            final byte[] bytes = (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8);
-            final Path path = output.getOutputFolder().resolve("block_registrations.txt");
+            final byte[] bytes = ("[\n" + String.join(",\n", lines) + "\n]\n").getBytes(StandardCharsets.UTF_8);
+            final Path path = output.getOutputFolder().resolve("block_registrations.json");
             try {
                 writer.writeIfNeeded(path, bytes, Hashing.sha1().hashBytes(bytes));
             } catch (IOException e) {

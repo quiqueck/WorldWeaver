@@ -115,8 +115,8 @@ public class WoverBiomeData extends BiomeData {
         this.edge = edge;
         this.parent = parent;
 
-        this.edgeData = edge == null ? null : BiomeDataRegistry.createKey(edge.location());
-        this.parentData = parent == null ? null : BiomeDataRegistry.createKey(parent.location());
+        this.edgeData = edge == null ? null : BiomeDataRegistry.createKey(edge.identifier());
+        this.parentData = parent == null ? null : BiomeDataRegistry.createKey(parent.identifier());
     }
 
     /**
@@ -174,7 +174,7 @@ public class WoverBiomeData extends BiomeData {
      * subclass add up to seven additional {@link RecordCodecBuilder} fields ({@code p10}...{@code p16}) on
      * top of the base fields, matched by a factory function taking the corresponding number of arguments —
      * mirroring the {@link BiomeData#codec} family this class is itself built on. Use
-     * {@link de.ambertation.wover.biome.api.data.BiomeCodecRegistry#register(net.minecraft.resources.ResourceLocation, net.minecraft.util.KeyDispatchDataCodec)}
+     * {@link de.ambertation.wover.biome.api.data.BiomeCodecRegistry#register(net.minecraft.resources.Identifier, net.minecraft.util.KeyDispatchDataCodec)}
      * to make the resulting codec usable from a {@code type} field.
      *
      * @param factory the factory used to construct the subclass from the decoded fields
@@ -453,14 +453,14 @@ public class WoverBiomeData extends BiomeData {
         // Registry#entrySet() iterates MappedRegistry.byKey, a HashMap<ResourceKey, ...>, and ResourceKey
         // hashes by JVM identity - so with more than one candidate, "the first match" used to be a
         // different Biome on every boot. isPickable() only looks at null/non-null, but this is public API
-        // and the instance itself is cached, so pick the lowest ResourceLocation deterministically.
+        // and the instance itself is cached, so pick the lowest Identifier deterministically.
         final WoverBiomeData found = reg
                 .entrySet()
                 .stream()
                 .map(Map.Entry::getValue)
                 .filter(data -> data instanceof WoverBiomeData b && this.isSame(b.edge))
                 .map(data -> (WoverBiomeData) data)
-                .min(Comparator.comparing(b -> b.biomeKey.location().toString()))
+                .min(Comparator.comparing(b -> b.biomeKey.identifier().toString()))
                 .orElse(null);
 
         edgeParent = Optional.ofNullable(found);

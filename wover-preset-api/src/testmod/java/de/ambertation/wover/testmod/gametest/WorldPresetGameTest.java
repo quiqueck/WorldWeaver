@@ -5,7 +5,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FlatLevelGeneratorPresetTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
@@ -47,10 +47,10 @@ public class WorldPresetGameTest {
 
         final List<String> failures = new ArrayList<>();
 
-        if (!registry.containsKey(ResourceLocation.parse(DATAPACK_PRESET))) {
+        if (!registry.containsKey(Identifier.parse(DATAPACK_PRESET))) {
             failures.add(DATAPACK_PRESET + ": expected world preset loaded from datapack JSON but it is missing");
         }
-        if (!registry.containsKey(ResourceLocation.parse(INJECTED_PRESET))) {
+        if (!registry.containsKey(Identifier.parse(INJECTED_PRESET))) {
             failures.add(INJECTED_PRESET + ": expected world preset injected via BOOTSTRAP_WORLD_PRESETS but it is missing");
         }
 
@@ -93,7 +93,7 @@ public class WorldPresetGameTest {
         final List<String> failures = new ArrayList<>();
 
         final Holder.Reference<FlatLevelGeneratorPreset> holder = registry
-                .get(ResourceLocation.parse(FLAT_PRESET))
+                .get(Identifier.parse(FLAT_PRESET))
                 .orElse(null);
 
         if (holder == null) {
@@ -127,7 +127,7 @@ public class WorldPresetGameTest {
 
         //resolved through context.lookup(Registries.BIOME) while the registry was still loading
         if (!preset.settings().getBiome().is(Biomes.NETHER_WASTES)) {
-            failures.add("biome is " + preset.settings().getBiome() + ", expected " + Biomes.NETHER_WASTES.location());
+            failures.add("biome is " + preset.settings().getBiome() + ", expected " + Biomes.NETHER_WASTES.identifier());
         }
 
         final List<FlatLayerInfo> layers = preset.settings().getLayersInfo();

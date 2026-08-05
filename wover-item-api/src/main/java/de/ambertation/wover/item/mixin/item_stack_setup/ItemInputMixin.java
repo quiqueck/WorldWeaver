@@ -4,6 +4,7 @@ import de.ambertation.wover.item.api.ItemStackHelper;
 
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -24,7 +25,9 @@ public class ItemInputMixin {
             method = "createItemStack",
             at = @At(value = "NEW", target = "net/minecraft/world/item/ItemStack")
     )
-    public ItemStack wover_init(Holder<Item> item, int count, Operation<ItemStack> original) {
-        return ItemStackHelper.callItemStackSetupIfPossible(original.call(item, count));
+    public ItemStack wover_init(
+            Holder<Item> item, int count, DataComponentPatch components, Operation<ItemStack> original
+    ) {
+        return ItemStackHelper.callItemStackSetupIfPossible(original.call(item, count, components));
     }
 }

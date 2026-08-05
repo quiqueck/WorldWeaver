@@ -8,7 +8,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.KeyDispatchDataCodec;
 
 /**
@@ -27,14 +27,14 @@ public class BiomePredicateRegistry {
     public static final Registry<MapCodec<? extends BiomePredicate>> BIOME_PREDICATES = BiomePredicateRegistryImpl.BIOME_PREDICATES;
 
     /**
-     * Registers a new {@link BiomePredicate} with the given {@link ResourceLocation} and {@link KeyDispatchDataCodec}.
+     * Registers a new {@link BiomePredicate} with the given {@link Identifier} and {@link KeyDispatchDataCodec}.
      *
      * @param location             type of the {@link BiomePredicate}.
      * @param keyDispatchDataCodec The {@link KeyDispatchDataCodec} of the {@link BiomePredicate}.
      * @return The registered {@link BiomePredicate}.
      */
     public static MapCodec<? extends BiomePredicate> register(
-            ResourceLocation location,
+            Identifier location,
             KeyDispatchDataCodec<? extends BiomePredicate> keyDispatchDataCodec
     ) {
         return BiomePredicateRegistryImpl.register(BIOME_PREDICATES, location, keyDispatchDataCodec);

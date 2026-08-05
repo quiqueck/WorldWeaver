@@ -11,7 +11,7 @@ import de.ambertation.wover.tag.api.predefined.CommonBiomeTags;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 
@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
  * tuning values. The resulting data is written into a {@link WoverBiomeData} entry (the {@code wover:wover_data}
  * {@link BiomeData} type) instead of a plain {@link BiomeData}.
  * <p>
- * Use {@link #biomeKey(ResourceLocation)} to declare a completely new Biome (mirroring
- * {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(ResourceLocation)}), or {@link #wrappedKey(ResourceKey)}
+ * Use {@link #biomeKey(Identifier)} to declare a completely new Biome (mirroring
+ * {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(Identifier)}), or {@link #wrappedKey(ResourceKey)}
  * to attach this extra data to a Biome that already exists (mirroring
  * {@link de.ambertation.wover.biome.api.BiomeManager#wrapped(ResourceKey)}).
  *
@@ -113,19 +113,19 @@ public interface WoverBiomeBuilder<B extends BiomeBuilder<B>> {
      * @return a new {@link BiomeKey} for a {@link Wrapped} builder
      */
     static BiomeKey<Wrapped> wrappedKey(@NotNull ResourceKey<Biome> key) {
-        return new WrappedWoverBiomeKeyImpl(key.location());
+        return new WrappedWoverBiomeKeyImpl(key.identifier());
     }
 
     /**
      * Creates a key for a completely new, WoVer-aware Biome.
      * <p>
-     * Mirrors {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(ResourceLocation)}, but with the
+     * Mirrors {@link de.ambertation.wover.biome.api.BiomeManager#vanilla(Identifier)}, but with the
      * {@link WoverBiome} builder that also exposes edge/parent placement.
      *
      * @param location the id of the new Biome
      * @return a new {@link BiomeKey} for a {@link WoverBiome} builder
      */
-    static BiomeKey<WoverBiome> biomeKey(@NotNull ResourceLocation location) {
+    static BiomeKey<WoverBiome> biomeKey(@NotNull Identifier location) {
         return new WoverBiomeKeyImpl(location);
     }
 
@@ -209,7 +209,7 @@ public interface WoverBiomeBuilder<B extends BiomeBuilder<B>> {
     }
 
     /**
-     * Builder returned by {@link #biomeKey(ResourceLocation)}. Defines a completely new, vanilla-style
+     * Builder returned by {@link #biomeKey(Identifier)}. Defines a completely new, vanilla-style
      * Biome with WoVer's extra placement data (edge/parent/terrain height/gen chance).
      */
     abstract class WoverBiome extends AbstractWoverBiomeBuilder<WoverBiome> {

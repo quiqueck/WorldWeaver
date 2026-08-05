@@ -11,17 +11,17 @@ configure(allprojects.findAll { it.name != 'wunderlib' }) { projIt ->
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: 'eclipse'
-    apply plugin: 'fabric-loom'
+    apply plugin: 'net.fabricmc.fabric-loom'
 
     repositories {
-        maven { url "https://maven.dblsaiko.net/" }
-        maven { url "https://maven.fabricmc.net/" }
-        maven { url "https://maven.shedaniel.me/" }
-        maven { url 'https://maven.blamejared.com' }
-        maven { url 'https://jitpack.io' }
-        maven { url 'https://maven.terraformersmc.com/releases' }
-        maven { url 'https://maven.terraformersmc.com' }
-        maven { url 'https://maven.ambertation.de/releases' }
+        maven { url = "https://maven.dblsaiko.net/" }
+        maven { url = "https://maven.fabricmc.net/" }
+        maven { url = "https://maven.shedaniel.me/" }
+        maven { url = 'https://maven.blamejared.com' }
+        maven { url = 'https://jitpack.io' }
+        maven { url = 'https://maven.terraformersmc.com/releases' }
+        maven { url = 'https://maven.terraformersmc.com' }
+        maven { url = 'https://maven.ambertation.de/releases' }
     }
 
     version = rootProject.mod_version
@@ -202,8 +202,7 @@ configure(allprojects.findAll { it.name != 'wunderlib' }) { projIt ->
     dependencies {
         println("Adding dependencies for ${projIt.name}")
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
-        mappings loom.officialMojangMappings()
-        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
         dev sourceSets.main.output
         devClient sourceSets.client.output
@@ -249,7 +248,7 @@ configure(allprojects.findAll { it.name != 'wunderlib' }) { projIt ->
     // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        it.options.release = 21
+        it.options.release = 25
     }
 
     tasks.withType(AbstractArchiveTask).configureEach {
@@ -305,7 +304,8 @@ allprojects.findAll { it.name != 'wunderlib' }.each { p ->
 }
 
 subprojects.each {
-    remapJar.dependsOn("${it.path}:remapJar")
+    // Loom 1.15 has no separate remap step - the mod jar is `jar`, not `remapJar`.
+    jar.dependsOn("${it.path}:jar")
 }
 
 // Aggregate task: run every module's headless Fabric GameTest suite. Each module that declares a
@@ -349,10 +349,10 @@ tasks.sourcesJar {
 
 //dependencies for the main Libraray
 dependencies {
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     subprojects.each {
-        api project(path: "${it.path}", configuration: "namedElements")
+        api project(path: "${it.path}", configuration: "dev")
         if (it.name != "wunderlib") {
             // wunderlib is foreign and self-configuring (see common.gradle's top-of-file note) - it
             // never gets the devClient configuration the shared configure(allprojects...) block sets up.
@@ -367,8 +367,8 @@ dependencies {
 
         include project("${it.path}")
     }
-    modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+    compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    localRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     gradle.modApiOrLocal(dependencies, ':wunderlib', "de.ambertation:wunderlib:${project.wunderlib_version}")
 }
@@ -412,11 +412,11 @@ task copyHighlightJs(type: Copy) {
 
 javadoc {
     options {
-        source = "17"
+        source = "25"
         encoding = "UTF-8"
         charSet = "UTF-8"
         memberLevel = JavadocMemberLevel.PROTECTED
-        links("https://docs.oracle.com/en/java/javase/17/docs/api/")
+        links("https://docs.oracle.com/en/java/javase/25/docs/api/")
         // Disable the crazy super-strict doclint tool in Java 8
         addStringOption("Xdoclint:none", "-quiet")
         addStringOption("noqualifier", "net.minecraft.*:com.mojang.*:net.fabricmc.*")
@@ -477,15 +477,14 @@ task javadocJar(type: Jar, dependsOn: [javadoc, copyHighlightJs]) {
 }
 
 artifacts {
-    // Intentionally NOT attaching remapJar (intermediary-mapped) here: 'dev'/'localDev' are
-    // consumed directly by local composite-included projects (BCLib, BetterEnd) running in the
-    // "named" dev namespace. Mixing in the remapped jar puts two differently-namespaced copies
-    // of wover.accesswidener on the same runtime classpath, causing Fabric Loader to throw
-    // AccessWidenerFormatException (namespace mismatch) depending on classpath ordering.
+    // Loom 1.15 has no separate remap step, so `jar` is already the named/dev jar
+    // that local composite-included projects (BCLib, BetterEnd) consume via 'dev'/
+    // 'localDev' in the named dev namespace.
     localDev jar
-    archives sourcesJar
-    archives javadocJar
 }
+// Gradle 9 no longer takes ad-hoc artifacts on the legacy `archives` configuration;
+// wire the extra jars into `assemble` instead.
+tasks.assemble.dependsOn(sourcesJar, javadocJar)
 
 idea {
     module {

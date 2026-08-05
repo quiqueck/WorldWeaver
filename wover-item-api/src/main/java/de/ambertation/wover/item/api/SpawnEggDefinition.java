@@ -69,10 +69,7 @@ public class SpawnEggDefinition<I extends SpawnEggItem> extends ItemDefinition<I
         @Override
         public @NotNull ItemStack execute(BlockSource blockSource, ItemStack stack) {
             Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-            EntityType<?> entityType = ((SpawnEggItem) stack.getItem()).getType(
-                    blockSource.level().registryAccess(),
-                    stack
-            );
+            EntityType<?> entityType = SpawnEggItem.getType(stack);
 
             try {
                 entityType.spawn(
@@ -251,8 +248,7 @@ public class SpawnEggDefinition<I extends SpawnEggItem> extends ItemDefinition<I
      */
     public static SpawnEggItem createSpawnEgg(SpawnEggDefinition<SpawnEggItem> config) {
         return new SpawnEggItem(
-                config.entityType,
-                config.getProperties()
+                config.getProperties().spawnEgg(config.entityType)
         );
     }
 }

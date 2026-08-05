@@ -12,7 +12,7 @@ import de.ambertation.wover.state.api.WorldState;
 import net.minecraft.core.Registry;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class BiomeDataRegistryImpl {
             ResourceKey<Biome> key,
             Function<ResourceKey<Biome>, BiomeData> defaultFactory
     ) {
-        final ResourceKey<BiomeData> dataKey = createKey(key.location());
+        final ResourceKey<BiomeData> dataKey = createKey(key.identifier());
         if (registry != null) {
             final Optional<BiomeData> oData = registry.getOptional(dataKey);
 
@@ -95,7 +95,7 @@ public class BiomeDataRegistryImpl {
     }
 
     public static ResourceKey<BiomeData> createKey(
-            ResourceLocation ruleID
+            Identifier ruleID
     ) {
         return ResourceKey.create(
                 BiomeDataRegistry.BIOME_DATA_REGISTRY,

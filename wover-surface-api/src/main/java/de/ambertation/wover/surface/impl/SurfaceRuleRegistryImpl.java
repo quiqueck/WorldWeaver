@@ -10,7 +10,7 @@ import de.ambertation.wover.surface.api.SurfaceRuleRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
@@ -42,7 +42,7 @@ public class SurfaceRuleRegistryImpl {
     }
 
     public static ResourceKey<AssignedSurfaceRule> createKey(
-            ResourceLocation ruleID
+            Identifier ruleID
     ) {
         return ResourceKey.create(
                 SurfaceRuleRegistry.SURFACE_RULES_REGISTRY,
@@ -59,12 +59,12 @@ public class SurfaceRuleRegistryImpl {
             int priority
     ) {
         if (biomeKey == null) {
-            throw new IllegalStateException("Biome key is not set for surface rule '" + key.location() + "'");
+            throw new IllegalStateException("Biome key is not set for surface rule '" + key.identifier() + "'");
         }
 
         return ctx.register(
                 key,
-                new AssignedSurfaceRuleImpl(rules, biomeKey.location(), priority)
+                new AssignedSurfaceRuleImpl(rules, biomeKey.identifier(), priority)
         );
     }
 }

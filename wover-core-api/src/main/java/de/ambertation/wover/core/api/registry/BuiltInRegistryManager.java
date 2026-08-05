@@ -7,7 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Function;
 
@@ -21,7 +21,7 @@ import java.util.function.Function;
 public class BuiltInRegistryManager {
     /**
      * Registers a new element into the given registry. Thin wrapper around
-     * {@link Registry#register(Registry, ResourceLocation, Object)}.
+     * {@link Registry#register(Registry, Identifier, Object)}.
      *
      * @param registry         The registry to register the element into.
      * @param resourceLocation The id of the new element.
@@ -30,7 +30,7 @@ public class BuiltInRegistryManager {
      * @param <T>              The type of the element that is registered.
      * @return The registered element.
      */
-    public static <V, T extends V> T register(Registry<V> registry, ResourceLocation resourceLocation, T object) {
+    public static <V, T extends V> T register(Registry<V> registry, Identifier resourceLocation, T object) {
         return Registry.register(registry, resourceLocation, object);
     }
 
@@ -51,7 +51,7 @@ public class BuiltInRegistryManager {
 
     /**
      * Registers a new element into the given registry and returns a {@link Holder.Reference} to it. Thin wrapper
-     * around {@link Registry#registerForHolder(Registry, ResourceLocation, Object)}.
+     * around {@link Registry#registerForHolder(Registry, Identifier, Object)}.
      *
      * @param registry         The registry to register the element into.
      * @param resourceLocation The id of the new element.
@@ -62,7 +62,7 @@ public class BuiltInRegistryManager {
      */
     public static <V, T extends V> Holder.Reference<V> registerForHolder(
             Registry<V> registry,
-            ResourceLocation resourceLocation,
+            Identifier resourceLocation,
             T object
     ) {
         return Registry.registerForHolder(registry, resourceLocation, object);
@@ -83,7 +83,7 @@ public class BuiltInRegistryManager {
             ResourceKey<? extends Registry<T>> resourceKey,
             Function<Registry<T>, T> registryBootstrap
     ) {
-        LibWoverCore.C.log.debug("Creating registry: " + resourceKey.location());
+        LibWoverCore.C.log.debug("Creating registry: " + resourceKey.identifier());
         return BuiltInRegistries.registerSimple(resourceKey, registryBootstrap::apply);
     }
 
@@ -104,7 +104,7 @@ public class BuiltInRegistryManager {
             Lifecycle lifecycle,
             Function<Registry<T>, T> registryBootstrap
     ) {
-        LibWoverCore.C.log.debug("Creating registry: " + resourceKey.location());
+        LibWoverCore.C.log.debug("Creating registry: " + resourceKey.identifier());
         return BuiltInRegistries.registerSimple(resourceKey, registryBootstrap::apply);
     }
 }

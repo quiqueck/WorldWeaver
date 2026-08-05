@@ -10,6 +10,7 @@ import de.ambertation.wover.feature.impl.configured.InlineBuilderImpl;
 import de.ambertation.wover.feature.impl.configured.RandomPatchImpl;
 import de.ambertation.wover.math.api.valueproviders.Vec3iProvider;
 
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
@@ -617,11 +618,37 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
     }
 
     /**
+     * Scatters the backing configured feature using placement modifiers — the vanilla-migrated replacement for
+     * the removed {@code random_patch} configured feature. Emits {@code CountPlacement.of(tries)} +
+     * {@code RandomOffsetPlacement.of(trapezoid xz, trapezoid y)} + {@code BiomeFilter}, matching vanilla's
+     * modifier set/order.
+     */
+    @Override
+    public FeaturePlacementBuilderImpl scatter(int tries, int xzSpread, int ySpread) {
+        return this.count(tries)
+                   .spread(TrapezoidInt.of(-xzSpread, xzSpread, 0), TrapezoidInt.of(-ySpread, ySpread, 0))
+                   .onlyInBiome();
+    }
+
+    /**
+     * Same as {@link #scatter(int, int, int)}, but inserts a {@code BlockPredicateFilter} (the former
+     * {@code random_patch} inner predicate) between the random offset and the {@code BiomeFilter}.
+     */
+    @Override
+    public FeaturePlacementBuilderImpl scatter(int tries, int xzSpread, int ySpread, BlockPredicate filter) {
+        return this.count(tries)
+                   .spread(TrapezoidInt.of(-xzSpread, xzSpread, 0), TrapezoidInt.of(-ySpread, ySpread, 0))
+                   .is(filter)
+                   .onlyInBiome();
+    }
+
+    /**
      * Creates a new {@link RandomPatch} {@link de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator}
      *
      * @return {@link RandomPatch} instance.
      */
     @Override
+    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
     public RandomPatch inRandomPatch() {
         final RandomPatch randomPatch;
         if (randomPatchBuilder != null) {
@@ -641,11 +668,14 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
         }
         if (bootstrapContext == null) {
             throw new IllegalStateException(
-                    "A BootstrapContext for a Feature can not be null if it should be registered! (" + key.location() + ")"
+                    "A BootstrapContext for a Feature can not be null if it should be registered! (" + key.identifier() + ")"
             );
         }
         PlacedFeature feature = build();
-        return bootstrapContext.register(key, feature);
+        // Use the 3-arg register overload: under 26.1's async registry loading, another registry
+        // (e.g. biome_modifications) may look up this placed feature's holder first, creating an
+        // *unbound* reference. The 2-arg register would then no-op; the 3-arg overload binds it.
+        return bootstrapContext.register(key, feature, Lifecycle.stable());
     }
 
     @Override

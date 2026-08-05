@@ -7,7 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 @Mixin(MappedRegistry.class)
 public class MappedRegistryMixin implements CustomRegistryData {
-    private final Map<ResourceLocation, Object> wover$custom = new HashMap<>();
+    private final Map<Identifier, Object> wover$custom = new HashMap<>();
 
     public <T> @Nullable T wover_getData(@NotNull DataKey<T> id) {
         return (T) wover$custom.get(id.id);
@@ -30,7 +30,7 @@ public class MappedRegistryMixin implements CustomRegistryData {
 
     public <T> @Nullable T wover_computeDataIfAbsent(
             @NotNull DataKey<T> id,
-            @NotNull Function<ResourceLocation, T> fkt
+            @NotNull Function<Identifier, T> fkt
     ) {
         return (T) wover$custom.computeIfAbsent(id.id, fkt);
     }

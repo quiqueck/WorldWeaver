@@ -4,7 +4,7 @@ import de.ambertation.wover.core.api.ModCore;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
 
@@ -20,7 +20,7 @@ public class LootTableManager {
      * @return The loot table's resource key
      */
     public static ResourceKey<LootTable> getBlockLootTableKey(ResourceKey<Block> blockKey) {
-        return ResourceKey.create(Registries.LOOT_TABLE, blockKey.location().withPrefix("blocks/"));
+        return ResourceKey.create(Registries.LOOT_TABLE, blockKey.identifier().withPrefix("blocks/"));
     }
 
     /**
@@ -31,7 +31,7 @@ public class LootTableManager {
      * @param blockId The location of the block
      * @return The loot table's resource key
      */
-    public static ResourceKey<LootTable> getBlockLootTableKey(ModCore modCore, ResourceLocation blockId) {
+    public static ResourceKey<LootTable> getBlockLootTableKey(ModCore modCore, Identifier blockId) {
         return ResourceKey.create(Registries.LOOT_TABLE, blockId.withPrefix("blocks/"));
     }
 

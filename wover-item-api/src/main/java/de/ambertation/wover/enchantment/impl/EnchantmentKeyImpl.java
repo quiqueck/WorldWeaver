@@ -51,6 +51,6 @@ public class EnchantmentKeyImpl implements EnchantmentKey {
 
     @Override
     public void register(@NotNull BootstrapContext<Enchantment> context, Enchantment.Builder builder) {
-        context.register(this.key, builder.build(key.location()));
+        context.register(this.key, builder.build(key.identifier()));
     }
 }

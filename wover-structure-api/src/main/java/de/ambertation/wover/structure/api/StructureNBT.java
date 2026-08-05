@@ -9,7 +9,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -18,8 +18,6 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-
-import com.google.common.collect.Maps;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,17 +29,18 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Loads and caches a {@code .nbt} {@link StructureTemplate} from a namespace's
  * {@code data/<namespace>/structure/} folder (either from the classpath/jar or, via
- * {@link #createResourcesFrom(ResourceLocation, int)}, by walking a whole folder) and provides helper
+ * {@link #createResourcesFrom(Identifier, int)}, by walking a whole folder) and provides helper
  * methods to place it into a {@link ServerLevelAccessor} directly, without going through the vanilla
  * {@link net.minecraft.world.level.levelgen.structure.Structure}/{@link net.minecraft.world.level.levelgen.structure.StructurePiece}
  * pipeline.
  * <p>
- * Instances are cached by {@link ResourceLocation}; use {@link #create(ResourceLocation)} rather than
+ * Instances are cached by {@link Identifier}; use {@link #create(Identifier)} rather than
  * calling a constructor directly so repeated lookups reuse the same loaded template.
  */
 public class StructureNBT {
@@ -49,19 +48,19 @@ public class StructureNBT {
      * The location of the {@code .nbt} file this instance was loaded from, relative to
      * {@code data/<namespace>/structure/}.
      */
-    public final ResourceLocation location;
+    public final Identifier location;
     /**
      * The loaded {@link StructureTemplate}, or {@code null} if loading failed.
      */
     protected StructureTemplate structure;
 
 
-    protected StructureNBT(ResourceLocation location) {
+    protected StructureNBT(Identifier location) {
         this.location = location;
         this.structure = readStructureFromJar(location);
     }
 
-    protected StructureNBT(ResourceLocation location, StructureTemplate structure) {
+    protected StructureNBT(Identifier location, StructureTemplate structure) {
         this.location = location;
         this.structure = structure;
     }
@@ -87,16 +86,21 @@ public class StructureNBT {
         return Mirror.values()[random.nextInt(3)];
     }
 
-    private static final Map<ResourceLocation, StructureNBT> STRUCTURE_CACHE = Maps.newHashMap();
+    // ConcurrentHashMap, not HashMap: registry loading in 26.1 is async/parallel (multiple worker
+    // threads can resolve the same FeatureTemplate codec concurrently), and a plain HashMap's
+    // computeIfAbsent corrupts under concurrent structural modification -> intermittent
+    // ConcurrentModificationException during world boot. Same class of bug already fixed once in
+    // wover-core-api's CustomBootstrapContextImpl for the same reason.
+    private static final Map<Identifier, StructureNBT> STRUCTURE_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * Gets (or lazily loads and caches) the {@link StructureNBT} for the given {@link ResourceLocation}.
+     * Gets (or lazily loads and caches) the {@link StructureNBT} for the given {@link Identifier}.
      * The location is resolved to {@code data/<namespace>/structure/<path>.nbt} on the classpath.
      *
      * @param location The location of the {@code .nbt} file, without the {@code .nbt} extension
      * @return The (possibly cached) {@link StructureNBT}
      */
-    public static StructureNBT create(ResourceLocation location) {
+    public static StructureNBT create(Identifier location) {
         return STRUCTURE_CACHE.computeIfAbsent(location, StructureNBT::new);
     }
 
@@ -163,17 +167,18 @@ public class StructureNBT {
         return pos.offset(-blockpos2.getX() >> 1, 0, -blockpos2.getZ() >> 1);
     }
 
-    private static final Map<ResourceLocation, StructureTemplate> READER_CACHE = Maps.newHashMap();
+    // See STRUCTURE_CACHE above - same concurrency requirement.
+    private static final Map<Identifier, StructureTemplate> READER_CACHE = new ConcurrentHashMap<>();
 
-    private static StructureTemplate readStructureFromJar(ResourceLocation resource) {
+    private static StructureTemplate readStructureFromJar(Identifier resource) {
         return READER_CACHE.computeIfAbsent(resource, r -> _readStructureFromJar(r));
     }
 
-    private static String getStructurePath(ResourceLocation resource) {
+    private static String getStructurePath(Identifier resource) {
         return "data/" + resource.getNamespace() + "/structure/" + resource.getPath();
     }
 
-    private static StructureTemplate _readStructureFromJar(ResourceLocation resource) {
+    private static StructureTemplate _readStructureFromJar(Identifier resource) {
         try {
             InputStream inputstream = MinecraftServer.class.getResourceAsStream("/" + getStructurePath(resource) + ".nbt");
             return readStructureFromStream(inputstream);
@@ -258,7 +263,7 @@ public class StructureNBT {
      * @param recursionDepth The maximum recursion depth or 0 to indicate no limitation
      * @return A list of all structures found at the given resource location.
      */
-    public static List<StructureNBT> createResourcesFrom(ResourceLocation resource, int recursionDepth) {
+    public static List<StructureNBT> createResourcesFrom(Identifier resource, int recursionDepth) {
         String ns = resource.getNamespace();
         String nm = resource.getPath();
 
@@ -303,11 +308,11 @@ public class StructureNBT {
                                     }
                                 })
                                 .filter(s -> s.endsWith(".nbt"))
-                                .map(s -> ResourceLocation.fromNamespaceAndPath(
+                                .map(s -> Identifier.fromNamespaceAndPath(
                                         ns,
                                         (nm.isEmpty() ? "" : (nm + "/")) + s.substring(0, s.length() - 4)
                                 ))
-                                .sorted(Comparator.comparing(ResourceLocation::toString))
+                                .sorted(Comparator.comparing(Identifier::toString))
                                 .map(r -> {
                                     LibWoverStructure.C.log.info("Loading Structure: " + r);
                                     try {

@@ -3,7 +3,7 @@ package de.ambertation.wover.feature.api;
 import de.ambertation.wover.feature.impl.FeatureManagerImpl;
 
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
@@ -22,7 +22,7 @@ public class FeatureManager {
      * @return the new key of the feature
      */
     public static <C extends FeatureConfiguration, F extends Feature<C>> F register(
-            ResourceLocation location,
+            Identifier location,
             F feature
     ) {
         return FeatureManagerImpl.register(FeatureManagerImpl.createKey(location), feature);
@@ -50,7 +50,7 @@ public class FeatureManager {
      * @return the key
      */
     @NotNull
-    public static ResourceKey<Feature<?>> createKey(ResourceLocation location) {
+    public static ResourceKey<Feature<?>> createKey(Identifier location) {
         return FeatureManagerImpl.createKey(location);
     }
 

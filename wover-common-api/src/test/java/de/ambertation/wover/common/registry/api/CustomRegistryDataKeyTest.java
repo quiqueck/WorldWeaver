@@ -1,6 +1,6 @@
 package de.ambertation.wover.common.registry.api;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Pure-logic JUnit tests for {@link CustomRegistryData.DataKey}. These need no running server (only the
- * value-type {@link ResourceLocation}, which constructs without a Minecraft bootstrap) and run via
+ * value-type {@link Identifier}, which constructs without a Minecraft bootstrap) and run via
  * {@code ./gradlew :wover-common-api:test}.
  * <p>
  * The whole custom-registry-data mechanism keys its storage on {@code DataKey}: callers do
@@ -22,19 +22,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class CustomRegistryDataKeyTest {
     @Test
     void createKeyExposesThePassedId() {
-        final ResourceLocation id = ResourceLocation.fromNamespaceAndPath("wover", "test_key");
+        final Identifier id = Identifier.fromNamespaceAndPath("wover", "test_key");
         final CustomRegistryData.DataKey<String> key = CustomRegistryData.createKey(id);
 
         assertNotNull(key);
-        assertSame(id, key.id, "createKey must retain the exact ResourceLocation it was given");
+        assertSame(id, key.id, "createKey must retain the exact Identifier it was given");
     }
 
     @Test
     void keysAreEqualWhenIdsAreEqualEvenAcrossSeparateConstruction() {
         // Two independently built ResourceLocations that describe the same id...
-        final CustomRegistryData.DataKey<String> a = CustomRegistryData.createKey(ResourceLocation.parse("wover:data"));
+        final CustomRegistryData.DataKey<String> a = CustomRegistryData.createKey(Identifier.parse("wover:data"));
         final CustomRegistryData.DataKey<String> b = CustomRegistryData.createKey(
-                ResourceLocation.fromNamespaceAndPath("wover", "data")
+                Identifier.fromNamespaceAndPath("wover", "data")
         );
 
         // ...must compare equal and share a hash bucket, otherwise a get()/put() pair with matching ids misses.
@@ -46,10 +46,10 @@ class CustomRegistryDataKeyTest {
 
     @Test
     void keysWithDifferentIdsAreNotEqual() {
-        final CustomRegistryData.DataKey<String> a = CustomRegistryData.createKey(ResourceLocation.parse("wover:one"));
-        final CustomRegistryData.DataKey<String> b = CustomRegistryData.createKey(ResourceLocation.parse("wover:two"));
+        final CustomRegistryData.DataKey<String> a = CustomRegistryData.createKey(Identifier.parse("wover:one"));
+        final CustomRegistryData.DataKey<String> b = CustomRegistryData.createKey(Identifier.parse("wover:two"));
         // Different namespace, same path must also stay distinct.
-        final CustomRegistryData.DataKey<String> c = CustomRegistryData.createKey(ResourceLocation.parse("other:one"));
+        final CustomRegistryData.DataKey<String> c = CustomRegistryData.createKey(Identifier.parse("other:one"));
 
         assertNotEquals(a, b);
         assertNotEquals(a, c);
@@ -59,7 +59,7 @@ class CustomRegistryDataKeyTest {
     void equalityIgnoresTheGenericTypeParameter() {
         // Same id, but the two keys were declared with different data types. Equality keys only on `id`,
         // so these must still be interchangeable for storage/lookup.
-        final ResourceLocation id = ResourceLocation.parse("wover:shared");
+        final Identifier id = Identifier.parse("wover:shared");
         final CustomRegistryData.DataKey<String> asString = CustomRegistryData.createKey(id);
         final CustomRegistryData.DataKey<Integer> asInteger = CustomRegistryData.createKey(id);
 
@@ -69,10 +69,10 @@ class CustomRegistryDataKeyTest {
 
     @Test
     void keyIsNotEqualToUnrelatedObjectsOrNull() {
-        final CustomRegistryData.DataKey<String> key = CustomRegistryData.createKey(ResourceLocation.parse("wover:x"));
+        final CustomRegistryData.DataKey<String> key = CustomRegistryData.createKey(Identifier.parse("wover:x"));
 
         assertNotEquals(null, key);
-        // The bare ResourceLocation is not a DataKey and must not compare equal to one.
-        assertNotEquals(key, ResourceLocation.parse("wover:x"));
+        // The bare Identifier is not a DataKey and must not compare equal to one.
+        assertNotEquals(key, Identifier.parse("wover:x"));
     }
 }

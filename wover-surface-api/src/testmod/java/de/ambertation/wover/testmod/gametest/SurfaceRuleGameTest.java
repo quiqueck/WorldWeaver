@@ -6,7 +6,7 @@ import de.ambertation.wover.surface.api.SurfaceRuleRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +52,12 @@ public class SurfaceRuleGameTest {
         final List<String> failures = new ArrayList<>();
 
         for (String id : DATAPACK_RULES) {
-            if (!registry.containsKey(ResourceLocation.parse(id))) {
+            if (!registry.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected surface rule loaded from datapack JSON but it is missing");
             }
         }
 
-        if (!registry.containsKey(ResourceLocation.parse(INJECTED_RULE))) {
+        if (!registry.containsKey(Identifier.parse(INJECTED_RULE))) {
             failures.add(INJECTED_RULE + ": expected surface rule injected via BOOTSTRAP_SURFACE_RULE_REGISTRY but it is missing");
         }
 

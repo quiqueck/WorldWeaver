@@ -1,6 +1,6 @@
 package de.ambertation.wover.core.api;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -28,7 +28,7 @@ public class IntegrationCore {
     public static final boolean RUNS_NULLSCAPE = hasMod("nullscape");
 
     /** The {@link ModCore} instance representing vanilla Minecraft. */
-    public static final ModCore MINECRAFT = ModCore.create(ResourceLocation.DEFAULT_NAMESPACE);
+    public static final ModCore MINECRAFT = ModCore.create(Identifier.DEFAULT_NAMESPACE);
     /** The {@link ModCore} instance for BetterEnd. */
     public static final ModCore BETTER_END = ModCore.create("betterend");
     /** The {@link ModCore} instance for BetterNether. */

@@ -8,7 +8,7 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
 
 import java.util.LinkedList;
@@ -100,7 +100,7 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
     @ApiStatus.Internal
     @Override
     public final FabricDynamicRegistryProvider getProvider(
-            FabricDataOutput output,
+            FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
         return new FabricDynamicRegistryProvider(output, registriesFuture) {
@@ -115,7 +115,7 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
                         count++;
                     }
                 }
-                modCore.log.info("[" + count + " / " + content.size() + "] " + registryKey.location());
+                modCore.log.info("[" + count + " / " + content.size() + "] " + registryKey.identifier());
             }
 
             @Override

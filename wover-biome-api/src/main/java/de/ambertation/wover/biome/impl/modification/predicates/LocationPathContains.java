@@ -20,6 +20,6 @@ public record LocationPathContains(String needle) implements BiomePredicate {
 
     @Override
     public boolean test(Context ctx) {
-        return ctx.biomeKey.location().getPath().contains(needle);
+        return ctx.biomeKey.identifier().getPath().contains(needle);
     }
 }

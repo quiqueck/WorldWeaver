@@ -7,7 +7,7 @@ import de.ambertation.wover.surface.api.conditions.ConditionManager;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -31,7 +31,7 @@ public class MaterialConditionRegistryImpl {
     }
 
     @NotNull
-    public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> createKey(ResourceLocation location) {
+    public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> createKey(Identifier location) {
         return ResourceKey.create(
                 BuiltInRegistries.MATERIAL_CONDITION.key(),
                 location

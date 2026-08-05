@@ -3,7 +3,7 @@ package de.ambertation.wover.block.api.model;
 import de.ambertation.wover.block.api.trait.BlockTraitKey;
 import de.ambertation.wover.entrypoint.LibWoverBlock;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 import java.util.function.Supplier;
@@ -41,6 +41,18 @@ public class BlockModelKeys {
     public static final ModelKey<Void> BARREL = key("barrel");
     /** A vanilla-style bookshelf using the planks material for its frame. */
     public static final ModelKey<Supplier<Block>> BOOKSHELF = key("bookshelf");
+    /**
+     * A vanilla-style shelf: the multipart blockstate over facing/powered/side-chain plus the six part models
+     * and the inventory model, all reading the block's own {@code block/<name>} texture. The payload supplies
+     * the block whose texture the shelf's particles use.
+     */
+    public static final ModelKey<Supplier<Block>> SHELF = key("shelf");
+    /**
+     * A vanilla-style chiseled bookshelf: the multipart blockstate over facing/slot-occupied plus the body,
+     * inventory and twelve book-slot models, all reading the block's own {@code _top}/{@code _side}/
+     * {@code _empty}/{@code _occupied} textures.
+     */
+    public static final ModelKey<Void> CHISELED_BOOKSHELF = key("chiseled_bookshelf");
     /** A vanilla-style rotated pillar using the block's own textures. */
     public static final ModelKey<Void> PILLAR = key("pillar");
     /** A vanilla-style button using the planks material. */
@@ -94,9 +106,9 @@ public class BlockModelKeys {
     /** Like {@link #EXTERNAL_MODEL}, but the item model is derived from the block's own texture. */
     public static final ModelKey<Void> EXTERNAL_MODEL_DELEGATED_ITEM = key("external_model_delegated_item");
     /** Like {@link #EXTERNAL_MODEL}, but the item model points at an explicit model location. */
-    public static final ModelKey<Supplier<ResourceLocation>> EXTERNAL_MODEL_DELEGATED_ITEM_LOCATION = key("external_model_delegated_item_location");
+    public static final ModelKey<Supplier<Identifier>> EXTERNAL_MODEL_DELEGATED_ITEM_LOCATION = key("external_model_delegated_item_location");
     /** A hand-authored blockstate/model with a generated flat item model (from an optional texture). */
-    public static final ModelKey<Supplier<ResourceLocation>> EXTERNAL_MODEL_FLAT_ITEM = key("external_model_flat_item");
+    public static final ModelKey<Supplier<Identifier>> EXTERNAL_MODEL_FLAT_ITEM = key("external_model_flat_item");
 
     private BlockModelKeys() {
     }

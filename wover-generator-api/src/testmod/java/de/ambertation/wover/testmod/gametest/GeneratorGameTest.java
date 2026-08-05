@@ -5,7 +5,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
@@ -86,26 +86,26 @@ public class GeneratorGameTest {
 
         // --- datapack-loaded facet ---
         for (String id : DATAPACK_WORLD_PRESETS) {
-            if (!worldPresets.containsKey(ResourceLocation.parse(id))) {
+            if (!worldPresets.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected world preset loaded from datapack JSON but it is missing");
             }
         }
-        if (!noiseSettings.containsKey(ResourceLocation.parse(DATAPACK_NOISE_SETTINGS))) {
+        if (!noiseSettings.containsKey(Identifier.parse(DATAPACK_NOISE_SETTINGS))) {
             failures.add(DATAPACK_NOISE_SETTINGS + ": expected noise settings loaded from datapack JSON but it is missing");
         }
 
         // --- programmatic (codec-registry) facet ---
-        if (!chunkGenerators.containsKey(ResourceLocation.parse(PROGRAMMATIC_CHUNK_GENERATOR))) {
+        if (!chunkGenerators.containsKey(Identifier.parse(PROGRAMMATIC_CHUNK_GENERATOR))) {
             failures.add(PROGRAMMATIC_CHUNK_GENERATOR + ": expected chunk-generator codec registered at mod init but it is missing");
         }
         for (String id : PROGRAMMATIC_BIOME_SOURCES) {
-            if (!biomeSources.containsKey(ResourceLocation.parse(id))) {
+            if (!biomeSources.containsKey(Identifier.parse(id))) {
                 failures.add(id + ": expected biome-source codec registered at mod init but it is missing");
             }
         }
 
         // Negative guard: an id the module never registers must not be present.
-        if (worldPresets.containsKey(ResourceLocation.parse(ABSENT_WORLD_PRESET))) {
+        if (worldPresets.containsKey(Identifier.parse(ABSENT_WORLD_PRESET))) {
             failures.add(ABSENT_WORLD_PRESET + ": unexpectedly present - the containsKey assertions are not meaningful");
         }
 

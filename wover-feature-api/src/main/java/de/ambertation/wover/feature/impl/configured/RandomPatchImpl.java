@@ -7,16 +7,18 @@ import de.ambertation.wover.feature.api.placed.BasePlacedFeatureKey;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.RandomPatchFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomPatchConfiguration;
+import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
+import de.ambertation.wover.feature.impl.random.RandomPatchConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// Compat shim for the vanilla-removed random_patch feature (see RandomPatch); intentionally implements the
+// deprecated API.
+@SuppressWarnings("removal")
 public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfiguration, RandomPatchFeature> implements RandomPatch {
     private Holder<PlacedFeature> featureToPlace;
     private int tries = 96;
@@ -76,7 +78,7 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
 
     @Override
     protected @NotNull RandomPatchFeature getFeature() {
-        return (RandomPatchFeature) Feature.RANDOM_PATCH;
+        return de.ambertation.wover.feature.impl.FeatureManagerImpl.RANDOM_PATCH;
     }
 
     @Override
@@ -88,7 +90,7 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
     }
 
     public static class Key extends ConfiguredFeatureKey<RandomPatch> {
-        public Key(ResourceLocation id) {
+        public Key(Identifier id) {
             super(id);
         }
 

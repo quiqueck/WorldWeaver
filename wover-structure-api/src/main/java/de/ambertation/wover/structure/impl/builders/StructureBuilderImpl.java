@@ -27,11 +27,11 @@ public class StructureBuilderImpl<S extends Structure>
         var res = type.structureFactory.create(buildSettings());
         if (ModCore.isDevEnvironment()) {
             if (res.type() == null) {
-                throw new IllegalStateException("Structure type is null for " + key.key().location());
+                throw new IllegalStateException("Structure type is null for " + key.key().identifier());
             }
 
             if (!res.type().equals(key.type())) {
-                throw new IllegalStateException("Structure type is not the expected one for " + key.key().location());
+                throw new IllegalStateException("Structure type is not the expected one for " + key.key().identifier());
             }
         }
         return res;

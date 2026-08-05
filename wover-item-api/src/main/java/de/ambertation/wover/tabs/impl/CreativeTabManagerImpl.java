@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -62,7 +62,7 @@ public class CreativeTabManagerImpl implements CreativeTabsBuilder, CreativeTabs
 
     public void registerAllTabs() {
         for (SimpleCreativeTabImpl tab : tabs) {
-            var tabItem = FabricItemGroup
+            var tabItem = FabricCreativeModeTab
                     .builder()
                     .icon(() -> new ItemStack(tab.icon))
                     .title(tab.title)

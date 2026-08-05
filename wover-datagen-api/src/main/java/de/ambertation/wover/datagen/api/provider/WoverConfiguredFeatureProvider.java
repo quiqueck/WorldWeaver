@@ -5,7 +5,7 @@ import de.ambertation.wover.datagen.api.WoverRegistryContentProvider;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +35,7 @@ public abstract class WoverConfiguredFeatureProvider extends WoverRegistryConten
      */
     public WoverConfiguredFeatureProvider(
             @NotNull ModCore modCore,
-            @NotNull ResourceLocation providerId
+            @NotNull Identifier providerId
     ) {
         super(modCore, providerId.toString() + " (Configured Features)", Registries.CONFIGURED_FEATURE);
     }

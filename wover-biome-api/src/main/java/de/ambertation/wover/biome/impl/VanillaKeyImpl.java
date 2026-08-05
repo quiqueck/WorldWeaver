@@ -5,12 +5,12 @@ import de.ambertation.wover.biome.api.builder.BiomeBootstrapContext;
 import de.ambertation.wover.biome.api.builder.BiomeBuilder;
 import de.ambertation.wover.biome.impl.builder.VanillaBiomeBuilderImpl;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaKeyImpl extends BiomeKey<BiomeBuilder.Vanilla> {
-    VanillaKeyImpl(@NotNull ResourceLocation location) {
+    VanillaKeyImpl(@NotNull Identifier location) {
         super(location);
     }
 

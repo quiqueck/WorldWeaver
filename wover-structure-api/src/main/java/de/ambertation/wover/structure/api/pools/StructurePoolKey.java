@@ -5,14 +5,14 @@ import de.ambertation.wover.structure.impl.pools.StructurePoolBuilderImpl;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A wrapper around {@link ResourceKey} that identifies a {@link StructureTemplatePool}. Create one with
- * {@link StructurePoolManager#createKey(ResourceLocation)} (or the {@link de.ambertation.wover.structure.api.StructureKeys#pool(ResourceLocation)}
+ * {@link StructurePoolManager#createKey(Identifier)} (or the {@link de.ambertation.wover.structure.api.StructureKeys#pool(Identifier)}
  * alias), then call {@link #bootstrap(BootstrapContext)} to start building the pool.
  */
 public class StructurePoolKey {
@@ -33,7 +33,7 @@ public class StructurePoolKey {
         return new StructurePoolBuilderImpl(key, context);
     }
 
-    StructurePoolKey(@NotNull ResourceLocation location) {
+    StructurePoolKey(@NotNull Identifier location) {
         this.key = ResourceKey.create(Registries.TEMPLATE_POOL, location);
     }
 }

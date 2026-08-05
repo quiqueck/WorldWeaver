@@ -38,13 +38,13 @@ public class WoverBiomePicker {
      * comparison is correct, but its hash is the JVM <b>identity</b> hash and therefore differs on every
      * boot. Anything keyed on a {@link ResourceKey} (or on a type whose hash bottoms out in one, like
      * {@link BiomeData#hashCode()}) consequently has a hash-order that is not reproducible across JVMs.
-     * {@link net.minecraft.resources.ResourceLocation ResourceLocation} does implement a value-based
+     * {@link net.minecraft.resources.Identifier Identifier} does implement a value-based
      * {@code hashCode}/{@code compareTo}, so ordering by it is a pure function of the Biome set - stable
      * across restarts, JVM versions and machines. Without this, the same seed produced a different world on
      * every launch.
      */
     private static final Comparator<BiomeData> BY_BIOME_ID
-            = Comparator.comparing(data -> data.biomeKey.location().toString());
+            = Comparator.comparing(data -> data.biomeKey.identifier().toString());
 
     // LinkedHashMap/LinkedHashSet rather than the hash-ordered variants: see BY_BIOME_ID. Insertion order is
     // deterministic (populateBiomePickers feeds these in sorted order), which keeps the debug output and the
@@ -210,7 +210,7 @@ public class WoverBiomePicker {
 
                 for (PickableBiome builtBiome : new ArrayList<>(registeredBiomes.values())) {
                     if (!beforeList.contains(builtBiome)) {
-                        LibWoverWorldGenerator.C.log.verbose(" - " + builtBiome.biomeData.biomeKey.location() + ", subbiomes=" + builtBiome.subbiomes.size());
+                        LibWoverWorldGenerator.C.log.verbose(" - " + builtBiome.biomeData.biomeKey.identifier() + ", subbiomes=" + builtBiome.subbiomes.size());
                     }
                 }
             }
@@ -334,10 +334,10 @@ public class WoverBiomePicker {
         @Override
         public String toString() {
             return "PickableBiome{" +
-                    "key=" + biomeData.biomeKey.location() +
+                    "key=" + biomeData.biomeKey.identifier() +
                     ", alternatives=" + subbiomes.size() +
-                    ", edge=" + (edge != null ? edge.biomeData.biomeKey.location() : "null") +
-                    ", parent=" + (parent != null ? parent.biomeData.biomeKey.location() : "null") +
+                    ", edge=" + (edge != null ? edge.biomeData.biomeKey.identifier() : "null") +
+                    ", parent=" + (parent != null ? parent.biomeData.biomeKey.identifier() : "null") +
                     ", isValid=" + isValid +
                     '}';
         }
@@ -363,8 +363,8 @@ public class WoverBiomePicker {
      * {@link ChunkStatus#BIOMES} yet
      */
     public static @Nullable Holder<Biome> getBiomeAt(WorldGenLevel world, BlockPos testPos) {
-        final ChunkPos chunkPos = new ChunkPos(testPos);
-        final ChunkAccess chunk = world.getChunkSource().getChunk(chunkPos.x, chunkPos.z, ChunkStatus.BIOMES, false);
+        final ChunkPos chunkPos = ChunkPos.containing(testPos);
+        final ChunkAccess chunk = world.getChunkSource().getChunk(chunkPos.x(), chunkPos.z(), ChunkStatus.BIOMES, false);
         if (chunk != null) {
             return chunk.getBiomeFabric(testPos);
         } else {

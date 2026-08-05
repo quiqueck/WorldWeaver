@@ -342,7 +342,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
                 @NotNull ResourceKey<AssignedSurfaceRule> key
         ) {
             if (biomeKey == null) {
-                throw new IllegalStateException("Biome key is not set for surface rule '" + key.location() + "'");
+                throw new IllegalStateException("Biome key is not set for surface rule '" + key.identifier() + "'");
             }
 
             return SurfaceRuleRegistryImpl.register(ctx, key, biomeKey, getRuleSource(), sortPriority);

@@ -8,7 +8,7 @@ import de.ambertation.wover.events.api.types.OnBootstrapRegistry;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Provides a Datapack backed registry for Biome Modifications.
@@ -36,7 +36,7 @@ public class BiomeModificationRegistry {
      * @return The Key for the Modification in this Registry
      */
     public static ResourceKey<BiomeModification> createKey(
-            ResourceLocation modificationID
+            Identifier modificationID
     ) {
         return BiomeModificationRegistryImpl.createKey(modificationID);
     }
