@@ -30,8 +30,8 @@ public class AddonSurfaceRuleProvider extends WoverRegistryContentProvider<Assig
         SurfaceRuleBuilder
                 .start()
                 .biome(Biomes.MEADOW)
-                .surface(Blocks.LIME_CONCRETE.defaultBlockState())
-                .steep(Blocks.ORANGE_CONCRETE.defaultBlockState(), 3)
+                .surface(Blocks.CONCRETE.lime().defaultBlockState())
+                .steep(Blocks.CONCRETE.orange().defaultBlockState(), 3)
                 .register(ctx, TEST_MEADOW);
     }
 }

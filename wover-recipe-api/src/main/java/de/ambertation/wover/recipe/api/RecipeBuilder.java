@@ -4,7 +4,7 @@ import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.events.api.Event;
 import de.ambertation.wover.recipe.impl.*;
 
-import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;

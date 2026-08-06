@@ -1,0 +1,16 @@
+base.archivesName = "wover-test-api"
+
+ext {
+    baseNamespace = "test"
+    baseClass = "LibWoverTest"
+}
+
+dependencies {
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+loom {
+    accessWidenerPath = file('src/main/resources/wover-test.accesswidener')
+}
+
+moduleDependencies(project, ['wover-core-api', 'wover-block-api', 'wover-sets-api', 'wover-pottable-api', 'wover-tag-api'])

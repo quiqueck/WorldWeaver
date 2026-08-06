@@ -46,4 +46,12 @@ public class Bars extends SlotFromDefinition {
     protected BlockTrait<Block, ?> buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         return ModelTraitLibrary.bars();
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a thin grid panel), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no bars-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

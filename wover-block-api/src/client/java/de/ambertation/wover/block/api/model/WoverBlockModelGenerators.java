@@ -1,5 +1,8 @@
 package de.ambertation.wover.block.api.model;
 
+import de.ambertation.wover.block.api.client.render.ClientTinterRegistry;
+import de.ambertation.wover.block.api.render.TintBinding;
+import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.impl.ModelProviderExclusions;
 import de.ambertation.wover.entrypoint.LibWoverBlock;
 
@@ -231,8 +234,40 @@ public class WoverBlockModelGenerators {
      * @param resourceLocation The model the item should reference
      */
     public void delegateItemModel(Block block, Identifier resourceLocation) {
-        this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        final var tint = itemTintOf(block);
+        if (tint != null) {
+            // The block carries a TintBinding that opted its item in: the texture is colorized by the tint
+            // rather than by the texture itself, so a plain (untinted) item model would render the raw - usually
+            // grayscale - texture in the inventory while the block still looks correct in the world. Item tints
+            // are data-driven, so the colour has to be baked into the model here.
+            this.vanillaGenerator.itemModelOutput.accept(
+                    block.asItem(),
+                    ItemModelUtils.tintedModel(resourceLocation, ItemModelUtils.constantTint(tint))
+            );
+        } else {
+            this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        }
         itemModelDelegatedBlocks.add(block);
+    }
+
+    /**
+     * Resolves the constant item tint for a block, if it carries a {@link TintBinding} that opted its item model
+     * in.
+     *
+     * @param block the block whose item model is being generated
+     * @return the packed ARGB tint, or {@code null} if the item model should stay untinted
+     */
+    private @Nullable Integer itemTintOf(Block block) {
+        final var bindings = BlockTrait.<Block, TintBinding>getRuntimeTraits(block, TintBinding.TINT_KEY);
+        if (bindings == null || bindings.isEmpty()) return null;
+
+        final var binding = bindings.getLast();
+        if (!binding.tintItemModel()) return null;
+
+        final var source = ClientTinterRegistry.resolve(binding, block);
+        if (source == null) return null;
+
+        return source.color(binding.itemSampleState(block));
     }
 
     /**
@@ -731,47 +766,163 @@ public class WoverBlockModelGenerators {
     }
 
     /**
-     * Generates the particle-only-based blockstates for a standing/wall sign pair and a flat item model
-     * for the standing sign.
+     * Wall signs and wall hanging signs face south by default, unlike most horizontally facing blocks
+     * (which {@link #ROTATION_HORIZONTAL_FACING} covers), so they need their own dispatch.
+     */
+    private static final PropertyDispatch<VariantMutator> WALL_SIGN_FACING = PropertyDispatch
+            .modify(BlockStateProperties.HORIZONTAL_FACING)
+            .select(Direction.SOUTH, NOP)
+            .select(Direction.WEST, Y_ROT_90)
+            .select(Direction.NORTH, Y_ROT_180)
+            .select(Direction.EAST, Y_ROT_270);
+
+    private static final VariantMutator[] SIGN_QUADRANT_ROTATION = {NOP, Y_ROT_90, Y_ROT_180, Y_ROT_270};
+
+    /**
+     * The texture mapping shared by every model of a sign family: the board texture in
+     * {@link TextureSlot#ALL} and the wood the sign was cut from as the particle.
+     * <p>
+     * The particle picks up {@link #particleOnlyModel(Block)}'s {@code _log} special case, because modded
+     * logs carry their bark on {@code <name>_side} rather than on the unsuffixed sprite.
+     */
+    private TextureMapping signMapping(Block baseBlock, Block boardBlock) {
+        var particle = TextureMapping.getBlockTexture(baseBlock);
+        if (!particle.sprite().getNamespace().equals("minecraft")
+                && particle.sprite().getPath().endsWith("_log"))
+            particle = TextureMapping.getBlockTexture(baseBlock, "_side");
+
+        return new TextureMapping()
+                .put(TextureSlot.ALL, TextureMapping.getBlockTexture(boardBlock))
+                .put(TextureSlot.PARTICLE, particle);
+    }
+
+    /**
+     * Builds the 16-way rotation dispatch signs use: four authored models covering a quarter turn each,
+     * with the remaining three quadrants folded onto them as a y rotation.
      *
-     * @param baseBlock     The block whose texture is used for the sign's particle model (e.g. the plank block)
+     * @param rotationModels the four {@code _rot_0} .. {@code _rot_3} models, in order
+     */
+    private static PropertyDispatch<MultiVariant> signRotations(Identifier[] rotationModels) {
+        var dispatch = PropertyDispatch.initial(BlockStateProperties.ROTATION_16);
+        for (int rotation = 0; rotation < 16; rotation++) {
+            dispatch = dispatch.select(
+                    rotation,
+                    BlockModelGenerators.plainVariant(rotationModels[rotation % 4])
+                                        .with(SIGN_QUADRANT_ROTATION[rotation / 4])
+            );
+        }
+        return dispatch;
+    }
+
+    private Identifier[] signRotationModels(
+            Block signBlock,
+            TextureMapping mapping,
+            ModelTemplate[] templates,
+            String suffix
+    ) {
+        var models = new Identifier[4];
+        for (int i = 0; i < 4; i++) {
+            models[i] = templates[i].createWithSuffix(
+                    signBlock,
+                    suffix + i,
+                    mapping,
+                    vanillaGenerator.modelOutput
+            );
+        }
+        return models;
+    }
+
+    private static final ModelTemplate[] SIGN_ROT_TEMPLATES = {
+            ModelTemplates.SIGN_ROT_0, ModelTemplates.SIGN_ROT_1,
+            ModelTemplates.SIGN_ROT_2, ModelTemplates.SIGN_ROT_3
+    };
+    private static final ModelTemplate[] HANGING_SIGN_ROT_TEMPLATES = {
+            ModelTemplates.HANGING_SIGN_ROT_0, ModelTemplates.HANGING_SIGN_ROT_1,
+            ModelTemplates.HANGING_SIGN_ROT_2, ModelTemplates.HANGING_SIGN_ROT_3
+    };
+    private static final ModelTemplate[] ATTACHED_HANGING_SIGN_ROT_TEMPLATES = {
+            ModelTemplates.ATTACHED_HANGING_SIGN_ROT_0, ModelTemplates.ATTACHED_HANGING_SIGN_ROT_1,
+            ModelTemplates.ATTACHED_HANGING_SIGN_ROT_2, ModelTemplates.ATTACHED_HANGING_SIGN_ROT_3
+    };
+
+    /**
+     * Generates the blockstates and models for a standing/wall sign pair, plus a flat item model for the
+     * standing sign.
+     * <p>
+     * Since 26.2 the sign board is an ordinary block model rather than geometry owned by the block-entity
+     * renderer (which now only draws the text), so the sign needs real models reading
+     * {@code block/<sign>.png} - a particle-only model leaves the sign invisible.
+     *
+     * @param baseBlock     The block whose texture is used for the sign's particle (e.g. the plank block)
      * @param signBlock     The standing sign block
      * @param wallSignBlock The wall sign block
      */
     public void createSign(Block baseBlock, Block signBlock, Block wallSignBlock) {
-        final Identifier particleLocation = particleOnlyModel(baseBlock);
+        final TextureMapping mapping = signMapping(baseBlock, signBlock);
 
-        acceptBlockState(BlockModelGenerators.createSimpleBlock(
-                signBlock,
-                BlockModelGenerators.plainVariant(particleLocation)
-        ));
-        acceptBlockState(BlockModelGenerators.createSimpleBlock(
+        acceptBlockState(MultiVariantGenerator
+                .dispatch(signBlock)
+                .with(signRotations(signRotationModels(signBlock, mapping, SIGN_ROT_TEMPLATES, "_rot_"))));
+
+        final Identifier wallModel = ModelTemplates.WALL_SIGN.create(
                 wallSignBlock,
-                BlockModelGenerators.plainVariant(particleLocation)
-        ));
+                mapping,
+                vanillaGenerator.modelOutput
+        );
+        acceptBlockState(MultiVariantGenerator
+                .dispatch(wallSignBlock, BlockModelGenerators.plainVariant(wallModel))
+                .with(WALL_SIGN_FACING));
 
         vanillaGenerator.registerSimpleFlatItemModel(signBlock.asItem());
         itemModelDelegatedBlocks.add(signBlock);
     }
 
     /**
-     * Generates the particle-only-based blockstates for a hanging/wall-hanging sign pair and a flat item
-     * model for the hanging sign.
+     * Generates the blockstates and models for a hanging/wall-hanging sign pair, plus a flat item model for
+     * the hanging sign. See {@link #createSign(Block, Block, Block)} for why these are real models now.
+     * <p>
+     * A ceiling hanging sign carries two model families: the chained one it uses when it dangles freely, and
+     * the {@code attached} one with a solid bar for when it hangs directly under a block.
      *
-     * @param baseBlock            The block whose texture is used for the sign's particle model
+     * @param baseBlock            The block whose texture is used for the sign's particle
      * @param hangingSignBlock     The hanging sign block
      * @param wallHangingSignBlock The wall hanging sign block
      */
     public void createHangingSign(Block baseBlock, Block hangingSignBlock, Block wallHangingSignBlock) {
-        Identifier resourceLocation = particleOnlyModel(baseBlock);
-        acceptBlockState(BlockModelGenerators.createSimpleBlock(
-                hangingSignBlock,
-                BlockModelGenerators.plainVariant(resourceLocation)
-        ));
-        acceptBlockState(BlockModelGenerators.createSimpleBlock(
+        final TextureMapping mapping = signMapping(baseBlock, hangingSignBlock);
+
+        final Identifier[] hanging = signRotationModels(
+                hangingSignBlock, mapping, HANGING_SIGN_ROT_TEMPLATES, "_rot_"
+        );
+        final Identifier[] attached = signRotationModels(
+                hangingSignBlock, mapping, ATTACHED_HANGING_SIGN_ROT_TEMPLATES, "_attached_rot_"
+        );
+
+        var dispatch = PropertyDispatch.initial(BlockStateProperties.ATTACHED, BlockStateProperties.ROTATION_16);
+        for (int rotation = 0; rotation < 16; rotation++) {
+            var turn = SIGN_QUADRANT_ROTATION[rotation / 4];
+            dispatch = dispatch.select(
+                    false,
+                    rotation,
+                    BlockModelGenerators.plainVariant(hanging[rotation % 4]).with(turn)
+            );
+            dispatch = dispatch.select(
+                    true,
+                    rotation,
+                    BlockModelGenerators.plainVariant(attached[rotation % 4]).with(turn)
+            );
+        }
+        acceptBlockState(MultiVariantGenerator.dispatch(hangingSignBlock).with(dispatch));
+
+        final Identifier wallModel = ModelTemplates.WALL_HANGING_SIGN.create(
                 wallHangingSignBlock,
-                BlockModelGenerators.plainVariant(resourceLocation)
-        ));
+                mapping,
+                vanillaGenerator.modelOutput
+        );
+        acceptBlockState(MultiVariantGenerator
+                .dispatch(wallHangingSignBlock, BlockModelGenerators.plainVariant(wallModel))
+                .with(WALL_SIGN_FACING));
+
         vanillaGenerator.registerSimpleFlatItemModel(hangingSignBlock.asItem());
         itemModelDelegatedBlocks.add(hangingSignBlock);
     }

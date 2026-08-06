@@ -288,6 +288,40 @@ configure(allprojects.findAll { it.name != 'wunderlib' }) { projIt ->
             rename { "${it}-${project.base.archivesName.get()}" }
         }
     }
+
+}
+
+// Loom's genSources rewrites the Minecraft *classes* jar in place after decompiling, to bake in
+// line numbers matching the generated sources (GenerateSourcesTask.getClassesOutputJar(); the
+// .jar.backup files in the Loom cache are the pre-rewrite originals). That same jar is a declared
+// input of every project's validateAccessWidener (ValidateAccessWidenerTask.getTargetJars()).
+// Every project in the build shares one Loom cache, so one project's genSources and another
+// project's validateAccessWidener touch the identical file with no ordering between them - which
+// Gradle 9 rejects outright ("uses this output of task ... without declaring a dependency"), and
+// which org.gradle.parallel=true makes a real race rather than a theoretical one.
+//
+// Loom already orders these *within* a project, via genSourcesWithVineflower dependsOn
+// validateAccessWidener - validate the widener before decompiling with it applied. So extend
+// exactly that direction across the whole build: every validation runs before any decompile. The
+// reverse (validate mustRunAfter gen, which is what Gradle's own error message suggests) would
+// invert Loom's dependsOn and deadlock the graph with a circular dependency. Gradle's
+// missing-dependency check is satisfied by an ordering constraint either way round.
+//
+// Scoped to rootProject.allprojects rather than to the WorldWeaver subtree, because the Loom
+// cache that is actually shared belongs to the root project: built standalone that is just
+// WorldWeaver and this configures only itself, but composited into a mod (BetterEnd, BetterNether,
+// ...) the root and its other libraries write that same jar and would otherwise stay unordered
+// against these validations. Ordering only - this never pulls genSources into a build that did
+// not ask for it. mustRunAfter takes a closure so the sibling tasks are realized when the task
+// graph is assembled, not while projects are still being configured.
+rootProject.allprojects { producerProject ->
+    producerProject.tasks.matching { it.name.startsWith('genSources') }.configureEach { genTask ->
+        genTask.mustRunAfter({
+            rootProject.allprojects.collectMany { consumer ->
+                consumer.tasks.matching { it.name == 'validateAccessWidener' }.toList()
+            }
+        })
+    }
 }
 
 allprojects.findAll { it.name != 'wunderlib' }.each { p ->
@@ -326,12 +360,23 @@ gradle.projectsEvaluated {
     }
 }
 
-// The global "Data Generation" run (task runDatagen, defined in the loom runs
-// block below) only generates the root project's own resources. Each module
-// with a src/datagen dir gets its own run<Module>-datagen task (same loom
-// runs block above) - wire those in too, so a single runDatagen invocation
-// regenerates everything. Deliberately excludes each module's separate
-// run<Module>-testmodDatagen task (testmod fixtures, not real content).
+// runDatagen is an aggregator and nothing more: each module with a src/datagen dir gets its own
+// run<Module>-datagen task from the loom runs block above, and this hangs all of them off one
+// invocation. Deliberately excludes each module's separate run<Module>-testmodDatagen task (testmod
+// fixtures, not real content).
+//
+// The root project used to carry a "Data Generation" loom run of its own here, writing into
+// src/main/generated. It has no fabric-datagen entrypoint - what it emitted was the modules' own
+// providers, firing a second time off the aggregate classpath, into a second location. Every file it
+// produced was already in the module jar that generated it, and those jars are nested into the root
+// jar by `include project(...)` below, so the copy shipped twice. It also only ever caught some of
+// the modules, which is how the root copy of c:tools/shears sat empty for a day after the module
+// copy was fixed.
+tasks.register('runDatagen') {
+    group = 'fabric'
+    description = "Runs the data generation of every module"
+}
+
 gradle.projectsEvaluated {
     subprojects.each { sub ->
         def runName = 'run' + sub.name[0].toUpperCase() + sub.name.substring(1) + '-datagen'
@@ -378,18 +423,6 @@ dependencies {
 // jar by the `include project(...)` above, so they are never published separately.
 
 loom {
-    runs {
-        datagen {
-            inherit client
-            name "Data Generation"
-            vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.modid=${project.archives_base_name}"
-
-            runDir "build/datagen"
-        }
-    }
-
     subprojects.each { sub ->
         //println "${sub.loom.accessWidenerPath.text}"
         try {

@@ -24,6 +24,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -988,12 +989,20 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
 
     /**
      * Sets a predicate to determine if this block should use emissive rendering.
+     * <p>
+     * 26.2 narrowed {@code BlockBehaviour.Properties#emissiveRendering} from a
+     * {@link BlockBehaviour.StatePredicate} (which received the level and position alongside the state) to a
+     * plain {@link Predicate} over the {@link BlockState}: emissive rendering is resolved purely from the state
+     * now, and {@code BlockState#emissiveRendering()} no longer takes a level or a position at all. The
+     * parameter type follows vanilla rather than keeping a {@code StatePredicate} that could no longer be
+     * honoured - a signature that accepted a level/position it then had to discard would be a lie. This is a
+     * source-breaking change for callers that passed a lambda with three parameters; they drop the last two.
      *
      * @param predicate Predicate that tests if emissive rendering should be used
      * @return This configuration instance for method chaining
      */
     @SuppressWarnings("unchecked")
-    public D emissiveRendering(BlockBehaviour.StatePredicate predicate) {
+    public D emissiveRendering(Predicate<BlockState> predicate) {
         queueProperty((properties) -> properties.emissiveRendering(predicate));
         return (D) this;
     }

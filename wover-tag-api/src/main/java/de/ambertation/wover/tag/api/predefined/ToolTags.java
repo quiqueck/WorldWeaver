@@ -36,6 +36,10 @@ public class ToolTags {
      * {@code fabric:swords}
      */
     public static final TagKey<Item> FABRIC_SWORDS = TagManager.ITEMS.makeFabricTag("swords");
+    /**
+     * {@code fabric:spears}
+     */
+    public static final TagKey<Item> FABRIC_SPEARS = TagManager.ITEMS.makeFabricTag("spears");
 
     /**
      * Called internally to ensure that the tags are created.

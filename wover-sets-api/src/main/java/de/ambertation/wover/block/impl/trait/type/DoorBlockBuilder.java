@@ -9,6 +9,7 @@ import de.ambertation.wover.entrypoint.LibWoverSets;
 import de.ambertation.wover.loot.api.LootLookupProvider;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
@@ -59,7 +60,15 @@ public class DoorBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
             if (ModCore.isDatagen()) {
                 definition.addTags(BlockTags.DOORS);
-                definition.addItemTags(ItemTags.DOORS);
+                //26.2 pruned the ItemTags handles for the tags that exist as a block/item pair
+                //(DOORS, BUTTONS, STONE_BUTTONS, FENCES, STAIRS, SLABS, TRAPDOORS) and the BlockTags
+                //handle LOGS_THAT_BURN, and replaced them with the new BlockItemTags registry of
+                //BlockItemTagId records. Only the Java handle moved: BlockItemTagId.create("doors")
+                //builds both keys from the same minecraft:doors location, so .item() is exactly the
+                //old ItemTags.DOORS (and .block() the old BlockTags.LOGS_THAT_BURN) and neither the
+                //live tag nor the generated JSON changes. The block-tag siblings that kept their
+                //constants (BlockTags.DOORS, BUTTONS, SLABS, ...) are still used directly.
+                definition.addItemTags(BlockItemTags.DOORS.item());
 
                 if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
                     definition.addTags(BlockTags.WOODEN_DOORS);

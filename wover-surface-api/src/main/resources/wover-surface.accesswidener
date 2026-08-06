@@ -10,4 +10,9 @@ accessible class net/minecraft/world/level/levelgen/SurfaceRules$TestRuleSource
 
 accessible method net/minecraft/world/level/levelgen/SurfaceRules$SequenceRuleSource <init> (Ljava/util/List;)V
 
+# 26.2 turned SurfaceRules$Context#biome into a lazily populated Holder<Biome> field (it used to hold a
+# Supplier that resolved itself). The field is null until getBiome() fills it from biomeGetter, so
+# SurfaceRulesContextAccessor exposes the method rather than the field.
+accessible method net/minecraft/world/level/levelgen/SurfaceRules$Context getBiome ()Lnet/minecraft/core/Holder;
+
 accessible field net/minecraft/world/level/levelgen/SurfaceRules$Context context Lnet/minecraft/world/level/levelgen/WorldGenerationContext;

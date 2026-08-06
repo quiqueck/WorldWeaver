@@ -8,7 +8,7 @@ import de.ambertation.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class HangingSignBlockBuilder extends AbstractBlockTraitBuilder.Generic i
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_hanging_sign"));
         DEFAULT = combine(
                 new Trait(),
-                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.HANGING_SIGN),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.HANGING_SIGN),
                 BlockTraits.LOOT_TABLE.dropSelf()
         );
     }

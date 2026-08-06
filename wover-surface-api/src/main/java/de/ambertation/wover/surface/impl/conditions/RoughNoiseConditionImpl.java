@@ -9,7 +9,6 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.FloatProviders;
@@ -34,8 +33,6 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
                             maxThreshold1
                     )
             ));
-
-    public static final KeyDispatchDataCodec<RoughNoiseConditionImpl> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
 
     private final ResourceKey<NormalNoise.NoiseParameters> noise;
     private final double minThreshold;
@@ -64,8 +61,8 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
     }
 
     @Override
-    public KeyDispatchDataCodec<? extends SurfaceRules.ConditionSource> codec() {
-        return KEY_CODEC;
+    public MapCodec<? extends SurfaceRules.ConditionSource> codec() {
+        return CODEC;
     }
 
     @Override

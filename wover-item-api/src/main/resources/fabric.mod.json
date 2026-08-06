@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-item",
-    "version": "26.101.0",
+    "version": "26.201.0",
     "name": "WorldWeaver - Item API",
     "description": "",
     "authors": [
@@ -39,9 +39,7 @@
     "depends": {
         "fabricloader": ">=0.19.0",
         "minecraft": [
-            "26.1",
-            "26.1.1",
-            "26.1.2"
+            "26.2"
         ],
         "java": ">=25",
         "fabric-api": ">=0.155.0"

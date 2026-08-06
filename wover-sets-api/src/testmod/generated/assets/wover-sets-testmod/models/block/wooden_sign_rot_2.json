@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_sign_rot_2",
+  "textures": {
+    "all": "wover-sets-testmod:block/wooden_sign",
+    "particle": "wover-sets-testmod:block/wooden_planks"
+  }
+}

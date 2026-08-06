@@ -11,6 +11,7 @@ import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
@@ -64,7 +65,7 @@ public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
             definition.addItemTags(ItemTags.LOGS);
 
             if (definition.hasTrait(BlockTraits.FLAMMABLE)) {
-                definition.addTags(BlockTags.LOGS_THAT_BURN);
+                definition.addTags(BlockItemTags.LOGS_THAT_BURN.block());
             }
         }
     }

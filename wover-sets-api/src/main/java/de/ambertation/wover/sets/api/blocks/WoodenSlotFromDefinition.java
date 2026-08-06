@@ -43,6 +43,25 @@ public class WoodenSlotFromDefinition extends SlotFromDefinition {
     }
 
     @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        if (set instanceof WoodenBlockSet<?> woodenSet) {
+            finalizeWoodDefinitions(woodenSet, def);
+        } else {
+            throw new IllegalArgumentException("WoodenSlotFromDefinition can only be used with WoodenBlockSet");
+        }
+    }
+
+    /**
+     * Wood-typed equivalent of {@link #finalizeDefinitions}. The default implementation does nothing.
+     *
+     * @param set the wooden block set this factory belongs to
+     * @param def the definition to configure
+     */
+    protected void finalizeWoodDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
+
+    }
+
+    @Override
     protected BlockTrait<Block, ?> buildModel(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         if (set instanceof WoodenBlockSet<?> woodenSet) {
             return buildWoodModel(woodenSet, blockTraitLookup);

@@ -8,7 +8,7 @@ import de.ambertation.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class SignBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_sign"));
         DEFAULT = combine(
                 new Trait(),
-                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SIGN),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.SIGN),
                 BlockTraits.LOOT_TABLE.dropSelf()
         );
     }

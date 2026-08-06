@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "wover-sets-testmod:block/wooden_stripped_log_particles"
+    "facing=east": {
+      "model": "wover-sets-testmod:block/wooden_hanging_wall_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "wover-sets-testmod:block/wooden_hanging_wall_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "wover-sets-testmod:block/wooden_hanging_wall_sign"
+    },
+    "facing=west": {
+      "model": "wover-sets-testmod:block/wooden_hanging_wall_sign",
+      "y": 90
     }
   }
 }

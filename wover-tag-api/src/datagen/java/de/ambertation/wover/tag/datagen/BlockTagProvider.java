@@ -67,7 +67,15 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.add(CommonPoiTags.BEE_NEST, Blocks.BEE_NEST);
         ctx.add(CommonPoiTags.NETHER_PORTAL, Blocks.NETHER_PORTAL);
         ctx.add(CommonPoiTags.LODESTONE, Blocks.LODESTONE);
-        ctx.add(CommonPoiTags.LIGHTNING_ROD, Blocks.LIGHTNING_ROD);
+        //26.2 turned the lightning rod into a full weathering-copper family: Blocks.LIGHTNING_ROD
+        //is now a WeatheringCopperCollection<Block> holding all eight variants (unaffected /
+        //exposed / weathered / oxidized, each also waxed) instead of a single Block. Vanilla
+        //has BlockTags.LIGHTNING_RODS for exactly that set and PoiTypes registers the whole
+        //collection for its lightning_rod POI, so referencing the vanilla tag keeps
+        //wover:poi/lightning_rod in step with vanilla and needs no maintenance when further
+        //variants appear. This does widen the tag from one block to eight - that is the vanilla
+        //behaviour change, not a WoVer decision.
+        ctx.add(CommonPoiTags.LIGHTNING_ROD, BlockTags.LIGHTNING_RODS);
 
         ctx.addOptional(
                 WoverTagDatagen.VILLAGER_JOB_SITES,
@@ -282,25 +290,12 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.addOptional(BlockTags.INCORRECT_FOR_WOODEN_TOOL, MineableTags.NEEDS_GOLD_TOOL);
 
         ctx.add(CommonBlockTags.CAULDRONS, Blocks.LAVA_CAULDRON, Blocks.WATER_CAULDRON, Blocks.POWDER_SNOW_CAULDRON);
-        ctx.add(
-                CommonBlockTags.BEDS,
-                Blocks.RED_BED,
-                Blocks.BLACK_BED,
-                Blocks.BLUE_BED,
-                Blocks.BROWN_BED,
-                Blocks.CYAN_BED,
-                Blocks.GRAY_BED,
-                Blocks.GREEN_BED,
-                Blocks.LIGHT_BLUE_BED,
-                Blocks.LIGHT_GRAY_BED,
-                Blocks.LIME_BED,
-                Blocks.MAGENTA_BED,
-                Blocks.ORANGE_BED,
-                Blocks.PINK_BED,
-                Blocks.PURPLE_BED,
-                Blocks.WHITE_BED,
-                Blocks.YELLOW_BED
-        );
+        //26.2 replaced the sixteen Blocks.<COLOR>_BED constants with a single
+        //Blocks.BED, a ColorCollection<Block> (the same treatment WOOL, CONCRETE,
+        //DYED_TERRACOTTA, CARPET, ... received). asList() yields exactly those sixteen dyed beds
+        //in ColorCollection order; the provider sorts entries before writing, so the generated
+        //JSON is unchanged.
+        ctx.add(CommonBlockTags.BEDS, Blocks.BED.asList().toArray(Block[]::new));
 
         ctx.add(CommonBlockTags.ENCHANTING_MAGIC_SOURCE, CommonBlockTags.BOOKSHELVES);
     }

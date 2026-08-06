@@ -78,4 +78,12 @@ public class Button extends SlotFromDefinition {
 
         return RecipeTraitLibrary.button(set.recipeBaseMaterial(), group);
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a tiny nub on a face), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no button-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

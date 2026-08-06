@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover-generator-testmod",
-  "version": "26.100.0",
+  "version": "26.200.0",
   "name": "WorldWeaver - World Generator (TestMod)",
   "description": "",
   "authors": [
@@ -17,7 +17,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "de.ambertation.wover.testmod.entrypoint.TestModWoverWorldGenerator"
+      "de.ambertation.wover.testmod.entrypoint.TestModWoverWorldGenerator",
+      "de.ambertation.wover.test.api.gametest.CompatWorldgenBootCheck",
+      "de.ambertation.wover.testmod.entrypoint.WorldPresetStickBootCheck"
     ],
     "fabric-datagen": [
       "de.ambertation.wover.testmod.generator.datagen.TestModWoverWorldGeneratorDatagen"
@@ -33,7 +35,7 @@
   "mixins": [],
   "depends": {
     "fabricloader": ">=0.19.0",
-    "minecraft": ["26.1", "26.1.1", "26.1.2"],
+    "minecraft": ["26.2"],
     "java": ">=25",
     "fabric-api": ">=0.155.0"
   },

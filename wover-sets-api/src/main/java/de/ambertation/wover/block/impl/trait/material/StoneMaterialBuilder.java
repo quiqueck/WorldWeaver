@@ -22,14 +22,23 @@ public class StoneMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsPickAxe());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                // What vanilla does with stone and its whole decorative family (stone, deepslate, bricks,
+                // quartz, purpur, end_stone, ...). Override per block with SULFUR_CUBE_ARCHETYPE.
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowBouncy()
+        );
     }
 
     @Override
     public @Nullable List<BlockTrait<?, ?>> tagOnly() {
         // Task #32: only the pickaxe tag, no forced strength/instrument/reqTool - for stone-strength blocks
         // whose own (tougher) strength must survive. Matches BetterNether's NetherMaterial.stoneTagOnly().
-        return combine(BlockTraits.MINEABLE_WITH.needsPickAxe());
+        return combine(
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowBouncy()
+        );
     }
 
     class Trait extends BlockTraitImpl.Generic {

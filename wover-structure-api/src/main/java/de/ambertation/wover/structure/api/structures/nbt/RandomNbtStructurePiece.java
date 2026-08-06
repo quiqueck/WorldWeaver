@@ -14,6 +14,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
@@ -190,11 +191,11 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
                 new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.maxZ())
         );
 
-        list2.forEach(pos -> worldGenLevel.setBlock(
-                pos,
-                Blocks.OXIDIZED_COPPER.defaultBlockState(),
-                BlockHelper.SET_SILENT
-        ));
+        // 26.2 folded the four oxidation stages of each copper block into a WeatheringCopperCollection,
+        // so the flat Blocks.OXIDIZED_COPPER constant is gone. weathering() selects the unwaxed variants
+        // (the waxed() set is the other half of the collection), oxidized() the stage we used before.
+        final BlockState oxidizedCopper = Blocks.COPPER_BLOCK.weathering().oxidized().defaultBlockState();
+        list2.forEach(pos -> worldGenLevel.setBlock(pos, oxidizedCopper, BlockHelper.SET_SILENT));
 
         worldGenLevel.setBlock(templatePosition, Blocks.AMETHYST_BLOCK.defaultBlockState(), BlockHelper.SET_SILENT);
         worldGenLevel.setBlock(

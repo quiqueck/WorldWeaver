@@ -3,8 +3,8 @@ package de.ambertation.wover.recipe.impl;
 import de.ambertation.wover.recipe.api.BaseRecipeBuilder;
 import de.ambertation.wover.recipe.api.RecipeBuilder;
 
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeCategory;

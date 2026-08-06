@@ -80,4 +80,12 @@ public class Wall extends SlotFromDefinition {
                         : set.recipeMaterialWithFallback(baseBlockType));
 
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a thin post that connects to its neighbours), so it must not inherit the set
+        // material's sulfur cube archetype: vanilla lists no wall-shaped block in any archetype tag, and a
+        // cube renders what it swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

@@ -27,7 +27,6 @@ public class TestModWoverSurface implements ModInitializer {
         WorldLifecycle.WORLD_REGISTRY_READY.subscribe((registry, stage) -> {
             Registry<AssignedSurfaceRule> surfaceRegistr = registry.lookupOrThrow(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY);
             C.log.info("Surface rule registry: " + Integer.toHexString(surfaceRegistr.hashCode()));
-
         });
         PriorityLinkedList<String> list = new PriorityLinkedList<>();
         list.add("b", 200);
@@ -43,8 +42,8 @@ public class TestModWoverSurface implements ModInitializer {
                         .start()
                         .biome(Biomes.SAVANNA)
                         .chancedFloor(
-                                Blocks.RED_TERRACOTTA.defaultBlockState(),
-                                Blocks.RED_CONCRETE.defaultBlockState()
+                                Blocks.DYED_TERRACOTTA.red().defaultBlockState(),
+                                Blocks.CONCRETE.red().defaultBlockState()
                         )
                         .register(ctx, TEST_SAVANA);
             });

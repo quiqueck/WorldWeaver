@@ -8,7 +8,6 @@
   },
   "mixins": [
     "DedicatedServerPropertiesMixin",
-    "WorldDimensionDataMixin",
     "WorldPresetAccessor"
   ]
 }

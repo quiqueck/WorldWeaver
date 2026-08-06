@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ShelfBlock;
 import net.minecraft.world.level.block.SoundType;
 
-import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,18 +74,15 @@ public class Shelf extends SlotFromDefinition {
     }
 
     @Override
-    protected void finalizeBlockDefinitions(
-            BlockSet<?> set,
-            BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition,
-            BiConsumer<SlotType, Block> blockDefinitionConsumer
-    ) {
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
         // Vanilla gives every shelf SoundType.SHELF regardless of the wood - crimson and warped shelves use it
-        // just like oak's - so this has to override both WOOD_BLOCK's SoundType.WOOD and any per-set sound the
-        // material applied in addCommonBlockDefinitions. Setters and traits are applied in call order, so it
-        // only wins from here, the last point before the block is built. (This branch has no
-        // finalizeDefinitions hook, and no SULFUR_CUBE_ARCHETYPE trait to opt out of either.)
-        definition.sound(SoundType.SHELF);
+        // just like oak's - so this overrides both WOOD_BLOCK's SoundType.WOOD and any per-set sound the
+        // material applied in addCommonBlockDefinitions, which is why it belongs here rather than in
+        // addSlotSpecificDefinitions (see SlotFromDefinition#finalizeDefinitions on call ordering).
+        def.sound(SoundType.SHELF);
 
-        super.finalizeBlockDefinitions(set, definition, blockDefinitionConsumer);
+        // A thin wall-mounted box drawn over three sub-cube elements, not a full cube: like the chest and the
+        // other non-cube slots it must not inherit the set material's sulfur cube archetype.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
     }
 }

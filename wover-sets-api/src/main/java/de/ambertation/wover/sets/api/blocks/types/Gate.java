@@ -70,4 +70,12 @@ public class Gate extends WoodenSlotFromDefinition {
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return RecipeTraitLibrary.gate(set.recipeBaseMaterial());
     }
+
+    @Override
+    protected void finalizeWoodDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a thin swinging panel), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no gate-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

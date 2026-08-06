@@ -6,7 +6,7 @@ import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ public class ChiseledBookshelfBlockBuilder extends AbstractBlockTraitBuilder.Gen
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_chiseled_bookshelf"));
         DEFAULT = combine(
                 new Trait(),
-                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.CHISELED_BOOKSHELF),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.CHISELED_BOOKSHELF),
                 // Vanilla's chiseled bookshelf is silk-touch-only, with no consolation drop
                 // (VanillaBlockLoot#dropWhenSilkTouch) - unlike the plain bookshelf, which gives back 3 books.
                 BlockTraits.LOOT_TABLE.silkTouchSelf()

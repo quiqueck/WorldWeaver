@@ -15,7 +15,7 @@ import de.ambertation.wover.sets.api.blocks.SlotType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ public class Chest extends SlotFromDefinition {
         return registry.defineDefaultBlock(
                 name,
                 (def) -> new ChestBlock(
-                        () -> BlockEntityType.CHEST,
+                        () -> BlockEntityTypes.CHEST,
                         SoundEvents.CHEST_OPEN,
                         SoundEvents.CHEST_CLOSE,
                         def.getProperties()
@@ -63,5 +63,13 @@ public class Chest extends SlotFromDefinition {
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup blockTraitLookup) {
         return RecipeTraitLibrary.chest(set.recipeBaseMaterial());
+    }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a sub-cube box drawn by a block entity renderer), so it must not inherit the set
+        // material's sulfur cube archetype: vanilla lists no chest-shaped block in any archetype tag, and a
+        // cube renders what it swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
     }
 }

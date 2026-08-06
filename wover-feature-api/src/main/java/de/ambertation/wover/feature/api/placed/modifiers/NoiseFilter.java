@@ -72,13 +72,12 @@ public class NoiseFilter extends PlacementFilter {
      * Tests the input position against the noise value at the xz-coordinate of the input position
      * <p>
      * The noise comes from the level's own {@link RandomState}, which seeds it from the world seed and
-     * caches it per world. It must not come from {@code NoiseParameterManager.getOrCreateNoise}, which
-     * was what this used to call: that cache is static, keyed on the noise alone, and seeded by
-     * whichever {@link RandomSource} reached it first in the process. The field a world got therefore
-     * depended on which chunk happened to be generated first in that session, so it differed between
-     * loads of the same world and was shared across every world open in one process. Chunks generated
-     * before and after a restart were laid out against different fields and did not line up along their
-     * seam.
+     * caches it per world. It must not come from {@code NoiseParameterManager.getOrCreateNoise}, which is
+     * what this used to call: that cache is static, keyed on the noise alone, and seeded by whichever
+     * {@link RandomSource} reached it first in the process. The field a world got therefore depended on
+     * which chunk happened to be generated first in that session, so it differed between loads of the
+     * same world and was shared across every world open in one process. Chunks generated before and
+     * after a restart were laid out against different fields and did not line up along their seam.
      * <p>
      * {@code RoughNoiseConditionImpl} on the surface-rule side already reads its noise this way; this is
      * the placement side catching up.

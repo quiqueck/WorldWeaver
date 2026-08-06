@@ -36,7 +36,13 @@ public class PlantLightMaterialBuilder extends AbstractBlockTraitBuilder.Generic
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsHoe());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsHoe(),
+                // vanilla shroomlight - the block this family is modelled on - is slow_sliding, alongside
+                // the mushroom blocks and wart blocks. Override per block with SULFUR_CUBE_ARCHETYPE.
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowSliding()
+        );
     }
 
     class Trait extends BlockTraitImpl.Generic {

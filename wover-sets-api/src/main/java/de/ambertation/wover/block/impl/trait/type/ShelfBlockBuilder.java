@@ -9,7 +9,7 @@ import de.ambertation.wover.entrypoint.LibWoverSets;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ public class ShelfBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_shelf"));
         DEFAULT = combine(
                 new Trait(),
-                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.SHELF),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.SHELF),
                 // Vanilla's shelves drop plainly, without copying the block entity's contents (see
                 // loot_table/blocks/oak_shelf.json) - a broken shelf spills its items into the world instead.
                 BlockTraits.LOOT_TABLE.dropSelf()

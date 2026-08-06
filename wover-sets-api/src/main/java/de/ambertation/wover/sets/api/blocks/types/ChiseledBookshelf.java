@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.SoundType;
 
-import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,17 +71,15 @@ public class ChiseledBookshelf extends SlotFromDefinition {
     }
 
     @Override
-    protected void finalizeBlockDefinitions(
-            BlockSet<?> set,
-            BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition,
-            BiConsumer<SlotType, Block> blockDefinitionConsumer
-    ) {
-        // Vanilla's chiseled bookshelf is softer than the rest of the wood family (strength 1.5 rather
-        // than WOOD_BLOCK's 2.0/3.0) and has its own sound. Setters and traits are applied in call
-        // order, so both only win from here, the last point before the block is built. (This branch has
-        // no finalizeDefinitions hook, and no SULFUR_CUBE_ARCHETYPE trait to opt out of either.)
-        definition.strength(1.5F).sound(SoundType.CHISELED_BOOKSHELF);
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Vanilla's chiseled bookshelf is softer than the rest of the wood family (strength 1.5 rather than
+        // WOOD_BLOCK's 2.0/3.0) and has its own sound. Both have to land after the set's common
+        // configuration - see SlotFromDefinition#finalizeDefinitions on call ordering.
+        def.strength(1.5F).sound(SoundType.CHISELED_BOOKSHELF);
 
-        super.finalizeBlockDefinitions(set, definition, blockDefinitionConsumer);
+        // Vanilla tags no workstation or furnishing at all - not the crafting table, barrel, bookshelf,
+        // composter, furnace or chest - only building materials, terrain, ores and a handful of decorative
+        // full cubes. A chiseled bookshelf is a furnishing, so it drops the archetype its material would give it.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
     }
 }

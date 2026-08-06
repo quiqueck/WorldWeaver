@@ -156,7 +156,9 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
 
         return new RandomFeatureConfiguration(
                 features.subList(0, features.size() - 1),
-                features.get(features.size() - 1).feature
+                // 26.2 turned WeightedPlacedFeature into a record, so its public `feature` field is now
+                // the private component behind the generated feature() accessor.
+                features.get(features.size() - 1).feature()
         );
     }
 

@@ -24,6 +24,10 @@ public class ToolTiers {
             .toolValues(ToolSlot.AXE_SLOT, new ToolValues(6, -3.2f, 5, BlockTags.MINEABLE_WITH_AXE))
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(0, -3.0f, BlockTags.MINEABLE_WITH_HOE))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(7, -3.0f, 7, MineableTags.HAMMER))
+            .toolValues(
+                    ToolSlot.SPEAR_SLOT,
+                    new ToolValues(new ToolValues.SpearTuning(0.65f, 0.7f, 0.75f, 5.0f, 14.0f, 10.0f, 5.1f, 15.0f, 4.6f))
+            )
             .build();
 
     /** The vanilla stone tool tier. */
@@ -39,6 +43,10 @@ public class ToolTiers {
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(-1, -2.0f, BlockTags.MINEABLE_WITH_HOE))
             .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-1, -2.5f, MineableTags.SHEARS))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(9, -5.0f, 8, MineableTags.HAMMER))
+            .toolValues(
+                    ToolSlot.SPEAR_SLOT,
+                    new ToolValues(new ToolValues.SpearTuning(0.75f, 0.82f, 0.7f, 4.5f, 13.0f, 9.0f, 5.1f, 13.75f, 4.6f))
+            )
             .build();
 
     /** The vanilla golden tool tier. */
@@ -54,6 +62,10 @@ public class ToolTiers {
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(0, -3.0f, BlockTags.MINEABLE_WITH_HOE))
             .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(0, -3.5f, MineableTags.SHEARS)).
             toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -4.0f, 6, MineableTags.HAMMER))
+            .toolValues(
+                    ToolSlot.SPEAR_SLOT,
+                    new ToolValues(new ToolValues.SpearTuning(0.95f, 0.7f, 0.7f, 3.5f, 13.0f, 8.5f, 5.1f, 13.75f, 4.6f))
+            )
             .build();
 
     /** The vanilla iron tool tier. */
@@ -69,6 +81,10 @@ public class ToolTiers {
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(-2, -1.0f, BlockTags.MINEABLE_WITH_HOE))
             .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-2, -4.0f, MineableTags.SHEARS))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -4.3f, 7, MineableTags.HAMMER))
+            .toolValues(
+                    ToolSlot.SPEAR_SLOT,
+                    new ToolValues(new ToolValues.SpearTuning(0.95f, 0.95f, 0.6f, 2.5f, 11.0f, 6.75f, 5.1f, 11.25f, 4.6f))
+            )
             .build();
 
     /** The vanilla diamond tool tier. */
@@ -84,6 +100,10 @@ public class ToolTiers {
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(-3, 0.0f, BlockTags.MINEABLE_WITH_HOE))
             .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-3, -0.5f, MineableTags.SHEARS))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(7, -4.0f, 6, MineableTags.HAMMER))
+            .toolValues(
+                    ToolSlot.SPEAR_SLOT,
+                    new ToolValues(new ToolValues.SpearTuning(1.05f, 1.075f, 0.5f, 3.0f, 10.0f, 6.5f, 5.1f, 10.0f, 4.6f))
+            )
             .build();
 
     /** The vanilla netherite tool tier. */
@@ -99,6 +119,10 @@ public class ToolTiers {
             .toolValues(ToolSlot.HOE_SLOT, new ToolValues(-4, -0.5f, BlockTags.MINEABLE_WITH_HOE))
             .toolValues(ToolSlot.SHEARS_SLOT, new ToolValues(-4, 0f, MineableTags.SHEARS))
             .toolValues(ToolSlot.HAMMER_SLOT, new ToolValues(8, -3.2f, 5, MineableTags.HAMMER))
+            .toolValues(
+                    ToolSlot.SPEAR_SLOT,
+                    new ToolValues(new ToolValues.SpearTuning(1.15f, 1.2f, 0.4f, 2.5f, 9.0f, 5.5f, 5.1f, 8.75f, 4.6f))
+            )
             .build();
 
 

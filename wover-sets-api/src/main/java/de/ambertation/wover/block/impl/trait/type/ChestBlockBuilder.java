@@ -13,7 +13,7 @@ import de.ambertation.wover.tag.api.predefined.CommonItemTags;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -39,13 +39,13 @@ public class ChestBlockBuilder extends AbstractBlockTraitBuilder.Generic impleme
             return combine(
                     DEFAULT,
                     BlockTraits.MAGIC_SOURCE.withDefault(),
-                    BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.CHEST),
+                    BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.CHEST),
                     BlockTraits.LOOT_TABLE.dropNamedEntity()
             );
         } else {
             return combine(
                     DEFAULT,
-                    BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.CHEST),
+                    BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.CHEST),
                     BlockRenderTraits.CHEST_RENDERER.withDefault()
             );
         }

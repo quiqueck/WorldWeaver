@@ -24,13 +24,24 @@ public class WoodMaterialBuilder extends AbstractBlockTraitBuilder.Generic imple
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT, BlockTraits.FLAMMABLE.withDefault());
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe(), BlockTraits.FLAMMABLE.withDefault());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsAxe(),
+                BlockTraits.FLAMMABLE.withDefault(),
+                // What vanilla does with planks, logs and bamboo blocks. Override per block with
+                // SULFUR_CUBE_ARCHETYPE.
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.bouncy()
+        );
     }
 
     @Override
     public @Nullable List<BlockTrait<?, ?>> netherWood() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsAxe());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsAxe(),
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.bouncy()
+        );
     }
 
     class Trait extends BlockTraitImpl.Generic {

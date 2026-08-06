@@ -81,6 +81,14 @@ public class BlockTraits {
      * Adds one or more arbitrary block tags to a block, see {@link BlockTagTrait}.
      */
     public static final BlockTagTrait.Builder BLOCK_TAG = BlockTagTraitBuilder.BUILDER;
+    /**
+     * Declares what a block is to a sulfur cube: which {@code #minecraft:sulfur_cube_archetype/...} item tag
+     * its item joins, and hence whether a cube can swallow it at all and how it behaves afterwards. The
+     * material bundles above carry a default ({@link #STONE_BLOCK} → {@code slowBouncy()},
+     * {@link #METAL_BLOCK} → {@code slowFlat()}, ...); this builder is how an individual block overrides it,
+     * last-one-wins. See {@link SulfurCubeArchetypeTrait}.
+     */
+    public static final SulfurCubeArchetypeTrait.Builder SULFUR_CUBE_ARCHETYPE = SulfurCubeArchetypeBuilder.BUILDER;
 
     // Type traits
     /**

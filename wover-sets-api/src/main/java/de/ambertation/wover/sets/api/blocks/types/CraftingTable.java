@@ -62,4 +62,12 @@ public class CraftingTable extends SlotFromDefinition {
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return RecipeTraitLibrary.craftingTable(set.recipeBaseMaterial());
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Vanilla tags no workstation or furnishing at all - not the crafting table, barrel, bookshelf,
+        // composter, furnace or chest - only building materials, terrain, ores and a handful of decorative
+        // full cubes. Crafting table is a workstation, so it drops the archetype its material would give it.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

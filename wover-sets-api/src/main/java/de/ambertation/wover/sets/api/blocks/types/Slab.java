@@ -79,4 +79,12 @@ public class Slab extends SlotFromDefinition {
                 !wood
         );
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a half-height block), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no slab-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

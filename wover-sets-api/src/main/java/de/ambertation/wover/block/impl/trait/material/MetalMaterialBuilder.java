@@ -23,7 +23,13 @@ public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsPickAxe());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                // What vanilla does with iron/gold/netherite/copper blocks and their ores. Override per
+                // block with SULFUR_CUBE_ARCHETYPE.
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowFlat()
+        );
     }
 
     @Override
@@ -31,7 +37,10 @@ public class MetalMaterialBuilder extends AbstractBlockTraitBuilder.Generic impl
         // Task #32: only the pickaxe tag, no forced strength/instrument/reqTool/sound - for metal-classified
         // blocks that must keep their own strength (e.g. the netherite fire bowls). Matches BetterNether's
         // NetherMaterial.metalTagOnly().
-        return combine(BlockTraits.MINEABLE_WITH.needsPickAxe());
+        return combine(
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowFlat()
+        );
     }
 
     class Trait extends BlockTraitImpl.Generic {

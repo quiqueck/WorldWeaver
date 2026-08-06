@@ -62,4 +62,12 @@ public class Door extends SlotFromDefinition {
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return RecipeTraitLibrary.door(set.recipeBaseMaterial());
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a thin swinging panel), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no door-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

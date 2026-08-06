@@ -7,6 +7,7 @@ import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
@@ -52,7 +53,7 @@ public class TrapdoorBlockBuilder extends AbstractBlockTraitBuilder.Generic impl
 
             if (ModCore.isDatagen()) {
                 definition.addTags(BlockTags.TRAPDOORS);
-                definition.addItemTags(ItemTags.TRAPDOORS);
+                definition.addItemTags(BlockItemTags.TRAPDOORS.item());
 
                 if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
                     definition.addTags(BlockTags.WOODEN_TRAPDOORS);

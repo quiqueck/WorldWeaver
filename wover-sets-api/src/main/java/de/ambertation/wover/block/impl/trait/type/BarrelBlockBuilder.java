@@ -9,7 +9,7 @@ import de.ambertation.wover.tag.api.predefined.CommonBlockTags;
 import de.ambertation.wover.tag.api.predefined.CommonItemTags;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public class BarrelBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
         super(BlockTraitKey.ofUnique(LibWoverSets.C, "is_barrel"));
         DEFAULT = combine(
                 new Trait(),
-                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityType.BARREL),
+                BlockTraits.VALID_BLOCK_ENTITY.with(BlockEntityTypes.BARREL),
                 BlockTraits.LOOT_TABLE.dropNamedEntity()
         );
     }

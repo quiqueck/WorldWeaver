@@ -39,10 +39,15 @@ public interface SurfaceRulesContext {
     int getSurfaceDepth();
     /**
      * Returns the biome for the evaluated block
+     * <p>
+     * This used to hand out a {@link Supplier} because up to 26.1 that is literally what the vanilla
+     * surface rule context kept back then. 26.2 resolves the biome lazily inside the context itself, so
+     * this now hands out the {@link Holder} directly - the lookup still only happens on the first call
+     * for a given position.
      *
      * @return the biome
      */
-    Supplier<Holder<Biome>> getBiome();
+    Holder<Biome> getBiome();
     /**
      * Returns the chunk for the evaluated block
      *

@@ -4,6 +4,7 @@ import de.ambertation.wover.surface.impl.BaseSurfaceRuleBuilder;
 import de.ambertation.wover.surface.impl.SurfaceRuleBuilderImpl;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -55,10 +56,17 @@ public interface SurfaceRuleBuilder extends BaseSurfaceRuleBuilder<SurfaceRuleBu
 
     /**
      * Finalise rule building process.
+     * <p>
+     * Since Minecraft 26.2 {@link net.minecraft.world.level.levelgen.SurfaceRules#isBiome(HolderGetter, ResourceKey...)}
+     * resolves its biome keys into a {@link net.minecraft.core.HolderSet} rather than keeping the raw
+     * keys, so composing the biome filter now requires a biome lookup. Inside a registry bootstrap use
+     * {@code ctx.lookup(Registries.BIOME)}; at runtime use the {@link net.minecraft.core.RegistryAccess}.
      *
+     * @param biomes The lookup used to resolve {@link #biomeKey()}. Only consulted when a biome filter
+     *               was set on this builder.
      * @return {@link RuleSource}.
      */
-    RuleSource build();
+    RuleSource build(HolderGetter<Biome> biomes);
 
     /**
      * Register rule in the {@link SurfaceRuleRegistry} with the currently set sort priority (see {@link #sortPriority}).

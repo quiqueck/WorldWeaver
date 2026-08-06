@@ -46,4 +46,12 @@ public class Chain extends SlotFromDefinition {
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return RecipeTraitLibrary.chain(set.recipeMaterial(SlotType.INGOT), set.recipeMaterial(SlotType.NUGGET));
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a thin hanging link), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no chain-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

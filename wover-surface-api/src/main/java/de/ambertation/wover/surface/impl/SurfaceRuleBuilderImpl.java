@@ -8,6 +8,7 @@ import de.ambertation.wover.surface.api.conditions.NoiseCondition;
 import de.ambertation.wover.util.PriorityLinkedList;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -305,13 +306,21 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
 
     /**
      * Finalise rule building process.
+     * <p>
+     * Since Minecraft 26.2 {@link SurfaceRules#isBiome(HolderGetter, ResourceKey...)} resolves its biome
+     * keys into a {@link net.minecraft.core.HolderSet} instead of storing the raw keys, so building the
+     * biome filter now needs a biome lookup. Inside a datapack registry bootstrap you get one from the
+     * {@link BootstrapContext} ({@code ctx.lookup(Registries.BIOME)}); at runtime from the
+     * {@link net.minecraft.core.RegistryAccess}.
      *
+     * @param biomes The lookup used to resolve {@link #biomeKey()}. Only consulted when a biome filter
+     *               was actually set.
      * @return {@link SurfaceRules.RuleSource}.
      */
-    public SurfaceRules.RuleSource build() {
+    public SurfaceRules.RuleSource build(HolderGetter<Biome> biomes) {
         SurfaceRules.RuleSource rule = getRuleSource();
         if (biomeKey != null) {
-            rule = SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), rule);
+            rule = SurfaceRules.ifTrue(SurfaceRules.isBiome(biomes, biomeKey), rule);
         }
         return rule;
     }

@@ -7,7 +7,7 @@ import de.ambertation.wover.loot.api.LootTableManager;
 import de.ambertation.wover.testmod.block.TestBlock;
 import de.ambertation.wover.testmod.block.TestBlockRegistry;
 
-import net.minecraft.advancements.criterion.StatePropertiesPredicate;
+import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;

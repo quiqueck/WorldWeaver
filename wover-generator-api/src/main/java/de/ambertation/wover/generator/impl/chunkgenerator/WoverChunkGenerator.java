@@ -182,7 +182,10 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                         bootstapContext.lookup(Registries.NOISE),
                         slideNetherLike(densityGetter, 0, 256)
                 ),
-                SurfaceRuleData.nether(),
+                // 26.2: SurfaceRules.isBiome() resolves its biome keys into a HolderSet right away instead
+                // of storing the raw keys, so every rule factory that filters by biome needs a biome
+                // lookup - SurfaceRuleData.nether() included. The rule itself is unchanged.
+                SurfaceRuleData.nether(bootstapContext.lookup(Registries.BIOME)),
                 List.of(),
                 32,
                 false,

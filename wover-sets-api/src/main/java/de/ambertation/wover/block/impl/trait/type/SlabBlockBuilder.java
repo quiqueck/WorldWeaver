@@ -6,6 +6,7 @@ import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
@@ -34,7 +35,7 @@ public class SlabBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
             definition.addTags(BlockTags.SLABS);
-            definition.addItemTags(ItemTags.SLABS);
+            definition.addItemTags(BlockItemTags.SLABS.item());
 
             if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
                 definition.addTags(BlockTags.WOODEN_SLABS);

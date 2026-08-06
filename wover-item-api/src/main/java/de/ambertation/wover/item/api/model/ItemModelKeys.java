@@ -25,6 +25,12 @@ public class ItemModelKeys {
     public static final ItemModelKey<Void> ELYTRA = key("elytra");
     /** A plain flat item model for a boat/chest-boat. */
     public static final ItemModelKey<Void> BOAT = key("boat");
+    /**
+     * A vanilla-style spear item model: the flat icon for {@code gui}/{@code ground}/{@code fixed}/
+     * {@code on_shelf}, dispatching to a separate {@code spear_in_hand}-parented model (with its own
+     * {@code _in_hand} texture) for every other display context (hand/head rendering).
+     */
+    public static final ItemModelKey<Void> SPEAR = key("spear");
 
     private ItemModelKeys() {
     }

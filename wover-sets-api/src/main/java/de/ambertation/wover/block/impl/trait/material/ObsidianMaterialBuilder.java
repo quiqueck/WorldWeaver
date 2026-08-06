@@ -25,7 +25,13 @@ public class ObsidianMaterialBuilder extends AbstractBlockTraitBuilder.Generic i
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsPickAxe());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                // Vanilla puts obsidian and crying_obsidian in slow_bouncy, with the rest of the stone
+                // family. Override per block with SULFUR_CUBE_ARCHETYPE.
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowBouncy()
+        );
     }
 
     class Trait extends BlockTraitImpl.Generic {

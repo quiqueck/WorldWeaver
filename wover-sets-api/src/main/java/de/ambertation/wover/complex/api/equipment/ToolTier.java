@@ -1,5 +1,6 @@
 package de.ambertation.wover.complex.api.equipment;
 
+import de.ambertation.wover.block.api.model.ModelTraitLibrary;
 import de.ambertation.wover.entrypoint.LibWoverRecipe;
 import de.ambertation.wover.item.api.ItemDefinition;
 import de.ambertation.wover.item.api.ToolItemDefinition;
@@ -110,26 +111,84 @@ public class ToolTier {
         }
     }
 
+    static class ConfigureSpearItemTrait extends ConfigureToolItemTrait {
+        public static final ItemTraitKey ID = ItemTraitKey.ofUnique(LibWoverRecipe.C, "configure_spear_item");
+
+        public ConfigureSpearItemTrait(ToolSlot slot, ToolTier tier) {
+            super(ID, slot, tier);
+        }
+
+        @Override
+        protected void configure(
+                ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
+                ToolTier.ToolValues values
+        ) {
+            if (definition instanceof ToolItemDefinition toolDef) {
+                ToolValues.SpearTuning tuning = values.spearTuning;
+                if (tuning == null) {
+                    throw new IllegalArgumentException("No spear tuning configured for tier " + tier);
+                }
+                toolDef.spear(
+                        tier.toolMaterial,
+                        tuning.attackDuration(),
+                        tuning.damageMultiplier(),
+                        tuning.delay(),
+                        tuning.dismountTime(),
+                        tuning.dismountThreshold(),
+                        tuning.knockbackTime(),
+                        tuning.knockbackThreshold(),
+                        tuning.damageTime(),
+                        tuning.damageThreshold()
+                );
+                definition.addTrait(ModelTraitLibrary.spear());
+            } else {
+                throw new IllegalArgumentException("Definition must be a ToolItemDefinition");
+            }
+        }
+    }
+
 
     /**
      * The per-{@link ToolSlot} configuration of a {@link ToolTier}.
      *
-     * @param attackDamage               the attack damage bonus for this slot
-     * @param attackSpeed                the attack speed modifier for this slot
-     * @param disableBlockingForSeconds  seconds a shield is disabled for when hit by this tool (0 for none)
-     * @param smithingTemplate           the smithing template used to upgrade into this slot's item, or
-     *                                   {@code null} for a plain crafting recipe
-     * @param minableWithTag             the block tag this slot's tool is effective against, used both for the
-     *                                   item's {@code tool(...)} component and its mining tag
+     * @param attackDamage              the attack damage bonus for this slot
+     * @param attackSpeed               the attack speed modifier for this slot
+     * @param disableBlockingForSeconds seconds a shield is disabled for when hit by this tool (0 for none)
+     * @param smithingTemplate          the smithing template used to upgrade into this slot's item, or
+     *                                  {@code null} for a plain crafting recipe
+     * @param minableWithTag            the block tag this slot's tool is effective against, used both for the
+     *                                  item's {@code tool(...)} component and its mining tag
+     * @param spearTuning               the charge/thrust tuning used by {@link ToolSlot#SPEAR_SLOT}, or
+     *                                  {@code null} for every other slot
      */
     public record ToolValues(
             float attackDamage,
             float attackSpeed,
             float disableBlockingForSeconds,
             SmithingTemplateItem smithingTemplate,
-            TagKey<Block> minableWithTag
+            TagKey<Block> minableWithTag,
+            SpearTuning spearTuning
     ) {
-        /** Values representing "no change", useful as an offset for {@link ToolTier#copyWithOffset}. */
+        /**
+         * The charge/thrust tuning a {@link ToolSlot#SPEAR_SLOT} item is configured with; see
+         * {@link de.ambertation.wover.item.api.ToolItemDefinition#spear} for the meaning of each parameter.
+         */
+        public record SpearTuning(
+                float attackDuration,
+                float damageMultiplier,
+                float delay,
+                float dismountTime,
+                float dismountThreshold,
+                float knockbackTime,
+                float knockbackThreshold,
+                float damageTime,
+                float damageThreshold
+        ) {
+        }
+
+        /**
+         * Values representing "no change", useful as an offset for {@link ToolTier#copyWithOffset}.
+         */
         public static ToolValues NO_OFFSET = new ToolValues(0, 0);
 
         /**
@@ -139,7 +198,16 @@ public class ToolTier {
          * @param attackSpeed  the attack speed modifier for this slot
          */
         public ToolValues(float attackDamage, float attackSpeed) {
-            this(attackDamage, attackSpeed, 0, null, null);
+            this(attackDamage, attackSpeed, 0, null, null, null);
+        }
+
+        /**
+         * Creates values for a {@link ToolSlot#SPEAR_SLOT} tier, with no smithing template or mining tag.
+         *
+         * @param spearTuning the charge/thrust tuning to configure the spear with
+         */
+        public ToolValues(SpearTuning spearTuning) {
+            this(0, 0, 0, null, null, spearTuning);
         }
 
         /**
@@ -150,7 +218,7 @@ public class ToolTier {
          * @param disableBlockingForSeconds seconds a shield is disabled for when hit by this tool
          */
         public ToolValues(float attackDamage, float attackSpeed, float disableBlockingForSeconds) {
-            this(attackDamage, attackSpeed, disableBlockingForSeconds, null, null);
+            this(attackDamage, attackSpeed, disableBlockingForSeconds, null, null, null);
         }
 
         /**
@@ -161,18 +229,18 @@ public class ToolTier {
          * @param smithingTemplate the smithing template used to upgrade into this slot's item
          */
         public ToolValues(float attackDamage, float attackSpeed, SmithingTemplateItem smithingTemplate) {
-            this(attackDamage, attackSpeed, 0, smithingTemplate, null);
+            this(attackDamage, attackSpeed, 0, smithingTemplate, null, null);
         }
 
         /**
          * Creates values with no blocking penalty or smithing template.
          *
-         * @param attackDamage    the attack damage bonus for this slot
-         * @param attackSpeed     the attack speed modifier for this slot
-         * @param minableWithTag  the block tag this slot's tool is effective against
+         * @param attackDamage   the attack damage bonus for this slot
+         * @param attackSpeed    the attack speed modifier for this slot
+         * @param minableWithTag the block tag this slot's tool is effective against
          */
         public ToolValues(float attackDamage, float attackSpeed, TagKey<Block> minableWithTag) {
-            this(attackDamage, attackSpeed, 0, null, minableWithTag);
+            this(attackDamage, attackSpeed, 0, null, minableWithTag, null);
         }
 
         /**
@@ -189,7 +257,7 @@ public class ToolTier {
                 float disableBlockingForSeconds,
                 SmithingTemplateItem smithingTemplate
         ) {
-            this(attackDamage, attackSpeed, disableBlockingForSeconds, smithingTemplate, null);
+            this(attackDamage, attackSpeed, disableBlockingForSeconds, smithingTemplate, null, null);
         }
 
         /**
@@ -206,13 +274,13 @@ public class ToolTier {
                 float disableBlockingForSeconds,
                 TagKey<Block> minableWithTag
         ) {
-            this(attackDamage, attackSpeed, disableBlockingForSeconds, null, minableWithTag);
+            this(attackDamage, attackSpeed, disableBlockingForSeconds, null, minableWithTag, null);
         }
 
         /**
          * @param offset the values to add on top of this instance
          * @return a new {@link ToolValues} with {@code offset} added; a non-null {@code smithingTemplate}/
-         *         {@code minableWithTag} in {@code offset} replaces this instance's value
+         * {@code minableWithTag}/{@code spearTuning} in {@code offset} replaces this instance's value
          */
         ToolValues copyWithOffset(ToolValues offset) {
             return new ToolValues(
@@ -220,18 +288,27 @@ public class ToolTier {
                     attackSpeed + offset.attackSpeed,
                     disableBlockingForSeconds + offset.disableBlockingForSeconds,
                     offset.smithingTemplate != null ? offset.smithingTemplate : smithingTemplate,
-                    offset.minableWithTag != null ? offset.minableWithTag : this.minableWithTag
+                    offset.minableWithTag != null ? offset.minableWithTag : this.minableWithTag,
+                    offset.spearTuning != null ? offset.spearTuning : this.spearTuning
             );
         }
     }
 
-    /** The name of this tier, used as a naming component and in {@link #toString()}. */
+    /**
+     * The name of this tier, used as a naming component and in {@link #toString()}.
+     */
     public final String name;
-    /** The vanilla {@link ToolMaterial} items built for this tier use. */
+    /**
+     * The vanilla {@link ToolMaterial} items built for this tier use.
+     */
     public final ToolMaterial toolMaterial;
-    /** The mining level of this tier (higher is stronger; matches vanilla's tier ordering). */
+    /**
+     * The mining level of this tier (higher is stronger; matches vanilla's tier ordering).
+     */
     public final int level;
-    /** The block tag identifying which blocks require at least this tier to be mined correctly. */
+    /**
+     * The block tag identifying which blocks require at least this tier to be mined correctly.
+     */
     public final TagKey<Block> blockTag;
     private final ToolValues[] toolValues;
 

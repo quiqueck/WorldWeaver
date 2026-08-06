@@ -3,6 +3,7 @@ package de.ambertation.wover.block.api.model;
 import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.api.trait.BlockTraitKey;
 import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
+import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverBlock;
 
 import net.minecraft.world.level.block.Block;
@@ -43,6 +44,7 @@ public final class BlockModelBinding extends BlockTraitImpl<Block, BlockModelBin
      * @return the new binding
      */
     public static <P> BlockModelBinding of(ModelKey<P> modelKey, P payload) {
+        if (!ModCore.isDatagen() || !ModCore.isClient()) return null;
         return new BlockModelBinding(modelKey, payload);
     }
 

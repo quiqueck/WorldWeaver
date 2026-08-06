@@ -8,7 +8,6 @@ import de.ambertation.wover.surface.api.conditions.VolumeThresholdCondition;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.util.valueproviders.FloatProvider;
@@ -33,7 +32,6 @@ public class VolumeThresholdConditionImpl extends VolumeNoiseCondition implement
                     Codec.DOUBLE.fieldOf("scale_z").orElse(0.1).forGetter(p -> p.scaleZ)
             )
             .apply(instance, VolumeThresholdConditionImpl::new));
-    public static final KeyDispatchDataCodec<VolumeThresholdConditionImpl> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
     public final Context noiseContext;
     public final double threshold;
     public final FloatProvider roughness;
@@ -101,8 +99,8 @@ public class VolumeThresholdConditionImpl extends VolumeNoiseCondition implement
     }
 
     @Override
-    public KeyDispatchDataCodec<? extends SurfaceRules.ConditionSource> codec() {
-        return KEY_CODEC;
+    public MapCodec<? extends SurfaceRules.ConditionSource> codec() {
+        return CODEC;
     }
 
 

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_hanging_sign_rot_1",
+  "textures": {
+    "all": "wover-sets-testmod:block/wooden_hanging_sign",
+    "particle": "wover-sets-testmod:block/wooden_stripped_log_side"
+  }
+}

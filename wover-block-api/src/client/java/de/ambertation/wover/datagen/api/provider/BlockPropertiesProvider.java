@@ -12,6 +12,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
@@ -251,13 +252,17 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
     }
 
     /**
-     * {@code isValidSpawn} probed with a fixed ({@link EntityType#OCELOT}, {@link EntityType#ZOMBIE}) pair so that
-     * {@code Blocks::ocelotOrParrot}-style lambdas (which allow only some entities) are distinguishable from a
-     * blanket allow/deny. Emitted as {@code ocelot/zombie} booleans, e.g. {@code isValidSpawn=true/false}.
+     * {@code isValidSpawn} probed with a fixed ({@link EntityTypes#OCELOT}, {@link EntityTypes#ZOMBIE}) pair so
+     * that {@code Blocks::ocelotOrParrot}-style lambdas (which allow only some entities) are distinguishable from
+     * a blanket allow/deny. Emitted as {@code ocelot/zombie} booleans, e.g. {@code isValidSpawn=true/false}.
+     * <p>
+     * 26.2 moved the {@code EntityType.*} constants off {@link EntityType} itself (which now only carries the
+     * two codecs) into the new {@link EntityTypes} holder class; the constants themselves are unchanged, so the
+     * probed pair is identical to 26.1's.
      */
     private static String validSpawn(BlockState state) {
-        final String ocelot = spawnFor(state, EntityType.OCELOT);
-        final String zombie = spawnFor(state, EntityType.ZOMBIE);
+        final String ocelot = spawnFor(state, EntityTypes.OCELOT);
+        final String zombie = spawnFor(state, EntityTypes.ZOMBIE);
         return ocelot + "/" + zombie;
     }
 
@@ -303,7 +308,11 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
                 + ",\"isViewBlocking\":\"" + predicate(BlockState::isViewBlocking, state) + "\""
                 + ",\"isRedstoneConductor\":\"" + predicate(BlockState::isRedstoneConductor, state) + "\""
                 + ",\"hasPostProcess\":\"" + predicate((s, g, p) -> s.getPostProcessPos(g, p) != null, state) + "\""
-                + ",\"emissiveRendering\":\"" + predicate(BlockState::emissiveRendering, state) + "\""
+                // 26.2 narrowed emissive rendering from a BlockBehaviour.StatePredicate (state, level, pos) to a
+                // plain Predicate<BlockState>, so BlockState#emissiveRendering() no longer takes a level or a
+                // position. Probed through the same err-guarded helper as the other predicate columns (with the
+                // now-unused getter/pos arguments dropped on the floor) so the column keeps its exact format.
+                + ",\"emissiveRendering\":\"" + predicate((s, g, p) -> s.emissiveRendering(), state) + "\""
                 + ",\"isValidSpawn\":\"" + validSpawn(state) + "\"}";
     }
 

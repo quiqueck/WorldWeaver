@@ -56,6 +56,10 @@ public class WoverItemModelFactories implements WoverClientTraitEntrypoint {
             generator.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
         });
 
+        ClientItemModelRegistry.register(ItemModelKeys.SPEAR, (key, item, generator, payload) -> {
+            generator.generateSpear(item);
+        });
+
         // Boat renderer/model-layer registration is applied (walking the item registry) once at client init.
         ClientRenderTraitRegistry.register(ClientBoatRenderBootstrap::applyBoatRenderers);
     }

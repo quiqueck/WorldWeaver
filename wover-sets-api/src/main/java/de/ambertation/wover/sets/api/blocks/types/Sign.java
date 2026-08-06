@@ -63,7 +63,7 @@ public class Sign extends WoodenSlotFromDefinition {
     }
 
     @Override
-    protected void finalizeBlockDefinitions(
+    protected void buildAndRegisterBlocks(
             BlockSet<?> set,
             BlockDefinition<?, ? extends BlockDefinition<?, ?>> definition,
             BiConsumer<SlotType, Block> blockDefinitionConsumer
@@ -94,5 +94,13 @@ public class Sign extends WoodenSlotFromDefinition {
     @Override
     protected BlockRecipeTrait buildRecipe(BlockSet<?> set, BlockTraitLookup traitLookup) {
         return RecipeTraitLibrary.sign(set.recipeBaseMaterial());
+    }
+
+    @Override
+    protected void finalizeWoodDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Not a full cube (a thin board on a post), so it must not inherit the set material's sulfur cube
+        // archetype: vanilla lists no sign-shaped block in any archetype tag, and a cube renders what it
+        // swallowed as a block model.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
     }
 }

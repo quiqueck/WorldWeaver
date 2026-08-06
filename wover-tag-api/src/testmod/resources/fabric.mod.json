@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "wover-tag-testmod",
-  "version": "26.100.0",
+  "version": "26.200.0",
   "name": "WorldWeaver - Tag (TestMod)",
   "description": "",
   "authors": [
@@ -32,7 +32,7 @@
   "mixins": [],
   "depends": {
     "fabricloader": ">=0.19.0",
-    "minecraft": ["26.1", "26.1.1", "26.1.2"],
+    "minecraft": ["26.2"],
     "java": ">=25",
     "fabric-api": ">=0.155.0"
   },

@@ -10,6 +10,7 @@ import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.progress.LevelLoadListener;
+import net.minecraft.server.notifications.NotificationManager;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -47,6 +48,12 @@ public class MinecraftServerMixin {
     @Final
     protected WorldData worldData;
 
+    /**
+     * 26.2 appended a {@link NotificationManager} to the {@link MinecraftServer} constructor (it is the sink for
+     * the new server notification services). A mixin handler for {@code <init>} has to mirror the constructor
+     * descriptor exactly, so the parameter is repeated here even though we do not use it - without it the
+     * injector would be rejected at mixin-apply time.
+     */
     @Inject(at = @At("RETURN"), method = "<init>")
     private void wover_initMinecraftServerLate(
             Thread thread,
@@ -59,6 +66,7 @@ public class MinecraftServerMixin {
             Services services,
             LevelLoadListener levelLoadListener,
             boolean bl,
+            NotificationManager notificationManager,
             CallbackInfo ci
     ) {
         //in most cases this call is redundant, as we already captured the registries from the

@@ -2,7 +2,11 @@ package de.ambertation.wover.loot.api;
 
 import de.ambertation.wover.tag.api.predefined.CommonItemTags;
 
-import net.minecraft.advancements.criterion.*;
+import net.minecraft.advancements.predicates.DataComponentMatchers;
+import net.minecraft.advancements.predicates.EnchantmentPredicate;
+import net.minecraft.advancements.predicates.ItemPredicate;
+import net.minecraft.advancements.predicates.MinMaxBounds;
+import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.predicates.DataComponentPredicates;
@@ -488,7 +492,7 @@ public class LootLookupProvider {
                         LootItem.lootTableItem(withoutSilkTouch)
                                 .when(LootItemBlockStatePropertyCondition
                                         .hasBlockStateProperties(withSilkTouch)
-                                        .setProperties(net.minecraft.advancements.criterion.StatePropertiesPredicate.Builder
+                                        .setProperties(net.minecraft.advancements.predicates.StatePropertiesPredicate.Builder
                                                 .properties()
                                                 .hasProperty(property, comparable))
                                 )
@@ -520,7 +524,7 @@ public class LootLookupProvider {
                         .add(LootItem.lootTableItem(withSilkTouch)
                                      .when(LootItemBlockStatePropertyCondition
                                              .hasBlockStateProperties(withSilkTouch)
-                                             .setProperties(net.minecraft.advancements.criterion.StatePropertiesPredicate.Builder
+                                             .setProperties(net.minecraft.advancements.predicates.StatePropertiesPredicate.Builder
                                                      .properties()
                                                      .hasProperty(property, comparable))
                                      )

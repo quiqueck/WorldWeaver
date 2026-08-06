@@ -105,6 +105,11 @@ public class SmithingTemplates {
      */
     public static final Identifier EMPTY_SLOT_PICKAXE = Identifier.withDefaultNamespace(
             "container/slot/pickaxe");
+    /**
+     * Empty slot icon for spear weapons
+     */
+    public static final Identifier EMPTY_SLOT_SPEAR = Identifier.withDefaultNamespace(
+            "container/slot/spear");
 
     // Material slot empty icons
     /**
@@ -131,7 +136,8 @@ public class SmithingTemplates {
             EMPTY_SLOT_PICKAXE,
             EMPTY_SLOT_AXE,
             EMPTY_SLOT_HOE,
-            EMPTY_SLOT_SHOVEL
+            EMPTY_SLOT_SHOVEL,
+            EMPTY_SLOT_SPEAR
     );
 
     /**

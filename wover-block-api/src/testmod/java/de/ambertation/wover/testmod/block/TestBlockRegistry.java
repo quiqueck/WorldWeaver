@@ -6,6 +6,7 @@ import de.ambertation.wover.tag.api.predefined.CommonPoiTags;
 import de.ambertation.wover.testmod.entrypoint.TestModWoverBlock;
 
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.PushReaction;
@@ -34,7 +35,7 @@ public class TestBlockRegistry {
             )
             .addTrait(FlammableBlockBuilder.BUILDER.withDefault())
             .addTags(BlockTags.DOORS)
-            .addItemTags(ItemTags.DOORS)
+            .addItemTags(BlockItemTags.DOORS.item())
             .pushReaction(PushReaction.DESTROY)
             .buildAndRegister();
 

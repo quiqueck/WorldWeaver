@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_hanging_sign",
+  "textures": {
+    "all": "wover-sets-testmod:block/wooden_hanging_sign",
+    "particle": "wover-sets-testmod:block/wooden_stripped_log_side"
+  }
+}

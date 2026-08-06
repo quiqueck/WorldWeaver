@@ -44,18 +44,28 @@ public class OreMaterialBuilder extends AbstractBlockTraitBuilder.Generic implem
 
     public @Nullable List<BlockTrait<?, ?>> withDefault() {
         if (!ModCore.isDatagen()) return combine(DEFAULT);
-        return combine(DEFAULT, BlockTraits.MINEABLE_WITH.needsPickAxe());
+        return combine(
+                DEFAULT,
+                BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                // Vanilla splits its ores by what they hold: the metal ores are slow_flat, everything else
+                // (coal/lapis/redstone/diamond/emerald/quartz) is slow_bouncy with the stone family. This
+                // takes the non-metal side as the default; a metal ore overrides it with
+                // SULFUR_CUBE_ARCHETYPE.slowFlat().
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowBouncy()
+        );
     }
 
     @Override
     public @Nullable List<BlockTrait<?, ?>> dropping(@NotNull Supplier<Item> drop, int min, int max) {
-        // withDefault() (classification + pickaxe tag) plus the vanilla ore-drop loot trait. Both the pickaxe
-        // tag and the loot trait are datagen-only (null off-datagen); combine(...) drops the nulls, so this
-        // reduces to combine(DEFAULT) outside datagen, exactly like withDefault().
+        // withDefault() (classification + pickaxe tag + sulfur cube archetype) plus the vanilla ore-drop loot
+        // trait. The pickaxe tag, the archetype and the loot trait are all datagen-only (null off-datagen);
+        // combine(...) drops the nulls, so this reduces to combine(DEFAULT) outside datagen, exactly like
+        // withDefault().
         if (!ModCore.isDatagen()) return combine(DEFAULT);
         return combine(
                 DEFAULT,
                 BlockTraits.MINEABLE_WITH.needsPickAxe(),
+                BlockTraits.SULFUR_CUBE_ARCHETYPE.slowBouncy(),
                 BlockTraits.LOOT_TABLE.dropOre(drop, min, max)
         );
     }

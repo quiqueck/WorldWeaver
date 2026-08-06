@@ -8,8 +8,10 @@ import de.ambertation.wover.surface.api.AssignedSurfaceRule;
 import de.ambertation.wover.surface.api.SurfaceRuleRegistry;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.RegistryLayer;
@@ -33,10 +35,11 @@ import org.jetbrains.annotations.ApiStatus;
 
 public class SurfaceRuleUtil {
     private static List<SurfaceRules.RuleSource> getRulesForBiome(ResourceKey<Biome> biomeKey) {
+        final RegistryAccess registryAccess = WorldState.registryAccess();
         Registry<AssignedSurfaceRule> registry = null;
-        if (WorldState.registryAccess() != null)
-            registry = WorldState.registryAccess()
-                                 .lookup(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY).orElse(null);
+        if (registryAccess != null)
+            registry = registryAccess
+                    .lookup(SurfaceRuleRegistry.SURFACE_RULES_REGISTRY).orElse(null);
 
         if (registry == null) {
             LibWoverSurface.C.LOG.warn(
@@ -54,7 +57,15 @@ public class SurfaceRuleUtil {
 
         if (list.size() == 0) return List.of();
 
-        return List.of(SurfaceRules.ifTrue(SurfaceRules.isBiome(biomeKey), new SurfaceRules.SequenceRuleSource(list)));
+        // 26.2: SurfaceRules.isBiome() resolves its keys into a HolderSet<Biome> right away instead of
+        // storing the raw ResourceKeys, so it needs a lookup. We are past WORLD_REGISTRY_READY here, so
+        // the biome registry of the world we are injecting into is the correct source for it.
+        final HolderGetter<Biome> biomes = registryAccess.lookupOrThrow(Registries.BIOME);
+
+        return List.of(SurfaceRules.ifTrue(
+                SurfaceRules.isBiome(biomes, biomeKey),
+                new SurfaceRules.SequenceRuleSource(list)
+        ));
     }
 
     private static List<SurfaceRules.RuleSource> getRulesForBiomes(List<Optional<ResourceKey<Biome>>> biomes) {

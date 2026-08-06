@@ -50,4 +50,12 @@ public class Bookshelf extends SlotFromDefinition {
         // of the material until the recipe is actually created
         return RecipeTraitLibrary.bookshelf(set.recipeBaseMaterial());
     }
+
+    @Override
+    protected void finalizeDefinitions(BlockSet<?> set, BlockDefinition<?, ?> def) {
+        // Vanilla tags no workstation or furnishing at all - not the crafting table, barrel, bookshelf,
+        // composter, furnace or chest - only building materials, terrain, ores and a handful of decorative
+        // full cubes. Bookshelf is a furnishing, so it drops the archetype its material would give it.
+        def.addTrait(BlockTraits.SULFUR_CUBE_ARCHETYPE.notSwallowable());
+    }
 }

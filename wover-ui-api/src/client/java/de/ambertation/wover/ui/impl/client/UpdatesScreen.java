@@ -39,7 +39,10 @@ public class UpdatesScreen extends WoverLayoutScreen {
 
     public static void showUpdateUI() {
         //No more java side render thread calls?
-        Minecraft.getInstance().setScreen(new UpdatesScreen(Minecraft.getInstance().screen));
+        // 26.2 moved screen management off Minecraft onto Minecraft#gui (see WunderLib's
+        // LayoutScreen for the same refactor): #setScreen is now Gui#setScreen, and the current
+        // screen - formerly the Minecraft#screen field - is exposed as Gui#screen().
+        Minecraft.getInstance().gui.setScreen(new UpdatesScreen(Minecraft.getInstance().gui.screen()));
     }
 
     public Identifier getUpdaterIcon(ModCore core) {

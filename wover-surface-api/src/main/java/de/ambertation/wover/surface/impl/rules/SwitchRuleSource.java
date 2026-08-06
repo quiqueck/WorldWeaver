@@ -5,7 +5,6 @@ import de.ambertation.wover.surface.api.noise.NumericProvider;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.SurfaceRules.Context;
 import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
 import net.minecraft.world.level.levelgen.SurfaceRules.SurfaceRule;
@@ -26,11 +25,9 @@ public record SwitchRuleSource(NumericProvider selector, List<RuleSource> collec
                             SwitchRuleSource::new
                     ));
 
-    private static final KeyDispatchDataCodec<? extends RuleSource> KEY_CODEC = KeyDispatchDataCodec.of(SwitchRuleSource.CODEC);
-
     @Override
-    public @NotNull KeyDispatchDataCodec<? extends RuleSource> codec() {
-        return KEY_CODEC;
+    public @NotNull MapCodec<? extends RuleSource> codec() {
+        return CODEC;
     }
 
     @Override

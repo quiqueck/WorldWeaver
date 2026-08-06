@@ -263,7 +263,14 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
                     //reference (identical JSON to a plain required tag entry) but marks it as
                     //"forced" so 26.1's stricter TagsProvider validation does not reject
                     //references to vanilla/cross-provider tags that are not part of this run.
-                    TagAppender<ResourceKey<T>, T> builder = this.builder(tag);
+                    //
+                    //26.2 collapsed TagAppender<E, T> to TagAppender<T>: the "entry" type
+                    //parameter E is gone because the interface now always works in terms of
+                    //ResourceKey<T> (add/addOptional/addAll take ResourceKey<T> directly, and
+                    //the generic TagAppender#map(Function) that produced the re-typed appenders
+                    //was dropped along with it). Everything below already passed ResourceKey<T>,
+                    //so only the declaration changes.
+                    TagAppender<T> builder = this.builder(tag);
                     builder.setReplace(replaceOriginalTags());
 
                     ResourceKey<T> key;

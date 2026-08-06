@@ -28,7 +28,7 @@ public class MarkPostProcessingFeature extends Feature<NoneFeatureConfiguration>
     public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> ctx) {
         BlockPos pos = ctx.origin();
         ctx.level().getChunk(pos.getX() >> 4, pos.getZ() >> 4)
-           .markPosForPostprocessing(new BlockPos(pos.getX() & 15, pos.getY(), pos.getZ() & 15));
+           .markPosForPostProcessing(new BlockPos(pos.getX() & 15, pos.getY(), pos.getZ() & 15));
         return true;
     }
 }
