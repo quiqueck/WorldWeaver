@@ -74,6 +74,8 @@ public record SlotType(String suffix) {
     public static final SlotType BARREL = new SlotType("barrel");
     public static final SlotType CRAFTING_TABLE = new SlotType("crafting_table");
     public static final SlotType BOOKSHELF = new SlotType("bookshelf");
+    /** A {@link net.minecraft.world.level.block.ChiseledBookShelfBlock} in this set's wood. */
+    public static final SlotType CHISELED_BOOKSHELF = new SlotType("chiseled_bookshelf");
     public static final SlotType COMPOSTER = new SlotType("composter");
     public static final SlotType BOAT = new SlotType("boat");
     public static final SlotType CHEST_BOAT = new SlotType("chest_boat");

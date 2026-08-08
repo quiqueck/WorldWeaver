@@ -1,0 +1,29 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "wover_loot_this_mod_does_not_exist"
+      ]
+    }
+  ],
+  "additions": [
+    {
+      "target": "minecraft:chests/shipwreck_supply",
+      "operations": [
+        {
+          "type": "add_pool",
+          "pools": {
+            "rolls": 1.0,
+            "entries": [
+              {
+                "type": "minecraft:item",
+                "name": "minecraft:light"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

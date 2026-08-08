@@ -1,6 +1,7 @@
 package de.ambertation.wover.block.impl.client.model;
 
 import de.ambertation.wover.block.api.client.model.ClientBlockModelRegistry;
+import de.ambertation.wover.block.api.client.render.WoverBuiltinTinters;
 import de.ambertation.wover.block.api.model.BlockModelKeys;
 import de.ambertation.wover.block.impl.client.render.ClientBlockRenderBootstrap;
 import de.ambertation.wover.client.api.WoverClientTraitEntrypoint;
@@ -86,6 +87,10 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
 
         ClientBlockModelRegistry.register(BlockModelKeys.BOOKSHELF, (key, block, generator, planksMaterial) -> {
             generator.createBookshelf(block, planksMaterial.get());
+        });
+
+        ClientBlockModelRegistry.register(BlockModelKeys.CHISELED_BOOKSHELF, (key, block, generator, payload) -> {
+            generator.createChiseledBookshelf(block);
         });
 
         ClientBlockModelRegistry.register(BlockModelKeys.PILLAR, (key, block, generator, payload) -> {
@@ -258,5 +263,10 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
 
         // Render-layer registration is applied (walking the block registry) once at client init.
         ClientRenderTraitRegistry.register(ClientBlockRenderBootstrap::applyRenderLayers);
+
+        // The built-in tint shapes (TinterKeys). Registered here rather than in their own entrypoint so the
+        // catalogue is present in both launches for the same reason the model factories are: the client walk
+        // registers block colours, the datagen walk bakes item tints.
+        WoverBuiltinTinters.register();
     }
 }

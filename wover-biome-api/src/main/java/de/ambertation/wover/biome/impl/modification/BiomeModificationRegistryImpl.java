@@ -13,18 +13,20 @@ import static de.ambertation.wover.events.impl.AbstractEvent.SYSTEM_PRIORITY;
 import de.ambertation.wover.events.impl.EventImpl;
 import de.ambertation.wover.state.api.WorldState;
 
+import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.WorldStem;
+import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.WorldData;
 
 import com.google.common.base.Stopwatch;
 
@@ -50,7 +52,12 @@ public class BiomeModificationRegistryImpl {
                 BiomeModificationRegistryImpl::onBootstrap
         );
 
-        WorldLifecycle.MINECRAFT_SERVER_READY.subscribe(BiomeModificationRegistryImpl::whenReady, SYSTEM_PRIORITY);
+        // Runs at BEFORE_CREATING_LEVELS, not MINECRAFT_SERVER_READY: that event's own contract is "Fabric
+        // is guaranteed to have loaded all biomes, features, structures, etc." - third-party biome-injecting
+        // mods (TerraBlender/BiomesOPlenty) populate their biomes lazily, at a point not guaranteed to have
+        // happened yet at MINECRAFT_SERVER_READY, so `in_dimension` predicates evaluated there can miss
+        // biomes that only appear in the dimension's BiomeSource#possibleBiomes() slightly later.
+        WorldLifecycle.BEFORE_CREATING_LEVELS.subscribe(BiomeModificationRegistryImpl::whenReady, SYSTEM_PRIORITY);
     }
 
     private static void onBootstrap(BootstrapContext<BiomeModification> ctx) {
@@ -64,7 +71,8 @@ public class BiomeModificationRegistryImpl {
     private static void whenReady(
             LevelStorageSource.LevelStorageAccess storageSource,
             PackRepository packRepository,
-            WorldStem worldStem
+            LayeredRegistryAccess<RegistryLayer> registries,
+            WorldData worldData
     ) {
         final Stopwatch sw = Stopwatch.createStarted();
 

@@ -108,6 +108,11 @@ public class BlockTraits {
      */
     public static final GenericBlockTrait.BuilderWithDefaults BOOK_SHELF = BookshelfBlockBuilder.BUILDER;
     /**
+     * Configures a block as a chiseled bookshelf: a valid host for the vanilla {@code CHISELED_BOOKSHELF}
+     * block entity, with vanilla's silk-touch-only loot table.
+     */
+    public static final GenericBlockTrait.BuilderWithDefaults CHISELED_BOOK_SHELF = ChiseledBookshelfBlockBuilder.BUILDER;
+    /**
      * Configures a block as a button.
      */
     public static final GenericBlockTrait.BuilderWithDefaults BUTTON_BLOCK = ButtonBlockBuilder.BUILDER;

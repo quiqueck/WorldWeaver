@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-pottable",
-    "version": "21.800.0",
+    "version": "21.800.1",
     "name": "WorldWeaver - Pottable API",
     "description": "Provides a datapack-driven registry for pottable plants and soils (e.g. for flower pots).",
     "authors": [

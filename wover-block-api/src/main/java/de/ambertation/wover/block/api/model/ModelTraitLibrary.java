@@ -65,6 +65,16 @@ public class ModelTraitLibrary {
         return bind(BlockModelKeys.BOOKSHELF, planksMaterial);
     }
 
+    /**
+     * A vanilla-style chiseled bookshelf model: the body and inventory models plus the twelve
+     * empty/occupied book-slot overlays, dispatched by a multipart blockstate over facing and the six
+     * {@code slot_N_occupied} properties. Textures are the block's own {@code _top}/{@code _side}/
+     * {@code _empty}/{@code _occupied} variants.
+     */
+    public static BlockModelBinding chiseledBookshelf() {
+        return bind(BlockModelKeys.CHISELED_BOOKSHELF, null);
+    }
+
     /** A vanilla-style rotated pillar model. */
     public static BlockModelBinding pillar() {
         return bind(BlockModelKeys.PILLAR, null);

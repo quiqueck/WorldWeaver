@@ -2,6 +2,7 @@ package de.ambertation.wover.datagen.api.provider;
 
 import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.api.trait.CompostableTrait;
+import de.ambertation.wover.block.api.trait.behaviour.FuelBlockTrait;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverDataProvider;
 
@@ -99,18 +100,27 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
     /**
      * Furnace fuel lives in {@code FuelValues}, whose vanilla table is built by dereferencing item tags (e.g.
      * {@code minecraft:logs}) that are not bound in the datagen registry context — {@code vanillaBurnTimes} throws
-     * during construction there. So fuel registrations are not observable at datagen time and this is emitted as
-     * {@code ?} for every block rather than faked.
+     * during construction there. So the effective burn time is not observable at datagen time; what <em>is</em>
+     * observable is the {@link FuelBlockTrait} the block was registered with, which is the value that trait hands
+     * to {@code FuelRegistryEvents.BUILD} at runtime. Blocks without the trait emit {@code -} (they may still be
+     * fuel through a vanilla item tag, which this file cannot see).
      */
-    private static String fuel(Block block) {
-        return "?";
+    private String fuel(Block block) {
+        var fuelTrait = (FuelBlockTrait) (BlockTrait.runtimeTraits(block)
+                                                    .filter(FuelBlockTrait.class::isInstance)
+                                                    .findAny().orElse(null));
+
+        if (fuelTrait != null) {
+            return "" + fuelTrait.ticks;
+        }
+        return "-";
     }
 
     private String lineFor(ResourceLocation id, Block block) {
-        return id
-                + "  flammable=" + flammable(block)
-                + "  compostable=" + compostable(block)
-                + "  fuel=" + fuel(block);
+        return "{\"id\":\"" + id + "\""
+                + ",\"flammable\":\"" + flammable(block) + "\""
+                + ",\"compostable\":\"" + compostable(block) + "\""
+                + ",\"fuel\":\"" + fuel(block) + "\"}";
     }
 
     private class Provider implements DataProvider {
@@ -131,8 +141,8 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
             // Sorting by the full line orders by the (unique) id prefix, so the file is fully deterministic.
             Collections.sort(lines);
 
-            final byte[] bytes = (String.join("\n", lines) + "\n").getBytes(StandardCharsets.UTF_8);
-            final Path path = output.getOutputFolder().resolve("block_registrations.txt");
+            final byte[] bytes = ("[\n" + String.join(",\n", lines) + "\n]\n").getBytes(StandardCharsets.UTF_8);
+            final Path path = output.getOutputFolder().resolve("block_registrations.json");
             try {
                 writer.writeIfNeeded(path, bytes, Hashing.sha1().hashBytes(bytes));
             } catch (IOException e) {

@@ -2,7 +2,11 @@ package de.ambertation.wover.loot.api;
 
 import de.ambertation.wover.tag.api.predefined.CommonItemTags;
 
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.critereon.DataComponentMatchers;
+import net.minecraft.advancements.critereon.EnchantmentPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.StatePropertiesPredicate;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.predicates.DataComponentPredicates;

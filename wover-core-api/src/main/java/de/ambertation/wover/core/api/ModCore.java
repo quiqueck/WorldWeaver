@@ -250,6 +250,22 @@ public final class ModCore implements Version.ModVersionProvider {
     }
 
     /**
+     * Returns true if the game is currently running inside Fabric API's headless GameTest server
+     * (the {@code -Dfabric-api.gametest} vmArg set by loom's {@code runGametest} task).
+     * <p>
+     * {@link net.minecraft.gametest.framework.GameTestServer#create} enables every available data
+     * pack unconditionally, regardless of {@link net.fabricmc.fabric.api.resource.ResourcePackActivationType}.
+     * Optional integration packs that are normally kept inactive until their companion mod is
+     * present (see {@link ModCore#addDatapack(ModCore)}) get force-enabled during GameTest runs, so
+     * any registry entries they reference need a real fallback rather than being left unbound.
+     *
+     * @return true if the game is currently running in a GameTest environment.
+     */
+    public static boolean isGametest() {
+        return System.getProperty("fabric-api.gametest") != null;
+    }
+
+    /**
      * Returns true if the game is currently running in a development environment.
      *
      * @return true if the game is currently running in a development environment.

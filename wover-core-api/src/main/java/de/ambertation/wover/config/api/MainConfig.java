@@ -46,15 +46,11 @@ public class MainConfig extends ConfigFile {
             true
     ).setGroup(GENERAL_GROUP);
 
-    /**
-     * If enabled, dedicated servers are forced to use the default world preset instead of whatever preset was
-     * selected in the server properties.
-     */
-    public final BooleanValue forceDefaultWorldPresetOnServer = new BooleanValue(
-            SERVER_CATEGORY,
-            "force_default_world_preset",
-            true
-    ).setGroup(SERVER_GROUP);
+    // Removed 2026-08-04: "server.force_default_world_preset". It made dedicated servers ignore
+    // "level-type" and always generate with our default preset. A server that never configured a
+    // level-type already gets our preset written into its server.properties, so the only thing the
+    // option could still do was discard a choice somebody made on purpose. Servers that have booted
+    // an older build keep the now-unread key in their config file; it is harmless.
 
     /**
      * Creates the config. This constructor is only called once, use {@link Configs#MAIN} to access the instance.

@@ -27,6 +27,38 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Puts the generator a world was <i>created</i> with back in charge of its dimensions, and pulls
+ * every Biome anyone else placed there into our Biome tags so it still shows up.
+ * <p>
+ * Two situations this exists for:
+ * <ol>
+ *     <li><b>Datapacks that ship their own dimension.</b> Incendium and Nullscape (datapacks wrapped
+ *     in a jar) each ship a full {@code data/minecraft/dimension/the_nether.json} /
+ *     {@code the_end.json} with their own {@code minecraft:noise} generator over a
+ *     {@code minecraft:multi_noise} biome source.</li>
+ *     <li><b>Mods that swap the biome source at runtime.</b> TerraBlender (and therefore
+ *     BiomesOPlenty) replaces the BiomeSource on an already-built ChunkGenerator; see
+ *     {@code WoverChunkGenerator#restoreInitialBiomeSource}.</li>
+ * </ol>
+ * In both cases we take the dimension back, but keep their content. What survives is everything
+ * those packs reference <i>by key</i> rather than embed: their Biomes, their features, and their
+ * terrain - the generator we install resolves {@code minecraft:nether} / {@code minecraft:end}
+ * through the same keys their {@code noise_settings} overrides replaced, so their terrain shaping
+ * (and its height) is what generates. What we drop is only the <i>placement</i> embedded in their
+ * dimension JSON - the {@code multi_noise} climate layout - which our tag-driven picker replaces.
+ * The overworld is left alone, so TerraBlender keeps it.
+ * <p>
+ * The Biomes reach our pickers through {@link BiomeTags#IS_NETHER} and the {@code wover:is_end/*}
+ * tags, filled by the two methods below: {@link #registerAllBiomesFromFabric} reads Fabric's live
+ * tables (so anything registered through {@code NetherBiomes}/{@code TheEndBiomes} is covered even
+ * if it ships no tags), and {@link #registerAllBiomesFromVanillaDimension} reads the vanilla
+ * {@code minecraft:normal} preset's own BiomeSource for that dimension, which is what brings in
+ * Biomes that only ever appear there. Neither is redundant.
+ * <p>
+ * Behaviour verified in detail on 26.2 with BiomesOPlenty, TerraBlender, Incendium, Nullscape and
+ * Terralith installed; this branch shares the mechanism but its numbers were not re-measured.
+ */
 class BiomeRepairHelper {
     private Map<ResourceKey<LevelStem>, ChunkGenerator> vanillaDimensions = null;
 

@@ -19,6 +19,14 @@ import java.util.List;
 
 @Mixin(WorldLoader.class)
 public class WorldLoaderMixin {
+    // TODO: this runs a second, complete RegistryDataLoader.load only to build a temporary
+    // RegistryAccess for WORLD_REGISTRY_READY(LOADING). Every world load therefore loads all
+    // worldgen registries - and fires every BOOTSTRAP_* event - twice. On 26.1+ this was removed by
+    // reading the result of the real load out of the lambda that performs it; here that result is a
+    // local inside load(), which @ModifyArg cannot reach, so it needs a different injection
+    // (@Local capture, or an @Inject positioned after the first load). Not urgent: the duplicate is
+    // wasted work rather than wrong output, and the throwaway access is discarded right after the
+    // event. See the 26.x WorldLoaderMixin for what the end state should look like.
     @ModifyArg(
             method = "load",
             at = @At(

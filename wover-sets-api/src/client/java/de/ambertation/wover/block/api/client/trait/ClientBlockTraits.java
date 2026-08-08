@@ -3,6 +3,7 @@ package de.ambertation.wover.block.api.client.trait;
 import de.ambertation.wover.block.api.render.BlockRenderTraits;
 import de.ambertation.wover.block.api.render.ChestRendererBinding;
 import de.ambertation.wover.block.api.render.RenderLayerBuilder;
+import de.ambertation.wover.block.api.render.TintBuilder;
 import de.ambertation.wover.block.impl.client.trait.BlockModelTraitBuilder;
 import de.ambertation.wover.item.api.render.BoatRendererBuilder;
 import de.ambertation.wover.item.api.render.ItemRenderTraits;
@@ -23,4 +24,6 @@ public class ClientBlockTraits {
     public static final ChestRendererBinding.Builder CHEST_RENDERER = BlockRenderTraits.CHEST_RENDERER;
     /** Selects the render layer (cutout/translucent) a block should use (alias of {@code BlockRenderTraits.RENDER_LAYER}). */
     public static final RenderLayerBuilder RENDER_LAYER = BlockRenderTraits.RENDER_LAYER;
+    /** Gives the block a tint colour, in the world and optionally on its item (alias of {@code BlockRenderTraits.TINT}). */
+    public static final TintBuilder TINT = BlockRenderTraits.TINT;
 }

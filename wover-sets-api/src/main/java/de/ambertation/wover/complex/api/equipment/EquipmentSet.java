@@ -194,7 +194,7 @@ public abstract class EquipmentSet {
                 slot, (definition, values) -> new Item(
                         commonToolProperties(definition.getProperties()).tool(
                                 this.toolTier.toolMaterial,
-                                this.toolTier.blockTag,
+                                values.minableWithTag(),
                                 values.attackDamage(), values.attackSpeed(), values.disableBlockingForSeconds()
                         )),
                 recipeOverride

@@ -32,7 +32,8 @@ public class SetGameTest {
             "wover-sets-testmod:wooden_door",
             "wover-sets-testmod:wooden_trapdoor",
             "wover-sets-testmod:wooden_button",
-            "wover-sets-testmod:wooden_wall"
+            "wover-sets-testmod:wooden_wall",
+            "wover-sets-testmod:wooden_chiseled_bookshelf"
     );
 
     // Set members are also given a BlockItem, so the same ids must resolve in the ITEM registry.

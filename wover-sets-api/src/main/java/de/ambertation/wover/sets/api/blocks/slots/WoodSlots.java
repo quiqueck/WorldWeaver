@@ -7,7 +7,7 @@ import de.ambertation.wover.sets.api.blocks.types.*;
  * Every slot {@link de.ambertation.wover.sets.api.blocks.WoodenBlockSet#createDefaultDefinitions()} builds by
  * default: planks, log/stripped log, bark/stripped bark, and the usual wood-family blocks (slab, stairs, fence,
  * fence gate, door, trapdoor, button, pressure plate, ladder, sign, hanging sign, chest, barrel, bookshelf,
- * composter, crafting table). Pass individual constants to
+ * chiseled bookshelf, composter, crafting table). Pass individual constants to
  * {@link de.ambertation.wover.sets.api.blocks.SlotMap#of}/{@link de.ambertation.wover.sets.api.blocks.SlotMap#add} to
  * build a custom subset, or {@link de.ambertation.wover.sets.api.blocks.SlotMap#replace} to override one of them
  * (e.g. with a different {@link de.ambertation.wover.sets.api.blocks.SlotType}). Note there is no {@code WALL}
@@ -25,6 +25,7 @@ public class WoodSlots {
     public static final SlotFromDefinition BOOKSHELF = new Bookshelf();
     public static final SlotFromDefinition BUTTON = new Button();
     public static final SlotFromDefinition CHEST = new Chest();
+    public static final SlotFromDefinition CHISELED_BOOKSHELF = new ChiseledBookshelf();
     public static final SlotFromDefinition CHEST_BOAT = new Boat(true);
     public static final SlotFromDefinition COMPOSTER = new Composter();
     public static final SlotFromDefinition CRAFTING_TABLE = new CraftingTable();

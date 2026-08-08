@@ -1,6 +1,7 @@
 package de.ambertation.wover.biome.impl.modification;
 
 import de.ambertation.wover.biome.api.modification.predicates.BiomePredicate;
+import de.ambertation.wover.biome.mixin.HolderReferenceAccessor;
 import de.ambertation.wover.biome.mixin.HolderSetNamedAccessor;
 import de.ambertation.wover.entrypoint.LibWoverBiome;
 
@@ -53,8 +54,28 @@ public class BiomeTagModificationWorker {
 
     public boolean finished() {
         if (!unfrozen.isEmpty()) {
-            unfrozen.forEach((tag, contents) -> {
-                tag.wover_setContents(List.copyOf(contents));
+            unfrozen.forEach((tagHolder, contents) -> {
+                final TagKey<Biome> tagKey = ((HolderSet.Named<Biome>) tagHolder).key();
+                tagHolder.wover_setContents(List.copyOf(contents));
+
+                // HolderSet.Named#contains(Holder) delegates straight to Holder#is(TagKey) (decompiled
+                // and confirmed - it never actually looks at its own `contents` list), which reads the
+                // biome's OWN bound-tags set, populated once by MappedRegistry.bindTags(...) during
+                // normal datapack tag loading. Mutating only the tag's contents list above (the only
+                // thing HolderSetNamedAccessor exposes) makes the tag "contain" the biome for anyone
+                // iterating/streaming it, but invisible to the standard membership check every real
+                // consumer - vanilla or another mod - actually uses. Every biome in `contents` (not just
+                // the ones newly added this pass) gets its own bound set re-synced here so the two never
+                // drift apart again.
+                for (Holder<Biome> biomeHolder : contents) {
+                    if (!(biomeHolder instanceof HolderReferenceAccessor<?> accessor)) continue;
+                    @SuppressWarnings("unchecked")
+                    HolderReferenceAccessor<Biome> biomeAccessor = (HolderReferenceAccessor<Biome>) accessor;
+                    final Set<TagKey<Biome>> existing = biomeAccessor.wover_getTags();
+                    final Set<TagKey<Biome>> updated = existing == null ? new HashSet<>() : new HashSet<>(existing);
+                    updated.add(tagKey);
+                    biomeAccessor.wover_setTags(Set.copyOf(updated));
+                }
             });
             unfrozen.clear();
             return true;

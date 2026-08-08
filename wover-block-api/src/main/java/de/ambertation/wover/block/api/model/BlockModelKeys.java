@@ -41,6 +41,12 @@ public class BlockModelKeys {
     public static final ModelKey<Void> BARREL = key("barrel");
     /** A vanilla-style bookshelf using the planks material for its frame. */
     public static final ModelKey<Supplier<Block>> BOOKSHELF = key("bookshelf");
+    /**
+     * A vanilla-style chiseled bookshelf: the multipart blockstate over facing/slot-occupied plus the body,
+     * inventory and twelve book-slot models, all reading the block's own {@code _top}/{@code _side}/
+     * {@code _empty}/{@code _occupied} textures.
+     */
+    public static final ModelKey<Void> CHISELED_BOOKSHELF = key("chiseled_bookshelf");
     /** A vanilla-style rotated pillar using the block's own textures. */
     public static final ModelKey<Void> PILLAR = key("pillar");
     /** A vanilla-style button using the planks material. */

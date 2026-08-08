@@ -1,5 +1,8 @@
 package de.ambertation.wover.block.api.model;
 
+import de.ambertation.wover.block.api.client.render.ClientTinterRegistry;
+import de.ambertation.wover.block.api.render.TintBinding;
+import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.impl.ModelProviderExclusions;
 import de.ambertation.wover.entrypoint.LibWoverBlock;
 
@@ -19,6 +22,8 @@ import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChiseledBookShelfBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import net.fabricmc.api.EnvType;
@@ -226,8 +231,44 @@ public class WoverBlockModelGenerators {
      * @param resourceLocation The model the item should reference
      */
     public void delegateItemModel(Block block, ResourceLocation resourceLocation) {
-        this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        final var tint = itemTintOf(block);
+        if (tint != null) {
+            // The block carries a TintBinding that opted its item in: the texture is colorized by the tint
+            // rather than by the texture itself, so a plain (untinted) item model would render the raw - usually
+            // grayscale - texture in the inventory while the block still looks correct in the world. Item tints
+            // are data-driven, so the colour has to be baked into the model here.
+            this.vanillaGenerator.itemModelOutput.accept(
+                    block.asItem(),
+                    ItemModelUtils.tintedModel(resourceLocation, ItemModelUtils.constantTint(tint))
+            );
+        } else {
+            this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        }
         itemModelDelegatedBlocks.add(block);
+    }
+
+    /**
+     * Resolves the constant item tint for a block, if it carries a {@link TintBinding} that opted its item model
+     * in.
+     * <p>
+     * Diverges from 26.x only in how the colour is sampled: 1.21.6's {@code BlockColor} has a single
+     * {@code getColor(state, level, pos, tintIndex)} rather than {@code BlockTintSource#color(state)}, so the
+     * item's absent level/position are passed as {@code null} - which every built-in shape handles.
+     *
+     * @param block the block whose item model is being generated
+     * @return the packed ARGB tint, or {@code null} if the item model should stay untinted
+     */
+    private @Nullable Integer itemTintOf(Block block) {
+        final var bindings = BlockTrait.<Block, TintBinding>getRuntimeTraits(block, TintBinding.TINT_KEY);
+        if (bindings == null || bindings.isEmpty()) return null;
+
+        final var binding = bindings.getLast();
+        if (!binding.tintItemModel()) return null;
+
+        final var source = ClientTinterRegistry.resolve(binding, block);
+        if (source == null) return null;
+
+        return source.getColor(binding.itemSampleState(block), null, null, 0);
     }
 
     /**
@@ -341,6 +382,116 @@ public class WoverBlockModelGenerators {
                 BlockModelGenerators.plainVariant(resourceLocation)
         ));
         delegateItemModel(shelf, resourceLocation);
+    }
+
+    /**
+    /**
+     * The vanilla {@code block/chiseled_bookshelf} body shape, re-authored with {@code #top}/{@code #side}
+     * placeholders so it can be reused for any wood ({@code wover:block/chiseled_bookshelf}).
+     */
+    public static final ModelTemplate CHISELED_BOOKSHELF_MODEL = new ModelTemplate(
+            Optional.of(LibWoverBlock.C.id("block/chiseled_bookshelf")),
+            Optional.empty(),
+            TextureSlot.TOP,
+            TextureSlot.SIDE
+    );
+
+    /**
+     * The vanilla {@code block/chiseled_bookshelf_inventory} shape (the body plus a solid {@code #front}
+     * face, since the item model cannot use the per-slot overlays), re-authored with placeholders
+     * ({@code wover:block/chiseled_bookshelf_inventory}).
+     */
+    public static final ModelTemplate CHISELED_BOOKSHELF_INVENTORY_MODEL = new ModelTemplate(
+            Optional.of(LibWoverBlock.C.id("block/chiseled_bookshelf_inventory")),
+            Optional.of("_inventory"),
+            TextureSlot.TOP,
+            TextureSlot.SIDE,
+            TextureSlot.FRONT
+    );
+
+    private static final List<ModelTemplate> CHISELED_BOOKSHELF_SLOTS = List.of(
+            ModelTemplates.CHISELED_BOOKSHELF_SLOT_TOP_LEFT,
+            ModelTemplates.CHISELED_BOOKSHELF_SLOT_TOP_MID,
+            ModelTemplates.CHISELED_BOOKSHELF_SLOT_TOP_RIGHT,
+            ModelTemplates.CHISELED_BOOKSHELF_SLOT_BOTTOM_LEFT,
+            ModelTemplates.CHISELED_BOOKSHELF_SLOT_BOTTOM_MID,
+            ModelTemplates.CHISELED_BOOKSHELF_SLOT_BOTTOM_RIGHT
+    );
+
+    /**
+     * Generates a vanilla-style chiseled bookshelf: the body model, the inventory item model and the twelve
+     * book-slot overlays (empty/occupied per slot), dispatched by a multipart blockstate over {@code facing}
+     * and the six {@code slot_N_occupied} properties.
+     * <p>
+     * Vanilla's own {@code createChiseledBookshelf} is private and hard-wires
+     * {@link Blocks#CHISELED_BOOKSHELF}'s textures into every slot overlay, so this reproduces it against
+     * the given block's own {@code _top}/{@code _side}/{@code _empty}/{@code _occupied} textures instead.
+     * (On this branch the facing/rotation pairs and the combined facing+slot conditions are spelled out with
+     * this file's usual multipart idiom - the 26.x helpers do not exist here.)
+     *
+     * @param block The chiseled bookshelf block
+     */
+    public void createChiseledBookshelf(Block block) {
+        final ResourceLocation top = TextureMapping.getBlockTexture(block, "_top");
+        final ResourceLocation side = TextureMapping.getBlockTexture(block, "_side");
+        final ResourceLocation empty = TextureMapping.getBlockTexture(block, "_empty");
+
+        final ResourceLocation bodyModel = CHISELED_BOOKSHELF_MODEL.create(
+                block,
+                new TextureMapping().put(TextureSlot.TOP, top).put(TextureSlot.SIDE, side),
+                vanillaGenerator.modelOutput
+        );
+
+        // Build the twelve overlays up front: the blockstate references each of them once per facing, so
+        // creating them inside the facing loop would write the same twelve files four times over. (Vanilla
+        // solves the same problem with a static cache it clears at the end of createChiseledBookshelf.)
+        final Map<Boolean, List<MultiVariant>> slotVariants = new HashMap<>(2);
+        for (boolean occupied : new boolean[]{false, true}) {
+            final String suffix = occupied ? "_occupied" : "_empty";
+            final TextureMapping slotMapping = new TextureMapping()
+                    .put(TextureSlot.TEXTURE, TextureMapping.getBlockTexture(block, suffix));
+            slotVariants.put(occupied, CHISELED_BOOKSHELF_SLOTS
+                    .stream()
+                    .map(template -> BlockModelGenerators.plainVariant(template.createWithSuffix(
+                            block, suffix, slotMapping, vanillaGenerator.modelOutput
+                    )))
+                    .toList());
+        }
+
+        final MultiVariant body = BlockModelGenerators.plainVariant(bodyModel);
+        final MultiPartGenerator multiPart = MultiPartGenerator.multiPart(block);
+        final Direction[] facings = {Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST};
+        final VariantMutator[] rotations = {NOP, Y_ROT_90, Y_ROT_180, BlockModelGenerators.Y_ROT_270};
+        for (int i = 0; i < facings.length; i++) {
+            final Direction direction = facings[i];
+            final VariantMutator rotation = rotations[i];
+            multiPart.with(
+                    condition().term(BlockStateProperties.HORIZONTAL_FACING, direction),
+                    body.with(rotation).with(UV_LOCK)
+            );
+
+            for (int slot = 0; slot < CHISELED_BOOKSHELF_SLOTS.size(); slot++) {
+                final var occupiedProperty = ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES.get(slot);
+                for (boolean occupied : new boolean[]{true, false}) {
+                    multiPart.with(
+                            condition()
+                                    .term(BlockStateProperties.HORIZONTAL_FACING, direction)
+                                    .term(occupiedProperty, occupied),
+                            slotVariants.get(occupied).get(slot).with(rotation)
+                    );
+                }
+            }
+        }
+        acceptBlockState(multiPart);
+
+        delegateItemModel(block, CHISELED_BOOKSHELF_INVENTORY_MODEL.create(
+                block,
+                new TextureMapping()
+                        .put(TextureSlot.TOP, top)
+                        .put(TextureSlot.SIDE, side)
+                        .put(TextureSlot.FRONT, empty),
+                vanillaGenerator.modelOutput
+        ));
     }
 
     /**

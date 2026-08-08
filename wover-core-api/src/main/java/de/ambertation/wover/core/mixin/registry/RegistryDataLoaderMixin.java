@@ -5,6 +5,7 @@ import de.ambertation.wover.entrypoint.LibWoverCore;
 
 import com.mojang.serialization.Decoder;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -29,17 +30,64 @@ public class RegistryDataLoaderMixin {
         //SHADOWED
     }
 
+    /**
+     * Inserts our Datapack-backed registries into {@code WORLDGEN_REGISTRIES}, in front of
+     * {@link Registries#MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST}.
+     * <p>
+     * Position matters here in a way it does not on 26.1+. In 1.21.x {@code RegistryDataLoader} loads the
+     * list strictly in order, and {@code minecraft:nether}'s parameter list is baked from Fabric's
+     * {@code NetherBiomeData} table the moment it is decoded. We fill that table from the
+     * {@code wover:biome_data} registry's element callback, so appending our registries - as this used to
+     * do - meant {@code biome_data} always ran <i>after</i> the bake and the preset came out with the five
+     * vanilla Nether Biomes and nothing else, on every single boot. Measured before this change on MC
+     * 1.21.8 with BetterNether installed: 5 entries, then 27 in the throwaway second load that
+     * {@code WorldLoaderMixin} performs (never the world's).
+     * <p>
+     * Inserting rather than prepending keeps the change as small as possible: every vanilla registry that
+     * used to load before ours still does, except the handful that follow the parameter list (banner
+     * patterns, enchantments, jukebox songs, ...), none of which our bootstraps touch. If the anchor ever
+     * disappears we fall back to appending, i.e. to the old behaviour.
+     * <p>
+     * 26.1+ solves the same problem differently, because there the registries load concurrently and no list
+     * order can express it - see {@code DatapackRegistryLoadOrder} on those branches.
+     */
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void wover_init(CallbackInfo ci) {
-        List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList<>(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + 1);
-        enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES);
+        final List<RegistryDataLoader.RegistryData<?>> custom = new ArrayList<>();
         LibWoverCore.C.log.debug("Adding custom WORLDGEN_REGISTRIES");
         DatapackRegistryBuilderImpl.forEach((key, codec) -> {
             if (codec != null) {
                 LibWoverCore.C.log.debug("    - Adding " + key.location());
-                enhanced.add(new RegistryDataLoader.RegistryData(key, codec, false));
+                custom.add(new RegistryDataLoader.RegistryData(key, codec, false));
             }
         });
+
+        int insertAt = RegistryDataLoader.WORLDGEN_REGISTRIES.size();
+        for (int i = 0; i < RegistryDataLoader.WORLDGEN_REGISTRIES.size(); i++) {
+            if (RegistryDataLoader.WORLDGEN_REGISTRIES
+                    .get(i)
+                    .key()
+                    .equals(Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST)) {
+                insertAt = i;
+                break;
+            }
+        }
+        if (insertAt == RegistryDataLoader.WORLDGEN_REGISTRIES.size()) {
+            LibWoverCore.C.log.warn(
+                    "Did not find " + Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST.location()
+                            + " in WORLDGEN_REGISTRIES; appending our registries instead. Modded Nether "
+                            + "Biomes may be missing from minecraft:nether."
+            );
+        }
+
+        final List<RegistryDataLoader.RegistryData<?>> enhanced =
+                new ArrayList<>(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + custom.size());
+        enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES.subList(0, insertAt));
+        enhanced.addAll(custom);
+        enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES.subList(
+                insertAt,
+                RegistryDataLoader.WORLDGEN_REGISTRIES.size()
+        ));
 
         wt_set_WORLDGEN_REGISTRIES(enhanced);
     }

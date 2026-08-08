@@ -17,7 +17,8 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "de.ambertation.wover.testmod.entrypoint.TestModWoverSurface"
+      "de.ambertation.wover.testmod.entrypoint.TestModWoverSurface",
+      "de.ambertation.wover.testmod.entrypoint.SurfaceRuleAppliesBootCheck"
     ],
     "client": [
       "de.ambertation.wover.testmod.entrypoint.client.TestModWoverSurfaceClient"

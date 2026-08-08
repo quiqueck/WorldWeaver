@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "de.ambertation.wover.loot.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "LootPoolAccessor",
+    "LootTableAccessor",
+    "ReloadableServerRegistriesMixin"
+  ]
+}

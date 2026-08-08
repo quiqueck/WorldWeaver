@@ -231,6 +231,34 @@ public class RecipeTraitLibrary {
 
 
     /**
+     * A vanilla-style chiseled bookshelf recipe: two rows of planks around a row of slabs.
+     *
+     * @param planksMaterial the planks material this recipe consumes
+     * @param slabMaterial   the slab material this recipe consumes
+     * @return the recipe trait
+     */
+    public static BlockRecipeTrait chiseledBookshelf(
+            RecipeMaterial planksMaterial,
+            RecipeMaterial slabMaterial
+    ) {
+        return BlockRecipeTraitBuilder.BUILDER.with(
+                (key, block, context) -> {
+                    validOrThrow(planksMaterial, "chiseled bookshelf", "planks");
+                    validOrThrow(slabMaterial, "chiseled bookshelf", "slab");
+
+                    RecipeBuilder
+                            .crafting(key.location(), block)
+                            .shape("###", "SSS", "###")
+                            .addMaterial('#', planksMaterial)
+                            .addMaterial('S', slabMaterial)
+                            .group("chiseled_bookshelf")
+                            .category(RecipeCategory.BUILDING_BLOCKS)
+                            .build(context);
+                }
+        );
+    }
+
+    /**
      * A recipe stacking 2 slabs into a rotated pillar block, plus an optional stonecutting recipe from a source
      * stone material.
      *

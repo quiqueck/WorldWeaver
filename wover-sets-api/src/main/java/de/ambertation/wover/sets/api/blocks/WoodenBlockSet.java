@@ -4,6 +4,7 @@ import de.ambertation.wover.block.api.BlockDefinition;
 import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.api.trait.BlockTraits;
 import de.ambertation.wover.block.api.trait.behaviour.FlammableBlockTrait;
+import de.ambertation.wover.block.api.trait.behaviour.FuelBlockTrait;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.sets.api.blocks.slots.WoodSlots;
 import de.ambertation.wover.tag.api.TagManager;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.material.MapColor;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.WoodTypeBuilder;
 
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -194,23 +196,57 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
     }
 
     /**
+     * Furnace-fuel burn times (ticks) per slot, per the WP8.3 fuel policy (decision 6 + user's "include
+     * derived" scope choice): bark/log/stem/trunk stay non-fuel (absent from this map - {@link #fuelTrait}
+     * returns {@code null}), planks/stripped variants/plank-derived building blocks/furniture all become
+     * furnace fuel. Values match vanilla's {@code FuelValues#vanillaBurnTimes} table (base tier
+     * {@code i = 200}: planks/logs/stairs/fences/... = {@code i*3/2 = 300}, slabs = {@code i*3/4 = 150},
+     * doors/signs = {@code i = 200}, buttons = {@code i/2 = 100}, hanging signs = {@code i*4 = 800}) rather
+     * than BetterNether's legacy hard-coded {@code 40} (that value was the old {@code addFuel} helper's
+     * bowl-tier constant, never a real per-type burn time). {@code WALL} and the furniture slots
+     * (taburet/chair/bar stool) have no vanilla analog - they're wooden building blocks built from planks, so
+     * they're given the general 300-tick building-block tier.
+     */
+    public static final Map<SlotType, FuelBlockTrait.DefaultFuelTicks> FUEL_TICKS = Map.ofEntries(
+            Map.entry(SlotType.LOG, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.BARK, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.PLANKS, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.STRIPPED_LOG, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.STRIPPED_BARK, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.SLAB, FuelBlockTrait.DefaultFuelTicks.SLABS),
+            Map.entry(SlotType.STAIRS, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.FENCE, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.GATE, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.WALL, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.BUTTON, FuelBlockTrait.DefaultFuelTicks.HALF),
+            Map.entry(SlotType.PRESSURE_PLATE, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.TRAPDOOR, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.DOOR, FuelBlockTrait.DefaultFuelTicks.BASE),
+            Map.entry(SlotType.LADDER, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.SIGN, FuelBlockTrait.DefaultFuelTicks.BASE),
+            Map.entry(SlotType.HANGING_SIGN, FuelBlockTrait.DefaultFuelTicks.QUADRUPEL),
+            Map.entry(SlotType.CHEST, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.BARREL, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.CRAFTING_TABLE, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.BOOKSHELF, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.CHISELED_BOOKSHELF, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.COMPOSTER, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.TABURET, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.CHAIR, FuelBlockTrait.DefaultFuelTicks.LOGS),
+            Map.entry(SlotType.BAR_STOOL, FuelBlockTrait.DefaultFuelTicks.LOGS)
+    );
+
+    /**
      * The furnace-fuel trait applied to a block built for the given slot, or {@code null} for a slot that is
-     * not furnace fuel. Defaults to {@code null} for every slot (no fuel), matching the state every block in
-     * this set was left in when the old {@code addFuel(source, block)} side effect was retired (BCLib
-     * {@code FuelBlockTrait}'s javadoc) - wood sets that want vanilla-style plank/building-block fuel opt in
-     * by overriding this hook.
-     * <p>
-     * Declared here in terms of the WW-native {@link BlockTrait} rather than BCLib's concrete
-     * {@code org.betterx.bclib.trait.block.FuelBlockTrait} because {@code wover-sets-api} cannot depend on
-     * BCLib (BCLib depends on wover, not the reverse); {@link BlockDefinition#addTrait(BlockTrait)} already
-     * no-ops on {@code null}, so a subclass simply returns a concrete {@code FuelBlockTrait} instance (which
-     * implements this interface) per slot.
+     * not furnace fuel. Defaults to Traits set in {@code FUEL_TICKS}.
      *
      * @param slot the slot being configured
      * @return the fuel trait to apply to this slot, or {@code null} for no fuel
      */
-    protected BlockTrait<?, ?> fuelTrait(SlotType slot) {
-        return null;
+    protected @Nullable BlockTrait<?, ?> fuelTrait(SlotType slot) {
+        var ticks = FUEL_TICKS.getOrDefault(slot, null);
+        if (ticks == null) return null;
+        return ticks.trait;
     }
 
     @Override
@@ -223,6 +259,7 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
                 WoodSlots.BUTTON,
                 WoodSlots.CHEST,
                 WoodSlots.CHEST_BOAT,
+                WoodSlots.CHISELED_BOOKSHELF,
                 WoodSlots.COMPOSTER,
                 WoodSlots.CRAFTING_TABLE,
                 WoodSlots.DOOR,

@@ -1,0 +1,7 @@
+{
+  "parent": "wover:block/chiseled_bookshelf",
+  "textures": {
+    "side": "wover-sets-testmod:block/wooden_chiseled_bookshelf_side",
+    "top": "wover-sets-testmod:block/wooden_chiseled_bookshelf_top"
+  }
+}
