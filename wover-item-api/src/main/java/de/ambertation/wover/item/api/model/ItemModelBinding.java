@@ -1,5 +1,6 @@
 package de.ambertation.wover.item.api.model;
 
+import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverItem;
 import de.ambertation.wover.item.api.trait.ItemTrait;
 import de.ambertation.wover.item.api.trait.ItemTraitKey;
@@ -39,6 +40,7 @@ public final class ItemModelBinding extends ItemTraitImpl<Item, ItemModelBinding
      * @return the new binding
      */
     public static <P> ItemModelBinding of(ItemModelKey<P> modelKey, P payload) {
+        if (!ModCore.isDatagen() || !ModCore.isClient()) return null;
         return new ItemModelBinding(modelKey, payload);
     }
 

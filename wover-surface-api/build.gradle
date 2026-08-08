@@ -11,7 +11,26 @@ dependencies {
 
 loom {
     accessWidenerPath = file('src/main/resources/wover-surface.accesswidener')
+    runs {
+        // "Does a surface rule actually change generated blocks", not just "is it registered" - see
+        // SurfaceRuleAppliesBootCheck's own class doc for the full mechanism and why this can't be a
+        // @GameTest (GameTestServer never runs real noise-based chunk generation). A plain dedicated
+        // server boot, not GameTest, so it needs its own eula/server.properties, same reasoning as
+        // compat-test.gradle's compatWorldgenBoot run (this dimension never needs a client to connect).
+        surfaceRuleCheck {
+            server()
+            source sourceSets.testmod
+            runDir "build/surface-rule-check"
+            vmArg "-Dwover.surface.runSurfaceRuleCheck=true"
+        }
+    }
 }
+
+def surfaceRuleCheckDir = file("build/surface-rule-check")
+surfaceRuleCheckDir.mkdirs()
+new File(surfaceRuleCheckDir, "eula.txt").text = "eula=true\n"
+new File(surfaceRuleCheckDir, "server.properties").text =
+        "server-port=0\nonline-mode=false\nenable-query=false\nenable-rcon=false\n"
 
 moduleDependencies(project, ['wover-common-api', 'wover-datagen-api', 'wover-core-api', 'wover-math-api', 'wover-event-api'])
 //datagenDependencies(project, ['wover-preset-api'])

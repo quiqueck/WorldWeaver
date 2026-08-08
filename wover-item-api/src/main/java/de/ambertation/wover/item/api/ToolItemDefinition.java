@@ -171,4 +171,50 @@ public class ToolItemDefinition<I extends Item> extends ItemDefinition<I, ToolIt
         propertySetters.add((properties) -> properties.sword(material, baseDamage, attackSpeed));
         return this;
     }
+
+    /**
+     * Configures this item as a spear with the specified material and thrust-attack tuning.
+     * Spears are charge-and-thrust weapons: their attack damage attribute comes solely from
+     * {@code material}'s attack damage bonus, while {@code damageMultiplier} instead scales the
+     * damage of a fully charged thrust. See {@link net.minecraft.world.item.Item.Properties#spear}
+     * for the exact semantics of each tuning parameter.
+     *
+     * @param material           The tool material defining durability, enchantability, and repair compatibility
+     * @param attackDuration     Seconds of swing animation; also drives the attack speed attribute (1/duration)
+     * @param damageMultiplier   Damage multiplier applied to a fully charged thrust
+     * @param delay              Seconds before the charge begins accumulating after starting to use the item
+     * @param dismountTime       Seconds of attacker speed required to dismount the target
+     * @param dismountThreshold  Attacker speed (blocks/tick) required to dismount the target
+     * @param knockbackTime      Seconds of attacker speed required for the bonus knockback effect
+     * @param knockbackThreshold Attacker speed (blocks/tick) required for the bonus knockback effect
+     * @param damageTime         Seconds of relative speed required for the full damage multiplier
+     * @param damageThreshold    Relative speed (blocks/tick) required for the full damage multiplier
+     * @return This configuration instance for method chaining
+     */
+    public ToolItemDefinition<I> spear(
+            ToolMaterial material,
+            float attackDuration,
+            float damageMultiplier,
+            float delay,
+            float dismountTime,
+            float dismountThreshold,
+            float knockbackTime,
+            float knockbackThreshold,
+            float damageTime,
+            float damageThreshold
+    ) {
+        propertySetters.add((properties) -> properties.spear(
+                material,
+                attackDuration,
+                damageMultiplier,
+                delay,
+                dismountTime,
+                dismountThreshold,
+                knockbackTime,
+                knockbackThreshold,
+                damageTime,
+                damageThreshold
+        ));
+        return this;
+    }
 }

@@ -11,7 +11,53 @@ dependencies {
 
 loom {
     accessWidenerPath = file('src/main/resources/wover-generator.accesswidener')
+    runs {
+        // "Does selecting a non-default world type (server.properties level-type) actually stick" - see
+        // WorldPresetStickBootCheck's own class doc for the full mechanism and why this can't be a
+        // @GameTest (GameTestServer never runs a real preset-driven overworld generator at all). Two
+        // separate presets, not one, so the check can't be satisfied by a hardcoded default that ignores
+        // level-type entirely - each run's own server.properties selects a DIFFERENT preset, and the
+        // check demands that exact preset be the one actually configured.
+        presetCheckLarge {
+            server()
+            source sourceSets.testmod
+            runDir "build/preset-check/large"
+            vmArg "-Dwover.generator.expectedPreset=wover:large"
+        }
+        presetCheckAmplified {
+            server()
+            source sourceSets.testmod
+            runDir "build/preset-check/amplified"
+            vmArg "-Dwover.generator.expectedPreset=wover:amplified"
+        }
+        // No level-type line in this run's server.properties at all - a genuinely fresh install, not an
+        // explicit choice. DedicatedServerPropertiesMixin is the only thing that should inject a default
+        // here; confirms that mechanism alone (independent of the level-type-was-explicitly-set path the
+        // two runs above exercise) actually produces a WoVer preset, not vanilla's own default.
+        presetCheckDefault {
+            server()
+            source sourceSets.testmod
+            runDir "build/preset-check/default"
+            vmArg "-Dwover.generator.expectedPreset=wover:normal"
+        }
+    }
 }
+
+for (def entry : [["large", "wover:large"], ["amplified", "wover:amplified"]]) {
+    def (dirName, presetId) = entry
+    def presetCheckDir = file("build/preset-check/${dirName}")
+    presetCheckDir.mkdirs()
+    new File(presetCheckDir, "eula.txt").text = "eula=true\n"
+    new File(presetCheckDir, "server.properties").text =
+            "server-port=0\nonline-mode=false\nenable-query=false\nenable-rcon=false\nlevel-type=${presetId}\n"
+}
+
+// Deliberately no level-type key here - see the presetCheckDefault run block's own comment.
+def presetCheckDefaultDir = file("build/preset-check/default")
+presetCheckDefaultDir.mkdirs()
+new File(presetCheckDefaultDir, "eula.txt").text = "eula=true\n"
+new File(presetCheckDefaultDir, "server.properties").text =
+        "server-port=0\nonline-mode=false\nenable-query=false\nenable-rcon=false\n"
 
 moduleDependencies(project, ['wover-common-api', 'wover-core-api', 'wover-math-api', 'wover-event-api', 'wover-surface-api', 'wover-biome-api', 'wover-preset-api', 'wover-ui-api', 'wover-tag-api', 'wover-datagen-api', 'wover-structure-api', 'wover-feature-api', 'wover-item-api'])
 testDependencies(project, ['wover-feature-api', 'wover-structure-api'])

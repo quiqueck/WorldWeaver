@@ -27,6 +27,7 @@
     ],
     "fabric-gametest": [
       "de.ambertation.wover.testmod.gametest.BiomeGameTest",
+      "de.ambertation.wover.testmod.gametest.BiomeModificationAppliesGameTest",
       "de.ambertation.wover.testmod.gametest.BiomeTagReloadGameTest"
     ]
   },

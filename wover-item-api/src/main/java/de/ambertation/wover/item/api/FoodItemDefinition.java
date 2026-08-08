@@ -49,6 +49,13 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
     private final Consumable.Builder consumable;
 
     /**
+     * Set once {@link #food(FoodProperties)} or {@link #food(FoodProperties, Consumable)} is called
+     * directly, so {@link #beforeBuild()} does not clobber it with its own (still-default)
+     * {@link #foodProperties}/{@link #consumable} builders afterwards.
+     */
+    private boolean foodSetDirectly = false;
+
+    /**
      * Creates a new food item configuration with default food consumption behavior.
      *
      * @param registry    The item registry to use for registration
@@ -89,7 +96,9 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      */
     @Override
     protected void beforeBuild() {
-        this.food(this.foodProperties.build(), consumable.build());
+        if (!foodSetDirectly) {
+            this.food(this.foodProperties.build(), consumable.build());
+        }
     }
 
     /**
@@ -236,6 +245,7 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      * @return This configuration instance for method chaining
      */
     public FoodItemDefinition<I> food(FoodProperties foodProps) {
+        foodSetDirectly = true;
         propertySetters.add((properties) -> properties.food(foodProps));
         return this;
     }
@@ -249,6 +259,7 @@ public class FoodItemDefinition<I extends Item> extends ItemDefinition<I, FoodIt
      * @return This configuration instance for method chaining
      */
     public FoodItemDefinition<I> food(FoodProperties foodProps, Consumable consumableBehavior) {
+        foodSetDirectly = true;
         propertySetters.add((properties) -> properties.food(foodProps, consumableBehavior));
         return this;
     }

@@ -20,7 +20,8 @@ public enum ToolSlot {
     SWORD_SLOT(3, "sword", RecipeCategory.COMBAT, ToolTier.ConfigureSwordItemTrait::new),
     HOE_SLOT(4, "hoe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
     SHEARS_SLOT(5, "shears", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
-    HAMMER_SLOT(6, "hammer", RecipeCategory.COMBAT, ToolTier.ConfigureDiggerItemTrait::new);
+    HAMMER_SLOT(6, "hammer", RecipeCategory.COMBAT, ToolTier.ConfigureDiggerItemTrait::new),
+    SPEAR_SLOT(7, "spear", RecipeCategory.COMBAT, ToolTier.ConfigureSpearItemTrait::new);
 
 
     /** The {@link RecipeCategory} used for this slot's auto-generated recipe. */

@@ -257,4 +257,12 @@ public class ModelTraitLibrary {
     public static ItemModelBinding chestBoat() {
         return boat();
     }
+
+    /**
+     * A vanilla-style spear item model (flat icon for gui/ground/fixed/on_shelf, a dedicated
+     * {@code spear_in_hand}-parented model with its own {@code _in_hand} texture for hand rendering).
+     */
+    public static ItemModelBinding spear() {
+        return bindItem(ItemModelKeys.SPEAR, null);
+    }
 }

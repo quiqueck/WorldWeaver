@@ -39,6 +39,7 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
             case SHOVEL_SLOT -> new TagKey[]{ItemTags.SHOVELS, ToolTags.FABRIC_SHOVELS};
             case HOE_SLOT -> new TagKey[]{ItemTags.HOES, ToolTags.FABRIC_HOES};
             case SWORD_SLOT -> new TagKey[]{ItemTags.SWORDS, ToolTags.FABRIC_SWORDS};
+            case SPEAR_SLOT -> new TagKey[]{ItemTags.SPEARS, ToolTags.FABRIC_SPEARS};
             case SHEARS_SLOT -> new TagKey[]{CommonItemTags.SHEARS, ToolTags.FABRIC_SHEARS};
             case HAMMER_SLOT -> new TagKey[]{CommonItemTags.HAMMERS};
             default -> new TagKey[0];
@@ -145,6 +146,8 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
                     builder.shape("#", "I", "I");
                 } else if (slot == ToolSlot.SWORD_SLOT) {
                     builder.shape("#", "#", "I");
+                } else if (slot == ToolSlot.SPEAR_SLOT) {
+                    builder.shape("  #", " I ", "I  ");
                 } else {
                     LibWoverRecipe.C.LOG.error("Invalid Tool slot " + slot.name() + " for item " + item + " at " + location);
                     return;

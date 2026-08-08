@@ -11,6 +11,8 @@ public class BlockRenderTraits {
     public static final RenderLayerBuilder RENDER_LAYER = RenderLayerBuilder.BUILDER;
     /** Marks a custom chest block for the wooden-chest render materials, see {@link ChestRendererBinding}. */
     public static final ChestRendererBinding.Builder CHEST_RENDERER = new ChestRendererBinding.Builder();
+    /** Gives the block a tint colour, in the world and optionally on its item, see {@link TintBinding}. */
+    public static final TintBuilder TINT = TintBuilder.BUILDER;
 
     private BlockRenderTraits() {
     }

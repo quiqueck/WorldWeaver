@@ -1,5 +1,8 @@
 package de.ambertation.wover.block.api.model;
 
+import de.ambertation.wover.block.api.client.render.ClientTinterRegistry;
+import de.ambertation.wover.block.api.render.TintBinding;
+import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.block.impl.ModelProviderExclusions;
 import de.ambertation.wover.entrypoint.LibWoverBlock;
 
@@ -231,8 +234,40 @@ public class WoverBlockModelGenerators {
      * @param resourceLocation The model the item should reference
      */
     public void delegateItemModel(Block block, Identifier resourceLocation) {
-        this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        final var tint = itemTintOf(block);
+        if (tint != null) {
+            // The block carries a TintBinding that opted its item in: the texture is colorized by the tint
+            // rather than by the texture itself, so a plain (untinted) item model would render the raw - usually
+            // grayscale - texture in the inventory while the block still looks correct in the world. Item tints
+            // are data-driven, so the colour has to be baked into the model here.
+            this.vanillaGenerator.itemModelOutput.accept(
+                    block.asItem(),
+                    ItemModelUtils.tintedModel(resourceLocation, ItemModelUtils.constantTint(tint))
+            );
+        } else {
+            this.vanillaGenerator.registerSimpleItemModel(block, resourceLocation);
+        }
         itemModelDelegatedBlocks.add(block);
+    }
+
+    /**
+     * Resolves the constant item tint for a block, if it carries a {@link TintBinding} that opted its item model
+     * in.
+     *
+     * @param block the block whose item model is being generated
+     * @return the packed ARGB tint, or {@code null} if the item model should stay untinted
+     */
+    private @Nullable Integer itemTintOf(Block block) {
+        final var bindings = BlockTrait.<Block, TintBinding>getRuntimeTraits(block, TintBinding.TINT_KEY);
+        if (bindings == null || bindings.isEmpty()) return null;
+
+        final var binding = bindings.getLast();
+        if (!binding.tintItemModel()) return null;
+
+        final var source = ClientTinterRegistry.resolve(binding, block);
+        if (source == null) return null;
+
+        return source.color(binding.itemSampleState(block));
     }
 
     /**
