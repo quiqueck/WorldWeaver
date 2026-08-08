@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-surface",
-    "version": "26.201.0",
+    "version": "26.201.1",
     "name": "WorldWeaver - Surface API",
     "description": "Provides A Registry for SurfaceRules.",
     "authors": [

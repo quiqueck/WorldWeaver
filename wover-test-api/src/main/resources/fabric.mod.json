@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-test",
-    "version": "26.201.0",
+    "version": "26.201.1",
     "name": "WorldWeaver - Test API",
     "description": "Shared GameTest support (mock players, registry/trait sweeps) consumed by BetterEnd's and BetterNether's own testmods, so both stop duplicating the same helpers.",
     "authors": [
