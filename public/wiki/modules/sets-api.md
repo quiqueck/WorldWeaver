@@ -252,8 +252,10 @@ public class TestEquipmentSet extends EquipmentSet {
 }
 ```
 
-Each `add(...)` call immediately builds and registers the item (using a sensible default `AxeItem`/`HoeItem`/
-`ShovelItem`/`ShearsItem`/digger-`Item` for tools, a plain `Item` for armor, unless a custom factory is passed)
+Each `add(...)` call immediately builds and registers the item (using a sensible default for tools — since
+Minecraft 26.3 removed the per-tool `Item` subclasses, that is a plain `Item` whose `Item.Properties` were run
+through `axe(...)`/`hoe(...)`/`shovel(...)`/`tool(...)`, plus `ShearsItem` for the shears slot — and a plain
+`Item` for armor, unless a custom factory is passed)
 and its recipe — a plain crafting recipe by default, or a smithing-transform recipe if the tier's
 `ToolValues`/`ArmorValues` for that slot specify a `SmithingTemplateItem` *and* the set was constructed with a
 template base set to upgrade from (the constructor's optional `Supplier<EquipmentSet>` parameter, resolved

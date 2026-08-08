@@ -9,7 +9,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.KeyDispatchDataCodec;
 
 public record ConfigIs(Identifier configFile, String path, String key,
                        String testValue) implements BiomePredicate {
@@ -24,10 +23,10 @@ public record ConfigIs(Identifier configFile, String path, String key,
                     instance,
                     ConfigIs::new
             ));
-    public static final KeyDispatchDataCodec<ConfigIs> CODEC = KeyDispatchDataCodec.of(DIRECT_CODEC);
+    public static final MapCodec<ConfigIs> CODEC = DIRECT_CODEC;
 
     @Override
-    public KeyDispatchDataCodec<? extends BiomePredicate> codec() {
+    public MapCodec<? extends BiomePredicate> codec() {
         return CODEC;
     }
 

@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_shelf"
+        "recipes": "wover-sets-testmod:wooden_shelf"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

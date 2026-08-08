@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -15,9 +14,8 @@ import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,11 +34,11 @@ import org.jetbrains.annotations.NotNull;
  * with edge length {@code 2*xzSpread+1} centered on the input position.
  * If {@code false}, the positions will be created in a circle.
  */
-public class ExtendXYZ extends PlacementModifier {
+public class ExtendXYZ implements PlacementModifier {
     private interface PropagationFunction {
         void propagate(
                 RandomSource randomSource,
-                Stream.Builder<BlockPos> builder,
+                Consumer<BlockPos> consumer,
                 float maxR2, int maxDepth, int scale, float d0, float d1,
                 float currentR2, float density,
                 BlockPos pos, boolean didAdd
@@ -239,39 +237,39 @@ public class ExtendXYZ extends PlacementModifier {
 
     private static void propagateSphere(
             RandomSource randomSource,
-            Stream.Builder<BlockPos> builder,
+            Consumer<BlockPos> consumer,
             float maxR2, int maxDepth, int scale, float d0, float d1,
             float currentR2, float currentDensity,
             BlockPos pos, boolean didAdd
     ) {
         final int depth = (int) (maxDepth * (1 - (currentR2 / maxR2)));
-        propagateDown(randomSource, builder, d0, d1, currentDensity, pos, depth, scale);
+        propagateDown(randomSource, consumer, d0, d1, currentDensity, pos, depth, scale);
     }
 
     private static void propagateSquare(
             RandomSource randomSource,
-            Stream.Builder<BlockPos> builder,
+            Consumer<BlockPos> consumer,
             float maxR2, int maxDepth, int scale, float d0, float d1,
             float currentR2, float currentDensity,
             BlockPos pos, boolean didAdd
     ) {
-        propagateDown(randomSource, builder, d0, d1, currentDensity, pos, maxDepth, scale);
+        propagateDown(randomSource, consumer, d0, d1, currentDensity, pos, maxDepth, scale);
     }
 
     private static void propagateSpikesConnected(
             RandomSource randomSource,
-            Stream.Builder<BlockPos> builder,
+            Consumer<BlockPos> consumer,
             float maxR2, int maxDepth, int scale, float d0, float d1,
             float currentR2, float currentDensity,
             BlockPos pos, boolean didAdd
     ) {
         if (!didAdd) return;
-        propagateDownConnected(randomSource, builder, d0, d1, currentDensity * currentDensity, pos, maxDepth, scale);
+        propagateDownConnected(randomSource, consumer, d0, d1, currentDensity * currentDensity, pos, maxDepth, scale);
     }
 
     private static void propagateDownConnected(
             RandomSource randomSource,
-            Stream.Builder<BlockPos> builder,
+            Consumer<BlockPos> consumer,
             float d0, float d1,
             float currentDensity,
             BlockPos pos, int depth, int scale
@@ -288,13 +286,13 @@ public class ExtendXYZ extends PlacementModifier {
             //if densityDown is >=1 the condition will always be false
             if (randomSource.nextFloat() > densityDown) return;
 
-            builder.add(pos.above(scale * y));
+            consumer.accept(pos.above(scale * y));
         }
     }
 
     private static void propagateDown(
             RandomSource randomSource,
-            Stream.Builder<BlockPos> builder,
+            Consumer<BlockPos> consumer,
             float d0, float d1,
             float currentDensity,
             BlockPos pos, int depth, int scale
@@ -311,25 +309,25 @@ public class ExtendXYZ extends PlacementModifier {
             //if densityDown is >=1 the condition will always be false
             if (randomSource.nextFloat() > densityDown) continue;
 
-            builder.add(pos.above(y * scale));
+            consumer.accept(pos.above(y * scale));
         }
     }
 
     /**
-     * Calculates the positions that this placement modifier will emit.
+     * Emits the extended positions.
      *
      * @param placementContext The placement context.
      * @param randomSource     The random source.
      * @param blockPos         The input position.
-     * @return The stream of new positions.
+     * @param consumer         Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext placementContext,
             RandomSource randomSource,
-            BlockPos blockPos
+            BlockPos blockPos,
+            Consumer<BlockPos> consumer
     ) {
-        final Stream.Builder<BlockPos> builder = Stream.<BlockPos>builder();
         final int r = radius.sample(randomSource);
         final float r2 = r * r;
         final float d0 = centerDensity.sample(randomSource);
@@ -351,31 +349,31 @@ public class ExtendXYZ extends PlacementModifier {
                 if (density >= 1.0f || ( //if density is >=1 the condition will always be true
                         density > 0.001f && density >= randomSource.nextFloat()
                 )) {
-                    builder.add(now);
+                    consumer.accept(now);
                     heightPropagation.propagationFunction.propagate(
-                            randomSource, builder,
+                            randomSource, consumer,
                             r2, height, heightPropagation.scale, d0, d1,
                             currentR2, density, now, true
                     );
                 } else {
                     heightPropagation.propagationFunction.propagate(
-                            randomSource, builder,
+                            randomSource, consumer,
                             r2, height, heightPropagation.scale, d0, d1,
                             currentR2, density, now, false
                     );
                 }
             }
         }
-        return builder.build();
     }
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return the type of this placement modifier
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<ExtendXYZ> type() {
-        return PlacementModifiersImpl.EXTEND_XZ;
+    public @NotNull MapCodec<ExtendXYZ> codec() {
+        return CODEC;
     }
 }

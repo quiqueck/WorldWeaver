@@ -8,13 +8,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-public class NoiseRegistryProvider extends WoverFullRegistryProvider<NormalNoise.NoiseParameters> {
+public class NoiseRegistryProvider extends WoverFullRegistryProvider<NormalNoise> {
     public NoiseRegistryProvider(ModCore modCore) {
         super(modCore, "Noise Registry Provider", Registries.NOISE);
     }
 
     @Override
-    protected void bootstrap(BootstrapContext<NormalNoise.NoiseParameters> ctx) {
+    protected void bootstrap(BootstrapContext<NormalNoise> ctx) {
         NoiseRegistryImpl.bootstrap(ctx);
     }
 }

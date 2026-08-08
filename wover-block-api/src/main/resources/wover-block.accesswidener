@@ -7,3 +7,6 @@ accessible field net/minecraft/client/data/models/BlockModelGenerators TEXTURED_
 
 accessible method net/minecraft/world/entity/ai/village/poi/PoiTypes register (Lnet/minecraft/core/Registry;Lnet/minecraft/resources/ResourceKey;Ljava/util/Set;II)Lnet/minecraft/world/entity/ai/village/poi/PoiType;
 accessible field net/minecraft/world/entity/ai/village/poi/PoiTypes TYPE_BY_STATE Ljava/util/Map;
+
+# NOTE: the VanillaBlockLoot widening that used to live here moved to wover-loot-api together with
+# de.ambertation.wover.loot.api - see wover-loot-api/src/main/resources/wover-loot.accesswidener.

@@ -35,6 +35,9 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
  *   <li>programmatically via {@code RecipeBuilder.BOOTSTRAP_RECIPES} in {@code TestModWoverRecipe}
  *       (test_diamoan_recipe) - this proves runtime recipe injection through
  *       {@code RecipeRuntimeProviderImpl}.</li>
+ *   <li>programmatically via {@code PotionManager.BOOTSTRAP_POTIONS} in {@code TestModWoverRecipe} -
+ *       since 26.3 brewing is part of the recipe system, so a brewing contribution has to show up as a
+ *       {@code minecraft:brewing} recipe in the very same manager.</li>
  * </ul>
  * This test reads the live {@link RecipeManager} back from the server and asserts every expected
  * recipe is present. A missing recipe is a real regression in datapack loading or bootstrap
@@ -46,6 +49,22 @@ public class RecipeGameTest {
 
     // Recipe injected programmatically at runtime (TestModWoverRecipe via BOOTSTRAP_RECIPES).
     private static final String INJECTED_RECIPE = "wover-recipe-testmod:test_diamoan_recipe";
+
+    // Brewing recipes contributed via BOOTSTRAP_POTIONS. TestModWoverRecipe registers a single
+    // addStartMix(NETHER_STAR, TEST_POTION), and vanilla's BrewingProvider expands that into
+    // "water + reagent -> mundane" and "awkward + reagent -> test_potion", once per potion container.
+    // The ids are minted by BrewingRecipeBuilder#defaultId as
+    // <container-namespace>:brewing/<container>_<input-potion>_<reagent>, so they carry the container
+    // item's namespace (minecraft) exactly like vanilla's own generated brewing recipes.
+    //
+    // Checking all three containers is the point: it proves the extension really was folded into the same
+    // BrewingProvider run as vanilla's containers, rather than generated in isolation.
+    private static final List<String> BREWING_RECIPES = List.of(
+            "minecraft:brewing/potion_awkward_nether_star",
+            "minecraft:brewing/splash_potion_awkward_nether_star",
+            "minecraft:brewing/lingering_potion_awkward_nether_star",
+            "minecraft:brewing/potion_water_nether_star"
+    );
 
     @GameTest
     public void testmodRecipesArePresentAtRuntime(GameTestHelper helper) {
@@ -64,6 +83,12 @@ public class RecipeGameTest {
 
         if (!hasRecipe(recipeManager, INJECTED_RECIPE)) {
             failures.add(INJECTED_RECIPE + ": expected recipe injected via BOOTSTRAP_RECIPES but it is missing");
+        }
+
+        for (String brewing : BREWING_RECIPES) {
+            if (!hasRecipe(recipeManager, brewing)) {
+                failures.add(brewing + ": expected brewing recipe contributed via BOOTSTRAP_POTIONS but it is missing");
+            }
         }
 
         if (!failures.isEmpty()) {
@@ -103,24 +128,25 @@ public class RecipeGameTest {
      * Asserts that a recipe contributed at runtime through {@code RecipeBuilder.BOOTSTRAP_RECIPES} gets the
      * same unlock advancement a datapack recipe gets, and that the advancement really works.
      * <p>
-     * The {@code AdvancementHolder} that every vanilla recipe builder hands to {@code RecipeOutput#accept}
-     * used to be discarded on the runtime path, so these recipes never appeared in the recipe book unless the
-     * player was given them with {@code /recipe give}. This test pins the fix down at every level rather than
-     * just checking that the advancement object exists:
+     * Up to (and including) 26.1 the {@code AdvancementHolder} that every vanilla recipe builder hands to
+     * {@code RecipeOutput#accept} was discarded on the runtime path, so these recipes never appeared in the
+     * recipe book unless the player was given them with {@code /recipe give}. This test pins the fix down at
+     * every level rather than just checking that the advancement object exists:
      * <ol>
      *   <li>the advancement is in the live {@link ServerAdvancementManager} and in its tree, parented under
      *       {@code minecraft:recipes/root} exactly like a datapack recipe's advancement;</li>
      *   <li>its {@code has_the_recipe} criterion is a {@code minecraft:recipe_unlocked} trigger that actually
-     *       matches the contributed recipe;</li>
+     *       matches the contributed recipe - this is the part wunderreich had to drop, on the assumption that
+     *       a runtime-only recipe has no holder to reference;</li>
      *   <li>its reward grants the recipe;</li>
      *   <li>and, end to end: firing the trigger for a fresh player completes the advancement, whose reward
      *       puts the recipe into that player's recipe book.</li>
      * </ol>
      */
-    // makeMockServerPlayerInLevel() is @Deprecated(forRemoval = true), but it is the only helper that hands
-    // out a fully placed ServerPlayer (PlayerList#placeNewPlayer, hence a real PlayerAdvancements and
-    // ServerRecipeBook); makeMockPlayer(GameType) returns a bare Player that has neither. Vanilla offers no
-    // replacement, so the deprecation is accepted here.
+    // makeMockServerPlayerInLevel() is @Deprecated(forRemoval = true) in 26.3-snapshot-5, but it is the only
+    // helper that hands out a fully placed ServerPlayer (PlayerList#placeNewPlayer, hence a real
+    // PlayerAdvancements and ServerRecipeBook); makeMockServerPlayer(GameType) returns a bare Player that
+    // has neither. Vanilla offers no replacement yet, so the deprecation is accepted here.
     @SuppressWarnings("removal")
     @GameTest
     public void injectedRecipeHasWorkingUnlockAdvancement(GameTestHelper helper) {
@@ -178,7 +204,7 @@ public class RecipeGameTest {
                     + criterion.triggerInstance().getClass().getName());
         } else if (!instance.matches(recipeHolder)) {
             failures.add(UNLOCK_ADVANCEMENT + ": the recipe_unlocked trigger does not match " + INJECTED_RECIPE
-                    + " - it references " + instance.recipe());
+                    + " - its HolderSet references " + instance.recipes().stream().toList());
         }
 
         // (3) completing the advancement hands the recipe out.

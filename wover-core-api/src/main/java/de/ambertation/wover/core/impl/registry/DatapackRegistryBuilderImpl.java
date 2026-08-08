@@ -7,8 +7,8 @@ import de.ambertation.wover.util.PriorityLinkedList;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.SingleRegistryBootstrap;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
@@ -145,9 +145,15 @@ public class DatapackRegistryBuilderImpl {
     // I think we do not need to inject any data into the vanilla registries
     // so we can just ignore this method.
     // VanillaRegistries are apparently only used in the vanilla datagen, debug mode and in the validate command
+    //
+    // Minecraft 26.3 pulled the bootstrap function type out of RegistrySetBuilder: the nested
+    // RegistrySetBuilder.RegistryBootstrap<T> is now net.minecraft.core.registries.SingleRegistryBootstrap<T>
+    // (same shape, a single `void run(BootstrapContext<T>)`). 26.3 additionally introduced
+    // MultiRegistryBootstrap for bootstraps that need to write into several registries at once; we do not
+    // need that here, one registry per entry is exactly what we produce.
     @ApiStatus.Internal
     public static void bootstrap(
-            BiConsumer<ResourceKey<? extends Registry<?>>, RegistrySetBuilder.RegistryBootstrap<? extends Object>> consumer
+            BiConsumer<ResourceKey<? extends Registry<?>>, SingleRegistryBootstrap<? extends Object>> consumer
     ) {
         LibWoverCore.C.LOG.verboseWarning("DID NOT bootstrap VanillaRegistries.");
 //        initEntrypoints();

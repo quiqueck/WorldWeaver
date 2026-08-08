@@ -1,16 +1,15 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.RandomPatch;
 import de.ambertation.wover.feature.api.placed.BasePlacedFeatureKey;
+import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
 
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
-import de.ambertation.wover.feature.impl.random.RandomPatchConfiguration;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,15 +18,15 @@ import org.jetbrains.annotations.Nullable;
 // Compat shim for the vanilla-removed random_patch feature (see RandomPatch); intentionally implements the
 // deprecated API.
 @SuppressWarnings("removal")
-public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfiguration, RandomPatchFeature> implements RandomPatch {
+public class RandomPatchImpl extends FeatureConfiguratorImpl implements RandomPatch {
     private Holder<PlacedFeature> featureToPlace;
     private int tries = 96;
     private int xzSpread = 7;
     private int ySpread = 3;
 
     RandomPatchImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> featureKey
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> featureKey
     ) {
         super(ctx, featureKey);
     }
@@ -77,25 +76,20 @@ public class RandomPatchImpl extends FeatureConfiguratorImpl<RandomPatchConfigur
     }
 
     @Override
-    protected @NotNull RandomPatchFeature getFeature() {
-        return de.ambertation.wover.feature.impl.FeatureManagerImpl.RANDOM_PATCH;
-    }
-
-    @Override
-    protected @NotNull RandomPatchConfiguration createConfiguration() {
+    protected @NotNull Feature createFeature() {
         if (featureToPlace == null) {
             throwStateError("No PlacedFeature was provided.");
         }
-        return new RandomPatchConfiguration(tries, xzSpread, ySpread, featureToPlace);
+        return new RandomPatchFeature(tries, xzSpread, ySpread, featureToPlace);
     }
 
-    public static class Key extends ConfiguredFeatureKey<RandomPatch> {
+    public static class Key extends FeatureKey<RandomPatch> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public RandomPatch bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public RandomPatch bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new RandomPatchImpl(ctx, key);
         }
     }

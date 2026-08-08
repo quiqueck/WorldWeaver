@@ -13,14 +13,10 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 /**
  * Note that {@link SurfaceRulesContext#getBiome()} is deliberately <b>not</b> declared here as an
  * {@code @Accessor}. Up to 26.1 the {@code biome} field held a {@code Supplier<Holder<Biome>>} that did
- * the lazy lookup itself, so reading the field was enough. In 26.2 the field is a plain
+ * the lazy lookup itself, so reading the field was enough. In 26.3 the field is a plain
  * {@code Holder<Biome>} that stays {@code null} until {@code Context#getBiome()} populates it from
  * {@code biomeGetter}, so a field accessor would hand out nulls. We therefore widen the real
  * {@code getBiome()} method with the access widener instead and let it satisfy the interface.
- * <p>
- * Mixin rejects the stale {@code @Accessor} outright - it fails at apply time with
- * "No candidates were found matching biome:Ljava/util/function/Supplier;", which nothing catches
- * at compile time.
  */
 @Mixin(SurfaceRules.Context.class)
 public interface SurfaceRulesContextAccessor extends SurfaceRulesContext {

@@ -2,19 +2,18 @@ package de.ambertation.wover.biome.impl.modification.predicates;
 
 import de.ambertation.wover.biome.api.modification.predicates.BiomePredicate;
 
-import net.minecraft.util.KeyDispatchDataCodec;
+import com.mojang.serialization.MapCodec;
 
 import java.util.List;
 
 public record Or(List<BiomePredicate> predicates) implements BiomePredicate {
-    public static final KeyDispatchDataCodec<Or> CODEC = KeyDispatchDataCodec.of(
-            BiomePredicate.CODEC
-                    .listOf()
-                    .xmap(Or::new, Or::predicates)
-                    .fieldOf("predicates"));
+    public static final MapCodec<Or> CODEC = BiomePredicate.CODEC
+            .listOf()
+            .xmap(Or::new, Or::predicates)
+            .fieldOf("predicates");
 
     @Override
-    public KeyDispatchDataCodec<? extends BiomePredicate> codec() {
+    public MapCodec<? extends BiomePredicate> codec() {
         return CODEC;
     }
 

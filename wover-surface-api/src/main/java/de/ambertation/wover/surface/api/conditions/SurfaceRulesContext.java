@@ -6,8 +6,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.RandomState;
 
-import java.util.function.Supplier;
-
 /**
  * This interface is used to provide access to the surface rule context.
  */
@@ -38,10 +36,10 @@ public interface SurfaceRulesContext {
      */
     int getSurfaceDepth();
     /**
-     * Returns the biome for the evaluated block
+     * Returns the biome for the evaluated block.
      * <p>
-     * This used to hand out a {@link Supplier} because up to 26.1 that is literally what the vanilla
-     * surface rule context kept back then. 26.2 resolves the biome lazily inside the context itself, so
+     * Before Minecraft 26.3 this returned a {@code Supplier<Holder<Biome>>}, mirroring the field the
+     * surface rule context kept back then. 26.3 resolves the biome lazily inside the context itself, so
      * this now hands out the {@link Holder} directly - the lookup still only happens on the first call
      * for a given position.
      *

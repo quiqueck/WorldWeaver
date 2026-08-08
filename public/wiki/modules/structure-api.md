@@ -338,6 +338,14 @@ Both placement builders share `locateOffset`, `frequencyReductionMethod`, `frequ
 `exclusionZone` from the common `StructurePlacementBuilder` base, and default `salt` to the (absolute)
 hash code of the set's own id so different sets don't share correlated randomness by accident.
 
+> **Minecraft 26.3:** vanilla split its `StructurePlacement` class into a bare `StructurePlacement`
+> interface plus a new `AbstractSpreadingStructurePlacement` base class, and the nested
+> `FrequencyReductionMethod` and `ExclusionZone` types moved into the latter. The two builder methods
+> therefore now take `AbstractSpreadingStructurePlacement.FrequencyReductionMethod` and
+> `AbstractSpreadingStructurePlacement.ExclusionZone`; callers written against
+> `StructurePlacement.FrequencyReductionMethod` / `StructurePlacement.ExclusionZone` need to update the
+> type name (the values and behaviour are unchanged). `setPlacement(StructurePlacement)` is unaffected.
+
 `StructureSetManager.bootstrap(structureKey, context)` is a one-line shortcut for the common case of "one
 set containing exactly one structure, with the set id equal to the structure id":
 `createKey(structure).bootstrap(context).addStructure(structure)` — chain a placement call and `.register()`

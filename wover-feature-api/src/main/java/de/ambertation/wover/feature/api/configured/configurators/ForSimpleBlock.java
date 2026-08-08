@@ -3,7 +3,6 @@ package de.ambertation.wover.feature.api.configured.configurators;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 /**
@@ -11,7 +10,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
  * <p>
  * This builder configures a {@link SimpleBlockFeature}.
  */
-public interface ForSimpleBlock extends FeatureConfigurator<SimpleBlockConfiguration, SimpleBlockFeature> {
+public interface ForSimpleBlock extends FeatureConfigurator {
     /**
      * Sets the block state provider for this configuration.
      *

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:test_equipment_set_leggings"
+        "recipes": "wover-sets-testmod:test_equipment_set_leggings"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

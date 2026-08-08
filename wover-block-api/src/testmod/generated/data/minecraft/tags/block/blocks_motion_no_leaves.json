@@ -1,0 +1,7 @@
+{
+  "values": [
+    "wover-block-testmod:test_block",
+    "wover-block-testmod:test_door",
+    "wover-block-testmod:test_wall"
+  ]
+}

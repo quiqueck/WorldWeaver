@@ -4,15 +4,14 @@ import de.ambertation.wover.core.impl.registry.DatapackLoadElementImpl;
 import de.ambertation.wover.core.impl.registry.DatapackRegistryBuilderImpl;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.*;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 
-import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -179,28 +178,14 @@ public class DatapackRegistryBuilder {
             WritableRegistry<T> registry
     ) {
         return new BootstrapContext<>() {
-            @Override
-            public Holder.Reference<T> register(
-                    ResourceKey<T> resourceKey,
-                    T object,
-                    Lifecycle lifecycle
-            ) {
-                if (!registry.containsKey(resourceKey)) {
-                    //TODO: 1.21 creating a new instance of RegistrationInfo might be expensive...
-                    return registry.register(resourceKey, object, new RegistrationInfo(Optional.empty(), lifecycle));
-                } else {
-                    var holder = registry.getOrThrow(resourceKey);
-                    if (!holder.isBound()) {
-                        return registry.register(
-                                resourceKey,
-                                object,
-                                new RegistrationInfo(Optional.empty(), lifecycle)
-                        );
-                    }
-                    return holder;
-                }
-            }
-
+            // Minecraft 26.3 removed BootstrapContext#register(ResourceKey, T, Lifecycle); the interface
+            // now only declares the two-argument register(ResourceKey, T) and every registration uses the
+            // registry's own lifecycle. The lifecycle-aware overload we used to implement here is
+            // therefore unreachable and was dropped - but its extra "re-register a declared-but-unbound
+            // holder" branch was real behaviour that the two-argument version did not have, so it was
+            // folded in below. Datapack loading pre-creates unbound Holder.References for keys that are
+            // referenced before they are defined; without this branch such an element would silently stay
+            // unbound after a bootstrap wrote it.
             @Override
             public Holder.Reference<T> register(
                     ResourceKey<T> resourceKey,
@@ -209,13 +194,39 @@ public class DatapackRegistryBuilder {
                 if (!registry.containsKey(resourceKey)) {
                     return registry.register(resourceKey, object, RegistrationInfo.BUILT_IN);
                 } else {
-                    return registry.getOrThrow(resourceKey);
+                    var holder = registry.getOrThrow(resourceKey);
+                    if (!holder.isBound()) {
+                        return registry.register(resourceKey, object, RegistrationInfo.BUILT_IN);
+                    }
+                    return holder;
                 }
             }
 
+            // 26.3: RegistryOps.RegistryInfoLookup#lookup returns the Optional<HolderGetter<S>> directly.
+            // The RegistryOps.RegistryInfo wrapper (with its getter()/owner() accessors) is gone.
             @Override
             public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
-                return registryInfoLookup.lookup(resourceKey).map(o -> o.getter()).orElse(null);
+                return registryInfoLookup.lookup(resourceKey).orElse(null);
+            }
+
+            // New abstract method in 26.3 (on the extracted BootstrapContextAccess super-interface).
+            // Vanilla implements it as `contextRegistries.lookupOrThrow(key).listElements()`, i.e. "list
+            // everything that is visible in the surrounding context for that registry".
+            // A RegistryOps.RegistryInfoLookup only hands out a HolderGetter, and not every getter is
+            // enumerable: for a registry that is already loaded this is the registry's own
+            // HolderLookup.RegistryLookup, but for a registry that is still being loaded concurrently
+            // RegistryDataLoader hands out a ConcurrentHolderGetter, which can resolve single keys/tags
+            // but deliberately cannot list its (still incomplete) contents. We therefore enumerate when
+            // the getter supports it and return an empty stream otherwise, rather than throwing.
+            @Override
+            public <S> Stream<Holder.Reference<S>> listContextElements(
+                    ResourceKey<? extends Registry<? extends S>> resourceKey
+            ) {
+                final HolderGetter<S> getter = registryInfoLookup.lookup(resourceKey).orElse(null);
+                if (getter instanceof HolderLookup<S> holderLookup) {
+                    return holderLookup.listElements();
+                }
+                return Stream.empty();
             }
         };
     }
@@ -235,21 +246,10 @@ public class DatapackRegistryBuilder {
     ) {
         var lookup = access == null ? registry.createRegistrationLookup() : null;
         return new BootstrapContext<>() {
-            @Override
-            public Holder.Reference<T> register(
-                    ResourceKey<T> resourceKey,
-                    T object,
-                    Lifecycle lifecycle
-            ) {
-                if (!registry.containsKey(resourceKey)) {
-                    //TODO: 1.21 creating a new instance of RegistrationInfo might be expensive...
-                    return registry.register(resourceKey, object, new RegistrationInfo(Optional.empty(), lifecycle));
-                } else {
-                    return registry.getOrThrow(resourceKey);
-                }
-            }
-
-
+            // See makeContext(RegistryOps.RegistryInfoLookup, WritableRegistry): 26.3 dropped the
+            // lifecycle-aware register(ResourceKey, T, Lifecycle) from BootstrapContext. Here the two
+            // overloads only ever differed in the RegistrationInfo they passed on, so removing it does
+            // not change any behaviour.
             @Override
             public Holder.Reference<T> register(
                     ResourceKey<T> resourceKey,
@@ -271,6 +271,24 @@ public class DatapackRegistryBuilder {
                     return null;
                 }
                 return access.lookupOrThrow(resourceKey);
+            }
+
+            // New abstract method in 26.3 (see BootstrapContextAccess). Mirrors lookup(...) above:
+            // with a RegistryAccess every registry is a HolderLookup and can be enumerated directly;
+            // without one, only the registry that is currently being bootstrapped is visible. We
+            // enumerate that one through the WritableRegistry itself, because the registration lookup
+            // stored in `lookup` is only a HolderGetter and cannot list its elements.
+            @Override
+            public <S> Stream<Holder.Reference<S>> listContextElements(
+                    ResourceKey<? extends Registry<? extends S>> resourceKey
+            ) {
+                if (access == null) {
+                    if (resourceKey.equals(registry.key())) {
+                        return (Stream<Holder.Reference<S>>) (Stream<?>) registry.listElements();
+                    }
+                    return Stream.empty();
+                }
+                return access.lookupOrThrow(resourceKey).listElements();
             }
         };
     }

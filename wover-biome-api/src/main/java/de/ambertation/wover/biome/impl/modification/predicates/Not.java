@@ -2,16 +2,15 @@ package de.ambertation.wover.biome.impl.modification.predicates;
 
 import de.ambertation.wover.biome.api.modification.predicates.BiomePredicate;
 
-import net.minecraft.util.KeyDispatchDataCodec;
+import com.mojang.serialization.MapCodec;
 
 public record Not(BiomePredicate predicate) implements BiomePredicate {
-    public static final KeyDispatchDataCodec<Not> CODEC = KeyDispatchDataCodec.of(
-            BiomePredicate.CODEC
-                    .xmap(Not::new, Not::predicate)
-                    .fieldOf("predicate"));
+    public static final MapCodec<Not> CODEC = BiomePredicate.CODEC
+            .xmap(Not::new, Not::predicate)
+            .fieldOf("predicate");
 
     @Override
-    public KeyDispatchDataCodec<? extends BiomePredicate> codec() {
+    public MapCodec<? extends BiomePredicate> codec() {
         return CODEC;
     }
 

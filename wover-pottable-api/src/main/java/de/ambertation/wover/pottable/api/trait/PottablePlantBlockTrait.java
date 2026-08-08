@@ -125,6 +125,12 @@ public class PottablePlantBlockTrait extends BlockTraitImpl<Block, GenericBlockT
                     var runtimeTraits = BlockTrait.<Block, GenericBlockTrait>getRuntimeTraits(e.getValue(), KEY);
                     if (runtimeTraits == null) return;
 
+                    // Register at most ONE entry per block: the PottablePlant's ResourceKey is derived
+                    // only from the block id, so a second registration would reuse the same key and make
+                    // MappedRegistry#register throw. keepLatestOnly() already collapses the traits at
+                    // BlockDefinition#addTrait time, so this loop normally sees a single element - we keep
+                    // the last match anyway, so the outcome stays "latest wins" even if a trait ever
+                    // reached the block through some other route.
                     // Register at most ONE entry per block. The PottablePlant's ResourceKey comes only from
                     // the block id, and the BootstrapContext keeps the FIRST registration for a key and
                     // silently ignores later ones - so looping and registering per trait would quietly

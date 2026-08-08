@@ -264,7 +264,7 @@ public abstract class WoverTagProvider<T, P extends TagBootstrapContext<T>> impl
                     //"forced" so 26.1's stricter TagsProvider validation does not reject
                     //references to vanilla/cross-provider tags that are not part of this run.
                     //
-                    //26.2 collapsed TagAppender<E, T> to TagAppender<T>: the "entry" type
+                    //26.3 collapsed TagAppender<E, T> to TagAppender<T>: the "entry" type
                     //parameter E is gone because the interface now always works in terms of
                     //ResourceKey<T> (add/addOptional/addAll take ResourceKey<T> directly, and
                     //the generic TagAppender#map(Function) that produced the re-typed appenders

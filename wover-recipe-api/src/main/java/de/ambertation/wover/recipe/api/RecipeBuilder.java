@@ -4,6 +4,8 @@ import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.events.api.Event;
 import de.ambertation.wover.recipe.impl.*;
 
+// 26.3 moved Criterion out of net.minecraft.advancements into net.minecraft.advancements.triggers,
+// alongside the trigger classes that produce it (see BaseRecipeBuilderImpl).
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
@@ -60,8 +62,16 @@ public class RecipeBuilder {
         }
 
         /**
-         * Creates a context with a no-op {@link RecipeProvider}, useful when recipes are built outside of the
-         * datagen {@link RecipeProvider} lifecycle (e.g. from the {@link #BOOTSTRAP_RECIPES} runtime event).
+         * Creates a context with a {@link RecipeProvider} that generates nothing of its own, useful when
+         * recipes are built outside of the datagen {@link RecipeProvider} lifecycle (e.g. from the
+         * {@link #BOOTSTRAP_RECIPES} runtime event).
+         * <p>
+         * Recipes (and the unlock advancements attached to them) are written to {@code recipeOutput}, so what
+         * happens to them is entirely up to that output. Advancements registered <em>directly</em> on the
+         * provider's {@code advancementOutput} are dropped, because a bare {@link RecipeOutput} has no channel
+         * for advancements that belong to no recipe - see
+         * {@code RecipeProviderAdapter#NO_ADVANCEMENT_CHANNEL}. WoVer's own runtime path does not use this
+         * constructor; it keeps both channels.
          *
          * @param lookupProvider The registry lookup used to resolve dynamic registries.
          * @param recipeOutput   The output every built recipe is written to.
@@ -70,12 +80,14 @@ public class RecipeBuilder {
             this(
                     lookupProvider,
                     lookupProvider.lookupOrThrow(Registries.ITEM),
-                    new RecipeProvider(lookupProvider, recipeOutput) {
-                        @Override
-                        public void buildRecipes() {
-
-                        }
-                    },
+                    // 26.3: RecipeProvider is no longer constructed from (HolderLookup.Provider, RecipeOutput).
+                    // Recipes and advancements both became datapack registries, so it now takes a
+                    // BootstrapContext for each and builds its own RecipeOutput on top of them.
+                    // RecipeProviderAdapter builds that pair from the RecipeOutput we already have.
+                    RecipeProviderAdapter.providerFor(
+                            recipeOutput,
+                            RecipeProviderAdapter.NO_ADVANCEMENT_CHANNEL
+                    ),
                     recipeOutput
             );
         }

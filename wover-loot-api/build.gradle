@@ -9,4 +9,8 @@ dependencies {
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+loom {
+    accessWidenerPath = file('src/main/resources/wover-loot.accesswidener')
+}
+
 moduleDependencies(project, ['wover-core-api', 'wover-tag-api', 'wover-event-api', 'wover-datagen-api'])

@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.BlockColumnFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.BlockColumnConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 /**
@@ -21,7 +20,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
  * <p>
  * The vanilla game uses this type of feature to generate Sugar Cane, Cactus and Bamboo.
  */
-public interface AsBlockColumn extends FeatureConfigurator<BlockColumnConfiguration, BlockColumnFeature> {
+public interface AsBlockColumn extends FeatureConfigurator {
     /**
      * Adds a new segment with a fixed height and {@link Block} to the column.
      *

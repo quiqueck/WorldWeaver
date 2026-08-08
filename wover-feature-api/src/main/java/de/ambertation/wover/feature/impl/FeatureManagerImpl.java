@@ -2,109 +2,92 @@ package de.ambertation.wover.feature.impl;
 
 import de.ambertation.wover.entrypoint.LibWoverFeature;
 import de.ambertation.wover.feature.api.features.*;
-import de.ambertation.wover.feature.api.features.config.*;
-import de.ambertation.wover.feature.impl.random.RandomPatchConfiguration;
 import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
-import java.util.function.Function;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Registers WorldWeaver's own {@link Feature} types.
+ * <p>
+ * 26.3 renamed {@code BuiltInRegistries.FEATURE} to {@code BuiltInRegistries.FEATURE_TYPE} and changed its
+ * element type from {@code Feature<?>} to {@code MapCodec<? extends Feature>}: a {@link Feature} instance now
+ * carries its own configuration, so what gets registered is the type's codec, not a stateless singleton.
+ * ({@code Registries.FEATURE} is a different thing in 26.3 — the datapack registry of {@link Feature} values
+ * that used to be called {@code CONFIGURED_FEATURE}.)
+ */
 public class FeatureManagerImpl {
 
-
-    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(
+    public static <F extends Feature> MapCodec<F> register(
             @NotNull Identifier id,
-            @NotNull F feature
+            @NotNull MapCodec<F> codec
     ) {
-        return register(createKey(id), feature);
+        return register(createKey(id), codec);
     }
 
-    public static <C extends FeatureConfiguration, F extends Feature<C>> F register(
-            @NotNull ResourceKey<Feature<?>> key,
-            @NotNull F feature
+    public static <F extends Feature> MapCodec<F> register(
+            @NotNull ResourceKey<MapCodec<? extends Feature>> key,
+            @NotNull MapCodec<F> codec
     ) {
-        Registry.register(BuiltInRegistries.FEATURE, key, feature);
-        return feature;
-    }
-
-    private static <C extends FeatureConfiguration, F extends Feature<C>> F registerWithLegacy(
-            @NotNull Identifier id,
-            @NotNull Function<Codec<C>, F> feature,
-            Codec<C> codec
-    ) {
-        final var key = createKey(id);
-        F res = register(key, feature.apply(codec));
-        return res;
+        Registry.register(BuiltInRegistries.FEATURE_TYPE, key, codec);
+        return codec;
     }
 
     @NotNull
-    public static ResourceKey<Feature<?>> createKey(Identifier location) {
+    public static ResourceKey<MapCodec<? extends Feature>> createKey(Identifier location) {
         return ResourceKey.create(
-                BuiltInRegistries.FEATURE.key(),
+                BuiltInRegistries.FEATURE_TYPE.key(),
                 location
         );
     }
 
-    public static final Feature<PlaceFacingBlockConfig> PLACE_BLOCK = registerWithLegacy(
+    public static final MapCodec<PlaceFacingBlockFeature> PLACE_BLOCK = register(
             LibWoverFeature.C.id("place_block"),
-            PlaceBlockFeature::new,
-            PlaceFacingBlockConfig.CODEC
+            PlaceFacingBlockFeature.CODEC
     );
 
-
-    public static final Feature<NoneFeatureConfiguration> MARK_POSTPROCESSING = registerWithLegacy(
+    public static final MapCodec<MarkPostProcessingFeature> MARK_POSTPROCESSING = register(
             LibWoverFeature.C.id("mark_postprocessing"),
-            (codec) -> new MarkPostProcessingFeature(),
-            null
+            MarkPostProcessingFeature.CODEC
     );
 
-    public static final Feature<SequenceFeatureConfig> SEQUENCE = registerWithLegacy(
+    public static final MapCodec<SequenceFeature> SEQUENCE = register(
             LibWoverFeature.C.id("sequence"),
-            (codec) -> new SequenceFeature(),
-            null
+            SequenceFeature.CODEC
     );
 
-    public static final Feature<ConditionFeatureConfig> CONDITION = registerWithLegacy(
+    public static final MapCodec<ConditionFeature> CONDITION = register(
             LibWoverFeature.C.id("condition"),
-            codec -> new ConditionFeature(),
-            null
+            ConditionFeature.CODEC
     );
 
-    public static final Feature<PillarFeatureConfig> PILLAR = registerWithLegacy(
+    public static final MapCodec<PillarFeature> PILLAR = register(
             LibWoverFeature.C.id("pillar"),
-            codec -> new PillarFeature(),
-            null
+            PillarFeature.CODEC
     );
 
-    public static final Feature<TemplateFeatureConfig> TEMPLATE = registerWithLegacy(
+    public static final MapCodec<TemplateFeature> TEMPLATE = register(
             LibWoverFeature.C.id("template"),
-            TemplateFeature::new,
-            TemplateFeatureConfig.CODEC
+            TemplateFeature.CODEC
     );
 
     // Minecraft 26.1 removed the vanilla "minecraft:random_patch" feature type. WorldWeaver still relies on
     // it for its public RandomPatch/WeightedBlockPatch API, so the mod re-registers a compatible
     // implementation under its own namespace ("wover:random_patch").
-    public static final RandomPatchFeature RANDOM_PATCH = registerWithLegacy(
+    public static final MapCodec<RandomPatchFeature> RANDOM_PATCH = register(
             LibWoverFeature.C.id("random_patch"),
-            RandomPatchFeature::new,
-            RandomPatchConfiguration.CODEC
+            RandomPatchFeature.CODEC
     );
 
     @ApiStatus.Internal
     public static void ensureStaticInitialization() {
         // no-op
     }
-
-
 }

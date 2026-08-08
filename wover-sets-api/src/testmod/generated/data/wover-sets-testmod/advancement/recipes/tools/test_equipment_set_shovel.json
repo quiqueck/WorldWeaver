@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:test_equipment_set_shovel"
+        "recipes": "wover-sets-testmod:test_equipment_set_shovel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

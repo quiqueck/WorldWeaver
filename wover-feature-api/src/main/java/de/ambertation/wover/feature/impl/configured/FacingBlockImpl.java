@@ -1,21 +1,19 @@
 package de.ambertation.wover.feature.impl.configured;
 
 import de.ambertation.wover.block.api.BlockHelper;
-import de.ambertation.wover.feature.api.Features;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.FacingBlock;
-import de.ambertation.wover.feature.api.features.PlaceBlockFeature;
-import de.ambertation.wover.feature.api.features.config.PlaceFacingBlockConfig;
+import de.ambertation.wover.feature.api.features.PlaceFacingBlockFeature;
 
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
@@ -26,15 +24,15 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockConfig, PlaceBlockFeature<PlaceFacingBlockConfig>> implements de.ambertation.wover.feature.api.configured.configurators.FacingBlock {
+public class FacingBlockImpl extends FeatureConfiguratorImpl implements de.ambertation.wover.feature.api.configured.configurators.FacingBlock {
     private final WeightedList.Builder<BlockState> stateBuilder = WeightedList.builder();
     BlockState firstState;
     private int count = 0;
     private List<Direction> directions = BlockHelper.HORIZONTAL;
 
     FacingBlockImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -97,10 +95,10 @@ public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockCon
 
 
     @Override
-    public @NotNull PlaceFacingBlockConfig createConfiguration() {
+    protected @NotNull Feature createFeature() {
         BlockStateProvider provider = null;
         if (count == 1) {
-            provider = SimpleStateProvider.simple(firstState);
+            provider = new SimpleStateProvider(firstState);
         } else {
             WeightedList<BlockState> list = stateBuilder.build();
             if (!list.isEmpty()) {
@@ -111,21 +109,16 @@ public class FacingBlockImpl extends FeatureConfiguratorImpl<PlaceFacingBlockCon
         if (provider == null) {
             throw new IllegalStateException("Facing Blocks need a State Provider.");
         }
-        return new PlaceFacingBlockConfig(provider, directions);
+        return new PlaceFacingBlockFeature(provider, directions);
     }
 
-    @Override
-    protected @NotNull PlaceBlockFeature<PlaceFacingBlockConfig> getFeature() {
-        return (PlaceBlockFeature) Features.PLACE_BLOCK;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<FacingBlock> {
+    public static class Key extends FeatureKey<FacingBlock> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public FacingBlock bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public FacingBlock bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new FacingBlockImpl(ctx, key);
         }
     }

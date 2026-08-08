@@ -3,10 +3,7 @@
     "description": {
       "translate": "pack.wover-surface-testmod.testpack.description"
     },
-    "max_format": 101,
-    "min_format": [
-      101,
-      1
-    ]
+    "max_format": 112,
+    "min_format": 112
   }
 }

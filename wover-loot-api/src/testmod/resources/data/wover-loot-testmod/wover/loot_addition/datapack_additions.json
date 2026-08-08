@@ -56,7 +56,7 @@
           "type": "add_condition",
           "pool": "every",
           "condition": {
-            "condition": "minecraft:random_chance",
+            "type": "minecraft:random_chance",
             "chance": 0.0
           }
         },

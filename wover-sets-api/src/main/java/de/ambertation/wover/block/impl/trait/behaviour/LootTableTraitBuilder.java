@@ -12,6 +12,7 @@ import de.ambertation.wover.entrypoint.LibWoverRecipe;
 import de.ambertation.wover.loot.api.LootLookupProvider;
 import de.ambertation.wover.loot.api.LootTableManager;
 
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -100,7 +101,7 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     }
 
     @Override
-    public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, NumberProvider amount) {
+    public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, Holder<NumberProvider> amount) {
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider)
                 -> provider.dropWithSilkTouch(block, otherwise, amount)
@@ -116,7 +117,7 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     }
 
     @Override
-    public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull NumberProvider count) {
+    public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull Holder<NumberProvider> count) {
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider)
                 -> provider.dropOre(block, drop.get(), count)

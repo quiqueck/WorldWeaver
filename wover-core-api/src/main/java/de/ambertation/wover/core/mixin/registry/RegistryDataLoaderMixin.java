@@ -28,17 +28,23 @@ import java.util.concurrent.Executor;
 
 @Mixin(RegistryDataLoader.class)
 public class RegistryDataLoaderMixin {
-    @Accessor("WORLDGEN_REGISTRIES")
+    // In Minecraft 26.3 RegistryDataLoader.WORLDGEN_REGISTRIES was renamed to WORLD_REGISTRIES.
+    // It is still the very same list (built first in <clinit>, same contents, same purpose: the
+    // registries that are loaded once per world from datapacks). The rename came along with the new
+    // RELOADABLE_REGISTRIES list, which holds the registries that 26.3 turned into reloadable
+    // datapack registries (recipes, loot tables, ...). Our custom registries keep going into the
+    // world registries, exactly as before.
+    @Accessor("WORLD_REGISTRIES")
     @Mutable
-    static void wt_set_WORLDGEN_REGISTRIES(List<RegistryDataLoader.RegistryData<?>> list) {
+    static void wt_set_WORLD_REGISTRIES(List<RegistryDataLoader.RegistryData<?>> list) {
         //SHADOWED
     }
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void wover_init(CallbackInfo ci) {
-        List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList<>(RegistryDataLoader.WORLDGEN_REGISTRIES.size() + 1);
-        enhanced.addAll(RegistryDataLoader.WORLDGEN_REGISTRIES);
-        LibWoverCore.C.log.debug("Adding custom WORLDGEN_REGISTRIES");
+        List<RegistryDataLoader.RegistryData<?>> enhanced = new ArrayList<>(RegistryDataLoader.WORLD_REGISTRIES.size() + 1);
+        enhanced.addAll(RegistryDataLoader.WORLD_REGISTRIES);
+        LibWoverCore.C.log.debug("Adding custom WORLD_REGISTRIES");
         DatapackRegistryBuilderImpl.forEach((key, codec) -> {
             if (codec != null) {
                 LibWoverCore.C.log.debug("    - Adding " + key.identifier());
@@ -46,7 +52,7 @@ public class RegistryDataLoaderMixin {
             }
         });
 
-        wt_set_WORLDGEN_REGISTRIES(enhanced);
+        wt_set_WORLD_REGISTRIES(enhanced);
     }
 
     // Announce which registries a load consists of before its tasks are created, so

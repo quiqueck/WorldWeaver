@@ -22,3 +22,12 @@ apply from: "common.gradle"
 apply from: "common-helper.gradle"
 apply from: "common-publish-maven.gradle"
 apply from: "common-publish-tag.gradle"
+
+// The root project's ModMetadataIntegrityTest scans every module's committed fabric.mod.json,
+// mixin configs and Java sources straight off disk. Gradle cannot infer any of that as a task
+// input, so `:test` would be reported UP-TO-DATE after a metadata edit and the guard would
+// silently stop running - exactly the failure mode it exists to catch. The task is three cheap
+// file walks, so simply never let it be considered up to date.
+tasks.named('test') {
+    outputs.upToDateWhen { false }
+}

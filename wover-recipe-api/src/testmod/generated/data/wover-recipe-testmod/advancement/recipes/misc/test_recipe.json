@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-recipe-testmod:test_recipe"
+        "recipes": "wover-recipe-testmod:test_recipe"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

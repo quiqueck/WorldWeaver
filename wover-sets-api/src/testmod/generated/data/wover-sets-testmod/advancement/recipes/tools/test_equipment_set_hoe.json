@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:test_equipment_set_hoe"
+        "recipes": "wover-sets-testmod:test_equipment_set_hoe"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

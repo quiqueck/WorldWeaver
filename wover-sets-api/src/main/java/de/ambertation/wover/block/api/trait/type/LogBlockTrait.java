@@ -6,8 +6,10 @@ import de.ambertation.wover.block.api.trait.behaviour.StripableBlockTrait;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 import java.util.List;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -36,10 +38,21 @@ public interface LogBlockTrait extends GenericBlockTrait {
         @Nullable List<BlockTrait<?, ?>> with(BlockState strippedBlockState);
 
         /**
-         * @param strippedBlockState computes the state this log strips to, or {@code null} for a non-strippable
+         * @param strippedBlockState produces the state this log strips to, or {@code null} for a non-strippable
          *                           log
          * @return the combined trait list, or {@code null} if the trait was already added
          */
-        @Nullable List<BlockTrait<?, ?>> with(StripableBlockTrait.BlockStateFactory strippedBlockState);
+        @Nullable List<BlockTrait<?, ?>> with(BlockStateProvider strippedBlockState);
+
+        /**
+         * Deferred variant of {@link #with(BlockStateProvider)}, for the usual case where the stripped log is
+         * registered in the same pass as this log and therefore does not exist yet. See
+         * {@link StripableBlockTrait.Builder#withDeferred}.
+         *
+         * @param strippedBlockState supplies the provider producing the stripped state, or {@code null} for a
+         *                           non-strippable log
+         * @return the combined trait list, or {@code null} if the trait was already added
+         */
+        @Nullable List<BlockTrait<?, ?>> withDeferred(Supplier<BlockStateProvider> strippedBlockState);
     }
 }

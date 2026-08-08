@@ -1,17 +1,16 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.FeatureContentManager;
 import de.ambertation.wover.feature.api.configured.configurators.*;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.ApiStatus;
 
-public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder {
+public class InlineBuilderImpl implements FeatureContentManager.InlineBuilder {
     private final ResourceKey<PlacedFeature> key;
     private final BootstrapContext<PlacedFeature> bootstapContext;
 
@@ -74,8 +73,8 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
-    public <F extends Feature<FC>, FC extends FeatureConfiguration> WithConfiguration<F, FC> withFeature(F feature) {
-        final var res = new WithConfigurationImpl<F, FC>(null, null);
+    public <F extends Feature> WithFeature<F> withFeature(F feature) {
+        final var res = new WithFeatureImpl<F>(null, null);
         res.feature(feature);
         res.setTransitive(bootstapContext, key);
         return res;
@@ -89,7 +88,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
-    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
+    @Deprecated(since = "26.1.0", forRemoval = true)
     public WeightedBlockPatch randomBlockPatch() {
         final var res = new WeightedBlockPatchImpl(null, null);
         res.setTransitive(bootstapContext, key);
@@ -97,7 +96,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
-    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
+    @Deprecated(since = "26.1.0", forRemoval = true)
     public WeightedBlockPatch bonemealPatch() {
         final var res = new WeightedBlockPatchImpl(null, null);
         res.likeDefaultBonemeal();
@@ -134,7 +133,7 @@ public class InlineBuilderImpl implements ConfiguredFeatureManager.InlineBuilder
     }
 
     @Override
-    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
+    @Deprecated(since = "26.1.0", forRemoval = true)
     public RandomPatch randomPatch() {
         final var res = new RandomPatchImpl(null, null);
         res.setTransitive(bootstapContext, key);

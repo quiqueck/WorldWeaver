@@ -6,16 +6,13 @@ import de.ambertation.wover.events.impl.EventImpl;
 import de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator;
 import de.ambertation.wover.feature.impl.placed.FeaturePlacementBuilderImpl;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.Optional;
@@ -23,9 +20,18 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F extends Feature<FC>> {
-    public static final EventImpl<OnBootstrapRegistry<ConfiguredFeature<?, ?>>> BOOTSTRAP_CONFIGURED_FEATURES =
-            new EventImpl<>("BOOTSTRAP_CONFIGURED_FEATURES");
+/**
+ * Base implementation for every {@link FeatureConfigurator}.
+ * <p>
+ * 26.3 collapsed {@code ConfiguredFeature<FC, F>} into {@link Feature}. The former two abstract steps
+ * ({@code createConfiguration()} returning an {@code FC} plus {@code getFeature()} returning the stateless
+ * {@code F} singleton) therefore merged into a single {@link #createFeature()} that returns the fully
+ * configured {@link Feature}. The class also lost its {@code <FC, F>} type parameters, which no longer
+ * describe anything.
+ */
+public abstract class FeatureConfiguratorImpl {
+    public static final EventImpl<OnBootstrapRegistry<Feature>> BOOTSTRAP_FEATURES =
+            new EventImpl<>("BOOTSTRAP_FEATURES");
 
     private static boolean didInit = false;
 
@@ -34,40 +40,42 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
         if (didInit) return;
         didInit = true;
 
+        // Registries.CONFIGURED_FEATURE -> Registries.FEATURE in 26.3 (directory
+        // data/<ns>/worldgen/configured_feature -> worldgen/feature), element type Feature.
         DatapackRegistryBuilder.addBootstrap(
-                Registries.CONFIGURED_FEATURE,
+                Registries.FEATURE,
                 FeatureConfiguratorImpl::onBootstrap
         );
     }
 
-    private static void onBootstrap(BootstrapContext<ConfiguredFeature<?, ?>> context) {
-        BOOTSTRAP_CONFIGURED_FEATURES.emit(c -> c.bootstrap(context));
+    private static void onBootstrap(BootstrapContext<Feature> context) {
+        BOOTSTRAP_FEATURES.emit(c -> c.bootstrap(context));
     }
 
     /**
-     * Creates a new {@link ResourceKey} for a {@link ConfiguredFeature} from the given id.
+     * Creates a new {@link ResourceKey} for a {@link Feature} from the given id.
      *
-     * @param id The id of the {@link ConfiguredFeature}
-     * @return The key for the {@link ConfiguredFeature}
+     * @param id The id of the {@link Feature}
+     * @return The key for the {@link Feature}
      */
     @NotNull
-    public static ResourceKey<ConfiguredFeature<?, ?>> createKey(
+    public static ResourceKey<Feature> createKey(
             @NotNull Identifier id
     ) {
         return ResourceKey.create(
-                Registries.CONFIGURED_FEATURE,
+                Registries.FEATURE,
                 id
         );
     }
 
     @Nullable
-    public static <FC extends FeatureConfiguration, F extends Feature<FC>> Holder<ConfiguredFeature<?, ?>> getHolder(
-            @Nullable HolderGetter<ConfiguredFeature<?, ?>> getter,
-            @NotNull ResourceKey<ConfiguredFeature<?, ?>> key
+    public static Holder<Feature> getHolder(
+            @Nullable HolderGetter<Feature> getter,
+            @NotNull ResourceKey<Feature> key
     ) {
         if (getter == null) return null;
 
-        final Optional<Holder.Reference<ConfiguredFeature<?, ?>>> h = getter.get(key);
+        final Optional<Holder.Reference<Feature>> h = getter.get(key);
         return h.orElse(null);
     }
 
@@ -75,15 +83,15 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
     // Instance Data and Methods
     // --------------------------------------------------
     @Nullable
-    public final ResourceKey<ConfiguredFeature<?, ?>> key;
-    protected final @Nullable BootstrapContext<ConfiguredFeature<?, ?>> bootstrapContext;
+    public final ResourceKey<Feature> key;
+    protected final @Nullable BootstrapContext<Feature> bootstrapContext;
 
     private ResourceKey<PlacedFeature> transitiveFeatureKey;
     private BootstrapContext<PlacedFeature> transitiveBootstrapContext;
 
     FeatureConfiguratorImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         this.key = key;
         this.bootstrapContext = ctx;
@@ -104,39 +112,42 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
         return this.transitiveBootstrapContext;
     }
 
-    protected abstract @NotNull FC createConfiguration();
-    protected abstract @NotNull F getFeature();
+    /**
+     * Builds the fully configured {@link Feature} this configurator describes.
+     *
+     * @return the feature
+     */
+    protected abstract @NotNull Feature createFeature();
 
-    public Holder<ConfiguredFeature<?, ?>> register() {
+    public Holder<Feature> register() {
         if (key == null) {
             throw new IllegalStateException("A ResourceKey can not be null if a feature should be registered!");
         }
         if (bootstrapContext == null) {
             throwStateError("Can not register a feature without a bootstrap context!");
         }
-        ConfiguredFeature<FC, F> cFeature = build();
 
-        // Use the 3-arg register overload: under 26.1's async registry loading, another registry
-        // (e.g. biome_modifications) may look up this feature's holder first, creating an *unbound*
-        // reference. The 2-arg register would then no-op; the 3-arg overload binds the pending reference.
+        // 26.3 removed BootstrapContext#register(key, value, Lifecycle). 26.1 used that overload here
+        // because it also bound an already-created *unbound* reference, which could happen when another
+        // registry (e.g. biome_modifications) looked this feature up first under parallel registry loading.
+        // Vanilla offers no replacement, so the two-argument register is the only option now.
         return bootstrapContext.register(
                 key,
-                cFeature,
-                Lifecycle.stable()
+                createFeature()
         );
     }
 
     /**
      * Creates an unnamed {@link Holder} for this {@link FeatureConfigurator}.
      * <p>
-     * This method is usefull, if you want to create an anonymous {@link ConfiguredFeature}
+     * This method is usefull, if you want to create an anonymous {@link Feature}
      * that is directly inlined into the definition of a
      * {@link net.minecraft.world.level.levelgen.placement.PlacedFeature} (instead of referenced by ID)
      *
      * @return the holder
      */
-    public Holder<ConfiguredFeature<?, ?>> directHolder() {
-        return Holder.direct(build());
+    public Holder<Feature> directHolder() {
+        return Holder.direct(createFeature());
     }
 
     public FeaturePlacementBuilderImpl inlinePlace() {
@@ -145,17 +156,6 @@ public abstract class FeatureConfiguratorImpl<FC extends FeatureConfiguration, F
             res.setTransitive(transitiveBootstrapContext, plc);
             return res;
         });
-    }
-
-    @NotNull
-    private ConfiguredFeature<FC, F> build() {
-        FC config = createConfiguration();
-
-        if (config == null) {
-            throw new IllegalStateException("Feature configuration for " + key.identifier() + " can not be null!");
-        }
-
-        return new ConfiguredFeature<>(getFeature(), config);
     }
 
     void throwStateError(String message) {

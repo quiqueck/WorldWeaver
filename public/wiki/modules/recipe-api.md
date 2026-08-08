@@ -28,7 +28,7 @@ data/<namespace>/recipe/<path>.json
 ```
 
 with the standard vanilla `type` + type-specific fields. The builders in this module map onto the following
-vanilla recipe types (as used by Minecraft 1.21.x):
+vanilla recipe types:
 
 | Builder | Vanilla `type` | Notes |
 |---|---|---|
@@ -81,27 +81,57 @@ A cooking recipe (`smelting`/`blasting`/`smoking`/`campfire_cooking`) looks like
 ### Recipe-unlock advancements
 
 Whenever a recipe is built with `shouldUnlockAdvancements` left at its default of `true` (see
-`BaseUnlockableRecipeBuilder`), an ordinary recipe-unlock advancement is written alongside it, exactly the way
-vanilla's own datagen `RecipeProvider` does: a `minecraft:recipe_unlocked` reward pointing at the recipe, with an
-`inventory_changed`-style trigger for every criterion added via `.unlockedBy(...)`/`.unlocks(...)`. This is not a
-WoVer-specific format — it's the same file vanilla writes at `data/<namespace>/advancement/<path>.json`.
+`BaseUnlockableRecipeBuilder`), an ordinary recipe-unlock advancement is produced alongside it, exactly the way
+vanilla's own datagen `RecipeProvider` does. It carries:
 
-### Brewing recipes are not datapack-driven
+- one criterion per `.unlockedBy(...)`/`.unlocks(...)` call (usually a `minecraft:inventory_changed` trigger for
+  the recipe's ingredients),
+- a `has_the_recipe` criterion using the `minecraft:recipe_unlocked` trigger, pointing at the recipe,
+- an `any-of` requirement over all of them, and
+- a `rewards.recipes` entry that hands the recipe to the player's recipe book.
 
-Unlike crafting/cooking/smithing/stonecutting recipes, vanilla Minecraft does **not** read brewing-stand recipes
-(potion mixes, container conversions, valid containers) from any datapack JSON format — they are hard-coded in
-`PotionBrewing#bootstrap`. `wover-recipe-api` mirrors that: `PotionManager.BOOTSTRAP_POTIONS` /
-`OnBootstrapPotions` (see below) is a Java-code hook into that same bootstrap step, not a file format. If you are
-hand-authoring a datapack, there is no brewing-recipe file to write for this module.
+This is not a WoVer-specific format — it's the same file vanilla writes at
+`data/<namespace>/advancement/recipes/<category>/<path>.json`.
+
+### Brewing recipes are ordinary recipes
+
+Brewing-stand recipes (potion mixes and container conversions) are ordinary datapack recipes of type
+`minecraft:brewing`, living in the same `minecraft:recipe` registry as everything else; vanilla itself ships 280
+of them under `data/minecraft/recipe/brewing/`. A single brew looks like this:
+
+```json
+{
+  "type": "minecraft:brewing",
+  "input": {
+    "item": "minecraft:potion",
+    "potion_contents": { "potions": "minecraft:leaping" }
+  },
+  "reagent": { "item": "minecraft:gunpowder" },
+  "output": {
+    "id": "minecraft:splash_potion",
+    "components": {
+      "minecraft:potion_contents": { "potion": "minecraft:leaping" }
+    }
+  }
+}
+```
+
+So a datapack *can* add, replace or remove brews by writing/overriding these files. `wover-recipe-api` does not
+generate them as files; `PotionManager.BOOTSTRAP_POTIONS` / `OnBootstrapPotions` (see below) contributes them at
+runtime instead, for the reasons described there.
 
 ### WoVer-specific extension: recipes without a JSON file
 
-Two mechanisms in this module add recipes to a running game without them ever existing as a JSON file on disk:
+Three mechanisms in this module add recipes to a running game without them ever existing as a JSON file on disk:
 
-- **`RecipeBuilder.BOOTSTRAP_RECIPES`** — a runtime event, fired while the vanilla `RecipeManager` applies newly
-  loaded recipes. Subscribers build recipes with the same `RecipeBuilder` API used for datagen, and they are
-  merged into the manager's recipe map in memory (see `RecipeManagerMixin`). This is useful for recipes that
-  depend on runtime state, or for mods that want to skip generating/shipping recipe JSON entirely.
+- **`RecipeBuilder.BOOTSTRAP_RECIPES`** — a runtime event, fired while the vanilla `RecipeManager` builds the
+  recipes for the world being loaded. Subscribers build recipes with the same `RecipeBuilder` API used for
+  datagen, and they are merged into the manager's recipe map in memory (see `RecipeManagerMixin`). This is
+  useful for recipes that depend on runtime state, or for mods that want to skip generating/shipping recipe JSON
+  entirely. Their unlock advancements are registered too (see `ServerAdvancementManagerMixin`), so such a recipe
+  unlocks itself in the recipe book exactly like a datapack recipe does.
+- **`PotionManager.BOOTSTRAP_POTIONS`** — the same mechanism for `minecraft:brewing` recipes; see "Brewing
+  recipes with `PotionManager`" below.
 - **`BlockRecipeTrait` / `ItemRecipeTrait`** — see "Recipe traits" below; these run at *datagen* time (they
   generate real JSON files), not at runtime.
 
@@ -251,19 +281,36 @@ Each `make...Recipe` call both builds and immediately writes its recipe(s) to th
 
 ### Brewing recipes with `PotionManager`
 
-Register a new potion, then subscribe to `PotionManager.BOOTSTRAP_POTIONS` to add mixes/containers to vanilla's
-own `PotionBrewing.Builder` — the same builder instance vanilla's `PotionBrewing#bootstrap` populates, so any
-method available on it in vanilla (adding a mix, a container-conversion recipe, or a valid container item) can be
-called from here:
+Register a new potion, then subscribe to `PotionManager.BOOTSTRAP_POTIONS` to add mixes, container conversions
+and container items. Subscribers receive a `BrewingBuilder`, which offers the same four methods (with the same
+names and signatures) that vanilla's deleted `PotionBrewing.Builder` used to:
 
 ```java
 public static final Holder<Potion> MY_POTION =
         PotionManager.registerPotion(MyMod.C, "my_potion", MyEffects.MY_EFFECT, 3600);
 
-PotionManager.BOOTSTRAP_POTIONS.subscribe((PotionBrewing.Builder builder) -> {
-    // e.g. builder.addMix(Potions.WATER, MyItems.MY_REAGENT, MY_POTION.value());
+PotionManager.BOOTSTRAP_POTIONS.subscribe((BrewingBuilder builder) -> {
+    builder.addStartMix(MyItems.MY_REAGENT, MY_POTION);
+    // also available: addMix(from, reagent, to), addContainer(item),
+    //                 addContainerRecipe(container, reagent, result)
 });
 ```
 
-Because vanilla does not expose brewing recipes through a datapack file, this Java hook is the only way to add
-brewing-stand recipes for this module — there is no JSON counterpart to generate during datagen.
+| `BrewingBuilder` method | What it produces |
+|---|---|
+| `addContainer(Item)` | declares an item as a potion container (bottle slot) — no recipe of its own, but every mix is generated for it |
+| `addContainerRecipe(container, reagent, result)` | one container conversion per known potion (vanilla's `potion + gunpowder -> splash_potion` pattern) |
+| `addMix(from, reagent, to)` | one brew per registered container |
+| `addStartMix(reagent, potion)` | `water + reagent -> mundane` and `awkward + reagent -> potion`, per container |
+
+Calls are recorded, not executed immediately, and replayed into the correct phase of vanilla's own
+`BrewingProvider` lifecycle, so the order you call them in does not matter, and your contributions are combined
+with vanilla's: a mix you add is brewable in every vanilla container, and a container you add works with every
+vanilla potion.
+
+Because brewing is now part of the recipe registry, the resulting `minecraft:brewing` recipes are injected the
+same way `RecipeBuilder.BOOTSTRAP_RECIPES` recipes are, and show up in the running server's `RecipeManager`
+alongside vanilla's 280 brewing JSON files. This is a runtime hook rather than a datagen provider on purpose:
+existing subscribers keep working without having to run datagen, and only the brews that vanilla's own generator
+would *not* already have produced are injected — so a datapack that removed or overrode a vanilla brew is never
+silently resurrected.

@@ -34,7 +34,7 @@ import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.ArrayList;
@@ -425,6 +425,11 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         private @Nullable AmbientAdditionsSettings ambientAdditions;
         private @Nullable Music backgroundMusic;
 
+        // 26.3 moved the creature world-gen spawn probability off MobSpawnSettings into the
+        // EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY attribute; null means "leave the
+        // attribute unset", so the Biome keeps vanilla's default.
+        private @Nullable Float creatureGenerationProbability;
+
         /**
          * Creates a new builder instance.
          * <p>
@@ -444,9 +449,11 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             this.temperature = 0.5f;
             this.hasPrecipitation = false;
 
+            // 26.3: Registries.CONFIGURED_CARVER -> Registries.CARVER, element type
+            // ConfiguredWorldCarver<?> -> WorldCarver (carvers now carry their own configuration).
             generationSettings = new BiomeGenerationSettings.Builder(
                     bootstrapContext.lookup(Registries.PLACED_FEATURE),
-                    bootstrapContext.lookup(Registries.CONFIGURED_CARVER)
+                    bootstrapContext.lookup(Registries.CARVER)
             );
 
             this.fogColor = DEFAULT_FOG_COLOR;
@@ -592,12 +599,12 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         /**
          * Adds a carver to the Biome.
          *
-         * @param carver The key of the {@link ConfiguredWorldCarver}.
+         * @param carver The key of the {@link WorldCarver}.
          * @return This builder.
          */
-        public B carver(ResourceKey<ConfiguredWorldCarver<?>> carver) {
+        public B carver(ResourceKey<WorldCarver> carver) {
             generationSettings.addCarver(
-                    bootstrapContext.lookup(Registries.CONFIGURED_CARVER).getOrThrow(carver)
+                    bootstrapContext.lookup(Registries.CARVER).getOrThrow(carver)
             );
             return (B) this;
         }
@@ -605,10 +612,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
         /**
          * Adds a carver to the Biome.
          *
-         * @param carver The holder of the {@link ConfiguredWorldCarver}.
+         * @param carver The holder of the {@link WorldCarver}.
          * @return This builder.
          */
-        public B carver(Holder<ConfiguredWorldCarver<?>> carver) {
+        public B carver(Holder<WorldCarver> carver) {
             generationSettings.addCarver(carver);
             return (B) this;
         }
@@ -1050,11 +1057,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B spawn(EntityType<?> entityType, int weight, int minGroupCount, int maxGroupCount) {
-            mobSpawnSettings.addSpawn(
-                    entityType.getCategory(),
-                    weight,
-                    new MobSpawnSettings.SpawnerData(entityType, minGroupCount, maxGroupCount)
-            );
+            // 26.3: SpawnerData is now (EntityType, IntProvider) and MobSpawnSettings.Builder lost
+            // addSpawn(MobCategory, int, SpawnerData). The new addSpawn(EntityType, int, int, int) builds
+            // exactly the same entry and derives the MobCategory from the type itself, as we did here.
+            mobSpawnSettings.addSpawn(entityType, weight, minGroupCount, maxGroupCount);
             return (B) this;
         }
 
@@ -1067,7 +1073,9 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B addMobCharge(EntityType<?> entityType, double energyBudget, double charge) {
-            mobSpawnSettings.addMobCharge(entityType, energyBudget, charge);
+            // 26.3 renamed MobSpawnSettings.Builder#addMobCharge to #addMobSpawnCost, matching the
+            // MobSpawnCost record it stores. Same two values, same meaning.
+            mobSpawnSettings.addMobSpawnCost(entityType, energyBudget, charge);
             return (B) this;
         }
 
@@ -1078,7 +1086,10 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B creatureGenerationProbability(float p) {
-            mobSpawnSettings.creatureGenerationProbability(p);
+            // 26.3 took this off MobSpawnSettings entirely: it is now the per-Biome
+            // EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY attribute, applied in
+            // buildBiome() alongside the other attributes 26.1 already moved there.
+            this.creatureGenerationProbability = p;
             return (B) this;
         }
 
@@ -1126,6 +1137,12 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             vanillaBuilder.generationSettings(generationSettings.build());
             vanillaBuilder.specialEffects(fx.build());
             vanillaBuilder.mobSpawnSettings(mobSpawnSettings.build());
+            if (creatureGenerationProbability != null) {
+                vanillaBuilder.setAttribute(
+                        EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY,
+                        creatureGenerationProbability
+                );
+            }
 
             // 26.1: fog/sky/water-fog colors, ambient particles/sounds and background music are stored as
             // per-biome EnvironmentAttributes rather than on BiomeSpecialEffects.

@@ -49,7 +49,7 @@ public class MinecraftServerMixin {
     protected WorldData worldData;
 
     /**
-     * 26.2 appended a {@link NotificationManager} to the {@link MinecraftServer} constructor (it is the sink for
+     * 26.3 appended a {@link NotificationManager} to the {@link MinecraftServer} constructor (it is the sink for
      * the new server notification services). A mixin handler for {@code <init>} has to mirror the constructor
      * descriptor exactly, so the parameter is repeated here even though we do not use it - without it the
      * injector would be rejected at mixin-apply time.

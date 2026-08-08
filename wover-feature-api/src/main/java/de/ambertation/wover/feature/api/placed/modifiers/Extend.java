@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -13,9 +12,8 @@ import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -25,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * This will basically generate a colum of positions in the given direction.
  */
-public class Extend extends PlacementModifier {
+public class Extend implements PlacementModifier {
     /**
      * The codec for this placement modifier.
      */
@@ -62,30 +60,30 @@ public class Extend extends PlacementModifier {
      * @param placementContext The placement context.
      * @param random           The random source.
      * @param blockPos         The input position.
-     * @return The stream of new positions.
+     * @param consumer         Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext placementContext,
             RandomSource random,
-            BlockPos blockPos
+            BlockPos blockPos,
+            Consumer<BlockPos> consumer
     ) {
-        var builder = Stream.<BlockPos>builder();
         final int count = length.sample(random);
-        builder.add(blockPos);
+        consumer.accept(blockPos);
         for (int y = 1; y < count + 1; y++) {
-            builder.add(blockPos.relative(direction, y));
+            consumer.accept(blockPos.relative(direction, y));
         }
-        return builder.build();
     }
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type of this placement modifier.
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.EXTEND;
+    public @NotNull MapCodec<Extend> codec() {
+        return CODEC;
     }
 }

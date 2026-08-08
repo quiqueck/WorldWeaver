@@ -13,14 +13,12 @@ import java.util.function.Supplier;
  * Lets a mod add pools and entries to loot tables it does not own - vanilla's chest, entity and gameplay
  * tables, or tables shipped by another mod.
  * <p>
- * Fabric's own {@code fabric-loot-api-v3} ({@code LootTableEvents.MODIFY}) already does exactly this for a
- * single, code-only addition. This class exists for two reasons: it is the same mechanism
- * {@link LootAdditionFile} runs a datapack addition through, in the very same idempotent pass, so a mod that
- * needs both forms does not stack two independent systems; and it keeps working unchanged on later Minecraft
- * versions where Fabric no longer ships a loot module at all. Registrations are collected here at mod-init
- * time and applied by {@code de.ambertation.wover.loot.mixin.ReloadableServerRegistriesMixin} while the
- * reloadable loot table registry is being rebuilt, right before vanilla validates it - so a malformed addition
- * fails loudly at load time instead of at loot-roll time.
+ * 26.3 turned loot tables into a datapack registry, where an entry is replaced wholesale and never merged, so
+ * there is no data-driven way to extend a table without taking ownership of it and freezing its vanilla
+ * contents. This class is the replacement: registrations are collected here at mod-init time and applied by
+ * {@code de.ambertation.wover.loot.mixin.ReloadableServerRegistriesMixin} while the
+ * {@code minecraft:loot_table} registry is being built, right before vanilla validates it - so a malformed
+ * addition fails loudly at load time instead of at loot-roll time.
  * <p>
  * <b>Prefer the data form for anything static.</b> {@link LootAdditionFile} expresses exactly these verbs as
  * {@code data/<namespace>/wover/loot_addition/<name>.json}, is emitted from datagen by

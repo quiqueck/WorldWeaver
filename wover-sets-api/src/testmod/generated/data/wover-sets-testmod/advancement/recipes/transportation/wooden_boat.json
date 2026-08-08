@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_boat"
+        "recipes": "wover-sets-testmod:wooden_boat"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

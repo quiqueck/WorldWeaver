@@ -1,18 +1,16 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.AsRandomSelect;
 import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.RandomSelectorFeature;
 import net.minecraft.world.level.levelgen.feature.WeightedPlacedFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.LinkedList;
@@ -20,13 +18,13 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AsRandomSelectImpl extends FeatureConfiguratorImpl<RandomFeatureConfiguration, RandomSelectorFeature> implements AsRandomSelect {
+public class AsRandomSelectImpl extends FeatureConfiguratorImpl implements AsRandomSelect {
     private final List<WeightedPlacedFeature> features = new LinkedList<>();
     private Holder<PlacedFeature> defaultFeature;
 
     AsRandomSelectImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -54,22 +52,18 @@ public class AsRandomSelectImpl extends FeatureConfiguratorImpl<RandomFeatureCon
     }
 
     @Override
-    public @NotNull RandomFeatureConfiguration createConfiguration() {
-        return new RandomFeatureConfiguration(features, defaultFeature);
+    protected @NotNull Feature createFeature() {
+        // 26.3: RandomFeatureConfiguration was folded into RandomSelectorFeature.
+        return new RandomSelectorFeature(features, defaultFeature);
     }
 
-    @Override
-    protected @NotNull RandomSelectorFeature getFeature() {
-        return (RandomSelectorFeature) Feature.RANDOM_SELECTOR;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<AsRandomSelect> {
+    public static class Key extends FeatureKey<AsRandomSelect> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public AsRandomSelect bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public AsRandomSelect bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new AsRandomSelectImpl(ctx, key);
         }
     }

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:stony_slab"
+        "recipes": "wover-sets-testmod:stony_slab"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

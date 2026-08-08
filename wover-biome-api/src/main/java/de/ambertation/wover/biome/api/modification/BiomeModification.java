@@ -21,13 +21,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.random.WeightedList;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
@@ -47,7 +50,9 @@ import org.jetbrains.annotations.Nullable;
  * event to inject the modifications into the world.
  * <p>
  * Modifications are currently injected by directly altering some constant fields in
- * {@link net.minecraft.world.level.biome.BiomeGenerationSettings} as well as the Tags stored
+ * {@link net.minecraft.world.level.biome.BiomeGenerationSettings}, by replacing the
+ * {@link net.minecraft.world.attribute.EnvironmentAttributeMap} of the affected
+ * {@link Biome} (which is where 26.3 keeps its {@link MobSpawnSettings}), as well as the Tags stored
  * in the Biome registry
  */
 public interface BiomeModification {
@@ -304,14 +309,17 @@ public interface BiomeModification {
         }
 
         /**
-         * Sets a predicate that tests if the passed configured feature can generate in the biome.
+         * Sets a predicate that tests if the passed feature can generate in the biome.
+         * <p>
+         * Was {@code hasConfiguredFeature} before 26.3 folded {@code ConfiguredFeature} into
+         * {@link Feature}.
          *
          * @param key The key of the feature.
          * @return This builder.
-         * @see BiomePredicate#hasConfiguredFeature(ResourceKey)
+         * @see BiomePredicate#hasFeature(ResourceKey)
          */
-        public Builder hasConfiguredFeature(ResourceKey<ConfiguredFeature<?, ?>> key) {
-            return predicate(BiomePredicate.hasConfiguredFeature(key));
+        public Builder hasFeature(ResourceKey<Feature> key) {
+            return predicate(BiomePredicate.hasFeature(key));
         }
 
         /**
@@ -538,7 +546,14 @@ public interface BiomeModification {
                 int minGroupCount,
                 int maxGroupCount
         ) {
-            return addSpawn(weight, new MobSpawnSettings.SpawnerData(entityType, minGroupCount, maxGroupCount));
+            // 26.3 replaced SpawnerData's (EntityType, int minCount, int maxCount) constructor with
+            // (EntityType, IntProvider). We build the group count the same way
+            // MobSpawnSettings.Builder#addSpawn(EntityType, int, int, int) now does, so an equal min/max
+            // still yields a ConstantInt rather than a degenerate UniformInt.
+            final IntProvider count = minGroupCount == maxGroupCount
+                    ? ConstantInt.of(minGroupCount)
+                    : UniformInt.of(minGroupCount, maxGroupCount);
+            return addSpawn(weight, new MobSpawnSettings.SpawnerData(entityType, count));
         }
 
         /**

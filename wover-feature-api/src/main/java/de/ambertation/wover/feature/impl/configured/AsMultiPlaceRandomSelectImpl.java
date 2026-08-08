@@ -1,25 +1,23 @@
 package de.ambertation.wover.feature.impl.configured;
 
 import de.ambertation.wover.block.api.BlockHelper;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.FeatureContentManager;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.AsMultiPlaceRandomSelect;
 import de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder;
 import de.ambertation.wover.util.Triple;
 
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.RandomSelectorFeature;
 import net.minecraft.world.level.levelgen.feature.WeightedPlacedFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -31,7 +29,7 @@ import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<RandomFeatureConfiguration, RandomSelectorFeature> implements AsMultiPlaceRandomSelect {
+public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl implements AsMultiPlaceRandomSelect {
 
     private final List<Triple<BlockStateProvider, Float, Integer>> features = new LinkedList<>();
 
@@ -40,8 +38,8 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     private static int lastID = 0;
 
     AsMultiPlaceRandomSelectImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -131,7 +129,7 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     }
 
     private Holder<PlacedFeature> place(BlockStateProvider p, int id) {
-        final FeaturePlacementBuilder builder = ConfiguredFeatureManager
+        final FeaturePlacementBuilder builder = FeatureContentManager
                 .INLINE_BUILDER
                 .simple()
                 .block(p)
@@ -141,7 +139,7 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
     }
 
     @Override
-    public @NotNull RandomFeatureConfiguration createConfiguration() {
+    protected @NotNull Feature createFeature() {
         if (modFunction == null) {
             throwStateError("AsMultiPlaceRandomSelect needs a placement.modification Function");
         }
@@ -154,26 +152,20 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl<Random
                                                             .toList();
 
 
-        return new RandomFeatureConfiguration(
+        // 26.3: RandomFeatureConfiguration was folded into RandomSelectorFeature.
+        return new RandomSelectorFeature(
                 features.subList(0, features.size() - 1),
-                // 26.2 turned WeightedPlacedFeature into a record, so its public `feature` field is now
-                // the private component behind the generated feature() accessor.
                 features.get(features.size() - 1).feature()
         );
     }
 
-    @Override
-    protected @NotNull RandomSelectorFeature getFeature() {
-        return (RandomSelectorFeature) Feature.RANDOM_SELECTOR;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<AsMultiPlaceRandomSelect> {
+    public static class Key extends FeatureKey<AsMultiPlaceRandomSelect> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public AsMultiPlaceRandomSelect bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public AsMultiPlaceRandomSelect bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new AsMultiPlaceRandomSelectImpl(ctx, key);
         }
     }

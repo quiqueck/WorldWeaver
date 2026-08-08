@@ -10,7 +10,8 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A helper class for registering material rules in {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_RULE}
+ * A helper class for registering material rules in {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_RULE_TYPE}
+ * (called {@code MATERIAL_RULE} before Minecraft 26.3)
  */
 public class MaterialRuleManager {
     /**

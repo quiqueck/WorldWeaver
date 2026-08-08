@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_fence"
+        "recipes": "wover-sets-testmod:wooden_fence"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

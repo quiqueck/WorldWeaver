@@ -6,7 +6,6 @@ import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 
-import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
@@ -40,7 +39,7 @@ public class ButtonBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
 
             if (ModCore.isDatagen()) {
                 definition.addTags(BlockTags.BUTTONS);
-                definition.addItemTags(BlockItemTags.BUTTONS.item());
+                definition.addItemTags(PrunedVanillaTags.ITEM_BUTTONS);
 
                 if (definition.hasTrait(BlockTraits.WOOD_BLOCK)) {
                     definition.strength(0.5F, 0.5F);
@@ -50,7 +49,7 @@ public class ButtonBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
 
                 if (definition.hasTrait(BlockTraits.STONE_BLOCK)) {
                     definition.addTags(BlockTags.STONE_BUTTONS);
-                    definition.addItemTags(BlockItemTags.STONE_BUTTONS.item());
+                    definition.addItemTags(PrunedVanillaTags.ITEM_STONE_BUTTONS);
                 }
             }
         }

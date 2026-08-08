@@ -1,17 +1,16 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.AsOre;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.BlockReplacement;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.OreFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.BlockMatchTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
@@ -20,14 +19,16 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AsOreImpl extends FeatureConfiguratorImpl<OreConfiguration, OreFeature> implements AsOre {
-    private final List<OreConfiguration.TargetBlockState> targetStates = new LinkedList<>();
+public class AsOreImpl extends FeatureConfiguratorImpl implements AsOre {
+    // 26.3: OreConfiguration is gone. Its TargetBlockState record became the top-level BlockReplacement, and
+    // the vein size / air-exposure chance are fields on OreFeature itself.
+    private final List<BlockReplacement> targetStates = new LinkedList<>();
     private int size = 6;
     private float discardChanceOnAirExposure = 0;
 
     AsOreImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> featureKey
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> featureKey
     ) {
         super(ctx, featureKey);
     }
@@ -49,7 +50,7 @@ public class AsOreImpl extends FeatureConfiguratorImpl<OreConfiguration, OreFeat
 
     @Override
     public AsOre add(RuleTest containedIn, BlockState ore) {
-        targetStates.add(OreConfiguration.target(
+        targetStates.add(BlockReplacement.replace(
                 containedIn,
                 ore
         ));
@@ -69,22 +70,17 @@ public class AsOreImpl extends FeatureConfiguratorImpl<OreConfiguration, OreFeat
     }
 
     @Override
-    public @NotNull OreConfiguration createConfiguration() {
-        return new OreConfiguration(targetStates, size, discardChanceOnAirExposure);
+    protected @NotNull Feature createFeature() {
+        return new OreFeature(targetStates, size, discardChanceOnAirExposure);
     }
 
-    @Override
-    protected @NotNull OreFeature getFeature() {
-        return (OreFeature) Feature.ORE;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<AsOre> {
+    public static class Key extends FeatureKey<AsOre> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public AsOre bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public AsOre bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new AsOreImpl(ctx, key);
         }
     }

@@ -7,11 +7,10 @@ import de.ambertation.wover.loot.mixin.LootTableAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.Util;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.predicates.ConditionUserBuilder;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.ArrayList;
@@ -19,15 +18,15 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.Optional;
 
 /**
  * The {@link MutableLootTable} handed to the appenders of one loot table during one reload.
  * <p>
  * Nothing is written back while the appenders run: the additions are collected here and flushed by
  * {@link #commit()} once all of them are done. The working state always starts from the snapshot of the
- * table's original pools (and, per pool, its original entries and conditions), never from whatever a previous
- * reload left behind - that is what makes re-application idempotent.
+ * table's original pools (and, per pool, its original entries), never from whatever a previous reload left
+ * behind - that is what makes re-application idempotent.
  */
 final class MutableLootTableImpl implements MutableLootTable {
     private final ResourceKey<LootTable> key;
@@ -43,7 +42,7 @@ final class MutableLootTableImpl implements MutableLootTable {
     private final Map<LootPool, List<LootPoolEntryContainer>> extraEntries = new IdentityHashMap<>();
 
     /** Conditions to AND onto pools that already exist. Keyed by identity - {@link LootPool} has no equals. */
-    private final Map<LootPool, List<LootItemCondition>> extraConditions = new IdentityHashMap<>();
+    private final Map<LootPool, List<Holder<LootItemCondition>>> extraConditions = new IdentityHashMap<>();
 
     MutableLootTableImpl(
             ResourceKey<LootTable> key,
@@ -143,22 +142,22 @@ final class MutableLootTableImpl implements MutableLootTable {
 
     @Override
     public MutableLootTable addConditionToPool(int index, LootItemCondition.Builder condition) {
-        return addConditionToPool(index, Objects.requireNonNull(condition, "condition").build());
+        return addConditionToPool(index, build(condition));
     }
 
     @Override
     public MutableLootTable addConditionToEveryPool(LootItemCondition.Builder condition) {
-        return addConditionToEveryPool(Objects.requireNonNull(condition, "condition").build());
+        return addConditionToEveryPool(build(condition));
     }
 
     @Override
-    public MutableLootTable addConditionToPool(int index, LootItemCondition condition) {
+    public MutableLootTable addConditionToPool(int index, Holder<LootItemCondition> condition) {
         addCondition(pools.get(index), Objects.requireNonNull(condition, "condition"));
         return this;
     }
 
     @Override
-    public MutableLootTable addConditionToEveryPool(LootItemCondition condition) {
+    public MutableLootTable addConditionToEveryPool(Holder<LootItemCondition> condition) {
         Objects.requireNonNull(condition, "condition");
         // Only the pools present *now* - a pool an earlier addPool() call in this same pass just added is not
         // retroactively restricted by a condition queued before it existed.
@@ -168,7 +167,11 @@ final class MutableLootTableImpl implements MutableLootTable {
         return this;
     }
 
-    private void addCondition(LootPool pool, LootItemCondition condition) {
+    private static Holder<LootItemCondition> build(LootItemCondition.Builder condition) {
+        return Holder.direct(Objects.requireNonNull(condition, "condition").build());
+    }
+
+    private void addCondition(LootPool pool, Holder<LootItemCondition> condition) {
         extraConditions.computeIfAbsent(pool, p -> new ArrayList<>()).add(condition);
     }
 
@@ -212,22 +215,16 @@ final class MutableLootTableImpl implements MutableLootTable {
             ((LootPoolAccessor) (Object) pool).wover_setEntries(List.copyOf(merged));
         }
 
-        for (Map.Entry<LootPool, List<LootItemCondition>> entry : extraConditions.entrySet()) {
+        for (Map.Entry<LootPool, List<Holder<LootItemCondition>>> entry : extraConditions.entrySet()) {
             final LootPool pool = entry.getKey();
             final LootPoolAccessor accessor = (LootPoolAccessor) (Object) pool;
-            final List<LootItemCondition> original = LootTableAppendersImpl.ORIGINAL_CONDITIONS
-                    .computeIfAbsent(pool, p -> List.copyOf(accessor.wover_getConditions()));
+            final Optional<Holder<LootItemCondition>> original = LootTableAppendersImpl.ORIGINAL_CONDITIONS
+                    .computeIfAbsent(pool, p -> accessor.wover_getCondition());
 
-            final List<LootItemCondition> merged = new ArrayList<>(original.size() + entry.getValue().size());
-            merged.addAll(original);
+            final List<Holder<LootItemCondition>> merged = new ArrayList<>(1 + entry.getValue().size());
+            original.ifPresent(merged::add);
             merged.addAll(entry.getValue());
-            final List<LootItemCondition> mergedList = List.copyOf(merged);
-            accessor.wover_setConditions(mergedList);
-            // conditions alone is not what addRandomItems tests - compositeCondition is, and it is only ever
-            // derived once, in the constructor. Recompute it exactly the way LootPool itself does, or the
-            // conditions we just wrote would silently never be evaluated.
-            final Predicate<LootContext> compositeCondition = Util.allOf(mergedList);
-            accessor.wover_setCompositeCondition(compositeCondition);
+            accessor.wover_setCondition(ConditionUserBuilder.buildCondition(merged));
         }
 
         ((LootTableAccessor) (Object) table).wover_setPools(List.copyOf(pools));

@@ -1,21 +1,21 @@
 package de.ambertation.wover.feature.api.placed;
 
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.FeatureContentManager;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator;
 
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A key for a {@link PlacedFeature} that can be used to reference the feature as well as
- * use it to place a {@link ConfiguredFeature}.
+ * use it to place a {@link Feature}.
  * <p>
  * If you do not call {@link #setDecoration(GenerationStep.Decoration)}, the feature is assigned
  * to the {@link GenerationStep.Decoration#VEGETAL_DECORATION} step.
@@ -30,12 +30,12 @@ public interface PlacedFeatureKey extends BasePlacedFeatureKey<PlacedFeatureKey>
      * to add it to the registry.
      *
      * @param bootstrapContext The {@link BootstrapContext} to use
-     * @param key              The {@link ResourceKey} for the {@link ConfiguredFeature} to place
+     * @param key              The {@link ResourceKey} for the {@link Feature} to place
      * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
      */
     public FeaturePlacementBuilder place(
             BootstrapContext<PlacedFeature> bootstrapContext,
-            ResourceKey<ConfiguredFeature<?, ?>> key
+            ResourceKey<Feature> key
     );
 
     /**
@@ -45,12 +45,12 @@ public interface PlacedFeatureKey extends BasePlacedFeatureKey<PlacedFeatureKey>
      * to add it to the registry.
      *
      * @param bootstrapContext The {@link BootstrapContext} to use
-     * @param holder           The {@link Holder} for the {@link ConfiguredFeature} to place
+     * @param holder           The {@link Holder} for the {@link Feature} to place
      * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
      */
     public FeaturePlacementBuilder place(
             BootstrapContext<PlacedFeature> bootstrapContext,
-            Holder<ConfiguredFeature<?, ?>> holder
+            Holder<Feature> holder
     );
 
     /**
@@ -60,13 +60,14 @@ public interface PlacedFeatureKey extends BasePlacedFeatureKey<PlacedFeatureKey>
      * to add it to the registry.
      *
      * @param bootstrapContext The {@link BootstrapContext} to use
-     * @param key              The {@link ConfiguredFeature} to place. Will use the passed bootstrapContext
-     *                         to get the holder from the {@link ConfiguredFeatureKey}.
+     * @param key              The {@link Feature} to place. Will use the passed bootstrapContext
+     *                         to get the holder from the {@link FeatureKey}.
+     * @param <B>              The type of the {@link FeatureConfigurator} the key can build
      * @return A {@link FeaturePlacementBuilder} to setup the placement Modifiers
      */
-    public <B extends FeatureConfigurator<?, ?>> FeaturePlacementBuilder place(
+    public <B extends FeatureConfigurator> FeaturePlacementBuilder place(
             @NotNull BootstrapContext<PlacedFeature> bootstrapContext,
-            ConfiguredFeatureKey<B> key
+            FeatureKey<B> key
     );
 
     /**
@@ -78,8 +79,8 @@ public interface PlacedFeatureKey extends BasePlacedFeatureKey<PlacedFeatureKey>
      * When the Placement is done, you should call {@link FeaturePlacementBuilder#register()}
      *
      * @param bootstrapContext The {@link BootstrapContext} to use
-     * @return A {@link ConfiguredFeatureManager.InlineBuilder} start the
+     * @return A {@link FeatureContentManager.InlineBuilder} start the
      * configuration.
      */
-    ConfiguredFeatureManager.InlineBuilder inlineConfiguration(@NotNull BootstrapContext<PlacedFeature> bootstrapContext);
+    FeatureContentManager.InlineBuilder inlineConfiguration(@NotNull BootstrapContext<PlacedFeature> bootstrapContext);
 }

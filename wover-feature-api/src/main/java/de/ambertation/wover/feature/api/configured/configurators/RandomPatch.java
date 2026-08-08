@@ -2,18 +2,17 @@ package de.ambertation.wover.feature.api.configured.configurators;
 
 import de.ambertation.wover.feature.api.placed.BasePlacedFeatureKey;
 import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
-import de.ambertation.wover.feature.impl.random.RandomPatchConfiguration;
-import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
 
 import net.minecraft.core.Holder;
+import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 /**
  * Places a given Feature multiple times in a randomized patch ({@link RandomPatchFeature}).
  * <p>
  * You can set a {@link PlacedFeature} that is randomly placed in the patch.
- * <p>
- * deprecated: Vanilla removed the {@code random_patch} configured-feature type in Minecraft 26.1.
+ *
+ * @deprecated Vanilla removed the {@code random_patch} configured-feature type in Minecraft 26.1.
  * WorldWeaver still ships a compatible {@code wover:random_patch} shim so existing data keeps working,
  * and this API remains functional for this release, but it is scheduled for removal. Use
  * {@link de.ambertation.wover.feature.api.placed.FeaturePlacementBuilder#scatter(int, int, int, net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate)
@@ -24,8 +23,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
  * {@code tries}) + {@code RandomOffsetPlacement.of(xz, y)} (former {@code xz_spread}/{@code y_spread}) + an
  * optional {@code BlockPredicateFilter} + {@code BiomeFilter} — rather than a configured {@code random_patch}.
  */
-//TODO: @Deprecated(since = "26.1.0", forRemoval = true)
-public interface RandomPatch extends FeatureConfigurator<RandomPatchConfiguration, RandomPatchFeature>, BasePatch<RandomPatchConfiguration, RandomPatchFeature, RandomPatch> {
+@Deprecated(since = "26.1.0", forRemoval = true)
+public interface RandomPatch extends FeatureConfigurator, BasePatch<RandomPatch> {
 
 
     /**

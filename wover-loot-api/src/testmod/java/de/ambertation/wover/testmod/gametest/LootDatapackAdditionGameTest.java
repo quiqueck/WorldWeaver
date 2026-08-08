@@ -5,6 +5,7 @@ import de.ambertation.wover.loot.api.LootAdditionFile;
 import de.ambertation.wover.loot.api.LootAdditionOp;
 import de.ambertation.wover.loot.impl.LootAdditionsImpl;
 import de.ambertation.wover.loot.impl.LootTableAppendersImpl;
+import de.ambertation.wover.loot.mixin.LootPoolAccessor;
 import de.ambertation.wover.loot.mixin.LootTableAccessor;
 
 import net.minecraft.core.BlockPos;
@@ -35,6 +36,7 @@ import com.mojang.serialization.JsonOps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
@@ -72,9 +74,9 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
  *     jungle_temple one. If a missing optional target aborted its file, the positive arm loses its marker.</li>
  *     <li><b>Idempotency</b> ({@link #datapackAdditionsSurviveReapplication}): the whole application is driven
  *     twice more over the live registry and nothing may move - pool count, the encoded entries of every pool,
- *     and the encoded <em>conditions</em> of every pool. The last one is the point: a behaviour-only check
- *     cannot tell a correctly re-derived restriction apart from one that keeps re-appending the same condition
- *     to a growing list on every pass but still evaluates the same way today.</li>
+ *     and the encoded <em>condition</em> of every pool. The last one is the point: a behaviour-only check
+ *     cannot tell a correctly re-derived restriction apart from one that is re-wrapped in another
+ *     {@code AllOfCondition} on every pass but still evaluates the same way today.</li>
  *     <li><b>Merge semantics</b> ({@link #replaceAndAppendMergeLikeVanillaTags}): the pure merge step, over
  *     hand-built files, because "two packs ship the same file id" cannot be staged from a single mod jar.</li>
  * </ul>
@@ -376,9 +378,9 @@ public class LootDatapackAdditionGameTest {
     }
 
     /**
-     * A full structural snapshot of the datapack-extended tables: for every pool, its encoded conditions and
+     * A full structural snapshot of the datapack-extended tables: for every pool, its encoded condition and
      * every one of its encoded entries. Encoding through the very codecs the datapack path decodes with is
-     * what makes "the restriction grew another entry but still evaluates the same" a failure rather than an
+     * what makes "the restriction grew another wrapper but still evaluates the same" a failure rather than an
      * invisible leak.
      */
     private static List<String> snapshot(LootTable... tables) {
@@ -387,12 +389,15 @@ public class LootDatapackAdditionGameTest {
             final List<LootPool> pools = pools(table);
             lines.add("pools=" + pools.size());
             for (LootPool pool : pools) {
-                lines.add("  conditions=" + LootItemCondition.DIRECT_CODEC
-                        .listOf()
-                        .encodeStart(JsonOps.INSTANCE, pool.conditions)
-                        .result()
-                        .map(Object::toString)
-                        .orElse("<encode failed>"));
+                final Optional<Holder<LootItemCondition>> condition =
+                        ((LootPoolAccessor) (Object) pool).wover_getCondition();
+                lines.add("  condition=" + condition
+                        .map(holder -> LootItemCondition.DIRECT_CODEC
+                                .encodeStart(JsonOps.INSTANCE, holder.value())
+                                .result()
+                                .map(Object::toString)
+                                .orElse("<encode failed>"))
+                        .orElse("<none>"));
                 for (LootPoolEntryContainer entry : pool.entries) {
                     lines.add("  entry=" + encode(entry));
                 }

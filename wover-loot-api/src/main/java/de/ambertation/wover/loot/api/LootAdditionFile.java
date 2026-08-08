@@ -16,13 +16,12 @@ import java.util.List;
  * The contents of one {@code data/<namespace>/wover/loot_addition/<name>.json} file.
  *
  * <h2>Why this exists</h2>
- * Fabric's own {@code fabric-loot-api-v3} ({@code LootTableEvents.MODIFY}) lets a mod add loot in Java, but
- * only in Java: there is no vanilla or Fabric route for a datapack to extend a table it doesn't own. Loot
- * tables are a reloadable registry where an entry is <em>replaced</em> wholesale, never merged - two packs
- * that both ship {@code minecraft:chests/bastion_treasure} do not combine, the higher one simply wins. This
- * file format is the additive layer on top: additions are collected from every pack and applied to the tables
- * while the registry is being rebuilt, just before vanilla validates it - the very same pass
- * {@link LootTableAppenders} runs its Java-registered appenders through.
+ * 26.3 loads loot tables as a datapack registry, where an entry is <em>replaced</em> wholesale and never
+ * merged: two packs that both ship {@code minecraft:chests/bastion_treasure} do not combine, the higher one
+ * simply wins. There is no vanilla route around that - vanilla ships no loot-table tags and no vanilla table
+ * uses {@code minecraft:loot_table} entries to compose. This file format is the additive layer on top:
+ * additions are collected from every pack and applied to the tables while the registry is being assembled,
+ * just before vanilla validates it.
  *
  * <h2>Merging - the same rules as a vanilla tag</h2>
  * A file is identified by its id, {@code <namespace>:<name>}, derived from its path exactly like a tag's is.

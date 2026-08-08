@@ -288,40 +288,6 @@ configure(allprojects.findAll { it.name != 'wunderlib' }) { projIt ->
             rename { "${it}-${project.base.archivesName.get()}" }
         }
     }
-
-}
-
-// Loom's genSources rewrites the Minecraft *classes* jar in place after decompiling, to bake in
-// line numbers matching the generated sources (GenerateSourcesTask.getClassesOutputJar(); the
-// .jar.backup files in the Loom cache are the pre-rewrite originals). That same jar is a declared
-// input of every project's validateAccessWidener (ValidateAccessWidenerTask.getTargetJars()).
-// Every project in the build shares one Loom cache, so one project's genSources and another
-// project's validateAccessWidener touch the identical file with no ordering between them - which
-// Gradle 9 rejects outright ("uses this output of task ... without declaring a dependency"), and
-// which org.gradle.parallel=true makes a real race rather than a theoretical one.
-//
-// Loom already orders these *within* a project, via genSourcesWithVineflower dependsOn
-// validateAccessWidener - validate the widener before decompiling with it applied. So extend
-// exactly that direction across the whole build: every validation runs before any decompile. The
-// reverse (validate mustRunAfter gen, which is what Gradle's own error message suggests) would
-// invert Loom's dependsOn and deadlock the graph with a circular dependency. Gradle's
-// missing-dependency check is satisfied by an ordering constraint either way round.
-//
-// Scoped to rootProject.allprojects rather than to the WorldWeaver subtree, because the Loom
-// cache that is actually shared belongs to the root project: built standalone that is just
-// WorldWeaver and this configures only itself, but composited into a mod (BetterEnd, BetterNether,
-// ...) the root and its other libraries write that same jar and would otherwise stay unordered
-// against these validations. Ordering only - this never pulls genSources into a build that did
-// not ask for it. mustRunAfter takes a closure so the sibling tasks are realized when the task
-// graph is assembled, not while projects are still being configured.
-rootProject.allprojects { producerProject ->
-    producerProject.tasks.matching { it.name.startsWith('genSources') }.configureEach { genTask ->
-        genTask.mustRunAfter({
-            rootProject.allprojects.collectMany { consumer ->
-                consumer.tasks.matching { it.name == 'validateAccessWidener' }.toList()
-            }
-        })
-    }
 }
 
 allprojects.findAll { it.name != 'wunderlib' }.each { p ->
@@ -412,8 +378,20 @@ dependencies {
 
         include project("${it.path}")
     }
-    compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
-    localRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+    // Optional-integration mods are published against older Minecraft versions than we target, so each of
+    // them drags in an older fabric-api. Loom applies the class tweakers of every mod on the classpath to
+    // the Minecraft jar, and an older fabric-api's tweakers reference signatures that no longer exist
+    // (e.g. the 26.1 datagen module injects FabricTagAppender<E,T> into what is now TagAppender<T>, failing
+    // the build with "Failed to setup Minecraft"). We declare the matching fabric-api ourselves above, so
+    // strip theirs.
+    def noFabricApi = { exclude group: "net.fabricmc.fabric-api" }
+
+    // REI, WTHIT and EMI are not wired up in WorldWeaver at all (no compile- or runtime-side integration
+    // exists in this repo), and none of them has a 26.3-compatible build yet - REI tops out at 26.2 and
+    // hard-depends on `minecraft ~26.2`, WTHIT at 26.1. Nothing to disable here; if integration is ever
+    // added, gate it the same way and only re-enable once they ship 26.3 builds.
+    compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}", noFabricApi)
+    localRuntime("com.terraformersmc:modmenu:${project.modmenu_version}", noFabricApi)
 
     gradle.modApiOrLocal(dependencies, ':wunderlib', "de.ambertation:wunderlib:${project.wunderlib_version}")
 }

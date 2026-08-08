@@ -72,6 +72,8 @@ library at a time (in the dependency order of `Notes.md`) without porting the wh
 | `wover-biome-api` | `BiomeGameTest` | GameTest | Biome + custom BiomeData registry + biome-modifications (datapack + injected) |
 | `wover-generator-api` | `GeneratorGameTest` | GameTest | World-presets/noise (datapack) + chunk-generator/biome-source codecs |
 | `wover-pottable-api` | `PottableGameTest` | GameTest | pottable_plant / pottable_soil datapack registries resolve at runtime |
+| `wover-loot-api` | `LootAppenderGameTest`, `LootContainerGameTest` | GameTest | Appenders land on vanilla tables exactly once; re-applying them does not stack. A real chest filling from an extended vanilla table yields the appended item once per fill; a chest on an untouched table never does |
+| `wover-loot-api` | `LootDatapackAdditionGameTest` | GameTest | A `data/*/wover/loot_addition/*.json` addition reaches a real container exactly once and survives re-application (pools, entries **and** encoded pool conditions compared structurally). Negative controls: a table no file names stays clean, and a file behind an unmet `fabric:load_conditions` never applies. Also covers `required: false` on a missing target, and the `replace`/append merge rules |
 | Datagen, ~11 modules | `tools/verify-datagen.sh` | Golden-file | Regenerated datagen matches committed output (no drift, no new files) |
 
 Every GameTest that checks datapack-loaded entries also includes a negative case (a plausible-but-absent

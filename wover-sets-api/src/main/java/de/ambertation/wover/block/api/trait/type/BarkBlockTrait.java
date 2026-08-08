@@ -6,8 +6,10 @@ import de.ambertation.wover.block.api.trait.behaviour.StripableBlockTrait;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 import java.util.List;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -36,9 +38,20 @@ public interface BarkBlockTrait extends GenericBlockTrait {
         @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockState strippedBlockState);
 
         /**
-         * @param strippedBlockState computes the state bark strips to, or {@code null} for non-strippable bark
+         * @param strippedBlockState produces the state bark strips to, or {@code null} for non-strippable bark
          * @return the combined trait list, or {@code null} if the trait was already added
          */
-        @Nullable List<BlockTrait<?, ?>> with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlockState);
+        @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockStateProvider strippedBlockState);
+
+        /**
+         * Deferred variant of {@link #with(BlockStateProvider)}, for the usual case where the stripped bark is
+         * registered in the same pass as this bark and therefore does not exist yet. See
+         * {@link StripableBlockTrait.Builder#withDeferred}.
+         *
+         * @param strippedBlockState supplies the provider producing the stripped state, or {@code null} for
+         *                           non-strippable bark
+         * @return the combined trait list, or {@code null} if the trait was already added
+         */
+        @Nullable List<BlockTrait<?, ?>> withDeferred(@Nullable Supplier<BlockStateProvider> strippedBlockState);
     }
 }

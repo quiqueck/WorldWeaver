@@ -16,7 +16,8 @@ import org.jetbrains.annotations.Nullable;
  * Base interface for keys that reference a {@link PlacedFeature}.
  * <p>
  * This is shared by {@link PlacedFeatureKey} (which can start a fresh {@link FeaturePlacementBuilder}) and
- * {@link PlacedConfiguredFeatureKey} (which places a specific, already known {@link net.minecraft.world.level.levelgen.feature.ConfiguredFeature}) and
+ * {@link BoundPlacedFeatureKey} (which places a specific, already known
+ * {@link net.minecraft.world.level.levelgen.feature.Feature}) and
  * exposes the parts common to both: resolving the {@link Holder}, and getting/setting the
  * {@link GenerationStep.Decoration} the feature is placed in.
  *

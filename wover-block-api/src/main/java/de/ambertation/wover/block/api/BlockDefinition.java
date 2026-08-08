@@ -1,10 +1,12 @@
 package de.ambertation.wover.block.api;
 
 import de.ambertation.wover.block.api.trait.*;
+import de.ambertation.wover.block.api.trait.behaviour.FuelBlockTrait;
 import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.item.api.BlockItemDefinition;
 import de.ambertation.wover.item.api.VanillaBlockItemDefinition;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -370,6 +372,17 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
         var blockitemDefinition = this.getBlockItemDefinition(block);
         if (blockitemDefinition != null) {
             blockitemDefinition.addTags(itemTags);
+            // FuelBlockTrait can't register itself at afterBlockRegistration time any more: 26.3 moved
+            // furnace fuel from a post-registration Fabric event to the minecraft:cooking_fuel item
+            // component, which has to be set on Item.Properties before the BlockItem is built.
+            BlockTrait.runtimeTraits(block)
+                      .filter(FuelBlockTrait.class::isInstance)
+                      .map(FuelBlockTrait.class::cast)
+                      .findFirst()
+                      .ifPresent(fuel -> blockitemDefinition.component(
+                              DataComponents.COOKING_FUEL,
+                              fuel.asCookingFuelComponent()
+                      ));
             this.blockItem = blockitemDefinition.buildAndRegister();
         } else {
             this.blockItem = null;
@@ -990,7 +1003,7 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
     /**
      * Sets a predicate to determine if this block should use emissive rendering.
      * <p>
-     * 26.2 narrowed {@code BlockBehaviour.Properties#emissiveRendering} from a
+     * 26.3 narrowed {@code BlockBehaviour.Properties#emissiveRendering} from a
      * {@link BlockBehaviour.StatePredicate} (which received the level and position alongside the state) to a
      * plain {@link Predicate} over the {@link BlockState}: emissive rendering is resolved purely from the state
      * now, and {@code BlockState#emissiveRendering()} no longer takes a level or a position at all. The

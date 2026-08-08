@@ -8,10 +8,13 @@ import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.predicates.DataComponentPredicates;
 import net.minecraft.core.component.predicates.EnchantmentsPredicate;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
@@ -32,7 +35,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer;
+import net.minecraft.world.level.storage.loot.entries.UniformContainerBase;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.*;
@@ -41,6 +44,7 @@ import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
 import java.util.List;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -49,6 +53,21 @@ import org.jetbrains.annotations.Nullable;
  * of higher-level {@code drop...(...)} helpers that mirror the private helper methods vanilla's own loot
  * table providers use internally (silk touch dispatch, ore drops, leaves drops, plant/crop drops,
  * composters, ...).
+ *
+ * <h2>26.3 migration notes</h2>
+ * Two vanilla changes reach through this whole class:
+ * <ul>
+ *     <li><b>Number providers became a datapack registry</b> ({@code minecraft:number_provider}). Every place
+ *     vanilla used to take a {@link NumberProvider} now takes a {@code Holder<NumberProvider>}, and the
+ *     factories that produce them ({@link ConstantValue#exactly(float)},
+ *     {@link UniformGenerator#between(float, float)}) return the holder directly. The {@code drop...(...)}
+ *     helpers below follow vanilla rather than unwrapping, so their signatures changed accordingly - callers
+ *     that already build their counts with {@code ConstantValue.exactly(...)} / {@code UniformGenerator.between(...)}
+ *     need no change at all.</li>
+ *     <li><b>Loot conditions became a reloadable registry</b> too, and vanilla moved its silk-touch/shears
+ *     conditions into it as {@code minecraft:tool/can_silk_touch} and {@code minecraft:tool/can_shear}. See
+ *     {@link WoverVanillaBlockLoot} for why we cannot let vanilla resolve them during datagen.</li>
+ * </ul>
  */
 public class LootLookupProvider {
     /**
@@ -72,7 +91,10 @@ public class LootLookupProvider {
      * @return The silk touch condition
      */
     public LootItemCondition.Builder hasSilkTouch() {
-        return vanillaBlockLoot.hasSilkTouch();
+        // Identical to silkTouchCondition() since 26.3 - see WoverVanillaBlockLoot for why we no longer
+        // delegate to VanillaBlockLoot#hasSilkTouch() (which now resolves a registry entry that is empty
+        // during datagen) and build the very same condition inline instead.
+        return silkTouchCondition();
     }
 
     /**
@@ -82,7 +104,7 @@ public class LootLookupProvider {
      * @param item           The item to drop
      * @param numberProvider The number of items to drop
      */
-    public record DropInfo(ItemLike item, NumberProvider numberProvider) {
+    public record DropInfo(ItemLike item, Holder<NumberProvider> numberProvider) {
         /**
          * Creates a drop with a fixed item count.
          *
@@ -110,9 +132,10 @@ public class LootLookupProvider {
      * @param provider The registry lookup provider, usually the one passed to the surrounding datagen callback
      */
     public LootLookupProvider(HolderLookup.Provider provider) {
-        this.vanillaBlockLoot = new VanillaBlockLoot(provider);
         this.provider = provider;
         this.enchantmentLookup = provider.lookupOrThrow(Registries.ENCHANTMENT);
+        // Must come last: WoverVanillaBlockLoot's overrides read the fields above.
+        this.vanillaBlockLoot = new WoverVanillaBlockLoot(new LookupContext(provider));
     }
 
     /**
@@ -122,6 +145,95 @@ public class LootLookupProvider {
      */
     public HolderLookup.RegistryLookup<Item> itemLookup() {
         return provider.lookupOrThrow(Registries.ITEM);
+    }
+
+    /**
+     * Gets the lookup for the block registry.
+     * <p>
+     * 26.3 replaced {@code LootItemBlockStatePropertyCondition} with {@link MatchBlock}, which builds an
+     * {@code advancements} {@code BlockPredicate} and therefore needs a block lookup to resolve the block into
+     * a {@code HolderSet}. Exposed for the same reason {@link #itemLookup()} is.
+     *
+     * @return The block registry lookup
+     */
+    public HolderLookup.RegistryLookup<Block> blockLookup() {
+        return provider.lookupOrThrow(Registries.BLOCK);
+    }
+
+    /**
+     * Adapts a plain {@link HolderLookup.Provider} to the {@link LootTableSubProvider.Context} that 26.3's
+     * {@code BlockLootSubProvider} constructor now takes in place of the provider itself.
+     * <p>
+     * Loot tables became a datapack registry in 26.3, so {@code LootTableSubProvider} is written against a
+     * bootstrap-style context: a {@link net.minecraft.data.worldgen.BootstrapContextAccess} (registry lookups
+     * plus the new {@code listContextElements}) extended with {@code accept(key, builder)} for emitting tables.
+     * We only ever use the sub-provider's {@code create...} / {@code apply...} table <em>builders</em>; the
+     * tables themselves are collected and written by {@code WoverLootTableProvider}, which predates this and
+     * still speaks {@code BiConsumer<ResourceKey<LootTable>, LootTable.Builder>}. So {@code accept} is
+     * deliberately unimplementable here rather than silently swallowing a table: reaching it would mean a
+     * caller used a vanilla {@code dropSelf}/{@code add}-style method that registers instead of returning, and
+     * that table would otherwise disappear without a trace.
+     *
+     * @param provider The registry lookup provider backing every {@code lookup(...)} call
+     */
+    private record LookupContext(HolderLookup.Provider provider) implements LootTableSubProvider.Context {
+        @Override
+        public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> registryKey) {
+            return provider.lookupOrThrow(registryKey);
+        }
+
+        @SuppressWarnings("deprecation") // deprecated in vanilla but still abstract, so it must be implemented
+        @Override
+        public <S> Stream<Holder.Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> registryKey) {
+            return provider.lookupOrThrow(registryKey).listElements();
+        }
+
+        @Override
+        public Holder.Reference<LootTable> accept(ResourceKey<LootTable> key, LootTable.Builder builder) {
+            throw new UnsupportedOperationException(
+                    "LootLookupProvider only uses VanillaBlockLoot as a builder factory; it cannot register the "
+                            + "loot table " + key.identifier() + ". Return the LootTable.Builder to the "
+                            + "WoverLootTableProvider callback instead of using a vanilla dropXXX(...) method."
+            );
+        }
+    }
+
+    /**
+     * {@link VanillaBlockLoot} with its two condition accessors rebuilt inline.
+     * <p>
+     * 26.3 moved vanilla's silk-touch and shears loot conditions into the reloadable
+     * {@code minecraft:predicate} registry ({@code minecraft:tool/can_silk_touch} and
+     * {@code minecraft:tool/can_shear}), so {@code BlockLootSubProvider#hasSilkTouch()}/{@code #hasShears()}
+     * now return a {@code Holder<LootItemCondition>} they resolve through that registry. Fabric's data
+     * generator builds every reloadable registry <em>empty</em> (see
+     * {@code FabricDataGenHelper#createReloadableLookupProvider}), so those lookups throw during datagen.
+     * <p>
+     * Both methods are re-implemented here with the exact same content vanilla's {@code LootPredicates#bootstrap}
+     * registers - a {@code match_tool} on silk touch level >= 1, and a {@code match_tool} on
+     * {@link Items#SHEARS} - wrapped in a direct holder. A direct holder is serialized inline by the
+     * {@code Holder<LootItemCondition>} codec, so the generated JSON keeps the shape it had in 26.1 instead of
+     * gaining a reference to a registry entry, and every inherited {@code create...DispatchTable} helper keeps
+     * working unchanged (they all reach these two through virtual dispatch). Same fix as wunderreich's
+     * {@code LootTableHelper}.
+     */
+    private class WoverVanillaBlockLoot extends VanillaBlockLoot {
+        private WoverVanillaBlockLoot(LootTableSubProvider.Context context) {
+            super(context);
+        }
+
+        @Override
+        public Holder<LootItemCondition> hasSilkTouch() {
+            return Holder.direct(silkTouchCondition().build());
+        }
+
+        @Override
+        public Holder<LootItemCondition> hasShears() {
+            // Vanilla matches the SHEARS item itself here, not the c:shears tag - LootLookupProvider's own
+            // public shearsCondition() intentionally uses the broader tag, so the two must not be conflated.
+            return Holder.direct(
+                    MatchTool.toolMatches(ItemPredicate.Builder.item().of(itemLookup(), Items.SHEARS)).build()
+            );
+        }
     }
 
     /**
@@ -283,7 +395,7 @@ public class LootLookupProvider {
      */
     public LootTable.Builder dropWithSilkTouchOrHoeOrShears(
             ItemLike withSilkTouch,
-            NumberProvider rolls
+            Holder<NumberProvider> rolls
     ) {
         return LootTable
                 .lootTable()
@@ -326,7 +438,7 @@ public class LootLookupProvider {
     public LootTable.Builder dropWithSilkTouch(
             Block withSilkTouch,
             ItemLike withoutSilkTouch,
-            NumberProvider numberProvider
+            Holder<NumberProvider> numberProvider
     ) {
         return vanillaBlockLoot.createSingleItemTableWithSilkTouch(withSilkTouch, withoutSilkTouch, numberProvider);
     }
@@ -347,13 +459,16 @@ public class LootLookupProvider {
 
         var mainBuilder = LootTable.lootTable();
         for (DropInfo dropInfo : withoutSilkTouch) {
-            LootPoolSingletonContainer.Builder<? extends LootPoolSingletonContainer.Builder<?>> item = LootItem
+            // 26.3 renamed LootPoolSingletonContainer to UniformContainerBase (the "uniform" refers to the
+            // weight/quality fields every single-entry container shares); LootItem.lootTableItem still returns
+            // its Builder.
+            UniformContainerBase.Builder<? extends UniformContainerBase.Builder<?>> item = LootItem
                     .lootTableItem(dropInfo.item)
                     .apply(SetItemCountFunction.setCount(dropInfo.numberProvider));
             createSelfDropDispatchTable(
                     mainBuilder,
                     withSilkTouch,
-                    vanillaBlockLoot.hasSilkTouch(),
+                    hasSilkTouch(),
                     vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)
             );
         }
@@ -424,7 +539,7 @@ public class LootLookupProvider {
      * @param numberProvider The base number of items to drop before the fortune bonus
      * @return The loot table builder
      */
-    public LootTable.Builder dropOre(Block oreBlock, Item ore, NumberProvider numberProvider) {
+    public LootTable.Builder dropOre(Block oreBlock, Item ore, Holder<NumberProvider> numberProvider) {
         return vanillaBlockLoot.createSilkTouchDispatchTable(
                 oreBlock,
                 vanillaBlockLoot.applyExplosionDecay(
@@ -481,7 +596,7 @@ public class LootLookupProvider {
     public <T extends Comparable<T> & StringRepresentable> LootTable.Builder dropWithSilkTouchAndCondition(
             Block withSilkTouch,
             ItemLike withoutSilkTouch,
-            NumberProvider numberProvider,
+            Holder<NumberProvider> numberProvider,
             Property<T> property,
             T comparable
     ) {
@@ -490,12 +605,7 @@ public class LootLookupProvider {
                 vanillaBlockLoot.applyExplosionCondition(
                         withSilkTouch,
                         LootItem.lootTableItem(withoutSilkTouch)
-                                .when(LootItemBlockStatePropertyCondition
-                                        .hasBlockStateProperties(withSilkTouch)
-                                        .setProperties(net.minecraft.advancements.predicates.StatePropertiesPredicate.Builder
-                                                .properties()
-                                                .hasProperty(property, comparable))
-                                )
+                                .when(hasBlockStateProperties(withSilkTouch, property, comparable))
                                 .apply(SetItemCountFunction.setCount(numberProvider))
                 )
         );
@@ -519,16 +629,60 @@ public class LootLookupProvider {
         return LootTable.lootTable().withPool(
                 LootPool
                         .lootPool()
-                        .when(vanillaBlockLoot.hasSilkTouch())
+                        .when(hasSilkTouch())
                         .setRolls(ConstantValue.exactly(1.0F))
                         .add(LootItem.lootTableItem(withSilkTouch)
-                                     .when(LootItemBlockStatePropertyCondition
-                                             .hasBlockStateProperties(withSilkTouch)
-                                             .setProperties(net.minecraft.advancements.predicates.StatePropertiesPredicate.Builder
-                                                     .properties()
-                                                     .hasProperty(property, comparable))
-                                     )
+                                     .when(hasBlockStateProperties(withSilkTouch, property, comparable))
                         )
+        );
+    }
+
+    /**
+     * Builds the "this block is in state {@code property=comparable}" loot condition.
+     * <p>
+     * 26.3 removed {@code LootItemBlockStatePropertyCondition} and folded block matching into
+     * {@link MatchBlock}, which wraps an {@code advancements} {@code BlockPredicate} - hence the block lookup.
+     * The condition is semantically the same but serializes differently: it is now
+     * {@code {"type": "minecraft:match_block", "blocks": <holder set>, "state": {...}}} instead of
+     * {@code {"condition": "minecraft:block_state_property", "block": <id>, "properties": {...}}}. That
+     * rewrite is visible in the regenerated loot tables and is expected.
+     *
+     * @param block      The block whose state is checked
+     * @param property   The block state property to check
+     * @param comparable The required value of the property
+     * @param <T>        The property's value type
+     * @return The condition builder
+     */
+    private <T extends Comparable<T> & StringRepresentable> LootItemCondition.Builder hasBlockStateProperties(
+            Block block,
+            Property<T> property,
+            T comparable
+    ) {
+        return MatchBlock.blockMatches(
+                blockLookup(),
+                block,
+                StatePropertiesPredicate.Builder.properties().hasProperty(property, comparable)
+        );
+    }
+
+    /**
+     * {@link #hasBlockStateProperties(Block, Property, Object)} for an integer-valued property, which is not
+     * {@link StringRepresentable} and therefore does not fit the generic overload.
+     *
+     * @param block      The block whose state is checked
+     * @param property   The integer block state property to check
+     * @param comparable The required value of the property
+     * @return The condition builder
+     */
+    private LootItemCondition.Builder hasBlockStateProperties(
+            Block block,
+            IntegerProperty property,
+            int comparable
+    ) {
+        return MatchBlock.blockMatches(
+                blockLookup(),
+                block,
+                StatePropertiesPredicate.Builder.properties().hasProperty(property, comparable)
         );
     }
 
@@ -559,7 +713,7 @@ public class LootLookupProvider {
             Block plantBlock,
             ItemLike sapling,
             float saplingChance,
-            NumberProvider saplingCount,
+            Holder<NumberProvider> saplingCount,
             int fortuneBonus
     ) {
         return vanillaBlockLoot.createShearsDispatchTable(
@@ -660,17 +814,15 @@ public class LootLookupProvider {
     public <T extends Comparable<T> & StringRepresentable> LootTable.Builder dropPlant(
             Block plantBlock,
             ItemLike fruit,
-            NumberProvider fruitCount,
+            Holder<NumberProvider> fruitCount,
             ItemLike seed,
-            NumberProvider seedCount,
+            Holder<NumberProvider> seedCount,
             float probability,
             int extraRounds,
             Property<T> property,
             T comparable
     ) {
-        LootItemCondition.Builder condition = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(plantBlock)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(property, comparable));
+        LootItemCondition.Builder condition = hasBlockStateProperties(plantBlock, property, comparable);
         return dropPlant(plantBlock, fruit, fruitCount, seed, seedCount, probability, extraRounds, condition);
     }
 
@@ -692,17 +844,15 @@ public class LootLookupProvider {
     public LootTable.Builder dropPlant(
             Block plantBlock,
             ItemLike fruit,
-            NumberProvider fruitCount,
+            Holder<NumberProvider> fruitCount,
             ItemLike seed,
-            NumberProvider seedCount,
+            Holder<NumberProvider> seedCount,
             float probability,
             int extraRounds,
             IntegerProperty property,
             int comparable
     ) {
-        LootItemCondition.Builder condition = LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(plantBlock)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(property, comparable));
+        LootItemCondition.Builder condition = hasBlockStateProperties(plantBlock, property, comparable);
         return dropPlant(plantBlock, fruit, fruitCount, seed, seedCount, probability, extraRounds, condition);
     }
 
@@ -725,9 +875,9 @@ public class LootLookupProvider {
     public LootTable.Builder dropPlant(
             Block plantBlock,
             ItemLike fruit,
-            NumberProvider fruitCount,
+            Holder<NumberProvider> fruitCount,
             ItemLike seed,
-            NumberProvider seedCount,
+            Holder<NumberProvider> seedCount,
             float probability,
             int extraRounds,
             LootItemCondition.Builder condition
@@ -822,7 +972,7 @@ public class LootLookupProvider {
             Block leaveBlock,
             ItemLike saplingBlock,
             @Nullable ItemLike stickBlock,
-            @Nullable NumberProvider stickCount,
+            @Nullable Holder<NumberProvider> stickCount,
             int fortuneRate,
             int dropRate
     ) {
@@ -951,16 +1101,7 @@ public class LootLookupProvider {
                 .withPool(
                         LootPool.lootPool()
                                 .add(LootItem.lootTableItem(Items.BONE_MEAL))
-                                .when(
-                                        LootItemBlockStatePropertyCondition
-                                                .hasBlockStateProperties(compsterBlock)
-                                                .setProperties(
-                                                        StatePropertiesPredicate
-                                                                .Builder.
-                                                                properties()
-                                                                .hasProperty(ComposterBlock.LEVEL, 8)
-                                                )
-                                )
+                                .when(hasBlockStateProperties(compsterBlock, ComposterBlock.LEVEL, 8))
                 );
     }
 }

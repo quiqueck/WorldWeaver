@@ -3,13 +3,12 @@ package de.ambertation.wover.feature.api.configured.configurators;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.OreFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
 /**
  * Places an ore ({@link OreFeature}).
  */
-public interface AsOre extends FeatureConfigurator<OreConfiguration, OreFeature> {
+public interface AsOre extends FeatureConfigurator {
     /**
      * Defines that an ore block should be placed in a surrounding block.
      *

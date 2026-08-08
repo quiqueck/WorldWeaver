@@ -30,7 +30,7 @@ import java.util.List;
  * The Builder is obtained from a {@link PlacedFeatureKey} using
  * the various place methods. Or you can generate it from a
  * {@link de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator}
- * for any {@link net.minecraft.world.level.levelgen.feature.ConfiguredFeature} by calling
+ * for any {@link net.minecraft.world.level.levelgen.feature.Feature} by calling
  * {@link FeatureConfigurator#inlinePlace()}.
  * <p>
  * Feature placement is a pipeline starting at a single input position randomly selected by
@@ -43,8 +43,8 @@ import java.util.List;
  *
  * @see PlacedFeatureKey#place(BootstrapContext, Holder)
  * @see PlacedFeatureKey#place(BootstrapContext, ResourceKey)
- * @see PlacedConfiguredFeatureKey#place(BootstrapContext)
- * @see PlacedConfiguredFeatureKey#place(BootstrapContext, HolderGetter)
+ * @see BoundPlacedFeatureKey#place(BootstrapContext)
+ * @see BoundPlacedFeatureKey#place(BootstrapContext, HolderGetter)
  * @see FeatureConfigurator#inlinePlace()
  */
 public interface FeaturePlacementBuilder {
@@ -849,7 +849,7 @@ public interface FeaturePlacementBuilder {
      */
     FeaturePlacementBuilder modifier(List<PlacementModifier> modifiers);
     /**
-     * Scatters the {@link net.minecraft.world.level.levelgen.feature.ConfiguredFeature} backing this placed
+     * Scatters the {@link net.minecraft.world.level.levelgen.feature.Feature} backing this placed
      * feature across an area. This is the placement-modifier replacement for the {@code random_patch}
      * configured feature that vanilla removed in Minecraft 26.1, and is the non-deprecated successor to
      * {@link #inRandomPatch()} / {@link RandomPatch}.
@@ -860,7 +860,7 @@ public interface FeaturePlacementBuilder {
      * <ol>
      *   <li>{@link net.minecraft.world.level.levelgen.placement.CountPlacement}{@code .of(tries)} — repeats
      *       the input position {@code tries} times (former {@code tries}).</li>
-     *   <li>{@link net.minecraft.world.level.levelgen.placement.RandomOffsetPlacement}{@code .of(xz, y)} —
+     *   <li>{@link net.minecraft.world.level.levelgen.placement.OffsetPlacement}{@code .of(xz, y)} —
      *       offsets each repetition by a {@link net.minecraft.util.valueproviders.TrapezoidInt} in
      *       ±{@code xzSpread} horizontally and ±{@code ySpread} vertically (former {@code xz_spread}/
      *       {@code y_spread}); vanilla now uses a trapezoid distribution here.</li>
@@ -893,19 +893,19 @@ public interface FeaturePlacementBuilder {
     FeaturePlacementBuilder scatter(int tries, int xzSpread, int ySpread, BlockPredicate filter);
 
     /**
-     * Start a new RandomPatch {@link net.minecraft.world.level.levelgen.feature.ConfiguredFeature}
+     * Start a new RandomPatch {@link net.minecraft.world.level.levelgen.feature.Feature}
      * based on this PlacedFeature.
      *
      * @return a new RandomPatch builder
-     * deprecated: Vanilla removed the {@code random_patch} configured-feature type in Minecraft 26.1. Scatter
+     * @deprecated Vanilla removed the {@code random_patch} configured-feature type in Minecraft 26.1. Scatter
      * this placed feature with <b>placement modifiers</b> instead by calling
      * {@link #scatter(int, int, int)} / {@link #scatter(int, int, int, BlockPredicate)} — which emit
-     * {@code CountPlacement.of(tries)} + {@code RandomOffsetPlacement.of(xz, y)} + an optional
+     * {@code CountPlacement.of(tries)} + {@code OffsetPlacement.of(xz, y)} + an optional
      * {@code BlockPredicateFilter} + {@code BiomeFilter} — rather than wrapping this placed feature in a
      * configured {@code random_patch}. The {@code wover:random_patch} compat shim keeps this method functional
      * until removal. See {@link RandomPatch}.
      */
-    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
+    @Deprecated(since = "26.1.0", forRemoval = true)
     RandomPatch inRandomPatch();
     /**
      * Register this PlacedFeature with the {@link BootstrapContext} and {@link ResourceKey} used to create

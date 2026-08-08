@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * A unique, interned identifier for an {@link ItemTrait}/{@link RuntimeItemTrait} kind.
  *
- * <p>Trait keys are identified by a namespace/path pair (similar to a {@link net.minecraft.resources.ResourceLocation})
+ * <p>Trait keys are identified by a namespace/path pair (similar to a {@link net.minecraft.resources.Identifier})
  * and are interned per mod namespace + path combination: calling {@link #of(ModCore, String)} twice with the same
  * arguments returns the same instance. This allows traits to be compared cheaply and consistently, both for
  * checking whether an {@link de.ambertation.wover.item.api.ItemDefinition} already carries a trait

@@ -10,6 +10,7 @@ import de.ambertation.wover.testmod.entrypoint.TestModWoverStructure;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -101,8 +102,12 @@ public class StructureProvider extends WoverStructureProvider {
 
                 .startRule()
                 .startProcessor()
-                .inputPredicateRandom(Blocks.RED_GLAZED_TERRACOTTA, 0.33f)
-                .outputState(Blocks.RED_CONCRETE)
+                // 26.3 folded the 16 dyed variants of each block into a ColorCollection, so the flat
+                // Blocks.RED_* constants are gone. pick(DyeColor.RED) yields the very same blocks
+                // (minecraft:red_glazed_terracotta / minecraft:red_concrete), so the generated
+                // processor_list JSON is unchanged.
+                .inputPredicateRandom(Blocks.GLAZED_TERRACOTTA.pick(DyeColor.RED), 0.33f)
+                .outputState(Blocks.CONCRETE.pick(DyeColor.RED))
                 .endProcessor()
                 .endRule()
 

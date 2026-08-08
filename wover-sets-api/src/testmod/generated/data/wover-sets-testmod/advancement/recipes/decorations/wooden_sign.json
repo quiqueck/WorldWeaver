@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_sign"
+        "recipes": "wover-sets-testmod:wooden_sign"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

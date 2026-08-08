@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,10 +11,10 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import java.util.List;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Tests the {@link Biome} at the input position against a list of {@link Identifier}s.
@@ -23,7 +22,7 @@ import java.util.Optional;
  * The position is accepted if the biome at the input position matches (or, if {@code negate} is
  * {@code true}, does not match) one of the given biome ids.
  */
-public class InBiome extends PlacementFilter {
+public class InBiome implements PlacementFilter {
     /**
      * Codec for this placement modifier.
      */
@@ -110,7 +109,7 @@ public class InBiome extends PlacementFilter {
      * does not match) one of {@link #biomeIDs}
      */
     @Override
-    protected boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
+    public boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
         Holder<Biome> holder = ctx.getLevel().getBiome(pos);
         Optional<Identifier> biomeLocation = holder.unwrapKey().map(key -> key.identifier());
         if (biomeLocation.isPresent()) {
@@ -121,12 +120,13 @@ public class InBiome extends PlacementFilter {
     }
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return the type of this placement modifier
+     * @return the codec of this placement modifier
      */
     @Override
-    public PlacementModifierType<InBiome> type() {
-        return PlacementModifiersImpl.IN_BIOME;
+    public @NotNull MapCodec<InBiome> codec() {
+        return CODEC;
     }
 }

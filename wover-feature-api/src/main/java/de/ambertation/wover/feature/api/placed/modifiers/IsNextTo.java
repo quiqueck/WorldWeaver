@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,7 +11,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * in the xz plane (north, east, south, west) by blocks that match the given
  * predicate.
  */
-public class IsNextTo extends PlacementFilter {
+public class IsNextTo implements PlacementFilter {
     /**
      * Codec for this placement modifier.
      */
@@ -78,7 +76,7 @@ public class IsNextTo extends PlacementFilter {
      * @return True if the block at the given offset is surrounded by blocks
      */
     @Override
-    protected boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
+    public boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
         WorldGenLevel level = ctx.getLevel();
 
         pos = pos.offset(this.offset);
@@ -89,12 +87,13 @@ public class IsNextTo extends PlacementFilter {
     }
 
     /**
-     * Returns the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type of this placement modifier.
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.IS_NEXT_TO;
+    public @NotNull MapCodec<IsNextTo> codec() {
+        return CODEC;
     }
 }

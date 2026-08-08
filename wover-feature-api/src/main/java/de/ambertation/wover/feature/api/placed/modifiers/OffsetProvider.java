@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 import de.ambertation.wover.math.api.valueproviders.Vec3iProvider;
 
 import com.mojang.serialization.Codec;
@@ -10,15 +9,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Moves the input position by using a given offset provider.
  */
-public class OffsetProvider extends PlacementModifier {
+public class OffsetProvider implements PlacementModifier {
     /**
      * Codec for this placement modifier.
      */
@@ -48,24 +46,26 @@ public class OffsetProvider extends PlacementModifier {
      * @param placementContext The placement context.
      * @param randomSource     The random source.
      * @param blockPos         The input position.
-     * @return The stream of new positions.
+     * @param consumer         Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext placementContext,
             RandomSource randomSource,
-            BlockPos blockPos
+            BlockPos blockPos,
+            Consumer<BlockPos> consumer
     ) {
-        return Stream.of(blockPos.offset(offset.sample(randomSource)));
+        consumer.accept(blockPos.offset(offset.sample(randomSource)));
     }
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type.
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.OFFSET_PROVIDER;
+    public @NotNull MapCodec<OffsetProvider> codec() {
+        return CODEC;
     }
 }

@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_stairs"
+        "recipes": "wover-sets-testmod:wooden_stairs"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

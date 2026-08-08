@@ -1,6 +1,6 @@
 package de.ambertation.wover.feature.impl.features;
 
-import de.ambertation.wover.feature.api.features.config.TemplateFeatureConfig;
+import de.ambertation.wover.feature.api.features.TemplateFeature;
 import de.ambertation.wover.structure.api.StructureNBT;
 
 import com.mojang.serialization.Codec;
@@ -17,8 +17,8 @@ import net.minecraft.world.level.block.Rotation;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class FeatureTemplateImpl extends StructureNBT implements TemplateFeatureConfig.FeatureTemplate {
-    public static final Codec<TemplateFeatureConfig.FeatureTemplate> CODEC =
+public class FeatureTemplateImpl extends StructureNBT implements TemplateFeature.FeatureTemplate {
+    public static final Codec<TemplateFeature.FeatureTemplate> CODEC =
             RecordCodecBuilder.create((instance) ->
                     instance.group(
                                     Identifier.CODEC
@@ -39,18 +39,18 @@ public class FeatureTemplateImpl extends StructureNBT implements TemplateFeature
         this.offsetY = offsetY;
     }
 
-    // 26.1 registry loading is async + parallel - createTemplate() is reached from
-    // WithTemplatesImpl's ConfiguredFeatureKey.bootstrap(), which can run concurrently across
-    // worker threads for different configured_feature entries. A plain HashMap here would race.
+    // Registry loading is async + parallel - createTemplate() is reached from
+    // WithTemplatesImpl's FeatureKey.bootstrap(), which can run concurrently across
+    // worker threads for different feature entries. A plain HashMap here would race.
     private static final Map<String, FeatureTemplateImpl> READER_CACHE = new ConcurrentHashMap<>();
 
-    public static TemplateFeatureConfig.FeatureTemplate createTemplate(
+    public static TemplateFeature.FeatureTemplate createTemplate(
             Identifier location
     ) {
         return createTemplate(location, 0);
     }
 
-    public static TemplateFeatureConfig.FeatureTemplate createTemplate(
+    public static TemplateFeature.FeatureTemplate createTemplate(
             Identifier location,
             int offsetY
     ) {

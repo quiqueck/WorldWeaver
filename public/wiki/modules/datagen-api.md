@@ -111,7 +111,7 @@ you don't have to look up the `ResourceKey` yourself:
 | Class | Registry |
 |---|---|
 | [`WoverBiomeOnlyProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverBiomeOnlyProvider.java) | `Registries.BIOME` |
-| [`WoverConfiguredFeatureProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverConfiguredFeatureProvider.java) | `Registries.CONFIGURED_FEATURE` |
+| [`WoverFeatureContentProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverFeatureContentProvider.java) | `Registries.FEATURE` |
 | [`WoverPlacedFeatureProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverPlacedFeatureProvider.java) | `Registries.PLACED_FEATURE` |
 | [`WoverStructureProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverStructureProvider.java) | `Registries.STRUCTURE` |
 | [`WoverStructureSetProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/WoverStructureSetProvider.java) | `Registries.STRUCTURE_SET` |
@@ -123,7 +123,7 @@ provider for the same registry), and you implement `bootstrap(BootstrapContext<T
 
 ### Multi-registry providers
 
-Some content naturally spans several registries at once — a feature needs both a `ConfiguredFeature` and a
+Some content naturally spans several registries at once — a feature needs both a `Feature` and a
 `PlacedFeature`, for instance. Implement
 [`WoverMultiProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/WoverMultiProvider.java)
 (or extend the convenience base class
@@ -133,7 +133,7 @@ which already stores the `ModCore` and `providerId`) and register the individual
 [`de.ambertation.wover.datagen.api.provider.multi`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/multi)
 package includes
 [`WoverFeatureProvider`](../../../wover-datagen-api/src/main/java/de/ambertation/wover/datagen/api/provider/multi/WoverFeatureProvider.java)
-as a ready-made example that wires up matching `WoverConfiguredFeatureProvider`/`WoverPlacedFeatureProvider`
+as a ready-made example that wires up matching `WoverFeatureContentProvider`/`WoverPlacedFeatureProvider`
 pairs; `wover-biome-api`'s `WoverBiomeProvider` follows the same pattern for biomes, biome data, surface rules
 and biome tags together.
 

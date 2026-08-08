@@ -8,7 +8,7 @@ import de.ambertation.wover.testmod.entrypoint.TestModWoverFeature;
 public class TestModWoverFeatureDatagen extends WoverDataGenEntryPoint {
     @Override
     protected void onInitializeProviders(PackBuilder globalPack) {
-        globalPack.addRegistryProvider(ConfiguredFeaturesProvider::new);
+        globalPack.addRegistryProvider(FeatureContentProvider::new);
         globalPack.addRegistryProvider(PlacedFeatureProvider::new);
         globalPack.addRegistryProvider(ModificationProvider::new);
     }

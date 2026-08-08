@@ -7,7 +7,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.levelgen.feature.RandomSelectorFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
@@ -20,7 +19,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
  *
  * @see #placement(Placer)
  */
-public interface AsMultiPlaceRandomSelect extends FeatureConfigurator<RandomFeatureConfiguration, RandomSelectorFeature> {
+public interface AsMultiPlaceRandomSelect extends FeatureConfigurator {
     /**
      * Will add all possible {@link BlockState}s of the passed {@link Block}. The weight is the chance of the
      * {@link Block} itself beeing selected. When the Block was selected, a random {@link BlockState} will be chosen.

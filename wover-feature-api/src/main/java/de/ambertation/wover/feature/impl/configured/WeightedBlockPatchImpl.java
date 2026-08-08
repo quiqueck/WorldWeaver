@@ -1,16 +1,15 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.FeatureContentManager;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.WeightedBlockPatch;
+import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import de.ambertation.wover.feature.impl.random.RandomPatchFeature;
-import de.ambertation.wover.feature.impl.random.RandomPatchConfiguration;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 // Compat shim for the vanilla-removed random_patch feature (see WeightedBlockPatch); intentionally implements
 // the deprecated API.
 @SuppressWarnings("removal")
-public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchConfiguration, RandomPatchFeature, WeightedBlockPatch> implements WeightedBlockPatch {
+public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<WeightedBlockPatch> implements WeightedBlockPatch {
 
     private BlockPredicate groundType = null;
     private boolean isEmpty = true;
@@ -28,8 +27,8 @@ public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchCon
     private int ySpread = 3;
 
     WeightedBlockPatchImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -90,8 +89,8 @@ public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchCon
     }
 
     @Override
-    public @NotNull RandomPatchConfiguration createConfiguration() {
-        var blockFeature = ConfiguredFeatureManager
+    protected @NotNull Feature createFeature() {
+        var blockFeature = FeatureContentManager
                 .INLINE_BUILDER
                 .simple()
                 .block((new WeightedStateProvider(stateBuilder.build())))
@@ -100,33 +99,28 @@ public class WeightedBlockPatchImpl extends WeightedBaseBlockImpl<RandomPatchCon
         if (isEmpty) blockFeature.isEmpty();
         if (groundType != null) blockFeature.isOn(groundType);
 
-        return new RandomPatchConfiguration(tries, xzSpread, ySpread, blockFeature.directHolder());
-    }
-
-    @Override
-    protected @NotNull RandomPatchFeature getFeature() {
-        return de.ambertation.wover.feature.impl.FeatureManagerImpl.RANDOM_PATCH;
+        return new RandomPatchFeature(tries, xzSpread, ySpread, blockFeature.directHolder());
     }
 
 
-    public static class Key extends ConfiguredFeatureKey<WeightedBlockPatch> {
+    public static class Key extends FeatureKey<WeightedBlockPatch> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public WeightedBlockPatch bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public WeightedBlockPatch bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new WeightedBlockPatchImpl(ctx, key);
         }
     }
 
-    public static class KeyBonemeal extends ConfiguredFeatureKey<WeightedBlockPatch> {
+    public static class KeyBonemeal extends FeatureKey<WeightedBlockPatch> {
         public KeyBonemeal(Identifier id) {
             super(id);
         }
 
         @Override
-        public WeightedBlockPatch bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public WeightedBlockPatch bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new WeightedBlockPatchImpl(ctx, key).likeDefaultBonemeal();
         }
     }

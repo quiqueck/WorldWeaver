@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Helper class for registering surface rules sources in the builtin
- * {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_RULE} Registry.
+ * {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_RULE_TYPE} Registry.
  */
 public class Rules {
     private Rules() {

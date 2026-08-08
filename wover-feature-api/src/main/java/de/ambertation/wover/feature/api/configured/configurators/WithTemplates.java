@@ -1,7 +1,6 @@
 package de.ambertation.wover.feature.api.configured.configurators;
 
 import de.ambertation.wover.feature.api.features.TemplateFeature;
-import de.ambertation.wover.feature.api.features.config.TemplateFeatureConfig;
 
 import net.minecraft.resources.Identifier;
 
@@ -12,7 +11,7 @@ import net.minecraft.resources.Identifier;
  * are chosen randomly bases on their weight. The weight is relative to the sum of all weights.
  * Templates are loaded from datapacks at {@code data/<namespace>/structure/<path>.nbt}.
  */
-public interface WithTemplates extends FeatureConfigurator<TemplateFeatureConfig, TemplateFeature<TemplateFeatureConfig>> {
+public interface WithTemplates extends FeatureConfigurator {
     /**
      * Adds a template to the random selection with a weight of 1.
      * <p>
@@ -48,7 +47,7 @@ public interface WithTemplates extends FeatureConfigurator<TemplateFeatureConfig
      * @param offsetY  The placement offset in y direction.
      * @param weight   The weight of the template
      * @return the same instance
-     * @see TemplateFeatureConfig.FeatureTemplate#getOffsetY()
+     * @see TemplateFeature.FeatureTemplate#getOffsetY()
      */
     WithTemplates add(
             Identifier location,

@@ -2,7 +2,6 @@ package de.ambertation.wover.feature.api.placed.modifiers;
 
 import de.ambertation.wover.block.api.BlockHelper;
 import de.ambertation.wover.block.api.predicate.BlockPredicates;
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -17,10 +16,9 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
  * Finally, if you want to select only a single, random direction, you can set {@code randomSelect} to true.
  * If set, only one random direction will be searched.
  */
-public class FindInDirection extends PlacementModifier {
+public class FindInDirection implements PlacementModifier {
     /**
      * The codec for this placement modifier.
      */
@@ -225,29 +223,27 @@ public class FindInDirection extends PlacementModifier {
 
 
     /**
-     * Calculates the positions that this placement modifier will emit.
+     * Emits the found surface positions.
      *
      * @param placementContext The placement context.
      * @param randomSource     The random source.
      * @param blockPos         The input position.
-     * @return The stream of new positions.
+     * @param consumer         Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext placementContext,
             RandomSource randomSource,
-            BlockPos blockPos
+            BlockPos blockPos,
+            Consumer<BlockPos> consumer
     ) {
-        var builder = Stream.<BlockPos>builder();
         if (randomSelect) {
-            submitSingle(placementContext, blockPos, builder, randomDirection(randomSource));
+            submitSingle(placementContext, blockPos, consumer, randomDirection(randomSource));
         } else {
             for (Direction d : directions) {
-                submitSingle(placementContext, blockPos, builder, d);
+                submitSingle(placementContext, blockPos, consumer, d);
             }
         }
-
-        return builder.build();
     }
 
     /**
@@ -274,13 +270,18 @@ public class FindInDirection extends PlacementModifier {
     private void submitSingle(
             PlacementContext placementContext,
             BlockPos blockPos,
-            Stream.Builder<BlockPos> builder,
+            Consumer<BlockPos> consumer,
             Direction searchDirection
     ) {
         // The probe must not leave the chunk that is currently being decorated. A placement modifier that
         // emits a position outside of it hands the feature an origin that is already out of bounds, and any
         // spread the feature applies on top of that (wover:random_patch's xz_spread, for example) then reads
-        // terrain two chunks away - past minecraft:features' write radius of 1.
+        // terrain two chunks away - past minecraft:features' write radius of 1. 26.3 logs those reads
+        // ("Detected unsafe terrain read during worldgen"), and rightly so: beyond the write radius the
+        // region only guarantees minecraft:structure_starts, so the neighbouring chunk may still be empty and
+        // the answer depends on how far it happened to get. Clamping to the write radius instead of to the
+        // chunk would not help - the emitted position could still be 16 blocks out and the feature's own
+        // spread would carry the reads past the limit again.
         //
         // The forward walk was already clamped this way; the backwards walk that runs when the start position
         // is inside the surface was not, and it is the one that escaped, because it travels against
@@ -301,20 +302,23 @@ public class FindInDirection extends PlacementModifier {
                 oppositeDist,
                 surfacePredicate
         )) {
+            // 26.3 collects the emitted positions into a List instead of consuming a Stream lazily, so a
+            // MutableBlockPos must not be handed out - it would alias.
             if (offsetInDir != 0)
-                builder.add(POS.move(searchDirection, offsetInDir));
+                consumer.accept(POS.move(searchDirection, offsetInDir).immutable());
             else
-                builder.add(POS);
+                consumer.accept(POS.immutable());
         }
     }
 
     /**
-     * Get the type of this modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type.
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.SOLID_IN_DIR;
+    public @NotNull MapCodec<FindInDirection> codec() {
+        return CODEC;
     }
 }

@@ -1,1 +1,7 @@
 accessWidener   v1  official
+
+# 26.3: recipes became a datapack registry, so RecipeManager builds its RecipeMap inside its constructor from
+# a HolderLookup<Recipe<?>>. The recipes contributed by BOOTSTRAP_RECIPES/BOOTSTRAP_POTIONS are folded into
+# that lookup (see RecipeLookups) rather than into the finished map, which means giving each of them a
+# Holder.Reference of its own - createStandAlone is public, binding a value to it is not. Changes no behaviour.
+accessible method net/minecraft/core/Holder$Reference bindValue (Ljava/lang/Object;)V

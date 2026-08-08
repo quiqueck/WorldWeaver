@@ -15,6 +15,7 @@ import de.ambertation.wover.sets.api.blocks.WoodenSlotFromDefinition;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.levelgen.feature.stateproviders.CopyPropertiesProvider;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -80,10 +81,12 @@ public class Log extends WoodenSlotFromDefinition {
     @Override
     protected void addWoodSlotSpecificDefinitions(WoodenBlockSet<?> set, BlockDefinition<?, ?> def) {
         if ((this.flags & STRIPABLE_FLAG) != 0) { // Is Stripable?
-            def.addTrait(BlockTraits.LOG_BLOCK.with((oldState) -> set
-                    .getBlockWithFallback(SlotType.STRIPPED_LOG, this.slot)
-                    .defaultBlockState()
-            ));
+            // Deferred: the stripped variant is registered in the same pass as this block, so it may not
+            // exist yet. CopyPropertiesProvider carries the pillar axis (and anything else the two blocks
+            // share) over to the stripped state, which is what 26.1's copyRotatedPillarBlockState did by hand.
+            def.addTrait(BlockTraits.LOG_BLOCK.withDeferred(() -> new CopyPropertiesProvider(
+                    set.getBlockWithFallback(SlotType.STRIPPED_LOG, this.slot)
+            )));
         } else {
             def.addTrait(BlockTraits.LOG_BLOCK);
         }

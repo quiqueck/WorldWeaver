@@ -1,13 +1,13 @@
 package de.ambertation.wover.feature.impl.configured;
 
 import de.ambertation.wover.block.api.BlockProperties;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.AsBlockColumn;
 
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -15,9 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.BlockColumnFeature;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.BlockColumnConfiguration;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
@@ -26,15 +24,16 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfiguration, BlockColumnFeature> implements de.ambertation.wover.feature.api.configured.configurators.AsBlockColumn {
-    private final List<BlockColumnConfiguration.Layer> layers = new LinkedList<>();
+public class AsBlockColumnImpl extends FeatureConfiguratorImpl implements de.ambertation.wover.feature.api.configured.configurators.AsBlockColumn {
+    // 26.3: BlockColumnConfiguration was folded into BlockColumnFeature, so Layer moved along with it.
+    private final List<BlockColumnFeature.Layer> layers = new LinkedList<>();
     private Direction direction = Direction.UP;
     private BlockPredicate allowedPlacement = BlockPredicate.ONLY_IN_AIR_PREDICATE;
     private boolean prioritizeTip = false;
 
     AsBlockColumnImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -78,7 +77,7 @@ public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfig
 
     @Override
     public AsBlockColumn add(IntProvider height, BlockStateProvider state) {
-        layers.add(new BlockColumnConfiguration.Layer(height, state));
+        layers.add(new BlockColumnFeature.Layer(height, state));
         return this;
     }
 
@@ -150,22 +149,17 @@ public class AsBlockColumnImpl extends FeatureConfiguratorImpl<BlockColumnConfig
     }
 
     @Override
-    public BlockColumnConfiguration createConfiguration() {
-        return new BlockColumnConfiguration(layers, direction, allowedPlacement, prioritizeTip);
+    protected @NotNull Feature createFeature() {
+        return new BlockColumnFeature(layers, direction, allowedPlacement, prioritizeTip);
     }
 
-    @Override
-    protected @NotNull BlockColumnFeature getFeature() {
-        return (BlockColumnFeature) Feature.BLOCK_COLUMN;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<AsBlockColumn> {
+    public static class Key extends FeatureKey<AsBlockColumn> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public AsBlockColumn bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public AsBlockColumn bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new AsBlockColumnImpl(ctx, key);
         }
     }

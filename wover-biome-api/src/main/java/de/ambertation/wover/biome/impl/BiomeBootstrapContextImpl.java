@@ -8,7 +8,6 @@ import de.ambertation.wover.entrypoint.LibWoverBiome;
 import de.ambertation.wover.surface.api.AssignedSurfaceRule;
 import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.biome.Biome;
 
@@ -21,7 +20,7 @@ public class BiomeBootstrapContextImpl extends CustomBootstrapContext<Biome, Bio
     private final List<BiomeBuilder<?>> registeredBuilders = new LinkedList<>();
 
     @Override
-    public void register(@NotNull BiomeBuilder<?> builder, Lifecycle lifecycle) {
+    public void register(@NotNull BiomeBuilder<?> builder) {
         registeredBuilders.add(builder);
     }
 

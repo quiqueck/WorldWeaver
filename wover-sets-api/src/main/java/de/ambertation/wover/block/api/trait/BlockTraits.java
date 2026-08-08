@@ -45,6 +45,13 @@ public class BlockTraits {
      * Makes a block climbable, like a vanilla ladder or vine.
      */
     public static final GenericBlockTrait.BuilderWithDefault CLIMBABLE = ClimbableBlockTraitBuilder.BUILDER;
+    /**
+     * Overrides whether a block is <em>motion blocking</em> (suffocates, blocks the view, counts for the
+     * {@code MOTION_BLOCKING} heightmaps). This is <b>not</b> needed for a normal solid block: WoVer derives
+     * that automatically from the block's shape during datagen, exactly as the engine did up to 26.1. Only
+     * reach for this trait when the derived answer is wrong - see {@link MotionBlockingTrait}.
+     */
+    public static final MotionBlockingTrait.Builder MOTION_BLOCKING = MotionBlockingBuilder.BUILDER;
 
     // Material Traits
     /**

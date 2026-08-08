@@ -7,14 +7,13 @@ import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverDataProvider;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ComposterBlock;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
@@ -27,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,10 +40,12 @@ import org.jetbrains.annotations.NotNull;
  * <ul>
  *     <li>{@code flammable=<burn>/<spread>} from Fabric's {@link FlammableBlockRegistry} default instance
  *     ({@code -} when the block is not registered as flammable),</li>
- *     <li>{@code compostable=<chance>} - resolved first from {@link ComposterBlock#COMPOSTABLES} keyed by the
- *     block's item and, failing that, from a {@link CompostableTrait} runtime trait attached to the block (the
- *     mechanism modded blocks use, since they are never added to the vanilla map); {@code -} when the block is
- *     not compostable by either source,</li>
+ *     <li>{@code compostable=<chance>} - resolved first from the block item's vanilla
+ *     {@code minecraft:compostable} data component (26.3's replacement for the removed
+ *     {@code ComposterBlock.COMPOSTABLES} map, see
+ *     {@link WoverItemRegistrationsProvider#vanillaCompostValue(Map, Item)}) and, failing that, from a
+ *     {@link CompostableTrait} runtime trait attached to the block (the mechanism modded blocks use, since they
+ *     never carry the vanilla component); {@code -} when the block is not compostable by either source,</li>
  *     <li>{@code fuel=?} for every block: furnace fuel lives in {@code FuelValues}, whose vanilla table is built
  *     by dereferencing item tags (e.g. {@code minecraft:logs}) that are not bound in the datagen registry
  *     context ({@code FuelValues.vanillaBurnTimes} throws {@code "Tag ... can't be dereferenced during
@@ -67,7 +69,7 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
             FabricPackOutput output,
             CompletableFuture<HolderLookup.Provider> registriesFuture
     ) {
-        return new Provider(output);
+        return new Provider(output, registriesFuture);
     }
 
     private static String flammable(Block block) {
@@ -76,12 +78,12 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
         return entry.getIgniteOdds() + "/" + entry.getBurnOdds();
     }
 
-    private static String compostable(Block block) {
-        final Item item = block.asItem();
-        if (item != Items.AIR && ComposterBlock.COMPOSTABLES.containsKey(item)) {
-            // Locale-independent (Float.toString uses '.'), so the file is byte-identical across locales.
-            return Float.toString(ComposterBlock.COMPOSTABLES.getFloat(item));
-        }
+    private static String compostable(Map<Item, DataComponentMap> defaultComponents, Block block) {
+        // 26.3 removed ComposterBlock.COMPOSTABLES; the vanilla composting value now lives on the item as the
+        // minecraft:compostable data component. WoverItemRegistrationsProvider owns the lookup (and the
+        // key -> chance translation that keeps this column comparable with the 26.1 golden file).
+        final String vanilla = WoverItemRegistrationsProvider.vanillaCompostValue(defaultComponents, block.asItem());
+        if (vanilla != null) return vanilla;
         // Modded blocks resolve their composting chance at runtime from a CompostableTrait rather than the
         // vanilla map (which is only ever populated for vanilla items), so mirror that here.
         final float traitChance = compostableTraitChance(block);
@@ -115,27 +117,35 @@ public class WoverBlockRegistrationsProvider implements WoverDataProvider<DataPr
         return "-";
     }
 
-    private String lineFor(Identifier id, Block block) {
+    private String lineFor(Map<Item, DataComponentMap> defaultComponents, Identifier id, Block block) {
         return "{\"id\":\"" + id + "\""
                 + ",\"flammable\":\"" + flammable(block) + "\""
-                + ",\"compostable\":\"" + compostable(block) + "\""
+                + ",\"compostable\":\"" + compostable(defaultComponents, block) + "\""
                 + ",\"fuel\":\"" + fuel(block) + "\"}";
     }
 
     private class Provider implements DataProvider {
         private final FabricPackOutput output;
+        private final CompletableFuture<HolderLookup.Provider> registriesFuture;
 
-        private Provider(FabricPackOutput output) {
+        private Provider(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
             this.output = output;
+            this.registriesFuture = registriesFuture;
         }
 
         @Override
         public @NotNull CompletableFuture<?> run(@NotNull CachedOutput writer) {
+            return registriesFuture.thenCompose(registries -> write(writer, registries));
+        }
+
+        private CompletableFuture<?> write(CachedOutput writer, HolderLookup.Provider registries) {
+            final Map<Item, DataComponentMap> defaultComponents =
+                    WoverItemRegistrationsProvider.bakeDefaultComponents(registries);
             final List<String> lines = new ArrayList<>();
             for (Block block : BuiltInRegistries.BLOCK) {
                 final Identifier id = BuiltInRegistries.BLOCK.getKey(block);
                 if (!id.getNamespace().equals(modCore.namespace)) continue;
-                lines.add(lineFor(id, block));
+                lines.add(lineFor(defaultComponents, id, block));
             }
             // Sorting by the full line orders by the (unique) id prefix, so the file is fully deterministic.
             Collections.sort(lines);

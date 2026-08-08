@@ -1,7 +1,6 @@
 package de.ambertation.wover.feature.api.configured.configurators;
 
 import de.ambertation.wover.feature.api.features.SequenceFeature;
-import de.ambertation.wover.feature.api.features.config.SequenceFeatureConfig;
 import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 
 import net.minecraft.core.Holder;
@@ -10,7 +9,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 /**
  * Places multiple features ({@link SequenceFeature}).
  */
-public interface AsSequence extends FeatureConfigurator<SequenceFeatureConfig, SequenceFeature> {
+public interface AsSequence extends FeatureConfigurator {
     /**
      * Adds a feature to the sequence.
      *

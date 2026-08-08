@@ -1,6 +1,7 @@
 package de.ambertation.wover.testmod.gametest;
 
 import de.ambertation.wover.loot.impl.LootTableAppendersImpl;
+import de.ambertation.wover.loot.mixin.LootPoolAccessor;
 import de.ambertation.wover.testmod.entrypoint.TestModWoverLoot;
 
 import net.minecraft.core.Holder;
@@ -22,6 +23,7 @@ import com.mojang.serialization.JsonOps;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
@@ -35,14 +37,14 @@ import net.fabricmc.fabric.api.gametest.v1.GameTest;
  * pools of {@code minecraft:chests/abandoned_mineshaft}. Neither item occurs in the vanilla version of
  * either table, so their presence is unambiguous.
  * <p>
- * <b>The interesting half is the idempotency check.</b> The additions are made while the reloadable loot
- * table registry is being rebuilt, and that registry is rebuilt on every {@code /reload} and every world
- * load. An implementation that accumulated state - or that appended to the current pools rather than to the
- * pools the datapacks provided - would double its additions on the second pass, and the only symptom would be
- * twice the loot. The test therefore drives the application code a second and a third time over the live
- * registry and asserts that nothing moves: same pool count, same entry counts, and still exactly one marker
- * per roll. Reverting the snapshot logic in {@code LootTableAppendersImpl}/{@code MutableLootTableImpl} makes
- * this fail with two, then three dragon eggs per roll.
+ * <b>The interesting half is the idempotency check.</b> The additions are made while the datapack registry
+ * is being built, and that registry is rebuilt on every {@code /reload} and every world load. An
+ * implementation that accumulated state - or that appended to the current pools rather than to the pools the
+ * datapacks provided - would double its additions on the second pass, and the only symptom would be twice
+ * the loot. The test therefore drives the application code a second and a third time over the live registry
+ * and asserts that nothing moves: same pool count, same entry counts, and still exactly one marker per roll.
+ * Reverting the snapshot logic in {@code LootTableAppendersImpl}/{@code MutableLootTableImpl} makes this
+ * fail with two, then three dragon eggs per roll.
  */
 public class LootAppenderGameTest {
     private static final int ROLLS = 8;
@@ -50,7 +52,7 @@ public class LootAppenderGameTest {
     @GameTest
     public void appendersApplyExactlyOnceAndSurviveReapplication(GameTestHelper helper) {
         // The loot registry lives only in the reloadable holder - MinecraftServer#registryAccess() is the
-        // composite of the layers below it and does not contain the loot table registry.
+        // composite of the layers below it and does not contain minecraft:loot_table.
         final MinecraftServer server = helper.getLevel().getServer();
         final HolderLookup.Provider reloadable = server.reloadableRegistries().lookup();
         final HolderLookup.RegistryLookup<LootTable> registry = reloadable.lookupOrThrow(Registries.LOOT_TABLE);
@@ -150,9 +152,9 @@ public class LootAppenderGameTest {
      * condition, then gets {@link TestModWoverLoot#CONDITION_MARKER} appended as its own, unconditional pool -
      * BetterEnd's exact "suppress vanilla, add a replacement" shape for its in-End fishing override. A behaviour-only
      * check ("still just the marker after two more passes") cannot tell a correctly-idempotent restriction
-     * apart from one that re-derives the same condition twice as long every pass but still happens to evaluate
-     * the same way; this additionally compares the pools' serialized conditions across passes so any such
-     * growth fails loudly instead of only after a codec/JSON diff seems relevant.
+     * apart from one that re-wraps the condition in another layer of {@code AllOfCondition} every pass but
+     * still happens to evaluate the same way; this additionally compares the pools' serialized conditions
+     * across passes so any such growth fails loudly instead of only after a codec/JSON diff seems relevant.
      */
     @GameTest
     public void conditionsGateExistingPoolsAndSurviveReapplication(GameTestHelper helper) {
@@ -237,20 +239,19 @@ public class LootAppenderGameTest {
         return new int[]{onlyMarker, exactlyOneMarker};
     }
 
-    /**
-     * The serialized conditions of every pool of {@code table}, in order, for structural before/after
-     * comparison. A pool's conditions are a plain {@code List<LootItemCondition>}, ANDed together - unlike on
-     * later Minecraft versions there is no single optional holder to unwrap.
-     */
+    /** The serialized condition of every pool of {@code table}, in order, for structural before/after comparison. */
     private static List<String> encodedConditions(LootTable table) {
         final List<LootPool> pools =
                 ((de.ambertation.wover.loot.mixin.LootTableAccessor) (Object) table).wover_getPools();
-        return pools.stream().map(pool -> LootItemCondition.DIRECT_CODEC
-                .listOf()
-                .encodeStart(JsonOps.INSTANCE, pool.conditions)
-                .result()
-                .map(Object::toString)
-                .orElse("<encode failed>")
-        ).collect(Collectors.toList());
+        return pools.stream().map(pool -> {
+            final Optional<Holder<LootItemCondition>> condition = ((LootPoolAccessor) (Object) pool).wover_getCondition();
+            return condition
+                    .map(holder -> LootItemCondition.DIRECT_CODEC
+                            .encodeStart(JsonOps.INSTANCE, holder.value())
+                            .result()
+                            .map(Object::toString)
+                            .orElse("<encode failed>"))
+                    .orElse("<no condition>");
+        }).collect(Collectors.toList());
     }
 }

@@ -6,7 +6,7 @@ import de.ambertation.wover.loot.impl.LootTableAppendersImpl;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.Registry;
-import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.ReloadableServerRegistries;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -24,33 +24,30 @@ import java.util.concurrent.Executor;
  * Applies every {@link de.ambertation.wover.loot.api.LootTableAppender} while the reloadable registries are
  * being assembled.
  * <p>
- * {@code ReloadableServerRegistries.reload(...)} loads the loot data types into a fresh
- * {@code List<WritableRegistry<?>>} and then calls
- * {@code createAndValidateFullContext(context, loadingContextWithTags, newlyLoadedRegistries)}, which wraps
- * that list into the layered access and runs {@code validateLootRegistries} on the result. Injecting at the
- * {@code HEAD} of that method is the last moment at which the freshly loaded registries are reachable and
- * nothing has looked at them yet - in particular, additions made here are still validated by vanilla, so a
+ * 26.3 loads loot tables as a datapack registry: {@code ReloadableServerRegistries.reload(...)} hands
+ * {@code RegistryDataLoader.RELOADABLE_REGISTRIES} to the loader and then calls
+ * {@code createAndValidateFullContext(layers, lookupWithUpdatedTags, loaded)}, which concatenates the two
+ * lookups and runs {@code validateLootRegistries} on the result. Injecting at the {@code HEAD} of that method
+ * is the last moment at which the freshly loaded {@code minecraft:loot_table} registry is reachable and
+ * nothing has looked at it yet - in particular, additions made here are still validated by vanilla, so a
  * malformed pool fails at load time with a proper problem report rather than silently at loot-roll time.
  * <p>
- * {@code WritableRegistry<T> extends Registry<T> extends HolderLookup.RegistryLookup<T>}, so the raw list can
- * be wrapped into a {@link HolderLookup.Provider} the same way {@code createAndValidateFullContext} itself
- * wraps {@code contextLookupWithUpdatedTags} two lines later - {@link LootTableAppendersImpl} and
- * {@link LootAdditionsImpl} only ever need that Provider view, never the list itself.
- * <p>
- * Nothing is added to or removed from the registries here, only the
- * {@link net.minecraft.world.level.storage.loot.LootTable} objects one of them holds are extended in place -
- * and those objects are re-created from the datapacks on every reload, which is what makes the whole mechanism
+ * The registry itself is frozen by then, which is fine: nothing is added to or removed from it, only the
+ * {@link net.minecraft.world.level.storage.loot.LootTable} objects it holds are extended in place - and those
+ * objects are re-created from the datapacks on every reload, which is what makes the whole mechanism
  * idempotent (see {@link LootTableAppendersImpl}).
  * <p>
- * Verified against 26.1.2: {@code private static ReloadableServerRegistries$LoadResult
- * createAndValidateFullContext(LayeredRegistryAccess, HolderLookup$Provider, List)} - the only method of that
- * name.
+ * Verified against 26.3-snapshot-5:
+ * {@code private static ReloadableServerRegistries$LoadResult createAndValidateFullContext(
+ * LayeredRegistryAccess, HolderLookup$Provider, RegistryAccess$Frozen)} - the only method of that name, and
+ * {@code public static CompletableFuture<ReloadableServerRegistries$LoadResult> reload(LayeredRegistryAccess,
+ * List, ResourceManager, Executor)} - likewise the only one.
  */
 @Mixin(ReloadableServerRegistries.class)
 public class ReloadableServerRegistriesMixin {
     /**
      * The {@link ResourceManager} the datapack additions have to be read from is only reachable here:
-     * {@code reload} takes it, hands it to the loader and never passes it on.
+     * {@code reload} takes it, hands it to {@code RegistryDataLoader.load(...)} and never passes it on.
      * {@code createAndValidateFullContext} runs from that future's {@code thenApplyAsync}, i.e. on a different
      * thread, so it is parked keyed by the {@code layers} instance both methods receive rather than in a
      * thread local.
@@ -68,17 +65,14 @@ public class ReloadableServerRegistriesMixin {
 
     @Inject(method = "createAndValidateFullContext", at = @At("HEAD"))
     private static void wover_appendLootTables(
-            LayeredRegistryAccess<RegistryLayer> contextLayers,
-            HolderLookup.Provider contextLookupWithUpdatedTags,
-            List<WritableRegistry<?>> newRegistries,
+            LayeredRegistryAccess<RegistryLayer> layers,
+            HolderLookup.Provider lookupWithUpdatedTags,
+            RegistryAccess.Frozen loaded,
             CallbackInfoReturnable<ReloadableServerRegistries.LoadResult> cir
     ) {
         // Decoding has to happen here rather than at reload() HEAD: an addition may reference the loot tables
-        // of this very reload, which do not exist until this Provider does.
-        final HolderLookup.Provider loaded = HolderLookup.Provider.create(
-                newRegistries.stream().map(r -> (HolderLookup.RegistryLookup<?>) r)
-        );
-        LootAdditionsImpl.parse(contextLayers, contextLookupWithUpdatedTags, loaded);
-        LootTableAppendersImpl.applyAll(contextLookupWithUpdatedTags, loaded);
+        // and predicates of this very reload, which do not exist until `loaded` does.
+        LootAdditionsImpl.parse(layers, lookupWithUpdatedTags, loaded);
+        LootTableAppendersImpl.applyAll(lookupWithUpdatedTags, loaded);
     }
 }

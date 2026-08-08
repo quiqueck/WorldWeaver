@@ -19,7 +19,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.data.worldgen.SurfaceRuleData;
+import net.minecraft.data.worldgen.material.NetherMaterialRules;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -30,6 +30,7 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.*;
 
 import java.util.List;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
@@ -182,15 +183,22 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                         bootstapContext.lookup(Registries.NOISE),
                         slideNetherLike(densityGetter, 0, 256)
                 ),
-                // 26.2: SurfaceRules.isBiome() resolves its biome keys into a HolderSet right away instead
-                // of storing the raw keys, so every rule factory that filters by biome needs a biome
-                // lookup - SurfaceRuleData.nether() included. The rule itself is unchanged.
-                SurfaceRuleData.nether(bootstapContext.lookup(Registries.BIOME)),
+                // 26.3 moved the surface/material rules out of Java into the minecraft:worldgen/material_rule
+                // datapack registry, so NoiseGeneratorSettings#surfaceRule became a Holder<RuleSource> called
+                // materialRule and the old net.minecraft.data.worldgen.SurfaceRuleData is gone. This is the
+                // same lookup vanilla's own NoiseGeneratorSettings#nether now performs, so we still reference
+                // the identical rule (minecraft:nether) rather than a copy of it.
+                bootstapContext.lookup(Registries.MATERIAL_RULE).getOrThrow(NetherMaterialRules.NETHER),
                 List.of(),
                 32,
                 false,
-                false,
-                false,
+                // 26.1 had booleans aquifersEnabled/oreVeinsEnabled here. 26.3 replaced them with the actual
+                // configuration: Optional<Aquifer.Config> (which now carries the barrier/fluid-level/lava
+                // density functions that used to sit in NoiseRouter) and List<OreVeinifier> (which carries the
+                // vein density functions). Both were `false` before, so both are empty here - the amplified
+                // nether has no aquifers and no ore veins, exactly as before.
+                Optional.empty(),
+                List.of(),
                 true
         );
     }
@@ -222,7 +230,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
 
     private static NoiseRouter netherNoNewCaves(
             HolderGetter<DensityFunction> functions,
-            HolderGetter<net.minecraft.world.level.levelgen.synth.NormalNoise.NoiseParameters> noises,
+            HolderGetter<net.minecraft.world.level.levelgen.synth.NormalNoise> noises,
             DensityFunction slide
     ) {
         DensityFunction temperature = DensityFunctions.shiftedNoise2d(
@@ -236,11 +244,14 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                 DensityFunctions.interpolated(DensityFunctions.blendDensity(slide)),
                 DensityFunctions.constant(0.64)
         ).squeeze();
+        // 26.3 shrank NoiseRouter from 15 components to 8. The four aquifer noises (barrier,
+        // fluidLevelFloodedness, fluidLevelSpread, lava) moved to Aquifer.Config and the three vein noises
+        // (veinToggle, veinRidged, veinGap) moved to OreVeinifier, both of which are now separate
+        // NoiseGeneratorSettings components. Every one of those seven was DensityFunctions.zero() here
+        // (we generate with aquifers and ore veins off), so dropping them is lossless - the port is a pure
+        // subset: temperature, vegetation, continents=zero, erosion=zero, depth=zero, ridges=zero,
+        // preliminarySurfaceLevel=zero, finalDensity=fullNoise, unchanged from before.
         return new NoiseRouter(
-                DensityFunctions.zero(),
-                DensityFunctions.zero(),
-                DensityFunctions.zero(),
-                DensityFunctions.zero(),
                 temperature,
                 vegetation,
                 DensityFunctions.zero(),
@@ -248,10 +259,7 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
                 DensityFunctions.zero(),
                 DensityFunctions.zero(),
                 DensityFunctions.zero(),
-                fullNoise,
-                DensityFunctions.zero(),
-                DensityFunctions.zero(),
-                DensityFunctions.zero()
+                fullNoise
         );
     }
 }

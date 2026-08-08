@@ -13,8 +13,8 @@ import net.minecraft.tags.FeatureTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.carver.WorldCarver;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import com.google.common.base.Suppliers;
@@ -29,17 +29,19 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 public class GenerationSettingsWorker {
-    private final Registry<ConfiguredWorldCarver<?>> carverLookup;
+    private final Registry<WorldCarver> carverLookup;
     private final Registry<PlacedFeature> featureLookup;
     private final BiomeGenerationSettings generationSettings;
     private final Biome biome;
-    MutableHolderSet<ConfiguredWorldCarver<?>> customizedCarvers;
+    MutableHolderSet<WorldCarver> customizedCarvers;
     List<HolderSet<PlacedFeature>> customizedFeatures;
 
     public GenerationSettingsWorker(RegistryAccess registries, Biome biome) {
         this.biome = biome;
         this.generationSettings = biome.getGenerationSettings();
-        this.carverLookup = registries.lookupOrThrow(Registries.CONFIGURED_CARVER);
+        // 26.3: Registries.CONFIGURED_CARVER -> Registries.CARVER, and its element type collapsed from
+        // ConfiguredWorldCarver<?> to the now config-carrying WorldCarver.
+        this.carverLookup = registries.lookupOrThrow(Registries.CARVER);
         this.featureLookup = registries.lookupOrThrow(Registries.PLACED_FEATURE);
     }
 
@@ -90,9 +92,10 @@ public class GenerationSettingsWorker {
         return getFlatFeatureStream().collect(Collectors.toSet());
     }
 
-    private List<ConfiguredFeature<?, ?>> createFlowerFeatures() {
+    private List<Feature> createFlowerFeatures() {
         // 26.1: Feature.FLOWER was removed; the bone-meal/flower feature list is now derived by filtering on
         // the FeatureTags.CAN_SPAWN_FROM_BONE_MEAL tag (matching BiomeGenerationSettings#boneMealFeatures).
+        // 26.3: that list is typed Supplier<List<Feature>> now that ConfiguredFeature folded into Feature.
         return getFlatFeatureStream()
                 .flatMap(PlacedFeature::getFeatures)
                 .filter((feature) -> feature.is(FeatureTags.CAN_SPAWN_FROM_BONE_MEAL))

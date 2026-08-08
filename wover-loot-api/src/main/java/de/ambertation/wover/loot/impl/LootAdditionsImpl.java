@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -42,11 +43,12 @@ import java.util.stream.Stream;
  *     <li>{@code reload(layers, pendingTags, resourceManager, executor)} is the only place the
  *     {@link ResourceManager} of the reload in flight is reachable, so its {@code HEAD} parks it in
  *     {@link #PENDING}, keyed by the {@code layers} instance;</li>
- *     <li>{@code createAndValidateFullContext(layers, lookupWithUpdatedTags, newRegistries)} - which vanilla
- *     reaches asynchronously, on a different thread, with the <em>same</em> {@code layers} instance - takes it
- *     back out and decodes. Decoding can only happen here, not at {@code reload} HEAD: a
- *     {@code minecraft:loot_table} entry nested into an addition resolves against a registry that does not
- *     exist yet when {@code reload} starts. That is why the datapack path is not a pure decode.</li>
+ *     <li>{@code createAndValidateFullContext(layers, lookupWithUpdatedTags, loaded)} - which vanilla reaches
+ *     asynchronously, on a different thread, with the <em>same</em> {@code layers} instance - takes it back out
+ *     and decodes. Decoding can only happen here, not at {@code reload} HEAD: a
+ *     {@code minecraft:loot_table} entry nested into an addition, and a {@code minecraft:predicate} referenced
+ *     by an {@code add_condition}, both resolve against registries that do not exist yet when {@code reload}
+ *     starts. That is why the datapack path is not a pure decode.</li>
  * </ul>
  * The decoded result is kept in {@link #CURRENT} and re-applied, unchanged, by every
  * {@link LootTableAppendersImpl#applyAll} pass - which is what makes re-application idempotent for the
@@ -138,16 +140,17 @@ public final class LootAdditionsImpl {
             HolderLookup.Provider loaded
     ) {
         // The lookup an addition is decoded against has to span *both* halves: the static registries (items,
-        // blocks, enchantments, ...) and the reloadable ones that were just parsed (loot_table). This is the
-        // same concatenation vanilla builds two statements later in createAndValidateFullContext, so a nested
-        // loot table reference resolves exactly as it would inside a real loot table JSON.
+        // blocks, enchantments, ...) and the reloadable ones that were just parsed (loot_table, predicate,
+        // item_modifier). This is the same concatenation vanilla builds two statements later in
+        // createAndValidateFullContext, so a nested loot table reference resolves exactly as it would inside a
+        // real loot table JSON.
         final HolderLookup.Provider full = HolderLookup.Provider.create(
                 Stream.concat(registries.listRegistries(), loaded.listRegistries())
         );
         final RegistryOps.RegistryInfoLookup infoLookup = new RegistryOps.RegistryInfoLookup() {
             @Override
-            public <T> Optional<RegistryOps.RegistryInfo<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
-                return full.lookup(key).map(RegistryOps.RegistryInfo::fromRegistryLookup);
+            public <T> Optional<HolderGetter<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+                return full.lookup(key).map(l -> l);
             }
         };
         final RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, infoLookup);

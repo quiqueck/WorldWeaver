@@ -113,6 +113,11 @@ builders:
 public class TestBlockRegistry {
     private static final BlockRegistry R = BlockRegistry.forMod(TestModWoverBlock.C);
 
+    // 26.3 dropped the ItemTags.DOORS constant, but vanilla still ships
+    // data/minecraft/tags/item/doors.json — recreate the key to keep using it.
+    private static final TagKey<Item> ITEM_TAG_DOORS =
+            TagKey.create(Registries.ITEM, Identifier.withDefaultNamespace("doors"));
+
     public static final TestBlock TEST_BLOCK = R
             .defineDefaultBlockWithProps("test_block", TestBlock::new)
             .addTrait(FlammableBlockBuilder.BUILDER.withDefault())
@@ -126,11 +131,21 @@ public class TestBlockRegistry {
             )
             .addTrait(FlammableBlockBuilder.BUILDER.withDefault())
             .addTags(BlockTags.DOORS)
-            .addItemTags(ItemTags.DOORS)
-            .pushReaction(PushReaction.DESTROY)
+            .addItemTags(ITEM_TAG_DOORS)
+            .pushReaction(PushReaction.POPPED)
             .buildAndRegister();
 }
 ```
+
+26.3 pruned a batch of `ItemTags` constants (`DOORS`, `SLABS`, `STAIRS`, `FENCES`, `BUTTONS`, `STONE_BUTTONS`,
+`TRAPDOORS`) and `BlockTags.LOGS_THAT_BURN`. Only the Java handles went away — vanilla still ships the tag JSON
+with unchanged contents — so recreate the key with
+`TagKey.create(Registries.ITEM, Identifier.withDefaultNamespace("doors"))` rather than dropping the
+`addItemTags(...)` call, which would silently remove your blocks from a live vanilla tag. `wover-sets-api`
+collects these in `PrunedVanillaTags`. The block-tag siblings (`BlockTags.DOORS`, `BlockTags.SLABS`, ...) all
+kept their constants and are still used directly. 26.3 also renamed the `PushReaction` constants:
+`NORMAL`/`DESTROY`/`BLOCK`/`IGNORE`/`PUSH_ONLY` became
+`PUSH_PULL`/`POPPED`/`IMMOVEABLE`/`IGNORE_ENTITY`/`PUSH`.
 
 `addTags(CommonPoiTags.MASON_WORKSTATION)` above is what produces the
 `data/wover/tags/block/poi/workstation/mason.json` file mentioned above — tags passed to a `BlockDefinition`
@@ -192,11 +207,11 @@ block's standard `blocks/<name>` table, and `createLootTableKey(ModCore, String)
 [`LootLookupProvider`](../../../wover-block-api/src/main/java/de/ambertation/wover/loot/api/LootLookupProvider.java)
 wraps vanilla's internal `VanillaBlockLoot` helper methods (silk touch dispatch, ore drops, leaves drops,
 crop/plant drops, slabs, composters, ...) plus registry lookups for enchantments (`fortune()`, `silkTouch()`).
-Construct one from the `HolderLookup.Provider` you're handed:
+Construct one from the `HolderLookup.Provider` you're handed. Real usage, from this module's test mod:
 
 ```java
-public class MyLootProvider extends WoverLootTableProvider {
-    public MyLootProvider(ModCore modCore) {
+public class TestLootProvider extends WoverLootTableProvider {
+    public TestLootProvider(ModCore modCore) {
         super(modCore, LootContextParamSets.BLOCK);
     }
 
@@ -208,12 +223,16 @@ public class MyLootProvider extends WoverLootTableProvider {
         final LootLookupProvider provider = new LootLookupProvider(lookup);
 
         biConsumer.accept(
-                LootTableManager.getBlockLootTableKey(
-                        BuiltInRegistries.BLOCK.getResourceKey(MyBlocks.MY_DOOR).orElseThrow()
-                ),
+                blockLootKey(TestBlockRegistry.TEST_DOOR),
                 provider.dropWithSilkTouchAndCondition(
-                        MyBlocks.MY_DOOR, DoorBlock.HALF, DoubleBlockHalf.LOWER
+                        TestBlockRegistry.TEST_DOOR, DoorBlock.HALF, DoubleBlockHalf.LOWER
                 )
+        );
+    }
+
+    private static ResourceKey<LootTable> blockLootKey(Block block) {
+        return LootTableManager.getBlockLootTableKey(
+                BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow()
         );
     }
 }
@@ -222,13 +241,14 @@ public class MyLootProvider extends WoverLootTableProvider {
 For a more manual, from-scratch loot table (custom pools/conditions/functions), build a `LootTable.Builder`
 directly using vanilla's loot API — `provider` just saves you from re-deriving common conditions like
 `provider.hasSilkTouch()`, `provider.silkTouchCondition()`, `provider.shearsOrHoeSilkTouchCondition()`, or
-looking up the fortune/silk-touch `Holder<Enchantment>` yourself. Simply not calling `biConsumer` for a block
-skips loot table generation for it.
+looking up the fortune/silk-touch `Holder<Enchantment>` yourself (see `TestLootProvider.buildTestBlockTable` in
+this module's test mod for a fully custom multi-pool example built this way). Simply not calling `biConsumer`
+for a block skips loot table generation for it.
 
-If you would rather attach a loot table to a block *type* than list it in a provider, `wover-sets-api`'s
-`LootTableTrait` is the trait-based route: blocks carrying it are collected by
-`LootTableTrait.bootstrapLootTables(modCore, provider, biConsumer)`, which you call from your own
-`WoverLootTableProvider`.
+> **Minecraft 26.3:** `LootItemBlockStatePropertyCondition` is gone. Block-state matching moved to `MatchBlock`,
+> which builds an `advancements` block predicate and therefore needs a block lookup — hence passing
+> `LootLookupProvider` around. Same semantics, new serialized form: `minecraft:match_block` with
+> `blocks` + `state`, instead of `minecraft:block_state_property` with `block` + `properties`.
 
 ### Points of interest
 

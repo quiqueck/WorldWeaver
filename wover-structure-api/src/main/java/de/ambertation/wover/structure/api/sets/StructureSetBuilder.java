@@ -15,6 +15,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.AbstractSpreadingStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
@@ -206,17 +207,28 @@ public class StructureSetBuilder {
 
     /**
      * Base builder for a {@link StructurePlacement}, shared by {@link RandomSpreadStructurePlacementBuilder}
-     * and {@link ConcentricRingsStructurePlacementBuilder}. Holds the settings common to every
-     * {@link StructurePlacement} subclass.
+     * and {@link ConcentricRingsStructurePlacementBuilder}. Holds the settings common to both.
+     * <p>
+     * 26.3 split the old monolithic {@code StructurePlacement} class in two: {@link StructurePlacement}
+     * is now a bare interface (only {@code isStructureChunk}/{@code codec}/{@code locateOffset}), and the
+     * five settings held below — locate offset, frequency reduction method, frequency, salt and exclusion
+     * zone — moved down into the new {@link AbstractSpreadingStructurePlacement} base class, which both
+     * {@link RandomSpreadStructurePlacement} and {@link ConcentricRingsStructurePlacement} extend. The
+     * nested {@code FrequencyReductionMethod} and {@code ExclusionZone} types moved with them, hence the
+     * changed parameter types on {@link #frequencyReductionMethod} and {@link #exclusionZone}.
+     * <p>
+     * The class name is kept as-is: every placement this builder can produce is still a
+     * {@link StructurePlacement}, and {@link StructureSetBuilder#setPlacement(StructurePlacement)} still
+     * accepts any of them, so the name is narrower than before but not wrong.
      *
      * @param <R> The concrete builder type, for chaining
      */
     public abstract class StructurePlacementBuilder<R extends StructurePlacementBuilder<R>> {
         protected Vec3i locateOffset;
-        protected StructurePlacement.FrequencyReductionMethod frequencyReductionMethod;
+        protected AbstractSpreadingStructurePlacement.FrequencyReductionMethod frequencyReductionMethod;
         protected float frequency;
         protected int salt;
-        protected Optional<StructurePlacement.ExclusionZone> exclusionZone;
+        protected Optional<AbstractSpreadingStructurePlacement.ExclusionZone> exclusionZone;
 
         /**
          * Builds the {@link StructurePlacement} and applies it to the owning {@link StructureSetBuilder}
@@ -239,14 +251,15 @@ public class StructureSetBuilder {
         }
 
         /**
-         * Sets the {@link StructurePlacement.FrequencyReductionMethod} used together with
-         * {@link #frequency(float)}. Defaults to {@link StructurePlacement.FrequencyReductionMethod#DEFAULT}.
+         * Sets the {@link AbstractSpreadingStructurePlacement.FrequencyReductionMethod} used together with
+         * {@link #frequency(float)}. Defaults to
+         * {@link AbstractSpreadingStructurePlacement.FrequencyReductionMethod#DEFAULT}.
          *
          * @param method The frequency reduction method to use
          * @return This builder instance, for chaining
          */
         @NotNull
-        public R frequencyReductionMethod(@NotNull StructurePlacement.FrequencyReductionMethod method) {
+        public R frequencyReductionMethod(@NotNull AbstractSpreadingStructurePlacement.FrequencyReductionMethod method) {
             this.frequencyReductionMethod = method;
             return (R) this;
         }
@@ -267,7 +280,7 @@ public class StructureSetBuilder {
         /**
          * Sets the salt used to seed the placement's random number generator, so that different structure
          * sets don't generate at correlated positions. Defaults to the (absolute value of the) hash code
-         * of the set's {@link ResourceKey#location()}.
+         * of the set's {@link ResourceKey#identifier()}.
          *
          * @param salt The salt to use
          * @return This builder instance, for chaining
@@ -279,21 +292,21 @@ public class StructureSetBuilder {
         }
 
         /**
-         * Sets an {@link StructurePlacement.ExclusionZone} that prevents this set from generating too
-         * close to another {@link StructureSet}. Unset ({@code null}) by default.
+         * Sets an {@link AbstractSpreadingStructurePlacement.ExclusionZone} that prevents this set from
+         * generating too close to another {@link StructureSet}. Unset ({@code null}) by default.
          *
          * @param exclusionZone The exclusion zone to use, or {@code null} to clear it
          * @return This builder instance, for chaining
          */
         @NotNull
-        public R exclusionZone(@Nullable StructurePlacement.ExclusionZone exclusionZone) {
+        public R exclusionZone(@Nullable AbstractSpreadingStructurePlacement.ExclusionZone exclusionZone) {
             this.exclusionZone = exclusionZone == null ? Optional.empty() : Optional.of(exclusionZone);
             return (R) this;
         }
 
         protected StructurePlacementBuilder(@NotNull ResourceKey<StructureSet> baseKey) {
             locateOffset = Vec3i.ZERO;
-            frequencyReductionMethod = StructurePlacement.FrequencyReductionMethod.DEFAULT;
+            frequencyReductionMethod = AbstractSpreadingStructurePlacement.FrequencyReductionMethod.DEFAULT;
             frequency = 1.0f;
             exclusionZone = Optional.empty();
 

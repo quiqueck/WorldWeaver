@@ -6,6 +6,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.Holder;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -27,8 +28,8 @@ import java.util.List;
  *     <tr><td>{@code add_pool}</td><td>{@link MutableLootTable#addPool(LootPool)}</td></tr>
  *     <tr><td>{@code add_entries} with {@code "pool": <int>}</td><td>{@link MutableLootTable#addToPool(int, List)}</td></tr>
  *     <tr><td>{@code add_entries} with {@code "pool": "every"}</td><td>{@link MutableLootTable#addToEveryPool(List)}</td></tr>
- *     <tr><td>{@code add_condition} with {@code "pool": <int>}</td><td>{@link MutableLootTable#addConditionToPool(int, LootItemCondition)}</td></tr>
- *     <tr><td>{@code add_condition} with {@code "pool": "every"}</td><td>{@link MutableLootTable#addConditionToEveryPool(LootItemCondition)}</td></tr>
+ *     <tr><td>{@code add_condition} with {@code "pool": <int>}</td><td>{@link MutableLootTable#addConditionToPool(int, Holder)}</td></tr>
+ *     <tr><td>{@code add_condition} with {@code "pool": "every"}</td><td>{@link MutableLootTable#addConditionToEveryPool(Holder)}</td></tr>
  * </table>
  * <p>
  * The operations of one addition are applied <b>in the order they are written</b>, which matters: the pools an
@@ -224,20 +225,20 @@ public sealed interface LootAdditionOp {
      * already had, so this can only narrow when a pool applies, never widen it.
      * <pre>{@code { "type": "add_condition", "pool": "every",
      *   "condition": { "condition": "minecraft:random_chance", "chance": 0.0 } } }</pre>
-     * {@code "pool"} defaults to {@code "every"}. {@code "condition"} is always inlined - there is no
-     * predicate registry to reference an entry of, unlike on later Minecraft versions.
+     * {@code "pool"} defaults to {@code "every"}. {@code "condition"} takes either an inline condition or the
+     * id of an entry of the {@code minecraft:predicate} datapack registry.
      *
      * @param pool      which pool(s) to restrict
      * @param condition the condition to AND onto each addressed pool
      */
-    record AddCondition(PoolSelector pool, LootItemCondition condition) implements LootAdditionOp {
+    record AddCondition(PoolSelector pool, Holder<LootItemCondition> condition) implements LootAdditionOp {
         /** The codec for the body of an {@code add_condition} operation. */
         public static final MapCodec<AddCondition> MAP_CODEC = RecordCodecBuilder.mapCodec(instance -> instance
                 .group(
                         PoolSelector.CODEC
                                 .optionalFieldOf("pool", PoolSelector.EVERY)
                                 .forGetter(AddCondition::pool),
-                        LootItemCondition.DIRECT_CODEC
+                        LootItemCondition.CODEC
                                 .fieldOf("condition")
                                 .forGetter(AddCondition::condition)
                 )

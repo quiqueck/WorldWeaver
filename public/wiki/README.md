@@ -37,7 +37,7 @@ which they should be upgraded/understood (each depends only on modules above it)
 | [preset-api](modules/preset-api.md) | `wover-preset-api` | core, tag, event | World Preset ("Create World" screen) registration | **Yes** — `world_preset/*.json` + WoVer's `world_preset_info` |
 | [surface-api](modules/surface-api.md) | `wover-surface-api` | common, datagen, core, math, event | Injectable surface rules merged into any chunk generator | **Yes** — `wover/worldgen/surface_rules/*.json` |
 | [structure-api](modules/structure-api.md) | `wover-structure-api` | core, math, event, block | Structure / structure-set / jigsaw pool registration | **Yes** — `structure/*.json`, `structure_set/*.json` |
-| [feature-api](modules/feature-api.md) | `wover-feature-api` | core, event, surface, block, structure | Configured/placed feature registration | **Yes** — `configured_feature/*.json`, `placed_feature/*.json` |
+| [feature-api](modules/feature-api.md) | `wover-feature-api` | core, event, surface, block, structure | Feature/placed-feature registration | **Yes** — `feature/*.json`, `placed_feature/*.json` |
 | [biome-api](modules/biome-api.md) | `wover-biome-api` | core, event, feature | Biome registration + runtime biome modification | **Yes** — `worldgen/biome/*.json`, `BiomeData` |
 | [generator-api](modules/generator-api.md) | `wover-generator-api` | core, event, surface, biome, preset, ui, tag | Custom Nether/End-style `ChunkGenerator`/`BiomeSource` | **Yes** — `dimension`, `chunk_generator`, `biome_source` JSON |
 | [pottable-api](modules/pottable-api.md) | `wover-pottable-api` | core, block, tag, event, datagen | Registry for pottable plants/soils (flower pots) | **Yes** — `wover/pottable_plant`, `wover/pottable_soil` |

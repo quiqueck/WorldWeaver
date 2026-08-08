@@ -14,9 +14,9 @@ import java.util.List;
  * A short-lived, mutable view of a {@link LootTable} that was just loaded from the datapacks.
  * <p>
  * An instance is handed to every {@link LootTableAppender} registered for the table, once per resource
- * reload, while the reloadable loot table registry is being rebuilt and before it is validated. It is only
- * valid for the duration of the {@link LootTableAppender#appendTo(MutableLootTable)} call - do not keep a
- * reference to it, and do not keep a reference to {@link #table()} either: both are replaced on every
+ * reload, while the {@code minecraft:loot_table} registry is being built and before it is validated. It is
+ * only valid for the duration of the {@link LootTableAppender#appendTo(MutableLootTable)} call - do not keep
+ * a reference to it, and do not keep a reference to {@link #table()} either: both are replaced on every
  * {@code /reload}.
  * <p>
  * Everything this view offers is additive. There is deliberately no way to remove or replace what the
@@ -42,18 +42,18 @@ public interface MutableLootTable {
 
     /**
      * The (already tag-updated) static registries of the server that is loading. Use this when an addition
-     * needs to look something up, e.g. an enchantment.
+     * needs to look something up, e.g. an enchantment or a predicate holder.
      * <p>
-     * Note that this does <em>not</em> contain the reloadable registries themselves - the loot table registry
-     * is still being assembled at this point.
+     * Note that this does <em>not</em> contain the reloadable registries themselves - the
+     * {@code minecraft:loot_table} registry is still being assembled at this point.
      *
      * @return the static registry lookup
      */
     HolderLookup.Provider registries();
 
     /**
-     * Resolves another loot table from the loot table registry that is currently being assembled, as a
-     * {@link Holder} suitable for
+     * Resolves another loot table from the {@code minecraft:loot_table} registry that is currently being
+     * assembled, as a {@link Holder} suitable for
      * {@link net.minecraft.world.level.storage.loot.entries.NestedLootTable#lootTableReference(Holder)}.
      * <p>
      * Unlike {@link #registries()}, which deliberately excludes the reloadable loot table registry because it
@@ -140,7 +140,7 @@ public interface MutableLootTable {
     /**
      * Adds a condition to a pool that already exists, identified by its index in {@link #pools()}.
      * <p>
-     * The new condition is AND'd together with whatever conditions the pool already has - from the datapacks,
+     * The new condition is AND'd together with whatever condition the pool already has - from the datapacks,
      * or from an earlier appender - so this can only narrow when a pool applies, never widen it. Use this to
      * restrict a vanilla pool to a subset of the situations it used to apply to (e.g. only outside a
      * particular dimension) while still leaving all of its original entries and functions untouched.
@@ -153,15 +153,16 @@ public interface MutableLootTable {
     MutableLootTable addConditionToPool(int index, LootItemCondition.Builder condition);
 
     /**
-     * {@link #addConditionToPool(int, LootItemCondition.Builder)} for a condition that is already built - the
-     * form the datapack path uses.
+     * {@link #addConditionToPool(int, LootItemCondition.Builder)} for a condition that is already resolved -
+     * the form the datapack path uses, and the only form that can reference an entry of the
+     * {@code minecraft:predicate} registry by id rather than inlining it.
      *
      * @param index     the index of the pool to restrict
      * @param condition the condition to add
      * @return this view, for chaining
      * @throws IndexOutOfBoundsException if {@code index} does not address a pool
      */
-    MutableLootTable addConditionToPool(int index, LootItemCondition condition);
+    MutableLootTable addConditionToPool(int index, Holder<LootItemCondition> condition);
 
     /**
      * Adds a condition to every pool the table currently has - the datapack-provided pools plus any pool an
@@ -174,11 +175,11 @@ public interface MutableLootTable {
     MutableLootTable addConditionToEveryPool(LootItemCondition.Builder condition);
 
     /**
-     * {@link #addConditionToEveryPool(LootItemCondition.Builder)} for a condition that is already built - the
-     * form the datapack path uses.
+     * {@link #addConditionToEveryPool(LootItemCondition.Builder)} for a condition that is already resolved -
+     * the form the datapack path uses.
      *
      * @param condition the condition to add to each pool
      * @return this view, for chaining
      */
-    MutableLootTable addConditionToEveryPool(LootItemCondition condition);
+    MutableLootTable addConditionToEveryPool(Holder<LootItemCondition> condition);
 }

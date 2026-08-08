@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 
 import java.util.function.BiConsumer;
@@ -125,10 +126,13 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
          * when mined normally.
          *
          * @param otherwise the item dropped without Silk Touch
-         * @param amount    the amount of {@code otherwise} to drop
+         * @param amount    the amount of {@code otherwise} to drop. 26.3 turned number providers into the
+         *                  {@code minecraft:number_provider} datapack registry, so this is now a
+         *                  {@link Holder} - {@code ConstantValue.exactly(...)} and
+         *                  {@code UniformGenerator.between(...)} already return one.
          * @return the new trait, or {@code null} outside of a datagen environment
          */
-        @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, NumberProvider amount);
+        @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, Holder<NumberProvider> amount);
 
         /**
          * Creates a trait that drops the block itself when mined with Silk Touch, a hoe, or shears.
@@ -143,14 +147,16 @@ public interface LootTableTrait extends BlockTrait<Block, LootTableTrait> {
          *
          * @param drop  supplies the item the ore drops (read lazily, so it may reference a not-yet-assigned
          *              registry field)
-         * @param count the base number of items to drop before the fortune bonus
+         * @param count the base number of items to drop before the fortune bonus. 26.3 turned number
+         *              providers into the {@code minecraft:number_provider} datapack registry, so this is now
+         *              a {@link Holder} - {@code UniformGenerator.between(...)} already returns one.
          * @return the new trait, or {@code null} outside of a datagen environment
          */
-        @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull NumberProvider count);
+        @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull Holder<NumberProvider> count);
 
         /**
          * Creates a trait using vanilla's ore-drop logic with a {@code min..max} uniform drop count. Shorthand
-         * for {@link #dropOre(Supplier, NumberProvider)} with {@code UniformGenerator.between(min, max)}.
+         * for {@link #dropOre(Supplier, Holder)} with {@code UniformGenerator.between(min, max)}.
          *
          * @param drop supplies the item the ore drops
          * @param min  the minimum number of items to drop before the fortune bonus

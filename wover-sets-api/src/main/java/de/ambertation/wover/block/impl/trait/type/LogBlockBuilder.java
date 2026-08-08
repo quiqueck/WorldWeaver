@@ -11,13 +11,15 @@ import de.ambertation.wover.block.impl.trait.BlockTraitImpl;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.entrypoint.LibWoverSets;
 
-import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.CopyPropertiesProvider;
 
 import java.util.List;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
 public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implements LogBlockTrait.Builder {
@@ -34,21 +36,26 @@ public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implement
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable Block strippedBlockState) {
         if (strippedBlockState == null) return withDefault();
-        return with((oldState) -> strippedBlockState.defaultBlockState());
+        return with(new CopyPropertiesProvider(strippedBlockState));
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockState strippedBlockState) {
         if (strippedBlockState == null) return withDefault();
-        return with((oldState) -> strippedBlockState);
+        return with(BlockStateProvider.simple(strippedBlockState));
     }
 
-    public @Nullable List<BlockTrait<?, ?>> with(@Nullable StripableBlockTrait.BlockStateFactory strippedBlockState) {
+    public @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockStateProvider strippedBlockState) {
         if (strippedBlockState == null) return withDefault();
-        //Make sure we copy the axis property if it exists
-        strippedBlockState = StripableBlockTrait.copyRotatedPillarBlockState(strippedBlockState);
+        return withDeferred(() -> strippedBlockState);
+    }
 
-        if (!ModCore.isDatagen()) return combine(BlockTraits.STRIPABLE.with(strippedBlockState));
-        return combine(new Trait(), BlockTraits.STRIPABLE.with(strippedBlockState), BlockTraits.LOOT_TABLE.dropSelf());
+    public @Nullable List<BlockTrait<?, ?>> withDeferred(@Nullable Supplier<BlockStateProvider> strippedBlockState) {
+        if (strippedBlockState == null) return withDefault();
+        // The axis (and any other shared property) is carried over by CopyPropertiesProvider, which the
+        // with(Block) overload above installs - 26.1 needed an explicit copyRotatedPillarBlockState wrapper
+        // here because the trait spoke in raw BlockStates.
+        if (!ModCore.isDatagen()) return combine(BlockTraits.STRIPABLE.withDeferred(strippedBlockState));
+        return combine(new Trait(), BlockTraits.STRIPABLE.withDeferred(strippedBlockState), BlockTraits.LOOT_TABLE.dropSelf());
     }
 
 
@@ -64,7 +71,7 @@ public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implement
             definition.addItemTags(ItemTags.LOGS);
 
             if (definition.hasTrait(BlockTraits.FLAMMABLE)) {
-                definition.addTags(BlockItemTags.LOGS_THAT_BURN.block());
+                definition.addTags(PrunedVanillaTags.BLOCK_LOGS_THAT_BURN);
             }
         }
     }

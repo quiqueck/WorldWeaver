@@ -29,6 +29,8 @@ run/
 run-client/
 run-server/
 output/
+# Fabric loader's remapped-mod cache, written next to the run dir by every dev/gametest run
+.fabric/
 *.log
 # Minecraft/log4j output dirs produced by fabric-loader-junit tests and dev runs
 logs/

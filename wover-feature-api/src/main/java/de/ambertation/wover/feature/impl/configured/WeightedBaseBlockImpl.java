@@ -9,20 +9,18 @@ import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 import java.util.Collection;
 import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class WeightedBaseBlockImpl<FC extends FeatureConfiguration, F extends Feature<FC>, W extends BaseWeightedBlock<FC, F, W>> extends FeatureConfiguratorImpl<FC, F> implements BaseWeightedBlock<FC, F, W> {
+public abstract class WeightedBaseBlockImpl<W extends BaseWeightedBlock<W>> extends FeatureConfiguratorImpl implements BaseWeightedBlock<W> {
     WeightedList.Builder<BlockState> stateBuilder = WeightedList.builder();
 
     WeightedBaseBlockImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }

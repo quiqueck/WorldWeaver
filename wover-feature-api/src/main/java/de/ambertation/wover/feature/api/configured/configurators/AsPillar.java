@@ -1,7 +1,6 @@
 package de.ambertation.wover.feature.api.configured.configurators;
 
 import de.ambertation.wover.feature.api.features.PillarFeature;
-import de.ambertation.wover.feature.api.features.config.PillarFeatureConfig;
 
 import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -19,15 +18,15 @@ import org.jetbrains.annotations.NotNull;
  * minimum and maximum height and a growing direction. The pillar is
  * built from a predefined collection of {@link BlockState}s.
  */
-public interface AsPillar extends FeatureConfigurator<PillarFeatureConfig, PillarFeature> {
+public interface AsPillar extends FeatureConfigurator {
     /**
-     * Sets the {@link PillarFeatureConfig.KnownTransformers} that determines the {@link BlockState} for
+     * Sets the {@link PillarFeature.KnownTransformers} that determines the {@link BlockState} for
      * each position of the pillar depending on its height.
      *
      * @param transformer The transformer to use
      * @return the same instance
      */
-    AsPillar transformer(@NotNull PillarFeatureConfig.KnownTransformers transformer);
+    AsPillar transformer(@NotNull PillarFeature.KnownTransformers transformer);
     /**
      * Determines for each position that was selected to be part of the pillar weather or not
      * it should be placed.

@@ -3,6 +3,7 @@ package de.ambertation.wover.loot.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ExtraCodecs;
@@ -167,7 +168,7 @@ public record LootAddition(
 
         /**
          * AND's a condition onto the pool at {@code index}. Mirrors
-         * {@link MutableLootTable#addConditionToPool(int, LootItemCondition)}.
+         * {@link MutableLootTable#addConditionToPool(int, Holder)}.
          *
          * @param index     the index of the pool to restrict
          * @param condition the condition to add
@@ -179,7 +180,7 @@ public record LootAddition(
 
         /**
          * AND's a condition onto every pool that exists when this operation runs. Mirrors
-         * {@link MutableLootTable#addConditionToEveryPool(LootItemCondition)}.
+         * {@link MutableLootTable#addConditionToEveryPool(Holder)}.
          *
          * @param condition the condition to add to each pool
          * @return this builder, for chaining
@@ -191,7 +192,7 @@ public record LootAddition(
         private Builder addCondition(LootAdditionOp.PoolSelector pool, LootItemCondition.Builder condition) {
             operations.add(new LootAdditionOp.AddCondition(
                     pool,
-                    Objects.requireNonNull(condition, "condition").build()
+                    Holder.direct(Objects.requireNonNull(condition, "condition").build())
             ));
             return this;
         }

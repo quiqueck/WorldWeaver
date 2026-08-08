@@ -14,14 +14,11 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * 26.2 moved the whole screen/overlay stack off {@link net.minecraft.client.Minecraft} and onto
+ * 26.3 moved the whole screen/overlay stack off {@link net.minecraft.client.Minecraft} and onto
  * {@link Gui} (the same refactor that turned {@code Minecraft#setScreen} into {@code Minecraft#gui#setScreen}).
  * {@code buildInitialScreens} and the private {@code addInitialScreens(List)} moved with it, so this mixin
  * had to be retargeted from {@code Minecraft} to {@code Gui}; it used to live in a {@code MinecraftMixin}
  * in this package.
- * <p>
- * Nothing catches this at compile time - the mixin still compiles against {@code Minecraft}, and only
- * fails when it is applied, with "could not find any targets matching 'addInitialScreens'".
  * <p>
  * The method body itself is unchanged - it still collects
  * {@code Function<Runnable, Screen>} factories into the supplied list and returns a boolean, and it still has

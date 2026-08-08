@@ -57,7 +57,7 @@ public class SurfaceRuleUtil {
 
         if (list.size() == 0) return List.of();
 
-        // 26.2: SurfaceRules.isBiome() resolves its keys into a HolderSet<Biome> right away instead of
+        // 26.3: SurfaceRules.isBiome() resolves its keys into a HolderSet<Biome> right away instead of
         // storing the raw ResourceKeys, so it needs a lookup. We are past WORLD_REGISTRY_READY here, so
         // the biome registry of the world we are injecting into is the correct source for it.
         final HolderGetter<Biome> biomes = registryAccess.lookupOrThrow(Registries.BIOME);

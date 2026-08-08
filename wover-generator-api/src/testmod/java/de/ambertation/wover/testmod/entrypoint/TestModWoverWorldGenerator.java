@@ -4,10 +4,10 @@ import de.ambertation.wover.biome.api.BiomeKey;
 import de.ambertation.wover.biome.api.BiomeManager;
 import de.ambertation.wover.biome.api.builder.BiomeBuilder;
 import de.ambertation.wover.core.api.ModCore;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.FeatureContentManager;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.NetherForrestVegetation;
-import de.ambertation.wover.feature.api.placed.PlacedConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.placed.BoundPlacedFeatureKey;
 import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 import de.ambertation.wover.feature.api.placed.PlacedFeatureManager;
 import de.ambertation.wover.generator.api.biomesource.WoverBiomeBuilder;
@@ -43,10 +43,10 @@ public class TestModWoverWorldGenerator implements ModInitializer {
     public static final BiomeKey<WoverBiomeBuilder.WoverBiome> NETHER_WASTE_SUB_BIOME = WoverBiomeBuilder.biomeKey(C.id(
             "wastes_sub_biome"));
 
-    public static final ConfiguredFeatureKey<NetherForrestVegetation> TEST_VEGETATION
-            = ConfiguredFeatureManager.netherForrestVegetation(C.id("test_vegetation"));
+    public static final FeatureKey<NetherForrestVegetation> TEST_VEGETATION
+            = FeatureContentManager.netherForrestVegetation(C.id("test_vegetation"));
 
-    public static final PlacedConfiguredFeatureKey TEST_VEGETATION_PLACED
+    public static final BoundPlacedFeatureKey TEST_VEGETATION_PLACED
             = PlacedFeatureManager.createKey(TEST_VEGETATION)
                                   .setDecoration(GenerationStep.Decoration.VEGETAL_DECORATION);
 

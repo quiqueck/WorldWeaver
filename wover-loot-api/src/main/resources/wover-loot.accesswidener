@@ -1,0 +1,9 @@
+accessWidener	v1	official
+
+# LootLookupProvider subclasses VanillaBlockLoot (see LootLookupProvider.WoverVanillaBlockLoot) to rebuild the
+# silk-touch/shears conditions 26.3 moved into the reloadable minecraft:predicate registry, which Fabric's data
+# generator builds empty. Fabric's own data-generation classtweaker widens BlockLootSubProvider#generate() to
+# public but leaves VanillaBlockLoot's override protected, so the class is no longer subclassable at all
+# ("generate() in VanillaBlockLoot cannot override generate() in BlockLootSubProvider"). Widening the override
+# to match its now-public parent restores that; it changes no behaviour.
+accessible method net/minecraft/data/loot/packs/VanillaBlockLoot generate ()V

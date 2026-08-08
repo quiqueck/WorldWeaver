@@ -69,19 +69,23 @@ public class WorldPresetGameTest {
 
     /**
      * Covers {@code FlatLevelPresetBootstrapContext#register(...)}, the flat-world counterpart of the
-     * test above, which had no coverage at all.
+     * test above, which had no coverage at all before the 26.3 port.
      * <p>
      * That method is not a thin delegate: it resolves three registries through the context's
      * {@code lookup(...)} (structure sets, placed features and the biome), assembles a
      * {@link net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings} and pushes the layers
-     * into it - so this asserts the whole result, not just that the key exists.
+     * into it. The 26.3 port changed its surroundings on both ends - the lifecycle-aware overload was
+     * removed, and {@code lookup} now comes from vanilla's new {@code BootstrapContextAccess} with a real
+     * type parameter instead of the old, effectively unusable
+     * {@code ResourceKey<? extends Registry<? extends FlatLevelGeneratorPreset>>} signature - so this
+     * asserts the whole result, not just that the key exists.
      * <p>
      * Note on layer order: {@code register} consumes {@code flatLayerInfos} bottom layer first, matching
      * vanilla, which reads {@code getLayersInfo()} bottom-up (see
      * {@code FlatLevelGeneratorSettings#updateLayers}) with index 0 at the lowest y. The testmod registers
      * {@code (12x netherrack, 2x nether_bricks)}, so the expectation below is netherrack at the bottom and
      * a nether-brick surface on top - i.e. the argument list in order. Until this was fixed the array was
-     * iterated back-to-front and every flat preset generated inverted.
+     * iterated back-to-front and this assertion was written inverted to match.
      */
     @GameTest
     public void flatLevelPresetIsRegisteredAndVisible(GameTestHelper helper) {

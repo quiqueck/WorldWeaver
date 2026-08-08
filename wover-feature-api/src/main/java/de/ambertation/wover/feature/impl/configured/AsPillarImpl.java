@@ -1,38 +1,36 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.Features;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.AsPillar;
 import de.ambertation.wover.feature.api.features.PillarFeature;
-import de.ambertation.wover.feature.api.features.config.PillarFeatureConfig;
 
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, PillarFeature> implements AsPillar {
+public class AsPillarImpl extends FeatureConfiguratorImpl implements AsPillar {
     private IntProvider maxHeight;
     private IntProvider minHeight;
     private BlockStateProvider stateProvider;
 
-    private PillarFeatureConfig.KnownTransformers transformer;
+    private PillarFeature.KnownTransformers transformer;
     private Direction direction = Direction.UP;
     private BlockPredicate allowedPlacement = BlockPredicate.ONLY_IN_AIR_PREDICATE;
 
     AsPillarImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -44,7 +42,7 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
     }
 
     @Override
-    public AsPillar transformer(@NotNull PillarFeatureConfig.KnownTransformers transformer) {
+    public AsPillar transformer(@NotNull PillarFeature.KnownTransformers transformer) {
         this.transformer = transformer;
         return this;
     }
@@ -95,9 +93,8 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
         return this;
     }
 
-
     @Override
-    public @NotNull PillarFeatureConfig createConfiguration() {
+    protected @NotNull Feature createFeature() {
         if (this.transformer == null) {
             throwStateError("A Pillar Feature needs a transformer");
         }
@@ -108,7 +105,7 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
             throwStateError("A Pillar Feature needs a height");
         }
         if (minHeight == null) minHeight = ConstantInt.of(0);
-        return new PillarFeatureConfig(
+        return new PillarFeature(
                 minHeight,
                 maxHeight,
                 direction,
@@ -118,18 +115,13 @@ public class AsPillarImpl extends FeatureConfiguratorImpl<PillarFeatureConfig, P
         );
     }
 
-    @Override
-    protected @NotNull PillarFeature getFeature() {
-        return (PillarFeature) Features.PILLAR;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<AsPillar> {
+    public static class Key extends FeatureKey<AsPillar> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public AsPillar bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public AsPillar bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new AsPillarImpl(ctx, key);
         }
     }

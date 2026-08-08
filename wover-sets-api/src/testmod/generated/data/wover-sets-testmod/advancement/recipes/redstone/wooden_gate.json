@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_gate"
+        "recipes": "wover-sets-testmod:wooden_gate"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

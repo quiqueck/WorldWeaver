@@ -7,7 +7,7 @@ import de.ambertation.wover.testmod.entrypoint.TestModWoverWorldGenerator;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 public class FeatureProvider extends WoverFeatureProvider {
@@ -21,7 +21,7 @@ public class FeatureProvider extends WoverFeatureProvider {
     }
 
     @Override
-    protected void bootstrapConfigured(BootstrapContext<ConfiguredFeature<?, ?>> context) {
+    protected void bootstrapFeatures(BootstrapContext<Feature> context) {
         TestModWoverWorldGenerator
                 .TEST_VEGETATION
                 .bootstrap(context)

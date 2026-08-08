@@ -6,6 +6,7 @@ import de.ambertation.wover.config.api.Configs;
 import de.ambertation.wover.core.api.ModCore;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -13,11 +14,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
 
@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link BiomePredicateRegistry}.
  * <p>
  * If you need to, you can add custom predicates as well using
- * {@link BiomePredicateRegistry#register(Identifier, KeyDispatchDataCodec)}.
+ * {@link BiomePredicateRegistry#register(Identifier, MapCodec)}.
  */
 public interface BiomePredicate {
     /**
@@ -214,13 +214,16 @@ public interface BiomePredicate {
     }
 
     /**
-     * Creates a predicate that tests if the passed configured feature can generate in the biome.
+     * Creates a predicate that tests if the passed feature can generate in the biome.
+     * <p>
+     * Was {@code hasConfiguredFeature} before 26.3 folded {@code ConfiguredFeature} into
+     * {@link Feature}.
      *
-     * @param key the configured feature key
+     * @param key the feature key
      * @return the predicate
      */
-    static BiomePredicate hasConfiguredFeature(ResourceKey<ConfiguredFeature<?, ?>> key) {
-        return new HasConfiguredFeature(key);
+    static BiomePredicate hasFeature(ResourceKey<Feature> key) {
+        return new HasFeature(key);
     }
 
     /**
@@ -351,10 +354,13 @@ public interface BiomePredicate {
         @NotNull
         public final Registry<PlacedFeature> placedFeatures;
         /**
-         * The configured feature registry from the {@link #registryAccess}
+         * The feature registry from the {@link #registryAccess}
+         * <p>
+         * Was {@code configuredFeatures} before 26.3 folded {@code ConfiguredFeature} into
+         * {@link Feature} and renamed the registry to {@link Registries#FEATURE}.
          */
         @NotNull
-        public final Registry<ConfiguredFeature<?, ?>> configuredFeatures;
+        public final Registry<Feature> features;
 
         private Context(
                 @NotNull RegistryAccess registryAccess,
@@ -369,7 +375,7 @@ public interface BiomePredicate {
             this.levelStems = registryAccess.lookupOrThrow(Registries.LEVEL_STEM);
             this.structures = registryAccess.lookupOrThrow(Registries.STRUCTURE);
             this.placedFeatures = registryAccess.lookupOrThrow(Registries.PLACED_FEATURE);
-            this.configuredFeatures = registryAccess.lookupOrThrow(Registries.CONFIGURED_FEATURE);
+            this.features = registryAccess.lookupOrThrow(Registries.FEATURE);
 
             this.biome = biome;
             this.biomeHolder = biomes.getOrThrow(biomeKey);
@@ -423,7 +429,7 @@ public interface BiomePredicate {
     Codec<BiomePredicate> CODEC = BiomePredicateRegistryImpl
             .BIOME_PREDICATES.byNameCodec()
                              .dispatch(
-                                     p -> p.codec().codec(),
+                                     BiomePredicate::codec,
                                      Function.identity()
                              );
     /**
@@ -432,7 +438,7 @@ public interface BiomePredicate {
      * @return the codec
      */
     @ApiStatus.Internal
-    KeyDispatchDataCodec<? extends BiomePredicate> codec();
+    MapCodec<? extends BiomePredicate> codec();
 
     /**
      * Tests if the predicate is {@code true} for the passed context.

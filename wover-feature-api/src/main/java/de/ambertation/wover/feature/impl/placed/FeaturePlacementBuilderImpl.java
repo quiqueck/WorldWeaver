@@ -10,7 +10,6 @@ import de.ambertation.wover.feature.impl.configured.InlineBuilderImpl;
 import de.ambertation.wover.feature.impl.configured.RandomPatchImpl;
 import de.ambertation.wover.math.api.valueproviders.Vec3iProvider;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
@@ -21,7 +20,7 @@ import net.minecraft.util.valueproviders.*;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.*;
 
 import java.util.LinkedList;
@@ -37,49 +36,49 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
     @Nullable
     private final ResourceKey<PlacedFeature> key;
     @NotNull
-    private final Holder<ConfiguredFeature<?, ?>> configuredFeatureHolder;
+    private final Holder<Feature> featureHolder;
     @Nullable
     private final BootstrapContext<PlacedFeature> bootstrapContext;
 
     //Transitive Members
     @Nullable
-    private final ResourceKey<ConfiguredFeature<?, ?>> transitiveConfiguredFeatureKey;
+    private final ResourceKey<Feature> transitiveFeatureKey;
 
     @Nullable
-    private final BiFunction<ResourceKey<ConfiguredFeature<?, ?>>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder;
+    private final BiFunction<ResourceKey<Feature>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder;
 
     public FeaturePlacementBuilderImpl(
             @Nullable BootstrapContext<PlacedFeature> bootstrapContext,
             @Nullable ResourceKey<PlacedFeature> key,
-            @NotNull Holder<ConfiguredFeature<?, ?>> configuredFeatureHolder
+            @NotNull Holder<Feature> featureHolder
     ) {
-        this(bootstrapContext, key, configuredFeatureHolder, null, null);
+        this(bootstrapContext, key, featureHolder, null, null);
     }
 
     public FeaturePlacementBuilderImpl(
             @Nullable BootstrapContext<PlacedFeature> bootstrapContext,
             @Nullable ResourceKey<PlacedFeature> key,
-            @NotNull Holder<ConfiguredFeature<?, ?>> configuredFeatureHolder,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> transitiveConfiguredFeatureKey,
-            @Nullable BiFunction<ResourceKey<ConfiguredFeature<?, ?>>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder
+            @NotNull Holder<Feature> featureHolder,
+            @Nullable ResourceKey<Feature> transitiveFeatureKey,
+            @Nullable BiFunction<ResourceKey<Feature>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder
     ) {
         this.bootstrapContext = bootstrapContext;
         this.key = key;
-        this.configuredFeatureHolder = configuredFeatureHolder;
-        this.transitiveConfiguredFeatureKey = transitiveConfiguredFeatureKey;
+        this.featureHolder = featureHolder;
+        this.transitiveFeatureKey = transitiveFeatureKey;
         this.randomPatchBuilder = randomPatchBuilder;
     }
 
     @ApiStatus.Internal
     public static FeaturePlacementBuilderImpl withTransitive(
-            FeatureConfiguratorImpl<?, ?> configuredFeatureBuilder,
-            BiFunction<ResourceKey<ConfiguredFeature<?, ?>>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder
+            FeatureConfiguratorImpl featureBuilder,
+            BiFunction<ResourceKey<Feature>, ResourceKey<PlacedFeature>, RandomPatchImpl> randomPatchBuilder
     ) {
         return new FeaturePlacementBuilderImpl(
-                configuredFeatureBuilder.getTransitiveBootstrapContext(),
-                configuredFeatureBuilder.getTransitiveFeatureKey(),
-                configuredFeatureBuilder.directHolder(),
-                configuredFeatureBuilder.key,
+                featureBuilder.getTransitiveBootstrapContext(),
+                featureBuilder.getTransitiveFeatureKey(),
+                featureBuilder.directHolder(),
+                featureBuilder.key,
                 randomPatchBuilder
         );
     }
@@ -246,17 +245,17 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
 
     @Override
     public FeaturePlacementBuilderImpl spreadHorizontal(IntProvider p) {
-        return modifier(RandomOffsetPlacement.horizontal(p));
+        return modifier(OffsetPlacement.horizontal(p));
     }
 
     @Override
     public FeaturePlacementBuilderImpl spreadVertical(IntProvider p) {
-        return modifier(RandomOffsetPlacement.horizontal(p));
+        return modifier(OffsetPlacement.horizontal(p));
     }
 
     @Override
     public FeaturePlacementBuilderImpl spread(IntProvider horizontal, IntProvider vertical) {
-        return modifier(RandomOffsetPlacement.of(horizontal, vertical));
+        return modifier(OffsetPlacement.of(horizontal, vertical));
     }
 
     @Override
@@ -620,7 +619,7 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
     /**
      * Scatters the backing configured feature using placement modifiers — the vanilla-migrated replacement for
      * the removed {@code random_patch} configured feature. Emits {@code CountPlacement.of(tries)} +
-     * {@code RandomOffsetPlacement.of(trapezoid xz, trapezoid y)} + {@code BiomeFilter}, matching vanilla's
+     * {@code OffsetPlacement.of(trapezoid xz, trapezoid y)} + {@code BiomeFilter}, matching vanilla's
      * modifier set/order.
      */
     @Override
@@ -648,11 +647,11 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
      * @return {@link RandomPatch} instance.
      */
     @Override
-    //TODO: @Deprecated(since = "26.1.0", forRemoval = true)
+    @Deprecated(since = "26.1.0", forRemoval = true)
     public RandomPatch inRandomPatch() {
         final RandomPatch randomPatch;
         if (randomPatchBuilder != null) {
-            randomPatch = randomPatchBuilder.apply(transitiveConfiguredFeatureKey, key);
+            randomPatch = randomPatchBuilder.apply(transitiveFeatureKey, key);
         } else {
             randomPatch = new InlineBuilderImpl(this.bootstrapContext, this.key).randomPatch();
         }
@@ -672,10 +671,11 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
             );
         }
         PlacedFeature feature = build();
-        // Use the 3-arg register overload: under 26.1's async registry loading, another registry
-        // (e.g. biome_modifications) may look up this placed feature's holder first, creating an
-        // *unbound* reference. The 2-arg register would then no-op; the 3-arg overload binds it.
-        return bootstrapContext.register(key, feature, Lifecycle.stable());
+        // 26.3 removed BootstrapContext#register(key, value, Lifecycle). 26.1 used that overload here
+        // because it also bound an already-created *unbound* reference, which could happen when another
+        // registry (e.g. biome_modifications) looked this placed feature up first under parallel registry
+        // loading. Vanilla offers no replacement, so the two-argument register is the only option now.
+        return bootstrapContext.register(key, feature);
     }
 
     @Override
@@ -686,6 +686,6 @@ public class FeaturePlacementBuilderImpl implements de.ambertation.wover.feature
 
     @NotNull
     public PlacedFeature build() {
-        return new PlacedFeature(configuredFeatureHolder, modifications);
+        return new PlacedFeature(featureHolder, modifications);
     }
 }

@@ -67,11 +67,11 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.add(CommonPoiTags.BEE_NEST, Blocks.BEE_NEST);
         ctx.add(CommonPoiTags.NETHER_PORTAL, Blocks.NETHER_PORTAL);
         ctx.add(CommonPoiTags.LODESTONE, Blocks.LODESTONE);
-        //26.2 turned the lightning rod into a full weathering-copper family: Blocks.LIGHTNING_ROD
+        //26.3 turned the lightning rod into a full weathering-copper family: Blocks.LIGHTNING_ROD
         //is now a WeatheringCopperCollection<Block> holding all eight variants (unaffected /
         //exposed / weathered / oxidized, each also waxed) instead of a single Block. Vanilla
-        //has BlockTags.LIGHTNING_RODS for exactly that set and PoiTypes registers the whole
-        //collection for its lightning_rod POI, so referencing the vanilla tag keeps
+        //introduced BlockTags.LIGHTNING_RODS for exactly that set and PoiTypes now registers the
+        //whole collection for its lightning_rod POI, so referencing the vanilla tag keeps
         //wover:poi/lightning_rod in step with vanilla and needs no maintenance when further
         //variants appear. This does widen the tag from one block to eight - that is the vanilla
         //behaviour change, not a WoVer decision.
@@ -179,18 +179,19 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.add(CommonBlockTags.COMPOSTER, Blocks.COMPOSTER);
         ctx.add(CommonBlockTags.WOODEN_COMPOSTER, Blocks.COMPOSTER);
 
-        ctx.add(
-                net.minecraft.tags.BlockTags.NETHER_CARVER_REPLACEABLES,
-                Blocks.BASALT,
-                Blocks.RED_SAND,
-                Blocks.MAGMA_BLOCK,
-                Blocks.SCULK
-        );
-        ctx.add(
-                net.minecraft.tags.BlockTags.NETHER_CARVER_REPLACEABLES,
-                CommonBlockTags.NETHER_STONES,
-                CommonBlockTags.NETHERRACK
-        );
+        //REMOVED IN 26.3: minecraft:nether_carver_replaceables (and its overworld sibling) no
+        //longer exist - neither the BlockTags constant nor the data file. 26.3 rewrote carving:
+        //CarverConfiguration, which carried the `replaceable` HolderSet<Block> that these tags
+        //fed, is gone entirely. Carvers are now plain records (CaveWorldCarver/CanyonWorldCarver)
+        //that only write into a CarvingMask via CarverOutput#carve(x, y, z); NoiseBasedChunkGenerator
+        //then re-resolves the masked column against the noise/aquifer state. Nothing consults a
+        //block tag any more, so there is no replacement tag to move these entries to and the
+        //generated data/minecraft/tags/block/nether_carver_replaceables.json disappears with them.
+        //
+        //The blocks named here (basalt, red sand, magma block, sculk) and the referenced
+        //wover:surfaces/nether/{stones,netherrack} tags are all still declared through the
+        //CommonBlockTags.NETHER_TERRAIN / NETHERRACK / NETHER_STONES groups above, so no WoVer
+        //tag loses content - only the vanilla tag that no longer has a consumer.
 
         ctx.add(
                 net.minecraft.tags.BlockTags.MINEABLE_WITH_AXE,
@@ -290,11 +291,15 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
         ctx.addOptional(BlockTags.INCORRECT_FOR_WOODEN_TOOL, MineableTags.NEEDS_GOLD_TOOL);
 
         ctx.add(CommonBlockTags.CAULDRONS, Blocks.LAVA_CAULDRON, Blocks.WATER_CAULDRON, Blocks.POWDER_SNOW_CAULDRON);
-        //26.2 replaced the sixteen Blocks.<COLOR>_BED constants with a single
+        //26.3 replaced the sixteen Blocks.<COLOR>_BED constants with a single
         //Blocks.BED, a ColorCollection<Block> (the same treatment WOOL, CONCRETE,
         //DYED_TERRACOTTA, CARPET, ... received). asList() yields exactly those sixteen dyed beds
         //in ColorCollection order; the provider sorts entries before writing, so the generated
         //JSON is unchanged.
+        //
+        //Blocks.STRAW_BED, new in 26.3, is deliberately NOT added: vanilla keeps it out of
+        //minecraft:beds as well, so adding it here would make wover:beds (and through it the
+        //wover:poi/home village POI) disagree with vanilla.
         ctx.add(CommonBlockTags.BEDS, Blocks.BED.asList().toArray(Block[]::new));
 
         ctx.add(CommonBlockTags.ENCHANTING_MAGIC_SOURCE, CommonBlockTags.BOOKSHELVES);

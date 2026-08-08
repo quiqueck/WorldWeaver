@@ -6,17 +6,19 @@ import de.ambertation.wover.block.api.model.BlockModelBinding;
 import de.ambertation.wover.block.api.trait.behaviour.LootTableTrait;
 import de.ambertation.wover.item.api.BlockItemDefinition;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SignItem;
+import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.entity.SignText;
 
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A {@link BlockDefinition} that builds a standing (or hanging) sign together with its matching wall variant and
- * a single shared {@link SignItem}.
+ * a single shared {@link StandingAndWallBlockItem}.
  * <p>
  * Vanilla signs always come in pairs (e.g. {@code StandingSignBlock}/{@code WallSignBlock}, or
  * {@code CeilingHangingSignBlock}/{@code WallHangingSignBlock}), but only need one {@code BlockItem} between them.
@@ -29,18 +31,26 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SignBlockDefinition extends BlockDefinition<SignBlock, SignBlockDefinition> {
     /**
-     * Creates the shared {@link SignItem} for a sign/wall-sign pair.
+     * Creates the shared {@link StandingAndWallBlockItem} for a sign/wall-sign pair.
+     * <p>
+     * This used to return {@code SignItem}, a class 26.3 deleted. {@code SignItem} only ever did two things:
+     * fix the attachment {@code Direction} to {@code DOWN} on the {@link StandingAndWallBlockItem} constructor,
+     * and open the sign text editor for the placing player. The latter moved onto
+     * {@link SignBlock#setPlacedBy}, so {@link StandingAndWallBlockItem} - which {@code SignItem} always
+     * extended, and which {@link net.minecraft.world.item.HangingSignItem} still extends - is a complete
+     * replacement. Vanilla itself now registers every sign item as a plain
+     * {@code StandingAndWallBlockItem(block, wallBlock, Direction.DOWN, properties)}.
      */
     public interface SignItemFactory {
         /**
-         * Creates the {@link SignItem} shared by the standing/hanging sign and its wall variant.
+         * Creates the item shared by the standing/hanging sign and its wall variant.
          *
          * @param signBlock     the primary (standing/ceiling) sign block
          * @param wallSignBlock the matching wall sign block
          * @param properties    the item properties to use
-         * @return the new {@link SignItem}
+         * @return the new {@link StandingAndWallBlockItem}
          */
-        SignItem create(SignBlock signBlock, SignBlock wallSignBlock, Item.Properties properties);
+        StandingAndWallBlockItem create(SignBlock signBlock, SignBlock wallSignBlock, Item.Properties properties);
     }
 
     /**
@@ -66,14 +76,14 @@ public class SignBlockDefinition extends BlockDefinition<SignBlock, SignBlockDef
      * Creates a new sign definition.
      * <p>
      * No default {@link BlockItem} is created (see {@link BlockDefinition#noBlockItem()}); the shared
-     * {@link SignItem} is created lazily from {@code itemFactory} once both blocks exist.
+     * {@link StandingAndWallBlockItem} is created lazily from {@code itemFactory} once both blocks exist.
      *
      * @param registry       the registry this definition will register both blocks with
      * @param signName       the registration name of the standing/ceiling sign block
      * @param wallSignName   the registration name of the wall sign block
      * @param signFactory    creates the standing/ceiling sign block
      * @param wallSignFactory creates the wall sign block
-     * @param itemFactory    creates the shared {@link SignItem} once both blocks are registered
+     * @param itemFactory    creates the shared {@link StandingAndWallBlockItem} once both blocks are registered
      */
     public SignBlockDefinition(
             BlockRegistry registry,
@@ -118,6 +128,14 @@ public class SignBlockDefinition extends BlockDefinition<SignBlock, SignBlockDef
         )
         )
                 .stacksTo(16)
+                // Vanilla's Item.Properties#signText(), inlined because BlockItemDefinition exposes the
+                // generic component(...) setter rather than every vanilla Properties shortcut. 26.3 made sign
+                // text an item component, and SignBlockEntity#applyImplicitComponents/collectImplicitComponents
+                // move it between block entity and stack. Declaring the empty default here is what keeps a
+                // blank sign's stack equal to the item's default components (as it is for vanilla signs)
+                // instead of always carrying an explicit sign_text_front/back override.
+                .component(DataComponents.SIGN_TEXT_FRONT, SignText.EMPTY)
+                .component(DataComponents.SIGN_TEXT_BACK, SignText.EMPTY)
                 .addTags(this.itemTags);
     }
 

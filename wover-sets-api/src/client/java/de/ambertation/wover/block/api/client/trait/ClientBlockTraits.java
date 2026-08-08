@@ -2,8 +2,8 @@ package de.ambertation.wover.block.api.client.trait;
 
 import de.ambertation.wover.block.api.render.BlockRenderTraits;
 import de.ambertation.wover.block.api.render.ChestRendererBinding;
-import de.ambertation.wover.block.api.render.TintBuilder;
 import de.ambertation.wover.block.api.render.RenderLayerBuilder;
+import de.ambertation.wover.block.api.render.TintBuilder;
 import de.ambertation.wover.block.impl.client.trait.BlockModelTraitBuilder;
 import de.ambertation.wover.item.api.render.BoatRendererBuilder;
 import de.ambertation.wover.item.api.render.ItemRenderTraits;

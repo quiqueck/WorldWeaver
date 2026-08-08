@@ -14,7 +14,8 @@ import de.ambertation.wover.sets.api.blocks.SlotType;
 import de.ambertation.wover.sets.api.blocks.WoodenBlockSet;
 import de.ambertation.wover.sets.api.blocks.WoodenSlotFromDefinition;
 
-import net.minecraft.world.item.SignItem;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
@@ -55,7 +56,9 @@ public class Sign extends WoodenSlotFromDefinition {
                     set.baseName + "_" + WALL_SIGN.suffix(),
                     (def) -> new StandingSignBlock(woodenBlockSet.woodType(), def.getProperties()),
                     (def) -> new WallSignBlock(woodenBlockSet.woodType(), def.getProperties()),
-                    SignItem::new
+                    (signBlock, wallSignBlock, properties) -> new StandingAndWallBlockItem(
+                            signBlock, wallSignBlock, Direction.DOWN, properties
+                    )
             );
         } else {
             throw new IllegalArgumentException("Sign slot can only be used with WoodenBlockSet.");

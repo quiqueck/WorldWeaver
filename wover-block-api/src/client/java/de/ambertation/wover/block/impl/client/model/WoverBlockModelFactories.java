@@ -65,13 +65,13 @@ public class WoverBlockModelFactories implements WoverClientTraitEntrypoint {
                             .select(Direction.WEST, X_ROT_90.then(Y_ROT_270))
                             .select(Direction.EAST, X_ROT_90.then(Y_ROT_90));
             Material openTopTexture = TextureMapping.getBlockTexture(block, "_top_open");
-            Identifier closedModel = TexturedModel.CUBE_TOP_BOTTOM.create(
+            Identifier closedModel = TexturedModel.CUBE_BOTTOM_TOP.create(
                     block,
                     generator.vanillaGenerator.modelOutput
             );
             MultiVariant multiVariant = generator.vanillaGenerator.plainVariant(closedModel);
             MultiVariant multiVariant2 = generator.vanillaGenerator.plainVariant(
-                    TexturedModel.CUBE_TOP_BOTTOM
+                    TexturedModel.CUBE_BOTTOM_TOP
                             .get(block)
                             .updateTextures(textureMapping -> textureMapping.put(TextureSlot.TOP, openTopTexture))
                             .createWithSuffix(block, "_open", generator.vanillaGenerator.modelOutput)

@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,7 +11,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The position will be accepted if all performed predicate tests succeed.
  */
-public class IsBasin extends PlacementFilter {
+public class IsBasin implements PlacementFilter {
     /**
      * Codec for this placement modifier.
      */
@@ -97,7 +95,7 @@ public class IsBasin extends PlacementFilter {
      * @return {@code true} if the position is in a basin, {@code false} otherwise
      */
     @Override
-    protected boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
+    public boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
         WorldGenLevel level = ctx.getLevel();
         if (topPredicate != null && !topPredicate.test(level, pos.above())) return false;
 
@@ -110,12 +108,13 @@ public class IsBasin extends PlacementFilter {
 
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return the type
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.IS_BASIN;
+    public @NotNull MapCodec<IsBasin> codec() {
+        return CODEC;
     }
 }

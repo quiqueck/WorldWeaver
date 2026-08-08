@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Helper class for registering custom conditions in
- * {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_CONDITION}.
+ * {@link net.minecraft.core.registries.BuiltInRegistries#MATERIAL_CONDITION_TYPE}
+ * (called {@code MATERIAL_CONDITION} before Minecraft 26.3).
  */
 public class ConditionManager {
     /**

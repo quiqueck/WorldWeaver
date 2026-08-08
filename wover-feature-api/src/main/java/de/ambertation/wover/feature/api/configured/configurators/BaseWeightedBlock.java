@@ -3,17 +3,17 @@ package de.ambertation.wover.feature.api.configured.configurators;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 /**
  * A {@link FeatureConfigurator} that allows to add blocks with a weight.
+ * <p>
+ * 26.3 collapsed {@code ConfiguredFeature} into {@link net.minecraft.world.level.levelgen.feature.Feature},
+ * which is non-generic and carries its own configuration, so the {@code <FC>}/{@code <F>} type parameters
+ * were dropped. Only the self-type is left.
  *
- * @param <FC> The {@link FeatureConfiguration} of the {@link Feature} that is configured
- * @param <F>  The {@link Feature} that is configured
- * @param <W>  The type of the {@link FeatureConfigurator} that is returned
+ * @param <W> The type of the {@link FeatureConfigurator} that is returned
  */
-public interface BaseWeightedBlock<FC extends FeatureConfiguration, F extends Feature<FC>, W extends BaseWeightedBlock<FC, F, W>> extends FeatureConfigurator<FC, F> {
+public interface BaseWeightedBlock<W extends BaseWeightedBlock<W>> extends FeatureConfigurator {
     /**
      * Allows the Block in its default BlockState to be placed. The Block must have a
      * {@link net.minecraft.world.level.block.HorizontalDirectionalBlock#FACING} property.

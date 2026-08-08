@@ -1,6 +1,5 @@
 package de.ambertation.wover.preset.api.context;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
@@ -18,6 +17,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -175,19 +175,23 @@ public class WorldPresetBootstrapContext implements BootstrapContext<WorldPreset
 
     /**
      * Registers a new world preset.
+     * <p>
+     * Minecraft 26.3 removed {@code BootstrapContext#register(ResourceKey, T, Lifecycle)}; the interface
+     * now only declares this two-argument form and every registration uses the registry's own lifecycle.
+     * The lifecycle-aware overload we used to implement here is gone with it and vanilla offers no
+     * replacement, so callers that used to pass a {@link com.mojang.serialization.Lifecycle} simply drop
+     * that argument.
      *
      * @param resourceKey the key of the preset
      * @param preset      the preset to register
-     * @param lifecycle   the lifecycle of the preset
      * @return a reference to the registered preset
      */
     @Override
     public Holder.@NotNull Reference<WorldPreset> register(
             ResourceKey<WorldPreset> resourceKey,
-            WorldPreset preset,
-            Lifecycle lifecycle
+            WorldPreset preset
     ) {
-        return context.register(resourceKey, preset, lifecycle);
+        return context.register(resourceKey, preset);
     }
 
     /**
@@ -200,6 +204,25 @@ public class WorldPresetBootstrapContext implements BootstrapContext<WorldPreset
     @Override
     public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
         return context.lookup(resourceKey);
+    }
+
+    /**
+     * Lists every element that is visible in the surrounding bootstrap context for the given registry.
+     * <p>
+     * New in Minecraft 26.3: {@code BootstrapContext} was split and the read-only half moved to
+     * {@link net.minecraft.data.worldgen.BootstrapContextAccess}, which added this method. As this class
+     * is a pure decorator around another context, we forward it unchanged - the wrapped context is the
+     * one that knows what is actually in scope.
+     *
+     * @param resourceKey the key of the registry
+     * @param <S>         the element type of the registry
+     * @return the elements of that registry that are visible in this context
+     */
+    @Override
+    public <S> Stream<Holder.Reference<S>> listContextElements(
+            ResourceKey<? extends Registry<? extends S>> resourceKey
+    ) {
+        return context.listContextElements(resourceKey);
     }
 
     /**

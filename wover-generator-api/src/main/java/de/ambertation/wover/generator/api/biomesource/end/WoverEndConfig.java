@@ -42,7 +42,7 @@ public class WoverEndConfig implements BiomeSourceConfig<WoverEndBiomeSource> {
     /**
      * The default {@link #caveBiomesTopY}: the top of the vertical cave-biome band.
      * <p>
-     * Was {@code 32} (the legacy pre-WoVer value) until the port to real per-column carvers exposed a
+     * Was {@code 32} (the legacy pre-WoVer value) until 26.3's port to real per-column carvers exposed a
      * mismatch with the island generator: {@code GeneratorConfig}'s {@code LayerOptions} center even the
      * smallest islands at Y&ge;40 (big islands Y60-80, medium Y50-90, small Y40-100, on a 128-tall noise
      * column), so a band topping out at 32 (&plusmn; jitter, i.e. 24-40) sat almost entirely below where

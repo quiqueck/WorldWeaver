@@ -45,7 +45,7 @@ public static final ModCore C = ModCore.create("mymod", "mymod");
 | Build a whole "material set" (wood/stone-type family of blocks+items+recipes) | `WoodenBlockSet`/`BlockSet`/`EquipmentSet` builders (`org.betterx.wover.sets.api.types`, `.equipment`) | `wover-sets-api` |
 | Register a biome | `BiomeManager` + `BiomeBuilder` (`org.betterx.wover.biome.api`) | `wover-biome-api` |
 | Modify an existing/vanilla biome at load time | `BiomeModificationRegistry` / `BiomeModification.Builder` | `wover-biome-api` |
-| Register a configured/placed feature | `ConfiguredFeatureManager`, `PlacedFeatureManager`, `FeaturePlacementBuilder` | `wover-feature-api` |
+| Register a feature/placed feature | `FeatureContentManager`, `PlacedFeatureManager`, `FeaturePlacementBuilder` | `wover-feature-api` |
 | Register a structure / structure set / jigsaw pool | `StructureManager` + `StructureBuilder`/`JigsawBuilder`/`RandomNbtBuilder` | `wover-structure-api` |
 | Register a per-biome surface rule | `SurfaceRuleRegistry` + `SurfaceRuleBuilder`, condition helpers in `Conditions`/`Rules` | `wover-surface-api` |
 | Register a World Preset ("Create World" entry) | `WorldPresetManager` + `WorldPresetInfoBuilder` | `wover-preset-api` |

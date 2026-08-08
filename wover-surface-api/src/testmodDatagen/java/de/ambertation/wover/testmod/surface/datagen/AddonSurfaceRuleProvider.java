@@ -9,6 +9,7 @@ import de.ambertation.wover.testmod.entrypoint.TestModWoverSurface;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 
@@ -30,8 +31,8 @@ public class AddonSurfaceRuleProvider extends WoverRegistryContentProvider<Assig
         SurfaceRuleBuilder
                 .start()
                 .biome(Biomes.MEADOW)
-                .surface(Blocks.CONCRETE.lime().defaultBlockState())
-                .steep(Blocks.CONCRETE.orange().defaultBlockState(), 3)
+                .surface(Blocks.CONCRETE.pick(DyeColor.LIME).defaultBlockState())
+                .steep(Blocks.CONCRETE.pick(DyeColor.ORANGE).defaultBlockState(), 3)
                 .register(ctx, TEST_MEADOW);
     }
 }

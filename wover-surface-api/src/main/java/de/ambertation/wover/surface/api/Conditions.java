@@ -144,7 +144,7 @@ public class Conditions {
      * @return A condition that is true if the noise value at the current position is between both thresholds.
      */
     public static SurfaceRules.ConditionSource roughNoise(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
+            ResourceKey<NormalNoise> noise,
             FloatProvider roughness,
             double minThreshold,
             double maxThreshold
@@ -165,7 +165,7 @@ public class Conditions {
      * @return A condition that is true if the noise value at the current position is above the threshold.
      */
     public static SurfaceRules.ConditionSource roughNoise(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
+            ResourceKey<NormalNoise> noise,
             FloatProvider roughness,
             double minThreshold
     ) {
@@ -184,7 +184,7 @@ public class Conditions {
      * @return A condition that is true if the noise value at the current position is above the threshold.
      */
     public static SurfaceRules.ConditionSource roughNoise(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
+            ResourceKey<NormalNoise> noise,
             double minThreshold
     ) {
         return new RoughNoiseConditionImpl(noise, UniformFloat.of(-0.2f, 0.4f), minThreshold, Double.MAX_VALUE);

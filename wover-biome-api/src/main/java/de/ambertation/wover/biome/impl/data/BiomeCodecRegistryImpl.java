@@ -1,35 +1,43 @@
 package de.ambertation.wover.biome.impl.data;
 
-import de.ambertation.wover.biome.api.data.BiomeCodecRegistry;
 import de.ambertation.wover.biome.api.data.BiomeData;
 import de.ambertation.wover.core.api.registry.BuiltInRegistryManager;
+import de.ambertation.wover.core.api.registry.DatapackRegistryBuilder;
 import de.ambertation.wover.entrypoint.LibWoverBiome;
+import de.ambertation.wover.entrypoint.LibWoverSurface;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.KeyDispatchDataCodec;
+import net.minecraft.resources.ResourceKey;
 
 import java.util.function.Function;
 import org.jetbrains.annotations.ApiStatus;
 
 public class BiomeCodecRegistryImpl {
+    // Owned here rather than on the public BiomeCodecRegistry for the same class-initialization-cycle
+    // reason described in BiomePredicateRegistryImpl: LibWoverBiome touches this class first, so
+    // BiomeCodecRegistry.BIOME_CODECS was left null. Note the registry id keeps LibWoverSurface's namespace
+    // it was originally created with, so no datapack path changes.
+    public static final ResourceKey<Registry<MapCodec<? extends BiomeData>>> BIOME_CODEC_REGISTRY =
+            DatapackRegistryBuilder.createRegistryKey(LibWoverSurface.C.id("wover/biome_codec"));
+
     public static final Registry<MapCodec<? extends BiomeData>> BIOME_CODECS = BuiltInRegistryManager.createRegistry(
-            BiomeCodecRegistry.BIOME_CODEC_REGISTRY,
+            BIOME_CODEC_REGISTRY,
             BiomeCodecRegistryImpl::onBootstrap
     );
 
     public static final Codec<BiomeData> CODEC = BIOME_CODECS
             .byNameCodec()
-            .dispatch(b -> b.codec().codec(), Function.identity());
+            .dispatch(BiomeData::codec, Function.identity());
 
     public static MapCodec<? extends BiomeData> register(
             Registry<MapCodec<? extends BiomeData>> registry,
             Identifier location,
-            KeyDispatchDataCodec<? extends BiomeData> keyDispatchDataCodec
+            MapCodec<? extends BiomeData> codec
     ) {
-        return BuiltInRegistryManager.register(registry, location, keyDispatchDataCodec.codec());
+        return BuiltInRegistryManager.register(registry, location, codec);
     }
 
     @ApiStatus.Internal
@@ -43,6 +51,6 @@ public class BiomeCodecRegistryImpl {
             return registry.get(biomeData).orElseThrow().value();
         }
 
-        return register(registry, biomeData, BiomeData.KEY_CODEC);
+        return register(registry, biomeData, BiomeData.CODEC);
     }
 }

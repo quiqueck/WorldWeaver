@@ -113,9 +113,9 @@ public abstract class WoverLootAdditionProvider implements WoverDataProvider<Dat
      * {@link net.minecraft.world.level.storage.loot.entries.NestedLootTable#lootTableReference(Holder)}, that
      * serializes as the plain {@code "value": "<namespace>:<path>"} reference the runtime decoder expects.
      * <p>
-     * It cannot simply be looked up. The loot table registry is reloadable, and Fabric's data generator builds
-     * every reloadable registry <em>empty</em> (see {@code FabricDataGenHelper#addEmptyRegistries}), so
-     * {@code lookup.lookupOrThrow(Registries.LOOT_TABLE).getOrThrow(key)} throws for every key - including the
+     * It cannot simply be looked up. {@code minecraft:loot_table} is a reloadable registry, and Fabric's data
+     * generator builds every reloadable registry <em>empty</em> (see {@code FabricDataGenHelper#addEmptyRegistries}),
+     * so {@code lookup.lookupOrThrow(Registries.LOOT_TABLE).getOrThrow(key)} throws for every key - including the
      * mod's own tables emitted by a {@code WoverLootTableProvider} in the very same run. A
      * {@link Holder#direct(Object)} is no use either: {@code RegistryFileCodec} would take its "inline the element"
      * branch and try to serialize a whole loot table we do not have.

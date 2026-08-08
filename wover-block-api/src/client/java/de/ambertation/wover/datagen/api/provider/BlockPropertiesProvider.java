@@ -52,6 +52,20 @@ import org.jetbrains.annotations.NotNull;
  * {@code LIT} state (smelter, lanterns, forges, …) would otherwise report {@code 0} forever and a dropped
  * {@code lightLevel(...)} lambda would be invisible. When every state shares a value the single value is
  * emitted; otherwise a compact {@code min..max#<distinctCount>} summary is emitted (deterministic).
+ *
+ * <p><b>Predicate columns carry an origin.</b> {@code isSuffocating}, {@code isViewBlocking},
+ * {@code isRedstoneConductor} and {@code isValidSpawn} are not plain booleans but
+ * <pre>{@code <origin>/<value>}   e.g.  isSuffocating=derived/true, isViewBlocking=explicit/false
+ * {@code <origin>/<ocelot>/<zombie>}  for isValidSpawn, e.g. isValidSpawn=explicit/true/true</pre>
+ * where {@code origin} is {@code explicit} when the definition site installed its own predicate on the
+ * block's {@link BlockBehaviour.Properties} and {@code derived} when the block still holds vanilla's default
+ * one (see {@link #origin(Block, Field, Object)} for how the two are told apart, and
+ * {@link #motionGatedColumn} for why the distinction is load-bearing rather than cosmetic). "Explicitly opted
+ * out" and "inherits the default" are different facts about a block and a single boolean cannot express
+ * both - dropping a {@code .isSuffocating(Blocks::never)} from a glass block turns {@code explicit/false}
+ * into {@code derived/true}, which a bare {@code false} → {@code true} flip would attribute to the wrong
+ * cause. The origin is also the property the block-trait architecture actually cares about: it says whether
+ * the block's configuration is visible at its {@code defineBlock(...)...buildAndRegister()} site.
  */
 public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> {
     /**
@@ -67,6 +81,53 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
     private static final Field PROPERTIES_FIELD = resolveBehaviourField("properties");
     private static final Field FORCE_SOLID_ON_FIELD = resolvePropertiesField("forceSolidOn");
     private static final Field FORCE_SOLID_OFF_FIELD = resolvePropertiesField("forceSolidOff");
+
+    /**
+     * The four block predicates a definition site can install on {@link BlockBehaviour.Properties}. Read as
+     * <em>objects</em> (never invoked through these fields) so that each one can be compared by identity
+     * against the value a freshly built {@link BlockBehaviour.Properties} carries - see
+     * {@link #DEFAULT_PROPERTIES} and {@link #origin(Block, Field, Object)}.
+     */
+    private static final Field IS_SUFFOCATING_FIELD = resolvePropertiesField("isSuffocating");
+    private static final Field IS_VIEW_BLOCKING_FIELD = resolvePropertiesField("isViewBlocking");
+    private static final Field IS_REDSTONE_CONDUCTOR_FIELD = resolvePropertiesField("isRedstoneConductor");
+    private static final Field IS_VALID_SPAWN_FIELD = resolvePropertiesField("isValidSpawn");
+
+    /**
+     * A pristine {@link BlockBehaviour.Properties} whose four predicates are, by identity, the ones every
+     * block that never overrode them holds.
+     * <p>
+     * All four are assigned in {@code Properties.<init>} from <em>non-capturing</em> lambdas (their
+     * {@code LambdaMetafactory} instantiated method type equals the interface method type, so nothing is
+     * captured). A non-capturing {@code invokedynamic} links to a {@code ConstantCallSite} that hands out one
+     * single shared instance for the lifetime of the JVM, and {@code Properties} has exactly one constructor,
+     * so <em>every</em> default {@code Properties} holds literally the same four objects.
+     * {@code ofFullCopy}/{@code ofLegacyCopy} copy the fields by reference, so identity survives copying too.
+     * ({@code isViewBlocking} is not even a separate call site - the constructor assigns it
+     * {@code this.isSuffocating}.)
+     */
+    private static final BlockBehaviour.Properties DEFAULT_PROPERTIES = BlockBehaviour.Properties.of();
+    private static final Object DEFAULT_IS_SUFFOCATING = defaultPredicate(IS_SUFFOCATING_FIELD);
+    private static final Object DEFAULT_IS_VIEW_BLOCKING = defaultPredicate(IS_VIEW_BLOCKING_FIELD);
+    private static final Object DEFAULT_IS_REDSTONE_CONDUCTOR = defaultPredicate(IS_REDSTONE_CONDUCTOR_FIELD);
+    private static final Object DEFAULT_IS_VALID_SPAWN = defaultPredicate(IS_VALID_SPAWN_FIELD);
+
+    /** The block inherits vanilla's default predicate; nothing was authored at the definition site. */
+    private static final String DERIVED = "derived";
+    /** The definition site installed its own predicate, replacing vanilla's default. */
+    private static final String EXPLICIT = "explicit";
+    /** The predicate could not be read reflectively. */
+    private static final String ERR = "err";
+
+    private static Object defaultPredicate(Field field) {
+        try {
+            return Objects.requireNonNull(field.get(DEFAULT_PROPERTIES), field.getName());
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(
+                    "Could not read the default BlockBehaviour.Properties." + field.getName(), e);
+        }
+    }
+
     /**
      * The concrete {@link BlockBehaviour.OffsetType} a block was built with is not retained (it is baked into an
      * {@code OffsetFunction}), but it is fully reconstructable from the two protected max-offset getters plus the
@@ -252,18 +313,78 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
     }
 
     /**
+     * Classifies one of the four {@link BlockBehaviour.Properties} predicates as {@link #DERIVED} (the block
+     * still holds the shared default instance) or {@link #EXPLICIT} (the definition site installed its own).
+     * <p>
+     * Identity is only ever used to recognise <em>the</em> default: two overrides can never be told apart this
+     * way, because every {@code Blocks::never} written at a different call site is a distinct instance.
+     */
+    private static String origin(Block block, Field field, Object defaultPredicate) {
+        try {
+            return field.get(PROPERTIES_FIELD.get(block)) == defaultPredicate ? DERIVED : EXPLICIT;
+        } catch (ReflectiveOperationException e) {
+            return ERR;
+        }
+    }
+
+    /**
+     * A predicate column whose vanilla default is tag-free and therefore truthful when probed against
+     * {@link EmptyBlockGetter} at datagen time ({@code isRedstoneConductor}, whose default is
+     * {@code BlockStateBase::isCollisionShapeFullBlock}, and {@code isValidSpawn}, whose default is
+     * {@code isFaceSturdy(UP) && getLightEmission() < 14}). Both branches probe; only the origin prefix is
+     * added.
+     */
+    private static String probedColumn(Block block, BlockState state, Field field, Object dflt, BlockPredicate probe) {
+        return origin(block, field, dflt) + "/" + predicate(probe, state);
+    }
+
+    /**
+     * {@code isSuffocating} / {@code isViewBlocking}, whose vanilla default is
+     * <pre>state.is(BlockTags.CAUSES_SUFFOCATION) &amp;&amp; state.isCollisionShapeFullBlock(level, pos)</pre>
+     * (26.3 replaced 26.1's computed {@code state.blocksMotion()} with that tag lookup - see
+     * {@link de.ambertation.wover.block.api.trait.behaviour.MotionBlockingTrait}). <b>Block tags are unbound
+     * during datagen</b>, so {@code state.is(...)} is {@code false} for every block there and probing the
+     * default would report every single block - {@code minecraft:stone} included - as non-suffocating.
+     * <p>
+     * So the default branch is not probed but <em>evaluated</em>: the tag half is answered by
+     * {@link AutoMotionBlockingTagProvider#blocksMotion(Block)}, the exact same derivation that provider uses
+     * to write the tag in the first place, and the geometry half is probed as usual. An explicit override
+     * never consults a tag, so that branch is probed and is truthful.
+     * <p>
+     * The tag half is only an approximation for {@code minecraft:}-namespace blocks, whose membership comes
+     * from vanilla's 340 hand-written {@code blocks_motion_no_leaves} entries rather than from WoVer's
+     * derivation. It is exact for every namespace {@link AutoMotionBlockingTagProvider} generates for, which
+     * is every mod that registers WoVer's automatic providers.
+     */
+    private static String motionGatedColumn(
+            Block block,
+            BlockState state,
+            Field field,
+            Object dflt,
+            BlockPredicate probe
+    ) {
+        final String origin = origin(block, field, dflt);
+        if (!DERIVED.equals(origin)) return origin + "/" + predicate(probe, state);
+        return origin + "/" + predicate(
+                (s, g, p) -> AutoMotionBlockingTagProvider.blocksMotion(block) && s.isCollisionShapeFullBlock(g, p),
+                state
+        );
+    }
+
+    /**
      * {@code isValidSpawn} probed with a fixed ({@link EntityTypes#OCELOT}, {@link EntityTypes#ZOMBIE}) pair so
      * that {@code Blocks::ocelotOrParrot}-style lambdas (which allow only some entities) are distinguishable from
-     * a blanket allow/deny. Emitted as {@code ocelot/zombie} booleans, e.g. {@code isValidSpawn=true/false}.
+     * a blanket allow/deny. Emitted as {@code ocelot/zombie} booleans behind the origin prefix, e.g.
+     * {@code isValidSpawn=explicit/true/false}.
      * <p>
-     * 26.2 moved the {@code EntityType.*} constants off {@link EntityType} itself (which now only carries the
+     * 26.3 moved the {@code EntityType.*} constants off {@link EntityType} itself (which now only carries the
      * two codecs) into the new {@link EntityTypes} holder class; the constants themselves are unchanged, so the
      * probed pair is identical to 26.1's.
      */
-    private static String validSpawn(BlockState state) {
+    private static String validSpawn(Block block, BlockState state) {
         final String ocelot = spawnFor(state, EntityTypes.OCELOT);
         final String zombie = spawnFor(state, EntityTypes.ZOMBIE);
-        return ocelot + "/" + zombie;
+        return origin(block, IS_VALID_SPAWN_FIELD, DEFAULT_IS_VALID_SPAWN) + "/" + ocelot + "/" + zombie;
     }
 
     private static String spawnFor(BlockState state, EntityType<?> type) {
@@ -304,16 +425,24 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
                 + ",\"forceSolidOff\":\"" + forceSolid(block, FORCE_SOLID_OFF_FIELD) + "\""
                 + ",\"dynamicShape\":\"" + block.hasDynamicShape() + "\""
                 + ",\"spawnTerrainParticles\":\"" + state.shouldSpawnTerrainParticles() + "\""
-                + ",\"isSuffocating\":\"" + predicate(BlockState::isSuffocating, state) + "\""
-                + ",\"isViewBlocking\":\"" + predicate(BlockState::isViewBlocking, state) + "\""
-                + ",\"isRedstoneConductor\":\"" + predicate(BlockState::isRedstoneConductor, state) + "\""
+                + ",\"isSuffocating\":\"" + motionGatedColumn(
+                        block, state, IS_SUFFOCATING_FIELD, DEFAULT_IS_SUFFOCATING, BlockState::isSuffocating) + "\""
+                + ",\"isViewBlocking\":\"" + motionGatedColumn(
+                        block, state, IS_VIEW_BLOCKING_FIELD, DEFAULT_IS_VIEW_BLOCKING, BlockState::isViewBlocking) + "\""
+                + ",\"isRedstoneConductor\":\"" + probedColumn(
+                        block,
+                        state,
+                        IS_REDSTONE_CONDUCTOR_FIELD,
+                        DEFAULT_IS_REDSTONE_CONDUCTOR,
+                        BlockState::isRedstoneConductor
+                ) + "\""
                 + ",\"hasPostProcess\":\"" + predicate((s, g, p) -> s.getPostProcessPos(g, p) != null, state) + "\""
-                // 26.2 narrowed emissive rendering from a BlockBehaviour.StatePredicate (state, level, pos) to a
+                // 26.3 narrowed emissive rendering from a BlockBehaviour.StatePredicate (state, level, pos) to a
                 // plain Predicate<BlockState>, so BlockState#emissiveRendering() no longer takes a level or a
                 // position. Probed through the same err-guarded helper as the other predicate columns (with the
                 // now-unused getter/pos arguments dropped on the floor) so the column keeps its exact format.
                 + ",\"emissiveRendering\":\"" + predicate((s, g, p) -> s.emissiveRendering(), state) + "\""
-                + ",\"isValidSpawn\":\"" + validSpawn(state) + "\"}";
+                + ",\"isValidSpawn\":\"" + validSpawn(block, state) + "\"}";
     }
 
     private class Provider implements DataProvider {

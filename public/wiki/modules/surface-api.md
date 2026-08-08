@@ -2,7 +2,7 @@
 
 Java API and datapack-driven registry for building `SurfaceRules.RuleSource` trees per-biome and injecting them into
 **any** noise-based `ChunkGenerator` (vanilla's, another mod's, or your own) — without a mod having to overwrite
-`NoiseGeneratorSettings#surfaceRule()` itself and risk clobbering rules another mod already installed.
+`NoiseGeneratorSettings#materialRule()` itself and risk clobbering rules another mod already installed.
 
 - **Gradle artifact:** `de.ambertation:worldweaver` (single artifact; this module ships inside it as the Fabric mod `wover-surface`)
 - **Depends on:** `wover-common-api`, `wover-datagen-api`, `wover-core-api`, `wover-math-api`, `wover-event-api`
@@ -28,7 +28,8 @@ right before the level is created:
    (vanilla's `NoiseBasedChunkGenerator` does, via a WoVer mixin), it collects every registered rule whose biome is
    one of the biomes the generator's `BiomeSource` can produce, wraps them per-biome in
    `SurfaceRules.ifTrue(SurfaceRules.isBiome(...), sequence(...))`, and merges the result into the generator's
-   `NoiseGeneratorSettings#surfaceRule()` — appending to the existing sequence (or wrapping it in one) rather than
+   `NoiseGeneratorSettings#materialRule()` (a `Holder<RuleSource>` since Minecraft 26.3; WoVer installs the merged
+   rules as a `Holder.direct(...)`) — appending to the existing sequence (or wrapping it in one) rather than
    replacing it. In the Nether, the merge is careful to keep the existing roof/floor rules ahead of the injected
    per-biome rules.
 3. The actual field write happens through
@@ -59,7 +60,7 @@ surface building:
 
 `wover-surface-api` does not replace this format — the `ruleSource` you write in its own JSON files (see below) is
 exactly this vanilla `RuleSource` codec, plus a handful of extra `RuleSource`/`ConditionSource` types the module
-registers into the vanilla `MATERIAL_RULE`/`MATERIAL_CONDITION` registries (see "Extra rule/condition types"
+registers into the vanilla `MATERIAL_RULE_TYPE`/`MATERIAL_CONDITION_TYPE` registries (see "Extra rule/condition types"
 below).
 
 ### WoVer's surface-rule registry format
@@ -98,7 +99,9 @@ Each file is one `AssignedSurfaceRule` with this shape (backed by the `AssignedS
 - `biome` (required) — the `Identifier` of the `Biome` this rule applies to. You can register several files
   for the same biome; all of them are collected and combined.
 - `ruleSource` (required) — an ordinary `SurfaceRules.RuleSource`, using the vanilla codec (so any node type
-  registered in `BuiltInRegistries.MATERIAL_RULE`/`MATERIAL_CONDITION`, vanilla or modded, works here).
+  registered in `BuiltInRegistries.MATERIAL_RULE_TYPE`/`MATERIAL_CONDITION_TYPE`, vanilla or modded, works here).
+  These two registries were called `MATERIAL_RULE`/`MATERIAL_CONDITION` before Minecraft 26.3, which reused those
+  names for the new `minecraft:worldgen/material_rule` / `material_condition` *datapack* registries.
 - `priority` (optional, defaults to `PriorityLinkedList.DEFAULT_PRIORITY`, currently `1000`) — when a biome has
   multiple rules (possibly from different mods), they're sorted highest-priority-first into one
   `SurfaceRules.SequenceRuleSource` before injection.
@@ -116,10 +119,10 @@ present:
 
 | `"type"` | Registered in | Fields |
 |---|---|---|
-| `wover:threshold_condition` | `MATERIAL_CONDITION` | `seed` (long), `threshold` (double, default `0`), `roughness` (`FloatProvider`, default `0`), `scale_x`, `scale_z` (double, default `0.1`) — true if a 2D `OpenSimplexNoise(seed)` sample at `(x*scale_x, z*scale_z)` plus a `roughness` sample exceeds `threshold`. |
-| `wover:volume_threshold_condition` | `MATERIAL_CONDITION` | Same as above plus `scale_y` — evaluates the noise in 3D `(x*scale_x, y*scale_y, z*scale_z)`. |
-| `wover:rough_noise_condition` | `MATERIAL_CONDITION` | `noise` (a `ResourceKey` into the vanilla `NOISE` registry, e.g. `minecraft:netherrack`), `roughness` (`FloatProvider`), `min_threshold`, `max_threshold` (double) — true if the referenced `NormalNoise` sample plus roughness falls in `[min_threshold, max_threshold]`. |
-| `wover:switch_rule` | `MATERIAL_RULE` | `selector` (a `NumericProvider`, see below), `collection` (list of `RuleSource`) — picks `collection[selector.getNumber(ctx) % collection.size()]` and applies it. |
+| `wover:threshold_condition` | `MATERIAL_CONDITION_TYPE` | `seed` (long), `threshold` (double, default `0`), `roughness` (`FloatProvider`, default `0`), `scale_x`, `scale_z` (double, default `0.1`) — true if a 2D `OpenSimplexNoise(seed)` sample at `(x*scale_x, z*scale_z)` plus a `roughness` sample exceeds `threshold`. |
+| `wover:volume_threshold_condition` | `MATERIAL_CONDITION_TYPE` | Same as above plus `scale_y` — evaluates the noise in 3D `(x*scale_x, y*scale_y, z*scale_z)`. |
+| `wover:rough_noise_condition` | `MATERIAL_CONDITION_TYPE` | `noise` (a `ResourceKey` into the vanilla `NOISE` registry, e.g. `minecraft:netherrack`), `roughness` (`FloatProvider`), `min_threshold`, `max_threshold` (double) — true if the referenced `NormalNoise` sample plus roughness falls in `[min_threshold, max_threshold]`. |
+| `wover:switch_rule` | `MATERIAL_RULE_TYPE` | `selector` (a `NumericProvider`, see below), `collection` (list of `RuleSource`) — picks `collection[selector.getNumber(ctx) % collection.size()]` and applies it. |
 
 Example (`wover:switch_rule` alternating between two blocks per column, keyed by a random 0/1 provider):
 
@@ -216,8 +219,11 @@ priority (highest number = applied first):
 | `rule(ruleSource[, priority])` | `PriorityLinkedList.DEFAULT_PRIORITY` (1000) by default | Add an arbitrary `SurfaceRules.RuleSource` (e.g. built with vanilla `SurfaceRules.*` helpers, `Rules.switchRules(...)`, or your own). |
 | `sortPriority(priority)` | — | Overrides the priority the *whole builder's* rule set is registered with (used when calling `register`, orthogonal to the per-rule priorities above). |
 
-Call `.build()` instead of `.register(ctx, key)` if you just want the assembled `RuleSource` without registering
-it (e.g. to embed it directly in a `NoiseGeneratorSettings` you build yourself).
+Call `.build(biomeLookup)` instead of `.register(ctx, key)` if you just want the assembled `RuleSource` without
+registering it (e.g. to embed it directly in a `NoiseGeneratorSettings` you build yourself). Since Minecraft 26.3
+`SurfaceRules.isBiome(...)` resolves biome keys into a `HolderSet` immediately, so `build` needs a
+`HolderGetter<Biome>` — use `ctx.lookup(Registries.BIOME)` inside a bootstrap, or the `RegistryAccess` at runtime.
+(`register(ctx, key)` is unchanged: it takes the lookup from the `BootstrapContext` you already pass it.)
 
 If you don't want the builder, register a hand-built `RuleSource` directly:
 
@@ -270,8 +276,8 @@ If you want your condition/rule usable from JSON too, register its `MapCodec` wi
 [`ConditionManager`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/conditions/ConditionManager.java)
 (for `SurfaceRules.ConditionSource`s) or
 [`MaterialRuleManager`](../../../wover-surface-api/src/main/java/de/ambertation/wover/surface/api/rules/MaterialRuleManager.java)
-(for `SurfaceRules.RuleSource`s) — both are thin wrappers around vanilla's `BuiltInRegistries.MATERIAL_CONDITION`/
-`MATERIAL_RULE`.
+(for `SurfaceRules.RuleSource`s) — both are thin wrappers around vanilla's
+`BuiltInRegistries.MATERIAL_CONDITION_TYPE`/`MATERIAL_RULE_TYPE`.
 
 ### Custom numeric providers
 

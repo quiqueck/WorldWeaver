@@ -14,7 +14,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Comparator;
@@ -39,11 +38,6 @@ public class WoverBiomeData extends BiomeData {
      * The {@link MapCodec} for the base {@link WoverBiomeData} class.
      */
     public static final MapCodec<WoverBiomeData> CODEC = codec(WoverBiomeData::new);
-    /**
-     * The {@link KeyDispatchDataCodec} for the base {@link WoverBiomeData} class, as returned by
-     * {@link #codec()}.
-     */
-    public static final KeyDispatchDataCodec<WoverBiomeData> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
 
     /**
      * The terrain height hint this Biome was placed with.
@@ -174,7 +168,7 @@ public class WoverBiomeData extends BiomeData {
      * subclass add up to seven additional {@link RecordCodecBuilder} fields ({@code p10}...{@code p16}) on
      * top of the base fields, matched by a factory function taking the corresponding number of arguments —
      * mirroring the {@link BiomeData#codec} family this class is itself built on. Use
-     * {@link de.ambertation.wover.biome.api.data.BiomeCodecRegistry#register(net.minecraft.resources.Identifier, net.minecraft.util.KeyDispatchDataCodec)}
+     * {@link de.ambertation.wover.biome.api.data.BiomeCodecRegistry#register(net.minecraft.resources.Identifier, MapCodec)}
      * to make the resulting codec usable from a {@code type} field.
      *
      * @param factory the factory used to construct the subclass from the decoded fields
@@ -513,11 +507,17 @@ public class WoverBiomeData extends BiomeData {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * 26.3 removed {@code KeyDispatchDataCodec}, which was only ever a wrapper around a {@link MapCodec},
+     * so {@link BiomeData#codec()} now hands back the {@link MapCodec} directly. The {@code KEY_CODEC}
+     * constant that used to hold {@code KeyDispatchDataCodec.of(CODEC)} went with it - unwrapped it was
+     * literally {@link #CODEC}.
      *
-     * @return {@link #KEY_CODEC}.
+     * @return {@link #CODEC}.
      */
-    public KeyDispatchDataCodec<? extends WoverBiomeData> codec() {
-        return KEY_CODEC;
+    @Override
+    public MapCodec<? extends WoverBiomeData> codec() {
+        return CODEC;
     }
 
     /**

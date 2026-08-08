@@ -17,8 +17,13 @@ import net.minecraft.world.item.alchemy.Potion;
  */
 public class PotionManager {
     /**
-     * Fired while vanilla builds its {@link net.minecraft.world.item.alchemy.PotionBrewing} instance. Subscribe
-     * to add custom potion mixes, container conversions, or brewing ingredients.
+     * Fired while the brewing recipes for the running world are assembled. Subscribe to add custom potion
+     * mixes, container conversions, or brewing ingredients.
+     * <p>
+     * 26.3 turned brewing into ordinary {@code minecraft:brewing} recipes, so this event is now emitted from
+     * the recipe bootstrap (alongside {@code RecipeBuilder#BOOTSTRAP_RECIPES}) instead of from
+     * {@code PotionBrewing#bootstrap}, and its subscribers receive a {@link BrewingBuilder} rather than the
+     * deleted {@code PotionBrewing.Builder}.
      */
     public static final Event<OnBootstrapPotions> BOOTSTRAP_POTIONS =
             PotionManagerImpl.BOOTSTRAP_POTIONS;

@@ -28,9 +28,18 @@ does not invent a new format for the vanilla `Biome` registry itself — Biomes 
 
 ### `Biome` — `data/<namespace>/worldgen/biome/<path>.json`
 
-Unmodified vanilla format (`has_precipitation`, `temperature`, `downfall`, `effects`, `spawners`,
-`spawn_costs`, `carvers`, `features`, ...). `wover-biome-api` only *generates* these files through its
+Unmodified vanilla format (`has_precipitation`, `temperature`, `downfall`, `effects`, `attributes`,
+`carvers`, `features`, ...). `wover-biome-api` only *generates* these files through its
 builder API (see below) — it never changes what a valid Biome JSON looks like.
+
+> **Minecraft 26.3:** the top-level `spawners` and `spawn_costs` fields are gone. A Biome's mob spawns are
+> now one of its environment attributes, so they are written as
+> `"attributes": { "minecraft:gameplay/natural_mob_spawns": { "spawns_by_category": {...},
+> "spawn_costs": {...} } }`, and the creature world-gen spawn probability is the separate
+> `minecraft:gameplay/creature_world_gen_spawn_probability` attribute. The `BiomeBuilder` methods that feed
+> them (`spawn(...)`, `addMobCharge(...)`, `creatureGenerationProbability(...)`) are unchanged — only the
+> emitted JSON moved. Biome JSON written for 26.1 keeps loading, but its old top-level `spawners` block is
+> silently ignored, so any hand-written Biome needs migrating.
 
 ### `BiomeData` — `data/<namespace>/wover/worldgen/biome_data/<path>.json`
 
@@ -74,7 +83,7 @@ The full base `BiomeData.CODEC` (a `MapCodec`, dispatched under `wover:vanilla_d
 You will normally never hand-write these files — they are produced by the `BiomeBuilder` API through
 datagen (see below). `BiomeData` is a normal (extensible) Java class: a mod can subclass it to attach
 completely custom fields, register the subclass's `type` id and codec with
-`BiomeCodecRegistry.register(location, keyDispatchDataCodec)`, and build the codec itself with one of the
+`BiomeCodecRegistry.register(location, mapCodec)`, and build the codec itself with one of the
 `BiomeData.codec(...)` factory overloads (`codec(factory)` for no extra fields, up to thirteen extra
 `RecordCodecBuilder` fields via the `codec(p4, ..., p16, factory)` overloads) — the same "extra
 `RecordCodecBuilder` fields on top of a common base" pattern vanilla uses for its own dispatch codecs.
@@ -119,7 +128,7 @@ from `wover:or`/`wover:not` around several `wover:is_biome` predicates rather th
 type), `wover:all` (`always()` — matches everything, the default when no predicate is set), `wover:is_biome`,
 `wover:in_dimension` (plus the `inOverworld()`/`inEnd()`/`inNether()` shortcuts), `wover:has_tag`,
 `wover:spawns` (entity type), `wover:has_structure`, `wover:has_placed_feature`,
-`wover:has_configured_feature`, `wover:is_namespace` (`isVanilla()`/`inNamespace(...)`, or wrapped in
+`wover:has_feature`, `wover:is_namespace` (`isVanilla()`/`inNamespace(...)`, or wrapped in
 `wover:not` for `notInNamespace(...)`), `wover:location_path_contains` (`pathContains(needle)`), and
 `wover:config_is`, a config-file backed `hasConfig(...)` predicate (see `wover-core-api`'s `Configs`).
 
@@ -184,7 +193,7 @@ vanilla-style Biome. Calling `.bootstrap(context)` on it returns a `BiomeBuilder
   / `feature(Decoration, Holder<PlacedFeature>)` to add a `PlacedFeature` to a `GenerationStep.Decoration`
   bucket, `feature(Consumer<BiomeGenerationSettings.Builder>)` to run one of vanilla's
   `BiomeDefaultFeatures` helpers directly (`defaultMushrooms()`/`netherDefaultOres()` are built-in shortcuts
-  for two of them), and `carver(ResourceKey<ConfiguredWorldCarver<?>>)`/`carver(Holder<...>)`.
+  for two of them), and `carver(ResourceKey<WorldCarver>)`/`carver(Holder<WorldCarver>)`.
 - **Mob spawns**: `spawn(EntityType<?>, weight, minGroupCount, maxGroupCount)`, `addMobCharge(entityType,
   energyBudget, charge)`, `creatureGenerationProbability(float)`.
 - **Tags**: `tag(TagKey<Biome>...)` adds arbitrary Biome tags; `structure(StructureKey<?,?,?>)`/
@@ -275,7 +284,7 @@ public class ModificationProvider extends WoverRegistryContentProvider<BiomeModi
 `BiomeModification.Builder`. Predicate helpers mirror the JSON predicate types 1:1:
 `isBiome(key)`/`inBiomes(keys...)`/`notInBiomes(keys...)`, `inDimension(key)`/`inOverworld()`/`inEnd()`/
 `inNether()`, `hasTag(tag)`, `spawns(entityType)`, `hasStructure(key)`, `hasPlacedFeature(key)`,
-`hasConfiguredFeature(key)`, `isVanilla()`/`inNamespace(String|ModCore)`/`notInNamespace(String|ModCore)`,
+`hasFeature(key)`, `isVanilla()`/`inNamespace(String|ModCore)`/`notInNamespace(String|ModCore)`,
 `pathContains(needle)`, `hasConfig(configValue, targetValue)`, and the combinators `anyOf(...)`/`allOf(...)`/
 `not(...)`. Content helpers: `addFeature(Decoration, ResourceKey<PlacedFeature>|Holder<PlacedFeature>)`,
 `addFeature(BasePlacedFeatureKey<?>)` (uses the key's own `Decoration`), `addStructureSet(StructureKey<?,?,?>|

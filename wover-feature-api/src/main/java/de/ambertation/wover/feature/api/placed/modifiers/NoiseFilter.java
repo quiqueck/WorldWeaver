@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -12,8 +11,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import net.minecraft.world.level.levelgen.synth.Noise;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * The modifier will look up the noise-vale {@code v} at {@code (x*scaleXZ, y*scaleY, z*scaleXZ)}. If {@code min < v < max}
  * the position will be accepted. Otherwise, it is rejected.
  */
-public class NoiseFilter extends PlacementFilter {
+public class NoiseFilter implements PlacementFilter {
     /**
      * Codec for this placement modifier.
      */
@@ -37,7 +36,7 @@ public class NoiseFilter extends PlacementFilter {
             )
             .apply(instance, NoiseFilter::new));
 
-    private final ResourceKey<NormalNoise.NoiseParameters> noise;
+    private final ResourceKey<NormalNoise> noise;
 
     private final double minNoiseLevel;
     private final double maxNoiseLevel;
@@ -55,7 +54,7 @@ public class NoiseFilter extends PlacementFilter {
      * @param scaleY        The y-scale for the input position
      */
     public NoiseFilter(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
+            ResourceKey<NormalNoise> noise,
             double minNoiseLevel,
             double maxNoiseLevel,
             float scaleXZ,
@@ -70,6 +69,7 @@ public class NoiseFilter extends PlacementFilter {
 
     /**
      * Tests the input position against the noise value at the xz-coordinate of the input position
+     *
      * <p>
      * The noise comes from the level's own {@link RandomState}, which seeds it from the world seed and
      * caches it per world. It must not come from {@code NoiseParameterManager.getOrCreateNoise}, which is
@@ -88,20 +88,21 @@ public class NoiseFilter extends PlacementFilter {
      * @return {@code true} if the noise value at {@code (x*scaleXZ, y*scaleY, z*scaleXZ)} is in the range {@code (minNoiseLevel, maxNoiseLevel)}
      */
     @Override
-    protected boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
+    public boolean shouldPlace(PlacementContext ctx, RandomSource random, BlockPos pos) {
         final RandomState randomState = ctx.getLevel().getLevel().getChunkSource().randomState();
-        final NormalNoise normalNoise = randomState.getOrCreateNoise(this.noise);
-        final double v = normalNoise.getValue(pos.getX() * scaleXZ, pos.getY() * scaleY, pos.getZ() * scaleXZ);
+        final Noise normalNoise = randomState.getOrCreateNoise(this.noise);
+        final double v = normalNoise.get(pos.getX() * scaleXZ, pos.getY() * scaleY, pos.getZ() * scaleXZ);
         return v > minNoiseLevel && v < maxNoiseLevel;
     }
 
     /**
-     * Gets the type of this placement modifier
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type of this placement modifier
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.NOISE_FILTER;
+    public @NotNull MapCodec<NoiseFilter> codec() {
+        return CODEC;
     }
 }

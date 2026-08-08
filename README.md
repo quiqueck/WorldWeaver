@@ -42,11 +42,11 @@ WorldWeaver:
 ```
 "depends": {
   ...
-  "wover": "26.100.x"
+  "wover": "26.300.x"
 },
 "breaks": {
-  "wover": "<26.100.0"
+  "wover": "<26.300.0"
 }
 ```
 
-In this example `26.100.0` is the WorldWeaver Version you are building against.
+In this example `26.300.0` is the WorldWeaver Version you are building against.

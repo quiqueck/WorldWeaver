@@ -2,23 +2,21 @@ package de.ambertation.wover.biome.impl.modification.predicates;
 
 import de.ambertation.wover.biome.api.modification.predicates.BiomePredicate;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 public record HasPlacedFeature(ResourceKey<PlacedFeature> key) implements BiomePredicate {
-    public static final KeyDispatchDataCodec<HasPlacedFeature> CODEC = KeyDispatchDataCodec
-            .of(ResourceKey.codec(Registries.PLACED_FEATURE)
-                           .xmap(HasPlacedFeature::new, HasPlacedFeature::key)
-                           .fieldOf("feature_key")
-            );
+    public static final MapCodec<HasPlacedFeature> CODEC = ResourceKey.codec(Registries.PLACED_FEATURE)
+            .xmap(HasPlacedFeature::new, HasPlacedFeature::key)
+            .fieldOf("feature_key");
 
 
     @Override
-    public KeyDispatchDataCodec<? extends BiomePredicate> codec() {
+    public MapCodec<? extends BiomePredicate> codec() {
         return CODEC;
     }
 

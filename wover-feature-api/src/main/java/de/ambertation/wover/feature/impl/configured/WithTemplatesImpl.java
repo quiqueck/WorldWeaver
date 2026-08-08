@@ -1,27 +1,25 @@
 package de.ambertation.wover.feature.impl.configured;
 
-import de.ambertation.wover.feature.api.Features;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.WithTemplates;
 import de.ambertation.wover.feature.api.features.TemplateFeature;
-import de.ambertation.wover.feature.api.features.config.TemplateFeatureConfig;
 import de.ambertation.wover.feature.impl.features.FeatureTemplateImpl;
 import de.ambertation.wover.util.RandomizedWeightedList;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.feature.Feature;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureConfig, TemplateFeature<TemplateFeatureConfig>> implements de.ambertation.wover.feature.api.configured.configurators.WithTemplates {
-    private final RandomizedWeightedList<TemplateFeatureConfig.FeatureTemplate> templates = new RandomizedWeightedList<>();
+public class WithTemplatesImpl extends FeatureConfiguratorImpl implements de.ambertation.wover.feature.api.configured.configurators.WithTemplates {
+    private final RandomizedWeightedList<TemplateFeature.FeatureTemplate> templates = new RandomizedWeightedList<>();
 
     WithTemplatesImpl(
-            @Nullable BootstrapContext<ConfiguredFeature<?, ?>> ctx,
-            @Nullable ResourceKey<ConfiguredFeature<?, ?>> key
+            @Nullable BootstrapContext<Feature> ctx,
+            @Nullable ResourceKey<Feature> key
     ) {
         super(ctx, key);
     }
@@ -52,24 +50,19 @@ public class WithTemplatesImpl extends FeatureConfiguratorImpl<TemplateFeatureCo
     }
 
     @Override
-    public @NotNull TemplateFeatureConfig createConfiguration() {
+    protected @NotNull Feature createFeature() {
         if (templates.isEmpty())
-            throwStateError("Template Feature Config must have at least one template!");
-        return TemplateFeatureConfig.of(templates);
+            throwStateError("Template Feature must have at least one template!");
+        return TemplateFeature.of(templates);
     }
 
-    @Override
-    protected @NotNull TemplateFeature<TemplateFeatureConfig> getFeature() {
-        return (TemplateFeature<TemplateFeatureConfig>) Features.TEMPLATE;
-    }
-
-    public static class Key extends ConfiguredFeatureKey<WithTemplates> {
+    public static class Key extends FeatureKey<WithTemplates> {
         public Key(Identifier id) {
             super(id);
         }
 
         @Override
-        public WithTemplates bootstrap(@NotNull BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
+        public WithTemplates bootstrap(@NotNull BootstrapContext<Feature> ctx) {
             return new WithTemplatesImpl(ctx, key);
         }
     }

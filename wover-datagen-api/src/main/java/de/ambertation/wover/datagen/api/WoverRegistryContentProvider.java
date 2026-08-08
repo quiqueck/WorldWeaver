@@ -2,7 +2,6 @@ package de.ambertation.wover.datagen.api;
 
 import de.ambertation.wover.core.api.ModCore;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.*;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -14,6 +13,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.ApiStatus;
 
 
@@ -47,8 +47,10 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
      * Called, when the Elements of the Registry need to be created and registered.
      * <p>
      * Only Elements that are registered in this method
-     * (using {@link BootstrapContext#register(ResourceKey, Object)} or
-     * {@link BootstrapContext#register(ResourceKey, Object, Lifecycle)}) will be serialized.
+     * (using {@link BootstrapContext#register(ResourceKey, Object)}) will be serialized.
+     * <p>
+     * Minecraft 26.3 dropped the {@code register(ResourceKey, Object, Lifecycle)} overload from
+     * {@link BootstrapContext}, so the two-argument form is the only registration entry point left.
      *
      * @param context The context to add the elements to.
      */
@@ -60,15 +62,35 @@ public abstract class WoverRegistryContentProvider<T> extends WoverRegistryProvi
 
     private void wrappedBoostrap(BootstrapContext<T> context) {
         BootstrapContext<T> wrapped = new BootstrapContext<T>() {
+            // Minecraft 26.3 removed BootstrapContext#register(ResourceKey, T, Lifecycle); only the
+            // two-argument form remains, and every registration now uses the registry's own lifecycle.
+            // We used to only wrap the lifecycle-aware overload, which worked because the plain
+            // register(ResourceKey, T) of the wrapped context was never reachable through this
+            // decorator anyway. Recording the key in the surviving overload keeps the tracking
+            // complete - nothing is lost, the lifecycle argument simply has no counterpart in 26.3.
             @Override
-            public Holder.Reference<T> register(ResourceKey<T> resourceKey, T object, Lifecycle lifecycle) {
+            public Holder.Reference<T> register(ResourceKey<T> resourceKey, T object) {
                 addContent(resourceKey);
-                return context.register(resourceKey, object, lifecycle);
+                return context.register(resourceKey, object);
             }
 
             @Override
             public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> resourceKey) {
                 return context.lookup(resourceKey);
+            }
+
+            // New abstract method in 26.3, declared on the extracted BootstrapContextAccess
+            // super-interface of BootstrapContext. This class is a pure decorator that only
+            // observes registrations, so it forwards the query to the wrapped context verbatim.
+            // Vanilla marks the method @Deprecated (it exposes the partially-built surrounding
+            // context and is meant for bootstrap code only), but it is abstract, so an anonymous
+            // BootstrapContext has no choice but to implement it. Same situation as in
+            // DatapackRegistryBuilder#makeContext.
+            @Override
+            public <S> Stream<Holder.Reference<S>> listContextElements(
+                    ResourceKey<? extends Registry<? extends S>> resourceKey
+            ) {
+                return context.listContextElements(resourceKey);
             }
         };
         bootstrap(wrapped);

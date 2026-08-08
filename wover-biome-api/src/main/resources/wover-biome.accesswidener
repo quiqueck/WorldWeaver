@@ -1,4 +1,9 @@
 accessWidener   v1  official
 
-accessible field net/minecraft/world/level/biome/MobSpawnSettings spawners Ljava/util/Map;
-mutable field net/minecraft/world/level/biome/MobSpawnSettings spawners Ljava/util/Map;
+# 26.3 moved a Biome's MobSpawnSettings into its EnvironmentAttributeMap (as the
+# gameplay/natural_mob_spawns EnvironmentAttribute), so BiomeModification no longer mutates
+# MobSpawnSettings.spawners (which 26.3 also renamed to spawnsByCategory) in place - see MobSettingsWorker
+# for why doing so would now be unsafe. It instead replaces the built Biome's attribute map with a derived
+# one, which needs this otherwise private final field to be writable.
+accessible field net/minecraft/world/level/biome/Biome attributes Lnet/minecraft/world/attribute/EnvironmentAttributeMap;
+mutable field net/minecraft/world/level/biome/Biome attributes Lnet/minecraft/world/attribute/EnvironmentAttributeMap;

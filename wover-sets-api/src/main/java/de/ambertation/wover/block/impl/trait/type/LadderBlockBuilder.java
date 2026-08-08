@@ -43,7 +43,7 @@ public class LadderBlockBuilder extends AbstractBlockTraitBuilder.Generic implem
                       .strength(0.4F)
                       .sound(SoundType.LADDER)
                       .noOcclusion()
-                      .pushReaction(PushReaction.DESTROY);
+                      .pushReaction(PushReaction.POPPED);
         }
     }
 }

@@ -936,13 +936,13 @@ public class WoverBlockModelGenerators {
     public void createBarrel(Block barrelBlock) {
         Material resourceLocation = TextureMapping.getBlockTexture(barrelBlock, "_top_open");
         MultiVariant closedVariant = BlockModelGenerators.plainVariant(
-                TexturedModel.CUBE_TOP_BOTTOM.create(
+                TexturedModel.CUBE_BOTTOM_TOP.create(
                         barrelBlock,
                         this.vanillaGenerator.modelOutput
                 )
         );
         MultiVariant openVariant = BlockModelGenerators.plainVariant(
-                TexturedModel.CUBE_TOP_BOTTOM
+                TexturedModel.CUBE_BOTTOM_TOP
                         .get(barrelBlock)
                         .updateTextures((textureMapping) -> {
                             textureMapping.put(TextureSlot.TOP, resourceLocation);

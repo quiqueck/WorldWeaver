@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.List;
 
 /**
- * {@code LootTable.pools} is a {@code private final List<LootPool>} with a private constructor, so appending a
- * pool to a table the datapacks already built is only possible by replacing the list outright.
+ * {@code LootTable.pools} is a {@code private final List<LootPool>} with a private constructor, so appending
+ * a pool to a table the datapacks already built is only possible by replacing the list outright.
  */
 @Mixin(LootTable.class)
 public interface LootTableAccessor {

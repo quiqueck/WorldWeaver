@@ -137,9 +137,8 @@ public abstract class EquipmentSet {
     }
 
     /**
-     * Registers the default item for {@code slot} (an {@link AxeItem}/{@link HoeItem}/{@link ShovelItem}/
-     * {@link ShearsItem}, or a plain digger {@link Item} for pickaxe/sword/hammer), with an auto-generated
-     * crafting recipe.
+     * Registers the default item for {@code slot} (an axe/hoe/shovel, a {@link ShearsItem}, or a plain digger
+     * {@link Item} for pickaxe/sword/hammer), with an auto-generated crafting recipe.
      *
      * @param slot the tool slot to register
      * @param <I>  unused type parameter, kept for API symmetry with the other overloads
@@ -150,6 +149,14 @@ public abstract class EquipmentSet {
 
     /**
      * Registers the default item for {@code slot}, with a custom recipe.
+     * <p>
+     * 26.3 removed the per-tool {@code Item} subclasses ({@code AxeItem}, {@code HoeItem}, {@code ShovelItem},
+     * ...). Every behaviour they carried is now data: their constructors were already nothing more than
+     * {@code super(properties.axe(material, damage, speed))} in 26.1, and their {@code useOn} override (log
+     * stripping, path making, tilling) became the {@code minecraft:block_transformer} data component that
+     * {@link Item.Properties#axe}/{@link Item.Properties#hoe}/{@link Item.Properties#shovel} now attach. So
+     * calling the properties method and constructing a plain {@link Item} is an exact, lossless replacement
+     * rather than a downgrade. {@link ShearsItem} still exists as a class in 26.3 and is used unchanged.
      *
      * @param slot           the tool slot to register
      * @param recipeOverride the recipe trait to use instead of the auto-generated recipe, or {@code null} to
@@ -159,28 +166,31 @@ public abstract class EquipmentSet {
     public <I extends Item> void add(ToolSlot slot, ItemRecipeTrait recipeOverride) {
         if (slot == ToolSlot.AXE_SLOT) {
             add(
-                    slot, (definition, values) -> new AxeItem(
-                            this.toolTier.toolMaterial,
-                            values.attackDamage(), values.attackSpeed(),
-                            commonToolProperties(definition.getProperties())
+                    slot, (definition, values) -> new Item(
+                            commonToolProperties(definition.getProperties()).axe(
+                                    this.toolTier.toolMaterial,
+                                    values.attackDamage(), values.attackSpeed()
+                            )
                     ),
                     recipeOverride
             );
         } else if (slot == ToolSlot.HOE_SLOT) {
             add(
-                    slot, (definition, values) -> new HoeItem(
-                            this.toolTier.toolMaterial,
-                            values.attackDamage(), values.attackSpeed(),
-                            commonToolProperties(definition.getProperties())
+                    slot, (definition, values) -> new Item(
+                            commonToolProperties(definition.getProperties()).hoe(
+                                    this.toolTier.toolMaterial,
+                                    values.attackDamage(), values.attackSpeed()
+                            )
                     ),
                     recipeOverride
             );
         } else if (slot == ToolSlot.SHOVEL_SLOT) {
             add(
-                    slot, (definition, values) -> new ShovelItem(
-                            this.toolTier.toolMaterial,
-                            values.attackDamage(), values.attackSpeed(),
-                            commonToolProperties(definition.getProperties())
+                    slot, (definition, values) -> new Item(
+                            commonToolProperties(definition.getProperties()).shovel(
+                                    this.toolTier.toolMaterial,
+                                    values.attackDamage(), values.attackSpeed()
+                            )
                     ),
                     recipeOverride
             );

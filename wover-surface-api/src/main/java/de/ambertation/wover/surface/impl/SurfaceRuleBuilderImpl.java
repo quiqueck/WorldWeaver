@@ -10,6 +10,7 @@ import de.ambertation.wover.util.PriorityLinkedList;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.data.worldgen.material.VanillaMaterialConditions;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +20,36 @@ import net.minecraft.world.level.levelgen.placement.CaveSurface;
 import org.jetbrains.annotations.NotNull;
 
 public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> implements BaseSurfaceRuleBuilder<T> {
+    /**
+     * Minecraft 26.3 deleted the {@code SurfaceRules.ON_FLOOR} / {@code ON_CEILING} constants and moved
+     * them into the new {@code minecraft:worldgen/material_condition} <b>datapack</b> registry, keyed by
+     * {@link VanillaMaterialConditions#ON_FLOOR} / {@link VanillaMaterialConditions#ON_CEILING}.
+     * <p>
+     * We deliberately do <b>not</b> reference those keys through
+     * {@link SurfaceRules#getCondition(HolderGetter, ResourceKey)}, for two reasons:
+     * <ul>
+     * <li>Resolving a key needs a {@code HolderGetter<ConditionSource>}, which the builder simply does
+     * not have at {@link #surface(BlockState)} / {@link #floor(BlockState)} / {@link #ceil(BlockState)}
+     * time - those methods build their rule eagerly and are routinely called outside any bootstrap.</li>
+     * <li>A holder reference would make every rule we emit depend on a vanilla data file that a
+     * datapack can override or remove, silently changing our rules. Emitting the condition inline
+     * keeps a WorldWeaver surface rule self-contained.</li>
+     * </ul>
+     * The inline form is value-identical to vanilla's: {@code data/minecraft/worldgen/material_condition/on_floor.json}
+     * is exactly {@code {"type":"minecraft:stone_depth","add_surface_depth":false,"offset":0,"secondary_depth_range":0,"surface_type":"floor"}},
+     * which is what {@link SurfaceRules#stoneDepthCheck(int, boolean, CaveSurface)} produces here, so
+     * neither the generated JSON nor the generated terrain changes.
+     */
+    private static final SurfaceRules.ConditionSource ON_FLOOR
+            = SurfaceRules.stoneDepthCheck(0, false, CaveSurface.FLOOR);
+
+    /**
+     * The ceiling counterpart of {@link #ON_FLOOR}, equivalent to
+     * {@link VanillaMaterialConditions#ON_CEILING}. See {@link #ON_FLOOR} for why this is inlined.
+     */
+    private static final SurfaceRules.ConditionSource ON_CEILING
+            = SurfaceRules.stoneDepthCheck(0, false, CaveSurface.CEILING);
+
     private final PriorityLinkedList<SurfaceRules.RuleSource> rules;
     protected ResourceKey<Biome> biomeKey;
     protected int sortPriority;
@@ -70,7 +101,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      */
     public T surface(BlockState state) {
         SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule);
+        rule = SurfaceRules.ifTrue(ON_FLOOR, rule);
         rules.add(rule, TOP_SURFACE_PRIORITY);
 
         return (T) this;
@@ -113,7 +144,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      */
     public T floor(BlockState state) {
         SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, rule);
+        rule = SurfaceRules.ifTrue(ON_FLOOR, rule);
         rules.add(rule, FLOOR_PRIORITY);
         return (T) this;
     }
@@ -174,7 +205,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      */
     public T ceil(BlockState state) {
         SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(SurfaceRules.ON_CEILING, rule);
+        rule = SurfaceRules.ifTrue(ON_CEILING, rule);
         rules.add(rule, CEILING_PRIORITY);
         return (T) this;
     }
@@ -260,7 +291,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
     public T chancedFloor(BlockState surfaceBlockA, BlockState surfaceBlockB, NoiseCondition noise) {
         SurfaceRules.RuleSource rule =
                 SurfaceRules.ifTrue(
-                        SurfaceRules.ON_FLOOR,
+                        ON_FLOOR,
                         SurfaceRules.sequence(
                                 SurfaceRules.ifTrue(
                                         noise,
@@ -278,7 +309,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
     public T chancedFloor(BlockState surfaceBlockA, SurfaceRules.RuleSource surfaceBlockB, NoiseCondition noise) {
         SurfaceRules.RuleSource rule =
                 SurfaceRules.ifTrue(
-                        SurfaceRules.ON_FLOOR,
+                        ON_FLOOR,
                         SurfaceRules.sequence(
                                 SurfaceRules.ifTrue(
                                         noise,
@@ -307,7 +338,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
     /**
      * Finalise rule building process.
      * <p>
-     * Since Minecraft 26.2 {@link SurfaceRules#isBiome(HolderGetter, ResourceKey...)} resolves its biome
+     * Since Minecraft 26.3 {@link SurfaceRules#isBiome(HolderGetter, ResourceKey...)} resolves its biome
      * keys into a {@link net.minecraft.core.HolderSet} instead of storing the raw keys, so building the
      * biome filter now needs a biome lookup. Inside a datapack registry bootstrap you get one from the
      * {@link BootstrapContext} ({@code ctx.lookup(Registries.BIOME)}); at runtime from the

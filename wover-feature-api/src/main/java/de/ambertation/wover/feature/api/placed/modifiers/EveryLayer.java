@@ -1,7 +1,6 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
 import de.ambertation.wover.block.api.BlockHelper;
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -13,9 +12,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * Minimum and maximum height are clamped to the build height of the world.
  */
 public class EveryLayer
-        extends PlacementModifier {
+        implements PlacementModifier {
     private static final EveryLayer INSTANCE = new EveryLayer(Integer.MIN_VALUE, Integer.MAX_VALUE, true);
     private static final EveryLayer INSTANCE_MIN_4 = new EveryLayer(4, Integer.MAX_VALUE, true);
     private static final EveryLayer UNDER_INSTANCE = new EveryLayer(Integer.MIN_VALUE, Integer.MAX_VALUE, false);
@@ -140,22 +138,20 @@ public class EveryLayer
     }
 
     /**
-     * Calculates the positions that this placement modifier will emit.
+     * Emits one position on top of (or underneath) every layer found at the input xz-coordinate.
      *
-     * @param ctx    The placement context.
-     * @param random The random source.
-     * @param pos    The input position.
-     * @return The stream of new positions.
+     * @param ctx      The placement context.
+     * @param random   The random source.
+     * @param pos      The input position.
+     * @param consumer Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext ctx,
             RandomSource random,
-            BlockPos pos
+            BlockPos pos,
+            Consumer<BlockPos> consumer
     ) {
-
-        Stream.Builder<BlockPos> builder = Stream.builder();
-
         final int z = pos.getZ();
         final int x = pos.getX();
         final int levelHeight = ctx.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
@@ -169,22 +165,22 @@ public class EveryLayer
                     ? findOnGroundYPosition(ctx, x, y, z, minHeight)
                     : findUnderGroundYPosition(ctx, x, y, z, minHeight);
             if (layerY != Integer.MAX_VALUE) {
-                builder.add(new BlockPos(x, layerY, z));
+                consumer.accept(new BlockPos(x, layerY, z));
                 y = layerY - 1;
             }
 
         } while (layerY != Integer.MAX_VALUE);
-        return builder.build();
     }
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type of this placement modifier.
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<EveryLayer> type() {
-        return PlacementModifiersImpl.EVERY_LAYER;
+    public @NotNull MapCodec<EveryLayer> codec() {
+        return CODEC;
     }
 
     private static int findOnGroundYPosition(PlacementContext ctx, int x, int startY, int z, int minHeight) {

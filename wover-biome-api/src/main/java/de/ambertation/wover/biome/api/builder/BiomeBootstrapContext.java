@@ -2,7 +2,6 @@ package de.ambertation.wover.biome.api.builder;
 
 import de.ambertation.wover.core.api.registry.LookupProvider;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -23,25 +22,25 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface BiomeBootstrapContext extends LookupProvider {
     /**
-     * Registers a {@link BiomeBuilder} with this context, using the given {@link Lifecycle}.
+     * Registers a {@link BiomeBuilder} with this context.
      * <p>
      * The builder will later be used to populate the Biome, {@link de.ambertation.wover.biome.api.data.BiomeData},
      * surface rule and Biome-tag registries.
-     *
-     * @param builder   The builder to register.
-     * @param lifecycle The {@link Lifecycle} to register the Biome with.
-     */
-    void register(@NotNull BiomeBuilder<?> builder, Lifecycle lifecycle);
-
-    /**
-     * Registers a {@link BiomeBuilder} with this context, using {@link Lifecycle#stable()}.
+     * <p>
+     * There used to be a {@code register(BiomeBuilder, Lifecycle)} overload here, with this method
+     * delegating to it with {@code Lifecycle.stable()}. Minecraft 26.3 removed
+     * {@code BootstrapContext#register(ResourceKey, T, Lifecycle)}, so there is no longer any way to act
+     * on a caller-supplied {@link com.mojang.serialization.Lifecycle} when the Biome is finally
+     * registered - and vanilla offers no replacement. The overload is therefore gone; callers that used to
+     * pass a lifecycle simply drop that argument.
+     * <p>
+     * Note that the lifecycle was already being discarded before 26.3: the only implementation
+     * ({@code BiomeBootstrapContextImpl}) accepted it and never used it, so removing it loses no
+     * behaviour that ever worked.
      *
      * @param builder The builder to register.
-     * @see #register(BiomeBuilder, Lifecycle)
      */
-    default void register(@NotNull BiomeBuilder<?> builder) {
-        this.register(builder, Lifecycle.stable());
-    }
+    void register(@NotNull BiomeBuilder<?> builder);
 
     /**
      * Looks up the {@link HolderGetter} for the given registry.

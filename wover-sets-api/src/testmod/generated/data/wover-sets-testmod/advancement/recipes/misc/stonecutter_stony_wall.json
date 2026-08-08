@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:stonecutter_stony_wall"
+        "recipes": "wover-sets-testmod:stonecutter_stony_wall"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

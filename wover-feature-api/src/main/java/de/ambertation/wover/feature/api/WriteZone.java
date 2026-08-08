@@ -62,17 +62,20 @@ public record WriteZone(int minX, int minZ, int maxX, int maxZ) {
     );
 
     /**
+     * Upper bound for the radius probe below. {@code FEATURES}' widest dependency is
+     * {@code STRUCTURE_STARTS} at 8 chunks, so no step can have a larger write radius than that.
+     */
+    private static final int MAX_PROBED_RADIUS = 8;
+
+    /**
      * The zone the given level currently permits.
      * <p>
-     * On 26.1 {@code WorldGenRegion} has no {@code isWithinWriteZone(BlockPos)} to probe with: its only
-     * public write-side check is {@code ensureCanWrite(BlockPos)}, and that one calls
-     * {@code Util.logAndPauseIfInIde(...)} when it fails, so it cannot be used as a quiet predicate - it
-     * would spam the log and pause the game in a dev environment. {@code ensureCanWrite} itself, though,
-     * compares the same {@code distanceX}/{@code distanceZ} against
-     * {@code this.generatingStep.blockStateWriteRadius()}, so the radius is available directly rather
-     * than needing to be probed: {@code generatingStep} is a private field on {@code WorldGenRegion}
-     * widened here to {@code ChunkStep}, whose {@code blockStateWriteRadius()} is a public record
-     * accessor.
+     * {@code WorldGenRegion} keeps its {@code writeRadius} private and its public
+     * {@code ensureCanWrite(BlockPos)} logs a warning when it fails, so it cannot be used as a quiet
+     * predicate. The radius is therefore probed through the silent, public
+     * {@code isWithinWriteZone(BlockPos)} - at most {@link #MAX_PROBED_RADIUS} calls, once per feature.
+     * Probing rather than hard-coding vanilla's {@code 1} keeps this correct if the chunk pyramid ever
+     * changes, and correct for steps other than {@code FEATURES}.
      */
     public static WriteZone of(LevelAccessor level) {
         if (!(level instanceof WorldGenRegion region)) {
@@ -80,19 +83,21 @@ public record WriteZone(int minX, int minZ, int maxX, int maxZ) {
         }
         final int centerX = region.getCenter().x();
         final int centerZ = region.getCenter().z();
-        // Clamped at zero because the field can legitimately be -1: ChunkStep.Builder defaults it to
-        // that and only the steps that actually write blocks ever set it. 26.3's probing loop had that
-        // floor implicitly - it starts at 0 and only ever grows - so without the clamp this is the one
-        // place the two implementations would disagree, and it would disagree badly: a negative radius
-        // makes minX greater than maxX, so contains() is false everywhere and a feature draws nothing
-        // at all rather than being confined to the chunk it is decorating.
-        final int radius = Math.max(0, region.generatingStep.blockStateWriteRadius());
+        int radius = 0;
+        while (radius < MAX_PROBED_RADIUS && region.isWithinWriteZone(chunkOrigin(centerX + radius + 1, centerZ))) {
+            radius++;
+        }
         return new WriteZone(
                 SectionPos.sectionToBlockCoord(centerX - radius),
                 SectionPos.sectionToBlockCoord(centerZ - radius),
                 SectionPos.sectionToBlockCoord(centerX + radius) + 15,
                 SectionPos.sectionToBlockCoord(centerZ + radius) + 15
         );
+    }
+
+    private static BlockPos chunkOrigin(int chunkX, int chunkZ) {
+        // isWithinWriteZone only looks at X/Z, so the Y is irrelevant.
+        return new BlockPos(SectionPos.sectionToBlockCoord(chunkX), 0, SectionPos.sectionToBlockCoord(chunkZ));
     }
 
     /**

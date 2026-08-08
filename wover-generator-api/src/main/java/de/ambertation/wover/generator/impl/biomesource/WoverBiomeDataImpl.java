@@ -18,7 +18,7 @@ import org.jetbrains.annotations.ApiStatus;
 public class WoverBiomeDataImpl {
     @ApiStatus.Internal
     public static void initialize() {
-        BiomeCodecRegistry.register(LibWoverWorldGenerator.C.id("wover_data"), WoverBiomeData.KEY_CODEC);
+        BiomeCodecRegistry.register(LibWoverWorldGenerator.C.id("wover_data"), WoverBiomeData.CODEC);
     }
 
     public static class CodecAttributes<T extends WoverBiomeData> {

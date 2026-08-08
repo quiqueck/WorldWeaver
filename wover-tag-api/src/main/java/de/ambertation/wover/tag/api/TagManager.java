@@ -106,7 +106,7 @@ public class TagManager {
      * {@code directory} is built using Minecrafts
      * {@link net.minecraft.core.registries.Registries#tagsDirPath(ResourceKey)}, while {@code locationProvider}
      * will lookup the Registry using {@link WorldState#registryAccess()} and determin the
-     * {@link net.minecraft.resources.ResourceLocation} using {@link Registry#getKey(Object)}.
+     * {@link net.minecraft.resources.Identifier} using {@link Registry#getKey(Object)}.
      *
      * @param registry The registry to create the {@link TagRegistry} for.
      * @return The created {@link TagRegistry}.

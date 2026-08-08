@@ -23,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:stony_weathered_from_vine"
+        "recipes": "wover-sets-testmod:stony_weathered_from_vine"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

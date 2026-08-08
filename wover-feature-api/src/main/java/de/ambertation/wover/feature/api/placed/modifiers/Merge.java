@@ -1,6 +1,5 @@
 package de.ambertation.wover.feature.api.placed.modifiers;
 
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -10,17 +9,16 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * A placement modifier that applies all of its sub-modifiers to the same
  * position, merges their result and emits all merged positions.
  */
-public class Merge extends PlacementModifier {
+public class Merge implements PlacementModifier {
     /**
      * Codec for this placement modifier.
      */
@@ -49,28 +47,28 @@ public class Merge extends PlacementModifier {
      * @param placementContext The placement context.
      * @param randomSource     The random source.
      * @param blockPos         The input position.
-     * @return The stream of new positions.
+     * @param consumer         Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext placementContext,
             RandomSource randomSource,
-            BlockPos blockPos
+            BlockPos blockPos,
+            Consumer<BlockPos> consumer
     ) {
-        Stream.Builder<BlockPos> stream = Stream.builder();
         for (PlacementModifier p : modifiers) {
-            p.getPositions(placementContext, randomSource, blockPos).forEach(stream::add);
+            p.modify(placementContext, randomSource, blockPos, consumer);
         }
-        return stream.build();
     }
 
     /**
-     * Gets the type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return The type
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.FOR_ALL;
+    public @NotNull MapCodec<Merge> codec() {
+        return CODEC;
     }
 }

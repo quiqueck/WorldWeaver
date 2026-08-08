@@ -1,10 +1,22 @@
 package de.ambertation.wover.testmod.gametest;
 
+import de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructurePiece;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -107,5 +119,131 @@ public class StructureGameTest {
         }
 
         helper.succeed();
+    }
+
+    /**
+     * Guards {@link RandomNbtStructurePiece#placeDebugMarkers} and the 26.3 port of the marker blocks.
+     * <p>
+     * Two things this covers that nothing else does:
+     * <ul>
+     *   <li><b>The gate.</b> Until the 26.3 port the six debug marker blocks were written
+     *       unconditionally, so they leaked into every {@code RandomNbtStructure} in normal gameplay.
+     *       They are now gated. Nothing else in the build exercises {@code postProcess}, and the markers
+     *       are never serialized, so datagen cannot catch a regression here.</li>
+     *   <li><b>The block identity.</b> 26.3 folded copper into a {@code WeatheringCopperCollection}, so
+     *       the flat {@code Blocks.OXIDIZED_COPPER} constant is gone and the code now navigates
+     *       {@code COPPER_BLOCK.weathering().oxidized()}. Picking {@code waxed()} or a different weather
+     *       stage compiles perfectly and would silently change what gets placed.</li>
+     * </ul>
+     * The piece is driven directly rather than through world generation, with a {@code writableBounds}
+     * that does not intersect the template's footprint — so the template itself places nothing and the
+     * only blocks written are the markers, which
+     * {@link RandomNbtStructurePiece#postProcess} writes at the corners of {@code writableBounds}.
+     */
+    @GameTest
+    public void randomNbtDebugMarkersAreGated(GameTestHelper helper) {
+        final Block oxidizedCopper = Blocks.COPPER_BLOCK.weathering().oxidized();
+
+        // The weathering()/oxidized() navigation must still land on the exact block the pre-26.3
+        // Blocks.OXIDIZED_COPPER constant named.
+        final Identifier oxidizedCopperId = BuiltInRegistries.BLOCK.getKey(oxidizedCopper);
+        if (!Identifier.withDefaultNamespace("oxidized_copper").equals(oxidizedCopperId)) {
+            helper.fail(Component.literal(
+                    "Blocks.COPPER_BLOCK.weathering().oxidized() resolved to " + oxidizedCopperId
+                            + ", expected minecraft:oxidized_copper - the debug markers would place the"
+                            + " wrong block"
+            ));
+            return;
+        }
+
+        final List<String> failures = new ArrayList<>();
+
+        // markers enabled -> all six must be written
+        runPiece(helper, new BlockPos(0, 1, 0), true, oxidizedCopper, failures);
+        // markers disabled -> none of the six may be written
+        runPiece(helper, new BlockPos(4, 1, 4), false, oxidizedCopper, failures);
+
+        if (!failures.isEmpty()) {
+            helper.fail(Component.literal(
+                    "RandomNbtStructurePiece debug-marker regression:\n - " + String.join("\n - ", failures)
+            ));
+            return;
+        }
+
+        helper.succeed();
+    }
+
+    /**
+     * Places a {@link RandomNbtStructurePiece} with {@code placeDebugMarkers} forced to {@code enabled},
+     * then checks the six marker positions.
+     */
+    private static void runPiece(
+            GameTestHelper helper,
+            BlockPos relativeBase,
+            boolean enabled,
+            Block oxidizedCopper,
+            List<String> failures
+    ) {
+        final ServerLevel level = helper.getLevel();
+        final BlockPos base = helper.absolutePos(relativeBase);
+
+        // A flat 3x1x3 box at base's own Y. The template is anchored three blocks higher, so it lies
+        // completely outside this box and super.postProcess() places none of it - every block written
+        // below is a debug marker.
+        final BoundingBox writableBounds = new BoundingBox(
+                base.getX(), base.getY(), base.getZ(),
+                base.getX() + 2, base.getY(), base.getZ() + 2
+        );
+        final BlockPos templatePosition = base.offset(0, 3, 0);
+        final BlockPos pivot = new BlockPos(0, 1, 0);
+
+        final RandomNbtStructurePiece piece = new RandomNbtStructurePiece(
+                level.getServer().getStructureManager(),
+                Identifier.parse("wover-structure-testmod:simple"),
+                RandomNbtStructurePiece.settings(Rotation.NONE, Mirror.NONE, pivot, false),
+                templatePosition,
+                false
+        );
+
+        final boolean previous = RandomNbtStructurePiece.placeDebugMarkers;
+        RandomNbtStructurePiece.placeDebugMarkers = enabled;
+        try {
+            piece.postProcess(
+                    level,
+                    level.structureManager(),
+                    level.getChunkSource().getGenerator(),
+                    RandomSource.create(42),
+                    writableBounds,
+                    ChunkPos.containing(base),
+                    base
+            );
+        } finally {
+            RandomNbtStructurePiece.placeDebugMarkers = previous;
+        }
+
+        // The four bounding-box corners (oxidized copper), the template origin (amethyst) and the
+        // rotation pivot (netherite) - see RandomNbtStructurePiece#postProcess.
+        record Marker(String what, BlockPos pos, Block block) {}
+        final List<Marker> markers = List.of(
+                new Marker("corner -X-Z", new BlockPos(base.getX(), base.getY(), base.getZ()), oxidizedCopper),
+                new Marker("corner +X-Z", new BlockPos(base.getX() + 2, base.getY(), base.getZ()), oxidizedCopper),
+                new Marker("corner -X+Z", new BlockPos(base.getX(), base.getY(), base.getZ() + 2), oxidizedCopper),
+                new Marker("corner +X+Z", new BlockPos(base.getX() + 2, base.getY(), base.getZ() + 2), oxidizedCopper),
+                new Marker("template origin", templatePosition, Blocks.AMETHYST_BLOCK),
+                new Marker("rotation pivot", templatePosition.offset(pivot), Blocks.NETHERITE_BLOCK)
+        );
+
+        for (Marker m : markers) {
+            final Block actual = level.getBlockState(m.pos()).getBlock();
+            if (enabled && actual != m.block()) {
+                failures.add("placeDebugMarkers=true: " + m.what() + " at " + m.pos() + " is "
+                        + BuiltInRegistries.BLOCK.getKey(actual) + ", expected "
+                        + BuiltInRegistries.BLOCK.getKey(m.block()));
+            } else if (!enabled && actual == m.block()) {
+                failures.add("placeDebugMarkers=false: " + m.what() + " at " + m.pos() + " is "
+                        + BuiltInRegistries.BLOCK.getKey(actual)
+                        + " - debug markers leaked into a run that disabled them");
+            }
+        }
     }
 }

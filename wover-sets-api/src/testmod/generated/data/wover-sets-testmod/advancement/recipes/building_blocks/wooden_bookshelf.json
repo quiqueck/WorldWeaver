@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_bookshelf"
+        "recipes": "wover-sets-testmod:wooden_bookshelf"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

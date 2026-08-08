@@ -13,6 +13,16 @@ import net.minecraft.world.level.levelgen.SurfaceRules;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * 26.3 split the material-condition registries in two: {@code minecraft:material_condition_type}
+ * ({@link BuiltInRegistries#MATERIAL_CONDITION_TYPE}) still holds the {@link MapCodec}s that dispatch
+ * a serialized condition onto its implementation, while the name
+ * {@code minecraft:worldgen/material_condition} ({@link net.minecraft.core.registries.Registries#MATERIAL_CONDITION})
+ * was reused for a brand new <i>datapack</i> registry that holds the condition sources themselves
+ * (that is where vanilla now keeps {@code minecraft:on_floor} and friends).
+ * <p>
+ * This class registers codecs, so it belongs on the {@code _TYPE} side.
+ */
 public class MaterialConditionRegistryImpl {
     public static final ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> THRESHOLD_CONDITION
             = ConditionManager.createKey(LibWoverSurface.C.id("threshold_condition"));
@@ -25,7 +35,7 @@ public class MaterialConditionRegistryImpl {
             ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> key,
             MapCodec<? extends SurfaceRules.ConditionSource> codec
     ) {
-        BuiltInRegistryManager.register(BuiltInRegistries.MATERIAL_CONDITION, key, codec);
+        BuiltInRegistryManager.register(BuiltInRegistries.MATERIAL_CONDITION_TYPE, key, codec);
 
         return key;
     }
@@ -33,7 +43,7 @@ public class MaterialConditionRegistryImpl {
     @NotNull
     public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> createKey(Identifier location) {
         return ResourceKey.create(
-                BuiltInRegistries.MATERIAL_CONDITION.key(),
+                BuiltInRegistries.MATERIAL_CONDITION_TYPE.key(),
                 location
         );
     }

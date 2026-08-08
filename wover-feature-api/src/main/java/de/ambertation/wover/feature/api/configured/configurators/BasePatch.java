@@ -1,16 +1,16 @@
 package de.ambertation.wover.feature.api.configured.configurators;
 
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 
 /**
  * A {@link FeatureConfigurator} that configures a patch distribution.
+ * <p>
+ * 26.3 collapsed {@code ConfiguredFeature} into {@link net.minecraft.world.level.levelgen.feature.Feature},
+ * which is non-generic and carries its own configuration, so the {@code <FC>}/{@code <F>} type parameters
+ * were dropped. Only the self-type is left.
  *
- * @param <FC> The feature configuration
- * @param <F>  The feature
- * @param <W>  The configurator itself
+ * @param <W> The configurator itself
  */
-public interface BasePatch<FC extends FeatureConfiguration, F extends Feature<FC>, W extends BasePatch<FC, F, W>> {
+public interface BasePatch<W extends BasePatch<W>> {
     /**
      * Configures the patch distribution similar to the default nether vegetation.
      *

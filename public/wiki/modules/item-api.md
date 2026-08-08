@@ -203,13 +203,24 @@ At runtime, `EnchantmentUtils` provides null-/registry-safe helpers that don't r
 example, to enchant an item stack the first time it's created:
 
 ```java
-public class EnchantedAxe extends AxeItem implements ItemWithCustomStack {
+public class EnchantedAxe extends Item implements ItemWithCustomStack {
+    public EnchantedAxe(DefaultItemDefinition<EnchantedAxe> config) {
+        super(config.getProperties().axe(ToolMaterial.WOOD, 6.0F, -3.1F));
+    }
+
     @Override
     public void setupItemStack(ItemStack stack, HolderLookup.Provider provider) {
         EnchantmentUtils.enchantInWorld(stack, Enchantments.SHARPNESS, 5, provider);
     }
 }
 ```
+
+26.3 removed the per-tool `Item` subclasses (`AxeItem`, `PickaxeItem`, `ShovelItem`, `HoeItem`, `SwordItem`);
+tools are data-driven now. Extend plain `Item` and apply the tool properties yourself via
+`Item.Properties#axe/pickaxe/sword/shovel/hoe/tool`, which install the same tool component and attack attribute
+modifiers the old constructors set up internally — vanilla's own `Items.WOODEN_AXE` is registered with
+`properties.axe(ToolMaterial.WOOD, 6.0F, -3.2F)`. `ToolItemDefinition` wraps the same calls if you'd rather
+configure the tool from the builder than from the item class.
 
 `EnchantmentManager.registerEffectComponent(id, builderConfigurator)` registers a custom
 `DataComponentType` for use as an enchantment effect component, for enchantments with bespoke effect data.

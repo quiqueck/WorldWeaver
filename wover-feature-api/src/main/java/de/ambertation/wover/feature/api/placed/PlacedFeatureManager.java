@@ -2,9 +2,9 @@ package de.ambertation.wover.feature.api.placed;
 
 import de.ambertation.wover.events.api.Event;
 import de.ambertation.wover.events.api.types.OnBootstrapRegistry;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureKey;
+import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.FeatureConfigurator;
-import de.ambertation.wover.feature.impl.placed.PlacedConfiguredFeatureKeyImpl;
+import de.ambertation.wover.feature.impl.placed.BoundPlacedFeatureKeyImpl;
 import de.ambertation.wover.feature.impl.placed.PlacedFeatureKeyImpl;
 import de.ambertation.wover.feature.impl.placed.PlacedFeatureManagerImpl;
 
@@ -14,9 +14,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -51,58 +49,52 @@ public class PlacedFeatureManager {
     }
 
     /**
-     * Creates a {@link PlacedFeatureKey} for the given {@link Identifier}. The resulting
-     * {@link PlacedFeatureKey} will place the {@link ConfiguredFeature} referenced by the given
-     * {@link ResourceKey}.
+     * Creates a {@link BoundPlacedFeatureKey} for the given {@link Identifier}. The resulting
+     * key will place the {@link Feature} referenced by the given {@link ResourceKey}.
+     *
+     * @param location The location of the {@link PlacedFeature}
+     * @param feature  The {@link ResourceKey} of the {@link Feature} to place
+     * @return The {@link BoundPlacedFeatureKey}
+     */
+    public static BoundPlacedFeatureKey
+    createKey(
+            Identifier location,
+            ResourceKey<Feature> feature
+    ) {
+        return new BoundPlacedFeatureKeyImpl(location, feature);
+    }
+
+
+    /**
+     * Creates a {@link BoundPlacedFeatureKey} for the given {@link Identifier}. The resulting
+     * key will place the {@link Feature} referenced by the given {@link FeatureKey}.
      *
      * @param location   The location of the {@link PlacedFeature}
-     * @param configured The {@link ResourceKey} of the {@link ConfiguredFeature} to place
-     * @param <FC>       The {@link FeatureConfiguration} of the {@link ConfiguredFeature}
-     * @param <F>        The {@link Feature} of the {@link ConfiguredFeature}
-     * @param <B>        The {@link FeatureConfigurator} for the {@link ConfiguredFeature}
-     * @return The {@link PlacedFeatureKey}
+     * @param featureKey The {@link FeatureKey} of the {@link Feature} to place
+     * @param <B>        The {@link FeatureConfigurator} for the {@link Feature}
+     * @return The {@link BoundPlacedFeatureKey}
      */
-    public static <FC extends FeatureConfiguration, F extends Feature<FC>, B extends FeatureConfigurator<FC, F>> PlacedConfiguredFeatureKey
+    public static <B extends FeatureConfigurator> BoundPlacedFeatureKey
     createKey(
             Identifier location,
-            ResourceKey<ConfiguredFeature<?, ?>> configured
+            FeatureKey<B> featureKey
     ) {
-        return new PlacedConfiguredFeatureKeyImpl(location, configured);
-    }
-
-
-    /**
-     * Creates a {@link PlacedFeatureKey} for the given {@link Identifier}. The resulting
-     * {@link PlacedFeatureKey} will place the {@link ConfiguredFeature} referenced by the given
-     * {@link ConfiguredFeatureKey}.
-     *
-     * @param location             The location of the {@link PlacedFeature}
-     * @param configuredFeatureKey The {@link ConfiguredFeatureKey} of the {@link ConfiguredFeature} to place
-     * @param <B>                  The {@link FeatureConfigurator} for the {@link ConfiguredFeature}
-     * @return The {@link PlacedFeatureKey}
-     */
-    public static <B extends FeatureConfigurator<?, ?>> PlacedConfiguredFeatureKey
-    createKey(
-            Identifier location,
-            ConfiguredFeatureKey<B> configuredFeatureKey
-    ) {
-        return new PlacedConfiguredFeatureKeyImpl(location, configuredFeatureKey);
+        return new BoundPlacedFeatureKeyImpl(location, featureKey);
     }
 
     /**
-     * Creates a {@link PlacedFeatureKey} with the same location as the passed {@link ConfiguredFeatureKey}.
-     * The resulting {@link PlacedFeatureKey} will place the {@link ConfiguredFeature} referenced by the given
-     * {@link ConfiguredFeatureKey}.
+     * Creates a {@link BoundPlacedFeatureKey} with the same location as the passed {@link FeatureKey}.
+     * The resulting key will place the {@link Feature} referenced by the given {@link FeatureKey}.
      *
-     * @param configuredFeatureKey The {@link ConfiguredFeatureKey} of the {@link ConfiguredFeature} to place
-     * @param <B>                  The {@link FeatureConfigurator} for the {@link ConfiguredFeature}
-     * @return The {@link PlacedFeatureKey}
+     * @param featureKey The {@link FeatureKey} of the {@link Feature} to place
+     * @param <B>        The {@link FeatureConfigurator} for the {@link Feature}
+     * @return The {@link BoundPlacedFeatureKey}
      */
-    public static <B extends FeatureConfigurator<?, ?>> PlacedConfiguredFeatureKey
+    public static <B extends FeatureConfigurator> BoundPlacedFeatureKey
     createKey(
-            ConfiguredFeatureKey<B> configuredFeatureKey
+            FeatureKey<B> featureKey
     ) {
-        return new PlacedConfiguredFeatureKeyImpl(configuredFeatureKey.key.identifier(), configuredFeatureKey);
+        return new BoundPlacedFeatureKeyImpl(featureKey.key.identifier(), featureKey);
     }
 
     /**

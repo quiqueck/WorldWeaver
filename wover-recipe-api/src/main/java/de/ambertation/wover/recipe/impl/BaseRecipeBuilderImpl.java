@@ -3,6 +3,10 @@ package de.ambertation.wover.recipe.impl;
 import de.ambertation.wover.recipe.api.BaseRecipeBuilder;
 import de.ambertation.wover.recipe.api.RecipeBuilder;
 
+// 26.3 split the advancements package: the criterion/trigger types moved from
+// net.minecraft.advancements(.criterion) to net.minecraft.advancements.triggers, while the
+// predicate types (ItemPredicate & friends) moved to net.minecraft.advancements.predicates.
+// Both Criterion and InventoryChangeTrigger are trigger-side types, so they live in .triggers now.
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.triggers.InventoryChangeTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;

@@ -2,10 +2,10 @@ package de.ambertation.wover.biome.impl.modification.predicates;
 
 import de.ambertation.wover.biome.api.modification.predicates.BiomePredicate;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.dimension.LevelStem;
 
 import java.util.Optional;
@@ -14,15 +14,13 @@ public record InDimension(ResourceKey<LevelStem> dimensionKey) implements BiomeP
     public static final InDimension OVERWORLD = new InDimension(LevelStem.OVERWORLD);
     public static final InDimension END = new InDimension(LevelStem.END);
     public static final InDimension NETHER = new InDimension(LevelStem.NETHER);
-    public static final KeyDispatchDataCodec<InDimension> CODEC = KeyDispatchDataCodec
-            .of(ResourceKey.codec(Registries.LEVEL_STEM)
-                           .xmap(InDimension::new, InDimension::dimensionKey)
-                           .fieldOf("dimension_key")
-            );
+    public static final MapCodec<InDimension> CODEC = ResourceKey.codec(Registries.LEVEL_STEM)
+            .xmap(InDimension::new, InDimension::dimensionKey)
+            .fieldOf("dimension_key");
 
 
     @Override
-    public KeyDispatchDataCodec<? extends BiomePredicate> codec() {
+    public MapCodec<? extends BiomePredicate> codec() {
         return CODEC;
     }
 

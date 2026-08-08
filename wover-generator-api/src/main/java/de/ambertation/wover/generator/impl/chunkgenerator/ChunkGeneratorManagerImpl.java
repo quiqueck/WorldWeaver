@@ -79,8 +79,8 @@ public class ChunkGeneratorManagerImpl {
             boolean recreated
     ) {
         // `access` is the registry provider the world's own WorldDimensions were resolved against -
-        // see WorldGeneratorConfigImpl#writeWorldPresetSettings for why encoding needs this exact one
-        // rather than the global WorldState.allStageRegistryAccess().
+// see WorldGeneratorConfigImpl#writeWorldPresetSettings for why encoding needs this exact one
+// rather than the global WorldState.allStageRegistryAccess().
         WorldGeneratorConfigImpl.createWorldConfig(access, currentPreset, dimensions);
     }
 

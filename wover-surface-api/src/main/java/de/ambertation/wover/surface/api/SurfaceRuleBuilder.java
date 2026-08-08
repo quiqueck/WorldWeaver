@@ -57,7 +57,7 @@ public interface SurfaceRuleBuilder extends BaseSurfaceRuleBuilder<SurfaceRuleBu
     /**
      * Finalise rule building process.
      * <p>
-     * Since Minecraft 26.2 {@link net.minecraft.world.level.levelgen.SurfaceRules#isBiome(HolderGetter, ResourceKey...)}
+     * Since Minecraft 26.3 {@link net.minecraft.world.level.levelgen.SurfaceRules#isBiome(HolderGetter, ResourceKey...)}
      * resolves its biome keys into a {@link net.minecraft.core.HolderSet} rather than keeping the raw
      * keys, so composing the biome filter now requires a biome lookup. Inside a registry bootstrap use
      * {@code ctx.lookup(Registries.BIOME)}; at runtime use the {@link net.minecraft.core.RegistryAccess}.

@@ -11,7 +11,7 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,7 @@ public class BaseFeatureKeyImpl<K extends BasePlacedFeatureKey<K>> implements Ba
 
     protected FeaturePlacementBuilder place(
             @NotNull BootstrapContext<PlacedFeature> bootstrapContext,
-            Holder<ConfiguredFeature<?, ?>> holder
+            Holder<Feature> holder
     ) {
         return new FeaturePlacementBuilderImpl(bootstrapContext, key, holder);
     }

@@ -25,17 +25,17 @@ import java.util.stream.Stream;
  * Backing store for {@link de.ambertation.wover.loot.api.LootTableAppenders}.
  *
  * <h2>Why this cannot accumulate state</h2>
- * The reloadable loot table registry is rebuilt from scratch on every {@code /reload} and every world load:
- * loading runs again and produces brand-new {@link LootTable} instances parsed from the JSON. Appending to a
- * fresh instance is therefore naturally idempotent - the previous pass's additions were left on objects that
- * are now garbage.
+ * The {@code minecraft:loot_table} registry is a datapack registry: every {@code /reload} and every world load
+ * runs {@code RegistryDataLoader.load(...)} again and produces brand-new {@link LootTable} instances parsed
+ * from the JSON. Appending to a fresh instance is therefore naturally idempotent - the previous pass's
+ * additions were left on objects that are now garbage.
  * <p>
  * That alone would be enough, but it silently depends on "the instance is always fresh", which is exactly the
  * kind of assumption that breaks. So {@link #ORIGINAL_POOLS} / {@link #ORIGINAL_ENTRIES} / {@link #ORIGINAL_CONDITIONS}
  * remember, per <em>instance</em>, the state that instance had when this class first saw it, and every pass rebuilds from
  * that snapshot instead of from the current state. Re-running a pass over an instance that was already
  * extended therefore produces exactly the same result as the first pass, rather than doubling the additions.
- * All three maps are weak and keyed by identity ({@link LootTable} and {@link LootPool} do not override
+ * Both maps are weak and keyed by identity ({@link LootTable} and {@link LootPool} do not override
  * {@code equals}), so they hold nothing alive and vanish with the registry they describe.
  */
 public final class LootTableAppendersImpl {
@@ -63,8 +63,8 @@ public final class LootTableAppendersImpl {
     static final Map<LootPool, List<LootPoolEntryContainer>> ORIGINAL_ENTRIES =
             Collections.synchronizedMap(new WeakHashMap<>());
 
-    /** The conditions a {@link LootPool} instance had before we touched it. See the class javadoc. */
-    static final Map<LootPool, List<LootItemCondition>> ORIGINAL_CONDITIONS =
+    /** The condition a {@link LootPool} instance had before we touched it. See the class javadoc. */
+    static final Map<LootPool, Optional<Holder<LootItemCondition>>> ORIGINAL_CONDITIONS =
             Collections.synchronizedMap(new WeakHashMap<>());
 
     @SafeVarargs

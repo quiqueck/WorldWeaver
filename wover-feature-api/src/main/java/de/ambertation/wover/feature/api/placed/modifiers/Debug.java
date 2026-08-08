@@ -2,7 +2,6 @@ package de.ambertation.wover.feature.api.placed.modifiers;
 
 
 import de.ambertation.wover.entrypoint.LibWoverFeature;
-import de.ambertation.wover.feature.impl.placed.modifiers.PlacementModifiersImpl;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -11,15 +10,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Will re-emit the input position unaltered, and log the position to the info log.
  */
-public class Debug extends PlacementModifier {
+public class Debug implements PlacementModifier {
     /**
      * A default instance with the caption set to {@code "Placing at {}"}.
      */
@@ -54,25 +52,27 @@ public class Debug extends PlacementModifier {
      * @param placementContext The placement context.
      * @param randomSource     The random source.
      * @param blockPos         The input position.
-     * @return The stream of new positions.
+     * @param consumer         Receives every emitted position.
      */
     @Override
-    public @NotNull Stream<BlockPos> getPositions(
+    public void modify(
             PlacementContext placementContext,
             RandomSource randomSource,
-            BlockPos blockPos
+            BlockPos blockPos,
+            Consumer<BlockPos> consumer
     ) {
         LibWoverFeature.C.log.info(caption, blockPos);
-        return Stream.of(blockPos);
+        consumer.accept(blockPos);
     }
 
     /**
-     * The type of this placement modifier.
+     * The {@link MapCodec} that serializes this placement modifier. 26.3 replaced the
+     * {@code PlacementModifierType} indirection with the {@link MapCodec} itself.
      *
-     * @return the type of this placement modifier.
+     * @return the codec of this placement modifier
      */
     @Override
-    public @NotNull PlacementModifierType<?> type() {
-        return PlacementModifiersImpl.DEBUG;
+    public @NotNull MapCodec<Debug> codec() {
+        return CODEC;
     }
 }

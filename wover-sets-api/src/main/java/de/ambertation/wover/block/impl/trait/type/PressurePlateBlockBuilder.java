@@ -47,7 +47,7 @@ public class PressurePlateBlockBuilder extends AbstractBlockTraitBuilder.Generic
                     .forceSolidOn()
                     .noCollission()
                     .strength(0.5F)
-                    .pushReaction(PushReaction.DESTROY);
+                    .pushReaction(PushReaction.POPPED);
         }
     }
 }

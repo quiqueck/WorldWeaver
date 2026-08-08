@@ -8,10 +8,12 @@ import de.ambertation.wover.testmod.entrypoint.TestModWoverSurface;
 
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.placement.CaveSurface;
 
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
                 .start()
                 .biome(Biomes.BEACH)
                 .surface(Blocks.CHERRY_PLANKS.defaultBlockState())
-                .subsurface(Blocks.WHITE_CONCRETE.defaultBlockState(), 5)
+                .subsurface(Blocks.CONCRETE.pick(DyeColor.WHITE).defaultBlockState(), 5)
                 .register(ctx, TEST_BEACH);
 
         SurfaceRuleBuilder
@@ -78,17 +80,21 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
                 .biome(Biomes.FLOWER_FOREST)
                 .rule(SurfaceRules.sequence(
                         SurfaceRules.ifTrue(
-                                SurfaceRules.ON_FLOOR,
+                                // 26.3 removed SurfaceRules.ON_FLOOR; the equivalent condition now lives
+                                // in the minecraft:worldgen/material_condition datapack registry as
+                                // VanillaMaterialConditions.ON_FLOOR. This inline form is the exact same
+                                // value (see data/minecraft/worldgen/material_condition/on_floor.json).
+                                SurfaceRules.stoneDepthCheck(0, false, CaveSurface.FLOOR),
                                 SurfaceRules.ifTrue(
                                         Conditions.roughNoise(Noises.NETHERRACK, 0.19),
-                                        SurfaceRules.state(Blocks.PURPLE_CONCRETE.defaultBlockState())
+                                        SurfaceRules.state(Blocks.CONCRETE.pick(DyeColor.PURPLE).defaultBlockState())
                                 )
                         ),
                         SurfaceRules.ifTrue(
                                 Conditions.NETHER_VOLUME_NOISE_LARGE,
-                                SurfaceRules.state(Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState())
+                                SurfaceRules.state(Blocks.CONCRETE.pick(DyeColor.LIGHT_BLUE).defaultBlockState())
                         ),
-                        SurfaceRules.state(Blocks.WHITE_CONCRETE.defaultBlockState())
+                        SurfaceRules.state(Blocks.CONCRETE.pick(DyeColor.WHITE).defaultBlockState())
                 ))
                 .register(ctx, TEST_FLOWER_FORREST);
     }

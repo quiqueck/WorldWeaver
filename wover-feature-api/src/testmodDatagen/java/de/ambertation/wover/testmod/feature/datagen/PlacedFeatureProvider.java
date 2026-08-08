@@ -2,7 +2,7 @@ package de.ambertation.wover.testmod.feature.datagen;
 
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverRegistryContentProvider;
-import de.ambertation.wover.feature.api.configured.ConfiguredFeatureManager;
+import de.ambertation.wover.feature.api.configured.FeatureContentManager;
 import de.ambertation.wover.testmod.entrypoint.TestModWoverFeature;
 
 import net.minecraft.core.registries.Registries;
@@ -33,7 +33,7 @@ public class PlacedFeatureProvider extends WoverRegistryContentProvider<PlacedFe
                                            .register();
 
 
-        var cfg = ConfiguredFeatureManager.INLINE_BUILDER.simple().block(Blocks.QUARTZ_BLOCK).directHolder();
+        var cfg = FeatureContentManager.INLINE_BUILDER.simple().block(Blocks.QUARTZ_BLOCK).directHolder();
 
 
         TestModWoverFeature.INLINE_FEATURE.place(context, cfg)

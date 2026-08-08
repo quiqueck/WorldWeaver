@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "wover-sets-testmod:wooden_bark"
+        "recipes": "wover-sets-testmod:wooden_bark"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

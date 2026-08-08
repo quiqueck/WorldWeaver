@@ -1,12 +1,12 @@
 package de.ambertation.wover.feature.api.configured.configurators;
 
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.NetherForestVegetationFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.NetherForestVegetationConfig;
+import net.minecraft.world.level.levelgen.feature.SimpleBlockFeature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider;
 
 /**
- * Places Blocks in the typical nether vegetation distribution ({@link NetherForestVegetationFeature}).
+ * Places Blocks in the typical nether vegetation distribution (a scattered {@link SimpleBlockFeature},
+ * the shape vanilla itself uses for {@code warped_forest_vegetation} and {@code nylium_bonemeal}).
  * <p>
  * The Feature will randomly select a block from the given list of blocks and place/spread it according
  * to the default nether vegetation distribution.
@@ -15,7 +15,7 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStatePr
  * a {@link WeightedStateProvider} that will be used to select the BlockState. You can not
  * use both for the same Configurator.
  */
-public interface NetherForrestVegetation extends BaseWeightedBlock<NetherForestVegetationConfig, NetherForestVegetationFeature, NetherForrestVegetation> {
+public interface NetherForrestVegetation extends BaseWeightedBlock<NetherForrestVegetation> {
     /**
      * The maximum spread radius for the Blocks (how wide the x-z plane is)
      *

@@ -5,13 +5,12 @@ import de.ambertation.wover.feature.api.placed.PlacedFeatureKey;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.levelgen.feature.RandomSelectorFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.RandomFeatureConfiguration;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 /**
  * Places a random feature ({@link RandomSelectorFeature}).
  */
-public interface AsRandomSelect extends FeatureConfigurator<RandomFeatureConfiguration, RandomSelectorFeature> {
+public interface AsRandomSelect extends FeatureConfigurator {
     /**
      * Adds a feature to the random selection.
      *

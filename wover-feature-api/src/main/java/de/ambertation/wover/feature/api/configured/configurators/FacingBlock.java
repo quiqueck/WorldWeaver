@@ -1,19 +1,18 @@
 package de.ambertation.wover.feature.api.configured.configurators;
 
-import de.ambertation.wover.feature.api.features.PlaceBlockFeature;
-import de.ambertation.wover.feature.api.features.config.PlaceFacingBlockConfig;
+import de.ambertation.wover.feature.api.features.PlaceFacingBlockFeature;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Places blocks that have a directional state ({@link PlaceBlockFeature} with {@link PlaceFacingBlockConfig}).
+ * Places blocks that have a directional state ({@link PlaceFacingBlockFeature}).
  * <p>
  * This can be used to place Blocks that have a
  * {@link net.minecraft.world.level.block.HorizontalDirectionalBlock#FACING} property. You can add multiple Blocks
  * or BlockStates to this Configurator. The Feature will choose one of them randomly by weight.
  */
-public interface FacingBlock extends BaseWeightedBlock<PlaceFacingBlockConfig, PlaceBlockFeature<PlaceFacingBlockConfig>, FacingBlock> {
+public interface FacingBlock extends BaseWeightedBlock<FacingBlock> {
     /**
      * Allows the Block to be placed in all Horizontal directions
      *

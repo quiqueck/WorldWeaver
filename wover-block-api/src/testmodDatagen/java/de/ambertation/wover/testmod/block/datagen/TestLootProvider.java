@@ -22,8 +22,8 @@ import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.AllOfCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchBlock;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 
@@ -101,26 +101,26 @@ public class TestLootProvider extends WoverLootTableProvider {
                         // count uniform 1..3 at the max age, otherwise a single item
                         .apply(SetItemCountFunction
                                 .setCount(UniformGenerator.between(1.0F, 3.0F))
-                                .when(hasAge(block, maxAge)))
+                                .when(hasAge(provider, block, maxAge)))
                         .apply(SetItemCountFunction
                                 .setCount(ConstantValue.exactly(1.0F))
-                                .when(hasAge(block, maxAge).invert()))
+                                .when(hasAge(provider, block, maxAge).invert()))
                         // fortune bonus curve, strongest at the max age
                         .apply(ApplyBonusCount
                                 .addOreBonusCount(provider.fortune())
-                                .when(hasAge(block, maxAge)))
+                                .when(hasAge(provider, block, maxAge)))
                         .apply(ApplyBonusCount
                                 .addUniformBonusCount(provider.fortune(), 2)
-                                .when(hasAge(block, maxAge - 1)))
+                                .when(hasAge(provider, block, maxAge - 1)))
                         .apply(ApplyBonusCount
                                 .addUniformBonusCount(provider.fortune(), 1)
-                                .when(hasAge(block, maxAge - 2)))
+                                .when(hasAge(provider, block, maxAge - 2)))
                         .apply(ApplyExplosionDecay.explosionDecay()));
 
         final LootPool.Builder noSilkTouchPool = LootPool
                 .lootPool()
                 .setRolls(ConstantValue.exactly(1.0F))
-                .when(AllOfCondition.allOf(provider.hasSilkTouch().invert(), hasAge(block, maxAge)))
+                .when(AllOfCondition.allOf(provider.hasSilkTouch().invert(), hasAge(provider, block, maxAge)))
                 .add(LootItem
                         .lootTableItem(block)
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F)))
@@ -129,9 +129,18 @@ public class TestLootProvider extends WoverLootTableProvider {
         return LootTable.lootTable().withPool(silkTouchPool).withPool(noSilkTouchPool);
     }
 
-    private static LootItemCondition.Builder hasAge(Block block, int age) {
-        return LootItemBlockStatePropertyCondition
-                .hasBlockStateProperties(block)
-                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(TestBlock.AGE, age));
+    /**
+     * 26.3 removed {@code LootItemBlockStatePropertyCondition}; block-state matching moved to
+     * {@link MatchBlock}, which builds an {@code advancements} block predicate and therefore needs a block
+     * lookup - hence the extra {@link LootLookupProvider} parameter. Same semantics, new serialized form:
+     * {@code minecraft:match_block} with {@code blocks} + {@code state} instead of
+     * {@code minecraft:block_state_property} with {@code block} + {@code properties}.
+     */
+    private static LootItemCondition.Builder hasAge(LootLookupProvider provider, Block block, int age) {
+        return MatchBlock.blockMatches(
+                provider.blockLookup(),
+                block,
+                StatePropertiesPredicate.Builder.properties().hasProperty(TestBlock.AGE, age)
+        );
     }
 }

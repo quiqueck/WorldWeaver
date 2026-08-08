@@ -15,6 +15,7 @@ import net.minecraft.util.valueproviders.FloatProviders;
 import net.minecraft.util.valueproviders.UniformFloat;
 import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import net.minecraft.world.level.levelgen.synth.Noise;
 
 public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
     public static final MapCodec<RoughNoiseConditionImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
@@ -34,13 +35,13 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
                     )
             ));
 
-    private final ResourceKey<NormalNoise.NoiseParameters> noise;
+    private final ResourceKey<NormalNoise> noise;
     private final double minThreshold;
     private final double maxThreshold;
     private final FloatProvider roughness;
 
     public RoughNoiseConditionImpl(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
+            ResourceKey<NormalNoise> noise,
             FloatProvider roughness,
             double minThreshold,
             double maxThreshold
@@ -53,7 +54,7 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
     }
 
     public RoughNoiseConditionImpl(
-            ResourceKey<NormalNoise.NoiseParameters> noise,
+            ResourceKey<NormalNoise> noise,
             double minThreshold,
             double maxThreshold
     ) {
@@ -68,7 +69,7 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
     @Override
     public SurfaceRules.Condition apply(final SurfaceRules.Context context2) {
         final SurfaceRulesContextAccessor ctx = SurfaceRulesContextAccessor.class.cast(context2);
-        final NormalNoise normalNoise = ctx.getRandomState().getOrCreateNoise(this.noise);
+        final Noise normalNoise = ctx.getRandomState().getOrCreateNoise(this.noise);
         final RandomSource roughnessSource = ctx.getRandomState()
                                                 .getOrCreateRandomFactory(NoiseParameterManager.ROUGHNESS_NOISE.identifier())
                                                 .fromHashOf(NoiseParameterManager.ROUGHNESS_NOISE.identifier());
@@ -86,7 +87,7 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
 
             protected boolean compute() {
                 double d = normalNoise
-                        .getValue(
+                        .get(
                                 ctx.getBlockX(),
                                 ctx.getBlockY(),
                                 ctx.getBlockZ()

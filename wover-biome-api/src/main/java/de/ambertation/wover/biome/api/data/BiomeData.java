@@ -11,7 +11,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.Objects;
@@ -41,10 +40,6 @@ public class BiomeData {
      * The {@link MapCodec} for the base {@link BiomeData} class.
      */
     public static final MapCodec<BiomeData> CODEC = codec(BiomeData::new);
-    /**
-     * The {@link KeyDispatchDataCodec} for the base {@link BiomeData} class, as returned by {@link #codec()}.
-     */
-    public static final KeyDispatchDataCodec<BiomeData> KEY_CODEC = KeyDispatchDataCodec.of(CODEC);
     /**
      * The key of the {@link Biome} this data belongs to.
      */
@@ -117,7 +112,7 @@ public class BiomeData {
      * This is the base overload of a family of {@code codec} methods that let a {@link BiomeData} subclass
      * add up to thirteen additional {@link RecordCodecBuilder} fields ({@code p4}...{@code p16}) on top of
      * the base fields, matched by a factory function taking the corresponding number of arguments. Use
-     * {@link BiomeCodecRegistry#register(Identifier, KeyDispatchDataCodec)} to make the resulting codec
+     * {@link BiomeCodecRegistry#register(Identifier, MapCodec)} to make the resulting codec
      * available for datapack loading.
      *
      * @param factory The factory that creates the subtype instance from the decoded fields.
@@ -655,14 +650,18 @@ public class BiomeData {
     }
 
     /**
-     * The {@link KeyDispatchDataCodec} that is used by {@link BiomeCodecRegistry} to (de)serialize this
-     * concrete {@link BiomeData} subtype. Subclasses need to override this to return their own codec,
-     * created with one of the {@link #codec} factory methods.
+     * The {@link MapCodec} that is used by {@link BiomeCodecRegistry} to (de)serialize this concrete
+     * {@link BiomeData} subtype. Subclasses need to override this to return their own codec, created with
+     * one of the {@link #codec} factory methods.
+     * <p>
+     * 26.3 removed {@code KeyDispatchDataCodec}, which was only ever a wrapper around a {@link MapCodec}.
+     * The {@code KEY_CODEC} constant that used to hold {@code KeyDispatchDataCodec.of(CODEC)} is gone with
+     * it - unwrapped it was just {@link #CODEC}, so this returns that directly.
      *
      * @return The dispatch codec for this subtype.
      */
-    public KeyDispatchDataCodec<? extends BiomeData> codec() {
-        return KEY_CODEC;
+    public MapCodec<? extends BiomeData> codec() {
+        return CODEC;
     }
 
     /**
