@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-events",
-    "version": "26.201.1",
+    "version": "26.201.2",
     "name": "WorldWeaver - Events API",
     "description": "Provides an API for registering events in the Lifecycle of a Minecraft World.",
     "authors": [

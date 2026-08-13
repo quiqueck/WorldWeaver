@@ -1,5 +1,6 @@
 package de.ambertation.wover.biome.impl.modification;
 
+import de.ambertation.wover.biome.api.modification.FeaturePosition;
 import de.ambertation.wover.entrypoint.LibWoverFeature;
 import de.ambertation.wover.feature.mixin.BiomeGenerationSettingsAccessor;
 import de.ambertation.wover.util.MutableHolderSet;
@@ -35,6 +36,7 @@ public class GenerationSettingsWorker {
     private final Biome biome;
     MutableHolderSet<ConfiguredWorldCarver<?>> customizedCarvers;
     List<HolderSet<PlacedFeature>> customizedFeatures;
+    private final int[] prependedPerStep = new int[GenerationStep.Decoration.values().length];
 
     public GenerationSettingsWorker(RegistryAccess registries, Biome biome) {
         this.biome = biome;
@@ -114,7 +116,7 @@ public class GenerationSettingsWorker {
         }
     }
 
-    public void addFeatures(FeatureMap features) {
+    public void addFeatures(FeatureMap features, FeaturePosition position) {
         boolean hasNewFeatures = false;
         for (int index = 0; index < features.size(); index++) {
             if (index < GenerationStep.Decoration.values().length) {
@@ -138,7 +140,16 @@ public class GenerationSettingsWorker {
                                       .stream()
                                       .toList()
                     );
-                    featuresInStep.addAll(newFeatures);
+                    if (position == FeaturePosition.PREPEND) {
+                        // At prependedCount, not at 0: a second prepending modification hitting the same
+                        // step of the same biome would otherwise insert in front of the first one's
+                        // features and silently reverse the two modifications relative to each other.
+                        // This worker lives for exactly one biome, so the counter is per biome and step.
+                        featuresInStep.addAll(prependedPerStep[index], newFeatures);
+                        prependedPerStep[index] += newFeatures.size();
+                    } else {
+                        featuresInStep.addAll(newFeatures);
+                    }
 
                     customizedFeatures.set(index, HolderSet.direct(featuresInStep));
                 }

@@ -238,6 +238,14 @@ public class ModelTraitLibrary {
         return bindItem(ItemModelKeys.FLAT_ITEM, null);
     }
 
+    /**
+     * A flat item model with vanilla's {@code item/handheld} transforms, so the item is held at a tool's
+     * diagonal grip instead of billboarded like an inventory icon.
+     */
+    public static ItemModelBinding handheld() {
+        return bindItem(ItemModelKeys.HANDHELD, null);
+    }
+
     /** A plain flat item model, reusing another item's texture as the model's layer. */
     public static ItemModelBinding itemModel(Supplier<Item> material) {
         return bindItem(ItemModelKeys.FLAT_ITEM_FROM, material);

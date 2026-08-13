@@ -19,6 +19,12 @@ public class ItemModelKeys {
 
     /** A plain flat item model using the item's own texture. */
     public static final ItemModelKey<Void> FLAT_ITEM = key("flat_item");
+    /**
+     * A flat item model using the item's own texture, but with vanilla's {@code item/handheld} transforms, so
+     * the item is held at a tool's diagonal grip instead of billboarded like an inventory icon. This is what
+     * every vanilla tool (pickaxe, axe, shovel, hoe, sword) uses.
+     */
+    public static final ItemModelKey<Void> HANDHELD = key("handheld");
     /** A plain flat item model reusing another item's texture as the model's layer. */
     public static final ItemModelKey<Supplier<Item>> FLAT_ITEM_FROM = key("flat_item_from");
     /** A vanilla-style elytra item model (dispatching normal/broken by durability). */

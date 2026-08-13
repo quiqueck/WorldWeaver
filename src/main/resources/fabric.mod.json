@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover",
-    "version": "26.201.1",
+    "version": "26.201.2",
     "name": "WorldWeaver",
     "description": "Unleash your world-building potential with WorldWeaver, a Minecraft utility mod for Fabric, simplifying tasks and enhancing the possibilities of data-driven world generation.",
     "authors": [

@@ -13,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.FeatureSorter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -96,6 +97,12 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
  * (which this class used until it was found to be unreliable against WoVer's own {@code WoverBiomeSource}
  * implementations).
  * <p>
+ * <b>Feature order - no property, always checked.</b> Every dimension's per-step feature order is built
+ * with vanilla's own sorter and reported as {@code featureorder@<dimension>}. It needs no expectation to
+ * compare against and generates no chunks, so every configured set gets it for free. See
+ * {@link #featureOrderFailure} for why this failure mode deserves its own check rather than being left to
+ * turn up as a crash.
+ * <p>
  * <b>No system property set = not a compat run at all.</b> Registers the SERVER_STARTED listener
  * unconditionally (this class is on every testmod's normal {@code main} entrypoint list, so it loads on
  * every ordinary {@code testmodServer}/{@code runServer} run too), but the listener itself is a no-op
@@ -129,6 +136,14 @@ public class CompatWorldgenBootCheck implements ModInitializer {
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             try {
                 runCheck(server, expected, expectDefaultGenerator, expectedSurfaceRules);
+            } catch (Throwable t) {
+                // Never leave the harness without a result file. Some of these checks force real chunk
+                // generation, and a broken enough world takes the server down mid-check - at which point
+                // the harness can only fall back to the exit code and report "the boot produced no
+                // result", burying the actual reason. Writing a FAIL that names the throwable keeps the
+                // diagnosis in the report where it belongs. Observed with a feature-order cycle in the
+                // End: the surface-rule check's forced chunk was the thing that died.
+                writeCrashResult(t);
             } finally {
                 server.halt(false);
             }
@@ -215,16 +230,71 @@ public class CompatWorldgenBootCheck implements ModInitializer {
             }
         }
 
+        // Unconditional, unlike every other check here: it needs no expectation to compare against (the
+        // failure is self-describing), it costs one sort per dimension with no chunk generation at all, and
+        // the thing it catches is a hard crash rather than a degradation. Every configured set gets it.
+        //
+        // Runs before the surface-rule check on purpose, and hands it the dimensions it found broken: a
+        // dimension with a feature-order cycle cannot generate a single chunk, so asking the surface-rule
+        // check to force one there does not test the surface rule, it just kills the server before any of
+        // this gets written out.
+        final Set<String> brokenDimensions = new LinkedHashSet<>();
+        for (ServerLevel level : server.getAllLevels()) {
+            final String dimension = level.dimension().identifier().toString();
+            final String key = "featureorder@" + dimension;
+            final String reason = featureOrderFailure(level);
+            checks.add(key + ": " + (reason == null ? "PASS" : "FAIL (" + reason + ")"));
+            if (reason != null) {
+                failures.add(key);
+                brokenDimensions.add(dimension);
+            }
+        }
+
         for (var entry : expectedSurfaceRules.entrySet()) {
             final String key = "surfacerule@" + entry.getKey();
             // null == fired; otherwise a short human-readable reason. The reason goes into "checks"
             // only - "missing" stays the bare key, which is what consumers match on.
-            final String reason = surfaceRuleFailure(server, entry.getKey(), entry.getValue());
+            final String reason = surfaceRuleFailure(server, entry.getKey(), entry.getValue(), brokenDimensions);
             checks.add(key + ": " + (reason == null ? "PASS" : "FAIL (" + reason + ")"));
             if (reason != null) failures.add(key);
         }
 
         writeResult(failures.isEmpty(), expected, presentByDimension, failures, checks);
+    }
+
+    /**
+     * Asks vanilla's own {@link FeatureSorter} to build the dimension's per-step feature order, which is
+     * exactly what the first chunk to reach {@link ChunkStatus#FEATURES} would do.
+     * <p>
+     * Worth its own check because of how late and how total the natural failure is. The order is one global
+     * topological sort per {@link net.minecraft.world.level.levelgen.GenerationStep.Decoration} over every
+     * biome in the dimension, so two biomes that disagree about the order of the same two features are a
+     * cycle - and the sorter answers a cycle with an {@link IllegalStateException}, from a supplier that is
+     * only forced when a chunk actually needs to decorate. Nothing complains at boot; the dimension simply
+     * crashes the server the moment anything enters it. Two mods that each work alone are enough to cause
+     * it, which makes it precisely a compat-test concern (BetterEnd + TechReborn, BetterEnd#596).
+     * <p>
+     * Deliberately builds its own sort instead of forcing the generator's memoized supplier: that supplier
+     * may already have been forced (and its exception swallowed) during boot logging, and a memoized
+     * supplier that threw does not re-throw the same way. This calls the sorter directly, on the same
+     * inputs, so the answer is about the biome data rather than about who looked at it first.
+     *
+     * @return {@code null} when the order is consistent, otherwise a short reason for the report
+     */
+    private static String featureOrderFailure(ServerLevel level) {
+        final BiomeSource biomeSource = level.getChunkSource().getGenerator().getBiomeSource();
+        try {
+            FeatureSorter.buildFeaturesPerStep(
+                    List.copyOf(biomeSource.possibleBiomes()),
+                    holder -> holder.value().getGenerationSettings().features(),
+                    true
+            );
+            return null;
+        } catch (IllegalStateException e) {
+            // The message already names the biomes involved, which is the whole diagnosis.
+            final String message = e.getMessage();
+            return message == null ? e.getClass().getSimpleName() : message;
+        }
     }
 
     /** How many distinct candidate positions {@link #findBiomeCandidates} will collect before giving up. */
@@ -269,7 +339,9 @@ public class CompatWorldgenBootCheck implements ModInitializer {
      *
      * @return {@code null} when the rule fired, otherwise a short reason for the report
      */
-    private static String surfaceRuleFailure(MinecraftServer server, String biomeId, String expectedBlockId) {
+    private static String surfaceRuleFailure(
+            MinecraftServer server, String biomeId, String expectedBlockId, Set<String> brokenDimensions
+    ) {
         final ResourceKey<Biome> biomeKey = ResourceKey.create(
                 net.minecraft.core.registries.Registries.BIOME, Identifier.parse(biomeId)
         );
@@ -279,6 +351,7 @@ public class CompatWorldgenBootCheck implements ModInitializer {
                 .orElse(Blocks.AIR);
 
         boolean foundBiomeAnywhere = false;
+        boolean skippedBrokenDimension = false;
         int voidChunks = 0;
         int terrainChunks = 0;
 
@@ -286,6 +359,14 @@ public class CompatWorldgenBootCheck implements ModInitializer {
         // in more than one dimension, and the scan of the levels that do not have it at all has already
         // been paid for by the time we get here anyway.
         for (ServerLevel level : server.getAllLevels()) {
+            // Forcing a chunk in a dimension whose feature order does not sort is not a check, it is a
+            // crash - and one that would take the whole result file with it. featureorder@<dimension> has
+            // already recorded the real problem.
+            if (brokenDimensions.contains(level.dimension().identifier().toString())) {
+                skippedBrokenDimension = true;
+                continue;
+            }
+
             final List<BlockPos> candidates = findBiomeCandidates(
                     level, biomeKey, SURFACE_RULE_SEARCH_RADIUS, 32, 8, SURFACE_RULE_MAX_CANDIDATES
             );
@@ -316,7 +397,14 @@ public class CompatWorldgenBootCheck implements ModInitializer {
         }
 
         if (!foundBiomeAnywhere) {
-            return "biome not found within " + SURFACE_RULE_SEARCH_RADIUS + " blocks of the origin in any dimension";
+            // Say which of the two it is. "Not found anywhere" reads as a missing biome, but when the
+            // dimension it lives in was skipped for a broken feature order, this check simply never got to
+            // look - the featureorder@ entry next to it is the real finding.
+            return "biome not found within " + SURFACE_RULE_SEARCH_RADIUS + " blocks of the origin in any "
+                    + (skippedBrokenDimension
+                            ? "dimension that could be searched - dimension(s) with a broken feature order "
+                              + "were skipped, see the featureorder@ checks"
+                            : "dimension");
         }
         if (terrainChunks == 0) {
             return voidChunks + " candidate chunk(s) inspected, all of them open void - "
@@ -420,6 +508,21 @@ public class CompatWorldgenBootCheck implements ModInitializer {
             }
         }
         return candidates;
+    }
+
+    /**
+     * Last-resort result for a boot check that did not survive to {@link #writeResult}. Records the
+     * throwable as the single failing check, so the harness reports what actually happened instead of
+     * falling back to "the boot produced no result".
+     */
+    private static void writeCrashResult(Throwable t) {
+        final String reason = t.getClass().getSimpleName()
+                + (t.getMessage() == null ? "" : ": " + t.getMessage());
+        writeResult(
+                false, Map.of(), Map.of(),
+                List.of("bootcheck"),
+                List.of("bootcheck: FAIL (" + reason + ")")
+        );
     }
 
     private static void writeResult(

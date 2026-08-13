@@ -52,6 +52,11 @@ public class ToolTier {
             if (values == null)
                 throw new IllegalArgumentException("No values for slot " + slot + " in tier " + this.tier);
 
+            // Without this, the tool would fall back to whatever flat item model its mod's model provider
+            // generates, and render billboarded in-hand instead of at a tool's grip. Slots that supply their
+            // own binding (spear) or are flat in vanilla (shears) opt out via ToolSlot#handheldModel.
+            if (slot.handheldModel) definition.addTrait(ModelTraitLibrary.handheld());
+
             configure(definition, values);
         }
 

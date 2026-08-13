@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-loot",
-    "version": "26.201.1",
+    "version": "26.201.2",
     "name": "WorldWeaver - Loot API",
     "description": "Datagen helpers for block loot tables, and a runtime API for appending pools and entries to loot tables that already exist - in Java or from a datapack.",
     "authors": [

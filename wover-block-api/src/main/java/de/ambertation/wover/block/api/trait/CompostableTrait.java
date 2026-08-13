@@ -17,4 +17,13 @@ public interface CompostableTrait {
      * @return the chance in {@code (0,1]}
      */
     float compostChance();
+
+    /**
+     * The tier this trait's item actually composts at.
+     *
+     * @return the tier nearest to {@link #compostChance()}
+     */
+    default CompostTier compostTier() {
+        return CompostTier.nearest(compostChance());
+    }
 }

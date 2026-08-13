@@ -1,6 +1,7 @@
 package de.ambertation.wover.biome.impl.modification;
 
 import de.ambertation.wover.biome.api.modification.BiomeModification;
+import de.ambertation.wover.biome.api.modification.FeaturePosition;
 import de.ambertation.wover.biome.api.modification.predicates.BiomePredicate;
 
 import net.minecraft.core.Holder;
@@ -19,6 +20,8 @@ public class BiomeModificationImpl implements BiomeModification {
     private final BiomePredicate predicate;
     @NotNull
     private final FeatureMap features;
+    @NotNull
+    private final FeaturePosition featurePosition;
     @Nullable
     private final List<TagKey<Biome>> biomeTags;
 
@@ -31,8 +34,19 @@ public class BiomeModificationImpl implements BiomeModification {
             @Nullable List<TagKey<Biome>> biomeTags,
             @Nullable WeightedList<MobSpawnSettings.SpawnerData> spawns
     ) {
+        this(predicate, features, FeaturePosition.APPEND, biomeTags, spawns);
+    }
+
+    public BiomeModificationImpl(
+            @NotNull BiomePredicate predicate,
+            @NotNull List<List<Holder<PlacedFeature>>> features,
+            @NotNull FeaturePosition featurePosition,
+            @Nullable List<TagKey<Biome>> biomeTags,
+            @Nullable WeightedList<MobSpawnSettings.SpawnerData> spawns
+    ) {
         this.predicate = predicate;
         this.features = FeatureMap.of(features);
+        this.featurePosition = featurePosition;
         this.biomeTags = biomeTags;
         this.spawns = spawns;
     }
@@ -53,13 +67,18 @@ public class BiomeModificationImpl implements BiomeModification {
     }
 
     @Override
+    public FeaturePosition featurePosition() {
+        return featurePosition;
+    }
+
+    @Override
     public WeightedList<MobSpawnSettings.SpawnerData> spawns() {
         return this.spawns;
     }
 
     @Override
     public void apply(GenerationSettingsWorker worker, MobSettingsWorker mobWorker) {
-        worker.addFeatures(features);
+        worker.addFeatures(features, featurePosition);
         mobWorker.addSpawns(spawns);
     }
 }
