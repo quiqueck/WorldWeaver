@@ -14,14 +14,16 @@ import net.minecraft.world.item.Item;
  * ({@link #addToolConfigTrait}).
  */
 public enum ToolSlot {
-    PICKAXE_SLOT(0, "pickaxe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
-    AXE_SLOT(1, "axe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
-    SHOVEL_SLOT(2, "shovel", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
-    SWORD_SLOT(3, "sword", RecipeCategory.COMBAT, ToolTier.ConfigureSwordItemTrait::new),
-    HOE_SLOT(4, "hoe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
-    SHEARS_SLOT(5, "shears", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new),
-    HAMMER_SLOT(6, "hammer", RecipeCategory.COMBAT, ToolTier.ConfigureDiggerItemTrait::new),
-    SPEAR_SLOT(7, "spear", RecipeCategory.COMBAT, ToolTier.ConfigureSpearItemTrait::new);
+    PICKAXE_SLOT(0, "pickaxe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new, true),
+    AXE_SLOT(1, "axe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new, true),
+    SHOVEL_SLOT(2, "shovel", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new, true),
+    SWORD_SLOT(3, "sword", RecipeCategory.COMBAT, ToolTier.ConfigureSwordItemTrait::new, true),
+    HOE_SLOT(4, "hoe", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new, true),
+    // Vanilla shears use item/generated, not item/handheld - keep the flat model here too.
+    SHEARS_SLOT(5, "shears", RecipeCategory.TOOLS, ToolTier.ConfigureDiggerItemTrait::new, false),
+    HAMMER_SLOT(6, "hammer", RecipeCategory.COMBAT, ToolTier.ConfigureDiggerItemTrait::new, true),
+    // The spear brings its own (two-model) binding, see ToolTier.ConfigureSpearItemTrait.
+    SPEAR_SLOT(7, "spear", RecipeCategory.COMBAT, ToolTier.ConfigureSpearItemTrait::new, false);
 
 
     /** The {@link RecipeCategory} used for this slot's auto-generated recipe. */
@@ -30,13 +32,26 @@ public enum ToolSlot {
     public final String name;
     /** The index of this slot's values within a {@link ToolTier}'s internal value array. */
     public final int slotIndex;
+    /**
+     * Whether this slot's item model is generated with vanilla's {@code item/handheld} parent (the tool grip)
+     * rather than the flat {@code item/generated} one. Slots that bring their own model binding (the spear) or
+     * that vanilla itself renders flat (shears) set this to {@code false}.
+     */
+    public final boolean handheldModel;
     private final ToolTier.TraitBuilder traitBuilder;
 
-    ToolSlot(int slotIndex, String name, RecipeCategory category, ToolTier.TraitBuilder traitBuilder) {
+    ToolSlot(
+            int slotIndex,
+            String name,
+            RecipeCategory category,
+            ToolTier.TraitBuilder traitBuilder,
+            boolean handheldModel
+    ) {
         this.name = name;
         this.category = category;
         this.slotIndex = slotIndex;
         this.traitBuilder = traitBuilder;
+        this.handheldModel = handheldModel;
     }
 
     /**

@@ -30,6 +30,10 @@ public class WoverItemModelFactories implements WoverClientTraitEntrypoint {
             generator.generateFlatItem(item, ModelTemplates.FLAT_ITEM);
         });
 
+        ClientItemModelRegistry.register(ItemModelKeys.HANDHELD, (key, item, generator, payload) -> {
+            generator.generateFlatItem(item, ModelTemplates.FLAT_HANDHELD_ITEM);
+        });
+
         ClientItemModelRegistry.register(ItemModelKeys.FLAT_ITEM_FROM, (key, item, generator, material) -> {
             final var modelLocation = ModelTemplates.FLAT_ITEM.create(
                     ModelLocationUtils.getModelLocation(item),
