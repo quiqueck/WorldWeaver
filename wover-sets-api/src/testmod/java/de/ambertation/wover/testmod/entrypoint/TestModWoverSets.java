@@ -1,5 +1,6 @@
 package de.ambertation.wover.testmod.entrypoint;
 
+import de.ambertation.wover.item.api.render.ItemRenderTraits;
 import de.ambertation.wover.block.api.trait.SignBlockDefinition;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.sets.api.blocks.SlotType;
@@ -37,7 +38,7 @@ public class TestModWoverSets implements ModInitializer {
 //        var boat = ItemRegistry
 //                .forMod(C)
 //                .defineBoatItem("wooden_boat")
-//                .addTrait(ClientBlockTraits.BOAT_RENDERER.withDefault())
+//                .addTrait(ItemRenderTraits.BOAT_RENDERER.withDefault())
 //                .buildAndRegisterBoat();
 
         CreativeTabs.start(C)

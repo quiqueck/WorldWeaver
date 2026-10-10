@@ -136,6 +136,8 @@ public class SurfaceRuleUtil {
             BiomeSource loadedBiomeSource
     ) {
         Object o = noiseSettings.value();
+        // TerraBlender only adds other mods' End surface rules when the End uses vanilla's biome source
+        TerraBlenderCompat.assignEndRuleCategory(dimensionKey, noiseSettings.value(), loadedBiomeSource);
         if (o instanceof SurfaceRuleProvider srp) {
             SurfaceRules.RuleSource originalRules = srp.wover_getOriginalSurfaceRules();
             srp.wover_overwriteSurfaceRules(mergeSurfaceRules(

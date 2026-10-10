@@ -1,6 +1,6 @@
 package de.ambertation.wover.biome.api.builder;
 
-import de.ambertation.wunderlib.ui.ColorHelper;
+import de.ambertation.wunderlib.utils.ColorUtilARGB32;
 import de.ambertation.wover.biome.api.BiomeKey;
 import de.ambertation.wover.biome.api.data.BiomeData;
 import de.ambertation.wover.biome.impl.builder.BiomeSurfaceRuleBuilderImpl;
@@ -633,7 +633,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B fogColor(int r, int g, int b) {
-            this.fogColor = ColorHelper.color(r, g, b);
+            this.fogColor = ColorUtilARGB32.color(r, g, b);
             return (B) this;
         }
 
@@ -646,7 +646,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B waterColor(int r, int g, int b) {
-            return waterColor(ColorHelper.color(r, g, b));
+            return waterColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -669,7 +669,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B waterFogColor(int r, int g, int b) {
-            return waterFogColor(ColorHelper.color(r, g, b));
+            return waterFogColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -692,7 +692,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B skyColor(int r, int g, int b) {
-            return skyColor(ColorHelper.color(r, g, b));
+            return skyColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -715,7 +715,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B foliageColorOverride(int r, int g, int b) {
-            return foliageColorOverride(ColorHelper.color(r, g, b));
+            return foliageColorOverride(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -738,7 +738,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B grassColorOverride(int r, int g, int b) {
-            return grassColorOverride(ColorHelper.color(r, g, b));
+            return grassColorOverride(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -786,7 +786,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @see #waterAndFogColor(int)
          */
         public B waterAndFogColor(int r, int g, int b) {
-            return waterAndFogColor(ColorHelper.color(r, g, b));
+            return waterAndFogColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -799,7 +799,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @see #plantsColor(int)
          */
         public B plantsColor(int r, int g, int b) {
-            return plantsColor(ColorHelper.color(r, g, b));
+            return plantsColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**

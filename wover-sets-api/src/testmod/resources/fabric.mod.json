@@ -26,7 +26,8 @@
       "de.ambertation.wover.testmod.entrypoint.client.TestModWoverSetsClient"
     ],
     "fabric-gametest": [
-      "de.ambertation.wover.testmod.gametest.SetGameTest"
+      "de.ambertation.wover.testmod.gametest.SetGameTest",
+      "de.ambertation.wover.testmod.gametest.EquipmentToolComponentGameTest"
     ]
   },
   "mixins": [],

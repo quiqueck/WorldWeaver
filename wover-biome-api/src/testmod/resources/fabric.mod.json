@@ -31,7 +31,9 @@
       "de.ambertation.wover.testmod.gametest.BiomeTagReloadGameTest"
     ]
   },
-  "mixins": [],
+  "mixins": [
+    "wover.biome.testmod.mixins.common.json"
+  ],
   "depends": {
     "fabricloader": ">=0.19.0",
     "minecraft": ["26.2"],

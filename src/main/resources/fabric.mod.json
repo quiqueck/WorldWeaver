@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover",
-    "version": "26.201.2",
+    "version": "26.201.3",
     "name": "WorldWeaver",
     "description": "Unleash your world-building potential with WorldWeaver, a Minecraft utility mod for Fabric, simplifying tasks and enhancing the possibilities of data-driven world generation.",
     "authors": [
@@ -34,7 +34,7 @@
         "wunderlib": "26.201.x"
     },
     "breaks": {
-        "wunderlib": "<26.201.0"
+        "wunderlib": "<26.201.1"
     },
     "custom": {
         "wover": {
@@ -43,6 +43,11 @@
                 "modrinth": "https://modrinth.com/mod/worldweaver",
                 "curseforge": "https://legacy.curseforge.com/minecraft/mc-mods/worldweaver"
             }
+        },
+        "modmenu": {
+            "badges": [
+                "library"
+            ]
         }
     }
 }

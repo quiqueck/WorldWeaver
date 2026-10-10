@@ -1,6 +1,6 @@
 package de.ambertation.wover.generator.impl.client;
 
-import de.ambertation.wunderlib.ui.ColorHelper;
+import de.ambertation.wunderlib.utils.ColorUtilARGB32;
 import de.ambertation.wunderlib.ui.layout.components.*;
 import de.ambertation.wunderlib.ui.layout.values.Size;
 import de.ambertation.wunderlib.ui.layout.values.Value;
@@ -99,7 +99,7 @@ public class WorldSetupScreen extends LayoutScreen implements BiomeSourceConfigP
         contentFallback.addText(
                 fit(), fit(),
                 Component.translatable("title.screen.wover.worldgen.no_generator_config")
-        ).centerVertical().setColor(ColorHelper.DARK_GRAY);
+        ).centerVertical().setColor(ColorUtilARGB32.DARK_GRAY);
     }
 
     private void generatorChanged(

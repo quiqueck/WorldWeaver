@@ -164,7 +164,9 @@ public class CookingRecipeBuilderImpl extends BaseRecipeBuilderImpl<CookingRecip
                     SimpleCookingRecipeBuilder.smelting(
                             input.createIngredient(context),
                             category,
-                            CookingBookCategory.MISC,
+                            // Anything that also cooks in a smoker is food (the smoker is food-only), so its
+                            // furnace recipe belongs to the furnace recipe book's food tab, like vanilla food.
+                            smoker ? CookingBookCategory.FOOD : CookingBookCategory.MISC,
                             outputItem,
                             xp,
                             cookingTime

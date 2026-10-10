@@ -74,14 +74,14 @@ public class WoverChunkGenerator extends NoiseBasedChunkGenerator implements
         }
 
         if (IntegrationCore.RUNS_TERRABLENDER) {
-            LibWoverWorldGenerator.C.log.info("Make sure features are loaded from terrablender:"
+            LibWoverWorldGenerator.C.log.verbose("Make sure features are loaded from terrablender:"
                     + biomeSource.getClass().getName());
             //terrablender is invalidating the feature initialization
             //we redo it at this point, otherwise we will get blank biomes
             ChunkGeneratorHelper.rebuildFeaturesPerStep(this, biomeSource);
         }
 
-        LibWoverWorldGenerator.C.log.info("Created WoverChunkGenerator with " + biomeSource.getClass().getName());
+        LibWoverWorldGenerator.C.log.verbose("Created WoverChunkGenerator with " + biomeSource.getClass().getName());
     }
 
     @Override

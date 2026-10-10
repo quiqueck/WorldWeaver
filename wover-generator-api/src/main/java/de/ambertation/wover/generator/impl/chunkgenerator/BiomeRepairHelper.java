@@ -238,7 +238,7 @@ class BiomeRepairHelper {
         biomeTagWorker.finished();
 
         if (biomesAdded > 0) {
-            LibWoverWorldGenerator.C.log.info("Added Tags for {} fabric biomes in {}", biomesAdded, sw);
+            LibWoverWorldGenerator.C.log.verbose("Added Tags for {} fabric biomes in {}", biomesAdded, sw);
         }
 
     }
@@ -275,7 +275,7 @@ class BiomeRepairHelper {
             biomeTagWorker.finished();
 
             if (biomesAdded > 0) {
-                LibWoverWorldGenerator.C.log.info("Added {} biomes to {} in {}", biomesAdded, tag.location(), sw);
+                LibWoverWorldGenerator.C.log.verbose("Added {} biomes to {} in {}", biomesAdded, tag.location(), sw);
             }
         }
     }

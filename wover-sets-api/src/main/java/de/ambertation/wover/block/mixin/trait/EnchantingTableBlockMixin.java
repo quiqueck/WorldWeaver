@@ -3,6 +3,7 @@ package de.ambertation.wover.block.mixin.trait;
 import de.ambertation.wover.tag.api.predefined.CommonBlockTags;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnchantingTableBlock;
 
@@ -23,7 +24,8 @@ public class EnchantingTableBlockMixin {
         if (level
                 .getBlockState(tablePos.offset(delta))
                 .is(CommonBlockTags.ENCHANTING_MAGIC_SOURCE)
-                && level.isEmptyBlock(tablePos.offset(delta.getX() / 2, delta.getY(), delta.getZ() / 2))) {
+                && level.getBlockState(tablePos.offset(delta.getX() / 2, delta.getY(), delta.getZ() / 2))
+                        .is(BlockTags.ENCHANTMENT_POWER_TRANSMITTER)) {
             info.setReturnValue(true);
         }
     }

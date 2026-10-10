@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.Locale;
 
 public class CachedConfig extends ConfigFile {
     public final StringValue lastCheckDate = new StringValue(
@@ -44,7 +45,7 @@ public class CachedConfig extends ConfigFile {
 
     public Instant lastCheckDate() {
         String d = lastCheckDate.get();
-        if (d.trim().toLowerCase().equals("never")) {
+        if (d.trim().toLowerCase(Locale.ROOT).equals("never")) {
             return Instant.now().minus(VersionChecker.WAIT_FOR_DAYS + 1, ChronoUnit.DAYS);
         }
         return Instant.parse(d);

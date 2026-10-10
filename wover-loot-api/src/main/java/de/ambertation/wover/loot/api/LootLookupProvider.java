@@ -335,6 +335,11 @@ public class LootLookupProvider {
      * Builds a loot table that drops {@code withSilkTouch} itself when the tool used has Silk Touch, and
      * every entry in {@code withoutSilkTouch} (each with explosion decay applied) otherwise.
      *
+     * <p>
+     * Only the first pool carries the Silk Touch self-drop; every further entry gets a pool of its own that is
+     * gated on the tool <i>not</i> having Silk Touch. Giving each pool its own self-drop alternative would make a
+     * Silk Touch tool yield the block once per entry.
+     *
      * @param withSilkTouch    The block to drop when Silk Touch is used
      * @param withoutSilkTouch The items to drop otherwise, one pool per entry
      * @return The loot table builder
@@ -346,16 +351,26 @@ public class LootLookupProvider {
         if (withoutSilkTouch.isEmpty()) return dropWithSilkTouch(withSilkTouch);
 
         var mainBuilder = LootTable.lootTable();
+        boolean first = true;
         for (DropInfo dropInfo : withoutSilkTouch) {
             LootPoolSingletonContainer.Builder<? extends LootPoolSingletonContainer.Builder<?>> item = LootItem
                     .lootTableItem(dropInfo.item)
                     .apply(SetItemCountFunction.setCount(dropInfo.numberProvider));
-            createSelfDropDispatchTable(
-                    mainBuilder,
-                    withSilkTouch,
-                    vanillaBlockLoot.hasSilkTouch(),
-                    vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)
-            );
+            if (first) {
+                createSelfDropDispatchTable(
+                        mainBuilder,
+                        withSilkTouch,
+                        vanillaBlockLoot.hasSilkTouch(),
+                        vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)
+                );
+                first = false;
+            } else {
+                mainBuilder.withPool(LootPool
+                        .lootPool()
+                        .setRolls(ConstantValue.exactly(1.0F))
+                        .when(vanillaBlockLoot.hasSilkTouch().invert())
+                        .add(vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)));
+            }
         }
 
         return mainBuilder;
