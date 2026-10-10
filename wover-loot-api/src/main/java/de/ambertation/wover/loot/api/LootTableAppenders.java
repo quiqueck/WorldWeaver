@@ -33,7 +33,7 @@ import java.util.function.Supplier;
  *     LootTableAppenders.register(
  *             MyMod.C,
  *             table -> table.addPool(LootPool.lootPool()
- *                                            .setRolls(UniformGenerator.between(0, 4))
+ *                                            .setRolls(ContextIntProviders.between(0, 4))
  *                                            .add(LootItem.lootTableItem(MyBlocks.SHINY.asItem()).setWeight(1))
  *                                            .add(EmptyLootItem.emptyItem().setWeight(9))),
  *             BuiltInLootTables.RUINED_PORTAL, BuiltInLootTables.NETHER_BRIDGE

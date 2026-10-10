@@ -21,6 +21,12 @@ public class VersionCheckerClient extends VersionChecker {
                         && ClientConfigs.CLIENT.didPresentWelcomeScreen.get()
         );
 
+        //Automated clients cannot click through these. The welcome screen is not marked as presented, so a
+        //later regular start still shows it.
+        if (ModCore.suppressScreens()) {
+            return;
+        }
+
         if (!ClientConfigs.CLIENT.didPresentWelcomeScreen.get()) {
             screens.add(WelcomeScreen::new);
         } else if (ClientConfigs.CLIENT.checkForNewVersions.get() && !VersionChecker.isEmpty()) {

@@ -1,29 +1,32 @@
 {
   "attributes": {
     "minecraft:gameplay/natural_mob_spawns": {
-      "spawn_costs": {},
-      "spawns_by_category": {
-        "creature": [
-          {
-            "type": "minecraft:camel",
-            "count": {
-              "type": "minecraft:uniform",
-              "max_inclusive": 6,
-              "min_inclusive": 2
+      "argument": {
+        "spawn_costs": {},
+        "spawns_by_category": {
+          "creature": [
+            {
+              "type": "minecraft:camel",
+              "count": {
+                "type": "minecraft:uniform",
+                "max_inclusive": 6,
+                "min_inclusive": 2
+              },
+              "weight": 1
             },
-            "weight": 1
-          },
-          {
-            "type": "minecraft:donkey",
-            "count": {
-              "type": "minecraft:uniform",
-              "max_inclusive": 3,
-              "min_inclusive": 1
-            },
-            "weight": 2
-          }
-        ]
-      }
+            {
+              "type": "minecraft:donkey",
+              "count": {
+                "type": "minecraft:uniform",
+                "max_inclusive": 3,
+                "min_inclusive": 1
+              },
+              "weight": 2
+            }
+          ]
+        }
+      },
+      "modifier": "overlay"
     },
     "minecraft:visual/fog_color": "#c0d8ff",
     "minecraft:visual/sky_color": "#7ba4ff",

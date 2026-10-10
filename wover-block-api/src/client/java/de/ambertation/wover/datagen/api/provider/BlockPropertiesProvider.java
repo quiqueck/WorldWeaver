@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.AABB;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
@@ -103,8 +104,9 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
      * single shared instance for the lifetime of the JVM, and {@code Properties} has exactly one constructor,
      * so <em>every</em> default {@code Properties} holds literally the same four objects.
      * {@code ofFullCopy}/{@code ofLegacyCopy} copy the fields by reference, so identity survives copying too.
-     * ({@code isViewBlocking} is not even a separate call site - the constructor assigns it
-     * {@code this.isSuffocating}.)
+     * The exception since the 26.3 release is {@code isViewBlocking}, whose default is a lambda capturing
+     * {@code this} (it delegates to the instance's own {@code isSuffocating}); {@link #origin} therefore
+     * compares lambda classes rather than instances.
      */
     private static final BlockBehaviour.Properties DEFAULT_PROPERTIES = BlockBehaviour.Properties.of();
     private static final Object DEFAULT_IS_SUFFOCATING = defaultPredicate(IS_SUFFOCATING_FIELD);
@@ -321,7 +323,14 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
      */
     private static String origin(Block block, Field field, Object defaultPredicate) {
         try {
-            return field.get(PROPERTIES_FIELD.get(block)) == defaultPredicate ? DERIVED : EXPLICIT;
+            final Object predicate = field.get(PROPERTIES_FIELD.get(block));
+            // Compared by lambda class, not identity: the 26.3 release turned the isViewBlocking default into a
+            // capturing lambda (it delegates to this.isSuffocating), so every Properties instance holds its own
+            // object. A lambda class is unique to its call site, so the class still identifies the default; for
+            // the non-capturing defaults the class test is equivalent to the old identity test.
+            return predicate == defaultPredicate
+                    || (predicate != null && predicate.getClass() == defaultPredicate.getClass())
+                    ? DERIVED : EXPLICIT;
         } catch (ReflectiveOperationException e) {
             return ERR;
         }
@@ -336,6 +345,23 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
      */
     private static String probedColumn(Block block, BlockState state, Field field, Object dflt, BlockPredicate probe) {
         return origin(block, field, dflt) + "/" + predicate(probe, state);
+    }
+
+    /**
+     * {@code isViewBlocking}. Since the 26.3 release its vanilla default delegates to the block's <em>own</em>
+     * {@code isSuffocating} predicate (26.1 and the 26.3 snapshots copied the default suffocation predicate
+     * instead), so a derived {@code isViewBlocking} reports exactly the block's {@code isSuffocating} value,
+     * including when that one was overridden. An explicit override is probed; 26.3 passes the camera
+     * near-plane box as well, and a unit box at the probed position stands in for it.
+     */
+    private static String viewBlockingColumn(Block block, BlockState state) {
+        final String origin = origin(block, IS_VIEW_BLOCKING_FIELD, DEFAULT_IS_VIEW_BLOCKING);
+        if (!DERIVED.equals(origin)) {
+            return origin + "/" + predicate((s, level, pos) -> s.isViewBlocking(level, pos, new AABB(pos)), state);
+        }
+        final String suffocating = motionGatedColumn(
+                block, state, IS_SUFFOCATING_FIELD, DEFAULT_IS_SUFFOCATING, BlockState::isSuffocating);
+        return origin + suffocating.substring(suffocating.indexOf('/'));
     }
 
     /**
@@ -427,8 +453,7 @@ public class BlockPropertiesProvider implements WoverDataProvider<DataProvider> 
                 + ",\"spawnTerrainParticles\":\"" + state.shouldSpawnTerrainParticles() + "\""
                 + ",\"isSuffocating\":\"" + motionGatedColumn(
                         block, state, IS_SUFFOCATING_FIELD, DEFAULT_IS_SUFFOCATING, BlockState::isSuffocating) + "\""
-                + ",\"isViewBlocking\":\"" + motionGatedColumn(
-                        block, state, IS_VIEW_BLOCKING_FIELD, DEFAULT_IS_VIEW_BLOCKING, BlockState::isViewBlocking) + "\""
+                + ",\"isViewBlocking\":\"" + viewBlockingColumn(block, state) + "\""
                 + ",\"isRedstoneConductor\":\"" + probedColumn(
                         block,
                         state,

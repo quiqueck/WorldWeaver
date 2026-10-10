@@ -52,6 +52,11 @@ public class ToolTier {
             if (values == null)
                 throw new IllegalArgumentException("No values for slot " + slot + " in tier " + this.tier);
 
+            // Without this, the tool would fall back to whatever flat item model its mod's model provider
+            // generates, and render billboarded in-hand instead of at a tool's grip. Slots that supply their
+            // own binding (spear) or are flat in vanilla (shears) opt out via ToolSlot#handheldModel.
+            if (slot.handheldModel) definition.addTrait(ModelTraitLibrary.handheld());
+
             configure(definition, values);
         }
 
@@ -59,6 +64,20 @@ public class ToolTier {
                 ItemDefinition<Item, ? extends ItemDefinition<Item, ?>> definition,
                 ToolTier.ToolValues values
         );
+    }
+
+    /**
+     * Returns the mining tag of {@code values}, failing loudly if there is none. {@code Item.Properties#tool}
+     * resolves the tag eagerly, and a {@code null} tag yields a tool rule backed by a {@code HolderSet.Named}
+     * without a key, which throws for every mod that later inspects the rule (quiqueck/BetterEnd#601).
+     */
+    static @NotNull TagKey<Block> requireMinableTag(ToolSlot slot, ToolTier tier, ToolValues values) {
+        if (values.minableWithTag == null) {
+            throw new IllegalArgumentException(
+                    "No mining tag configured for slot " + slot + " in tier " + tier
+                            + "; a tool component needs one");
+        }
+        return values.minableWithTag;
     }
 
     static class ConfigureDiggerItemTrait extends ConfigureToolItemTrait {
@@ -76,7 +95,7 @@ public class ToolTier {
             if (definition instanceof ToolItemDefinition toolDef) {
                 toolDef.tool(
                         this.tier.toolMaterial,
-                        values.minableWithTag,
+                        requireMinableTag(slot, tier, values),
                         values.attackDamage,
                         values.attackSpeed,
                         values.disableBlockingForSeconds

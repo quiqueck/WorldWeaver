@@ -55,12 +55,12 @@ public class AsPillarImpl extends FeatureConfiguratorImpl implements AsPillar {
 
     @Override
     public AsPillar blockState(Block block) {
-        return blockState(BlockStateProvider.simple(block.defaultBlockState()));
+        return blockState(BlockStateProvider.of(block.defaultBlockState()));
     }
 
     @Override
     public AsPillar blockState(BlockState state) {
-        return blockState(BlockStateProvider.simple(state));
+        return blockState(BlockStateProvider.of(state));
     }
 
     @Override

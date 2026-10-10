@@ -268,7 +268,7 @@ public class PillarFeature implements Feature {
                     IntProviders.CODEC.fieldOf("max_height").forGetter(o -> o.maxHeight),
                     Direction.CODEC.fieldOf("direction").orElse(Direction.UP).forGetter(o -> o.direction),
                     BlockPredicate.CODEC.fieldOf("allowed_placement").forGetter(o -> o.allowedPlacement),
-                    BlockStateProvider.CODEC.fieldOf("state").forGetter(o -> o.stateProvider),
+                    BlockStateProvider.DIRECT_CODEC.fieldOf("state").forGetter(o -> o.stateProvider),
                     KnownTransformers.CODEC.fieldOf("transform").forGetter(o -> o.transformer)
             )
             .apply(instance, PillarFeature::new));

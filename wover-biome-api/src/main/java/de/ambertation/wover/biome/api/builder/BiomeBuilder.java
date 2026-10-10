@@ -1,6 +1,6 @@
 package de.ambertation.wover.biome.api.builder;
 
-import de.ambertation.wunderlib.ui.ColorHelper;
+import de.ambertation.wunderlib.utils.ColorUtilARGB32;
 import de.ambertation.wover.biome.api.BiomeKey;
 import de.ambertation.wover.biome.api.data.BiomeData;
 import de.ambertation.wover.biome.impl.builder.BiomeSurfaceRuleBuilderImpl;
@@ -11,6 +11,7 @@ import de.ambertation.wover.surface.api.AssignedSurfaceRule;
 import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
 import de.ambertation.wover.tag.api.predefined.CommonBiomeTags;
 
+import net.minecraft.util.ARGB;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.registries.Registries;
@@ -640,7 +641,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B fogColor(int r, int g, int b) {
-            this.fogColor = ColorHelper.color(r, g, b);
+            this.fogColor = ColorUtilARGB32.color(r, g, b);
             return (B) this;
         }
 
@@ -653,7 +654,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B waterColor(int r, int g, int b) {
-            return waterColor(ColorHelper.color(r, g, b));
+            return waterColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -676,7 +677,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B waterFogColor(int r, int g, int b) {
-            return waterFogColor(ColorHelper.color(r, g, b));
+            return waterFogColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -699,7 +700,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B skyColor(int r, int g, int b) {
-            return skyColor(ColorHelper.color(r, g, b));
+            return skyColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -722,7 +723,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B foliageColorOverride(int r, int g, int b) {
-            return foliageColorOverride(ColorHelper.color(r, g, b));
+            return foliageColorOverride(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -745,7 +746,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @return This builder.
          */
         public B grassColorOverride(int r, int g, int b) {
-            return grassColorOverride(ColorHelper.color(r, g, b));
+            return grassColorOverride(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -793,7 +794,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @see #waterAndFogColor(int)
          */
         public B waterAndFogColor(int r, int g, int b) {
-            return waterAndFogColor(ColorHelper.color(r, g, b));
+            return waterAndFogColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -806,7 +807,7 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
          * @see #plantsColor(int)
          */
         public B plantsColor(int r, int g, int b) {
-            return plantsColor(ColorHelper.color(r, g, b));
+            return plantsColor(ColorUtilARGB32.color(r, g, b));
         }
 
         /**
@@ -1145,10 +1146,11 @@ public abstract class BiomeBuilder<B extends BiomeBuilder<B>> {
             }
 
             // 26.1: fog/sky/water-fog colors, ambient particles/sounds and background music are stored as
-            // per-biome EnvironmentAttributes rather than on BiomeSpecialEffects.
-            vanillaBuilder.setAttribute(EnvironmentAttributes.FOG_COLOR, fogColor);
-            vanillaBuilder.setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, waterFogColor);
-            vanillaBuilder.setAttribute(EnvironmentAttributes.SKY_COLOR, skyColor);
+            // per-biome EnvironmentAttributes rather than on BiomeSpecialEffects. Since the 26.3 release the
+            // color attributes are RGB vectors instead of packed ints, so the int colors are converted here.
+            vanillaBuilder.setAttribute(EnvironmentAttributes.FOG_COLOR, ARGB.vector3fFromRGB24(fogColor));
+            vanillaBuilder.setAttribute(EnvironmentAttributes.WATER_FOG_COLOR, ARGB.vector3fFromRGB24(waterFogColor));
+            vanillaBuilder.setAttribute(EnvironmentAttributes.SKY_COLOR, ARGB.vector3fFromRGB24(skyColor));
             if (ambientParticle != null) {
                 vanillaBuilder.setAttribute(EnvironmentAttributes.AMBIENT_PARTICLES, List.of(ambientParticle));
             }

@@ -1,22 +1,14 @@
 package de.ambertation.wover.structure.api.structures.nbt;
 
-import de.ambertation.wover.block.api.BlockHelper;
-import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.structure.impl.StructureManagerImpl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.StructureManager;
-import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
@@ -24,33 +16,12 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.BlockIgnorePr
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-
 /**
  * The {@link TemplateStructurePiece} placed by {@link de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructure}.
- * It behaves like a normal template piece, but can additionally mark its four bounding-box corners, its
- * origin and its rotation pivot with oxidized copper/amethyst/netherite debug blocks during
- * {@link #postProcess} (useful while tuning a
- * {@link de.ambertation.wover.structure.api.structures.StructurePlacement}). See {@link #placeDebugMarkers}.
+ * It behaves like a normal template piece; the rotation, mirror, pivot and keep-air flag are persisted
+ * with the piece so it can be re-placed identically after a reload.
  */
 public class RandomNbtStructurePiece extends TemplateStructurePiece {
-    /**
-     * Whether {@link #postProcess} marks this piece's four bounding-box corners (oxidized copper), its
-     * origin (amethyst) and its rotation pivot (netherite) with debug blocks.
-     * <p>
-     * These markers are a placement-tuning aid, but until now they were written <em>unconditionally</em>,
-     * so every {@link de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructure} placed by any
-     * mod using this API got six foreign blocks baked into it in normal gameplay as well. That was a
-     * shipped debugging leftover, not intended behaviour — the marker blocks are not part of any
-     * {@code .nbt} template and overwrite whatever the template (or the terrain) put there.
-     * <p>
-     * It therefore now defaults to {@link ModCore#isDevEnvironment()}, i.e. on in a dev/test run and off
-     * in production. It stays writable so a mod (or a test) can force either behaviour explicitly.
-     */
-    public static boolean placeDebugMarkers = ModCore.isDevEnvironment();
-
     private final boolean keepAir;
 
     /**
@@ -180,47 +151,5 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
             BoundingBox boundingBox
     ) {
 
-    }
-
-    @Override
-    public void postProcess(
-            WorldGenLevel worldGenLevel,
-            StructureManager structureManager,
-            ChunkGenerator chunkGenerator,
-            RandomSource randomSource,
-            BoundingBox writableBounds,
-            ChunkPos chunkPos,
-            BlockPos blockPos
-    ) {
-        super.postProcess(
-                worldGenLevel,
-                structureManager,
-                chunkGenerator,
-                randomSource,
-                writableBounds,
-                chunkPos,
-                blockPos
-        );
-        if (!placeDebugMarkers) return;
-
-        List<BlockPos> corners = ImmutableList.of(
-                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.minZ()),
-                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.minZ()),
-                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.maxZ()),
-                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.maxZ())
-        );
-
-        // 26.3 folded the four oxidation stages of each copper block into a WeatheringCopperCollection,
-        // so the flat Blocks.OXIDIZED_COPPER constant is gone. weathering() selects the unwaxed variants
-        // (the waxed() set is the other half of the collection), oxidized() the stage we used before.
-        final BlockState oxidizedCopper = Blocks.COPPER_BLOCK.weathering().oxidized().defaultBlockState();
-        corners.forEach(pos -> worldGenLevel.setBlock(pos, oxidizedCopper, BlockHelper.SET_SILENT));
-
-        worldGenLevel.setBlock(templatePosition, Blocks.AMETHYST_BLOCK.defaultBlockState(), BlockHelper.SET_SILENT);
-        worldGenLevel.setBlock(
-                templatePosition.offset(this.placeSettings.getRotationPivot()),
-                Blocks.NETHERITE_BLOCK.defaultBlockState(),
-                BlockHelper.SET_SILENT
-        );
     }
 }

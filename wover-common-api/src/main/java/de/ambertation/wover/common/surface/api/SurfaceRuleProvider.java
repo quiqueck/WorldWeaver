@@ -1,6 +1,6 @@
 package de.ambertation.wover.common.surface.api;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
-import net.minecraft.world.level.levelgen.SurfaceRules;
 
 /**
  * This interface is used to provide a way to overwrite surface rules.
@@ -20,11 +20,11 @@ public interface SurfaceRuleProvider {
      *
      * @param surfaceRule The new surface rules.
      */
-    void wover_overwriteSurfaceRules(SurfaceRules.RuleSource surfaceRule);
+    void wover_overwriteSurfaceRules(MaterialRule surfaceRule);
     /**
      * This method is used to get the original, unmodified surface rules.
      *
      * @return The original surface rules
      */
-    SurfaceRules.RuleSource wover_getOriginalSurfaceRules();
+    MaterialRule wover_getOriginalSurfaceRules();
 }

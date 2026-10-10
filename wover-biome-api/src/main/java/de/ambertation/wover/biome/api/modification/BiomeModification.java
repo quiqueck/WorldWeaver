@@ -65,6 +65,9 @@ public interface BiomeModification {
                     FeatureMap.CODEC
                             .optionalFieldOf("features", List.of())
                             .forGetter(BiomeModification::features),
+                    FeaturePosition.CODEC
+                            .optionalFieldOf("feature_position", FeaturePosition.APPEND)
+                            .forGetter(BiomeModification::featurePosition),
                     TagKey.codec(Registries.BIOME)
                           .listOf()
                           .optionalFieldOf("biome_tags", List.of())
@@ -91,6 +94,14 @@ public interface BiomeModification {
      * @return The features.
      */
     List<List<Holder<PlacedFeature>>> features();
+
+    /**
+     * Where {@link #features()} are inserted into a decoration step that is not empty.
+     *
+     * @return The insert position.
+     * @see FeaturePosition
+     */
+    FeaturePosition featurePosition();
 
     /**
      * The spawns that should be added to the biome.
@@ -154,6 +165,7 @@ public interface BiomeModification {
         private final BootstrapContext<BiomeModification> bootstrapContext;
         private BiomePredicate predicate;
         private final FeatureMap features;
+        private FeaturePosition featurePosition = FeaturePosition.APPEND;
         private final WeightedList.Builder<MobSpawnSettings.SpawnerData> spawns;
         // LinkedHashSet, not HashSet: TagKey is a record over (ResourceKey registry, Identifier location),
         // so its generated hashCode inherits ResourceKey's JVM identity hash and a HashSet here iterates in
@@ -437,6 +449,34 @@ public interface BiomeModification {
         }
 
         /**
+         * Sets where this modification's features are inserted into a decoration step that already has
+         * features in it. Defaults to {@link FeaturePosition#APPEND}.
+         *
+         * @param position The insert position.
+         * @return This builder.
+         * @see FeaturePosition
+         */
+        public Builder featurePosition(FeaturePosition position) {
+            this.featurePosition = position;
+            return this;
+        }
+
+        /**
+         * Inserts this modification's features in front of whatever the decoration step already contains,
+         * rather than behind it.
+         * <p>
+         * This is what a modification has to use when the same features sit at the <i>start</i> of that step
+         * in the mod's own biomes - otherwise the two orderings contradict each other and vanilla's feature
+         * sorter refuses to generate the dimension. {@link FeaturePosition} has the full reasoning.
+         *
+         * @return This builder.
+         * @see FeaturePosition#PREPEND
+         */
+        public Builder prependFeatures() {
+            return featurePosition(FeaturePosition.PREPEND);
+        }
+
+        /**
          * Adds a feature to the modification. This feature will be added to the {@link GenerationStep.Decoration}
          * of all Biomes that match the {@link #predicate}.
          *
@@ -613,6 +653,7 @@ public interface BiomeModification {
             return new BiomeModificationImpl(
                     predicate,
                     features.generic(),
+                    featurePosition,
                     tags != null ? tags.stream().toList() : null,
                     spawns.build()
             );

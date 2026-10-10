@@ -61,12 +61,12 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl implem
 
     @Override
     public AsMultiPlaceRandomSelect add(Block block, float weight) {
-        return add(BlockStateProvider.simple(block), weight);
+        return add(BlockStateProvider.of(block), weight);
     }
 
     @Override
     public AsMultiPlaceRandomSelect add(BlockState state, float weight) {
-        return add(BlockStateProvider.simple(state), weight);
+        return add(BlockStateProvider.of(state), weight);
     }
 
     @Override
@@ -107,12 +107,12 @@ public class AsMultiPlaceRandomSelectImpl extends FeatureConfiguratorImpl implem
 
     @Override
     public AsMultiPlaceRandomSelect add(Block block, float weight, int id) {
-        return add(BlockStateProvider.simple(block), weight, id);
+        return add(BlockStateProvider.of(block), weight, id);
     }
 
     @Override
     public AsMultiPlaceRandomSelect add(BlockState state, float weight, int id) {
-        return add(BlockStateProvider.simple(state), weight, id);
+        return add(BlockStateProvider.of(state), weight, id);
     }
 
     @Override

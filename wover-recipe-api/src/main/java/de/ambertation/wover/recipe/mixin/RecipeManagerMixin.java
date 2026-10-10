@@ -33,6 +33,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
  * <p>
  * The unlock advancements the same run produces are added by {@link ServerAdvancementManagerMixin}, which is
  * constructed a few instructions later in the very same {@code ReloadableServerResources} constructor.
+ * <p>
+ * Only the {@code RecipeManager} of that constructor is extended ({@link ReloadableServerResourcesMixin} marks
+ * it). Any other one - Polymer's {@code FakeWorld} builds its own over a minimal registry set - keeps exactly
+ * its datapack recipes.
  */
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin {
@@ -47,6 +51,11 @@ public class RecipeManagerMixin {
             HolderLookup<Recipe<?>> datapackRecipes,
             @Local(argsOnly = true) HolderLookup.Provider registries
     ) {
+        // Only the server's own RecipeManager gets the runtime recipes. Other mods build RecipeManagers for
+        // their own purposes (Polymer's FakeWorld, over a registry set without e.g. minecraft:trim_pattern);
+        // running the contributors there crashed the server and re-ran every BOOTSTRAP_RECIPES subscriber.
+        if (!RecipeRuntimeProviderImpl.isServerReload(registries)) return datapackRecipes;
+
         Stopwatch stopwatch = Stopwatch.createStarted();
         final long count = datapackRecipes.listElements().count();
         final HolderLookup<Recipe<?>> withRuntime =

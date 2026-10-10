@@ -84,12 +84,11 @@ public class StructureManagerImpl {
                 context
                         .chunkGenerator()
                         .getBiomeSource()
-                        .getNoiseBiome(
+                        .createUncachedResolver(context.randomState())
+                         .getNoiseBiome(
                                 QuartPos.fromBlock(blockPos.getX()),
                                 QuartPos.fromBlock(blockPos.getY()),
-                                QuartPos.fromBlock(blockPos.getZ()),
-                                context.randomState().sampler()
-                        )
+                                QuartPos.fromBlock(blockPos.getZ()))
         );
     }
 

@@ -2,10 +2,13 @@ package de.ambertation.wover.block.impl.trait.behaviour;
 
 import de.ambertation.wover.block.api.trait.behaviour.StripableBlockTrait;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.BlockTransformer;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.component.BlockTransformerMappings;
+import net.minecraft.world.item.component.BlockTransformers;
 
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 
@@ -30,8 +33,9 @@ import org.jetbrains.annotations.ApiStatus;
  * result is a plain serializable component, and it therefore also reaches the client (which needs it to predict
  * the interaction) and any other code that inspects the item.
  * <h2>Which items are modified</h2>
- * An item counts as an axe if its block transformer contains all of {@link BlockTransformerMappings#AXE}'s
- * entries. That is exactly the set of items built through {@link Item.Properties#axe} - vanilla's axes plus any
+ * An item counts as an axe if its block transformer contains all of the entries of vanilla's
+ * {@link BlockTransformers#AXE} (since the 26.3 release block transformers live in the
+ * {@code minecraft:block_transformer} registry and the item component holds a {@link Holder} into it). That is exactly the set of items built through {@link Item.Properties#axe} - vanilla's axes plus any
  * modded ones - and, because the test is "contains" rather than "equals", it keeps working when another mod has
  * already appended its own entries. Items with a deliberately different transformer (a mod that replaced the
  * axe mapping wholesale, or a hoe/shovel) are intentionally left alone.
@@ -53,22 +57,26 @@ public final class StripableBlockTransformers {
             if (extraTransforms.isEmpty()) return;
 
             context.modify(
-                    StripableBlockTransformers::isAxe,
+                    item -> item.components().get(DataComponents.BLOCK_TRANSFORMER) != null,
                     (builder, lookup, item) -> {
-                        final var current = item.components().get(DataComponents.BLOCK_TRANSFORMER);
-                        if (current == null) return;
+                        final Holder<BlockTransformer> current = item.components().get(DataComponents.BLOCK_TRANSFORMER);
+                        if (current == null || !isAxe(current, lookup)) return;
 
-                        final var merged = new ArrayList<>(current.transforms());
+                        final var merged = new ArrayList<>(current.value().transforms());
                         merged.addAll(extraTransforms);
-                        builder.set(DataComponents.BLOCK_TRANSFORMER, new BlockTransformer(merged));
+                        // The merged list has no identity in the block_transformer registry, so it is bound as a
+                        // direct holder; it serializes inline.
+                        builder.set(DataComponents.BLOCK_TRANSFORMER, Holder.direct(new BlockTransformer(merged)));
                     }
             );
         });
     }
 
-    private static boolean isAxe(Item item) {
-        final var transformer = item.components().get(DataComponents.BLOCK_TRANSFORMER);
-        return transformer != null
-                && transformer.transforms().containsAll(BlockTransformerMappings.AXE.transforms());
+    private static boolean isAxe(Holder<BlockTransformer> transformer, HolderLookup.Provider lookup) {
+        if (transformer.is(BlockTransformers.AXE)) return true;
+        return lookup.lookup(Registries.BLOCK_TRANSFORMER)
+                     .flatMap(r -> r.get(BlockTransformers.AXE))
+                     .map(axe -> transformer.value().transforms().containsAll(axe.value().transforms()))
+                     .orElse(false);
     }
 }

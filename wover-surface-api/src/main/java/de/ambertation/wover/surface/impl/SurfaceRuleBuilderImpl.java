@@ -14,7 +14,9 @@ import net.minecraft.data.worldgen.material.VanillaMaterialConditions;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,9 +28,9 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * {@link VanillaMaterialConditions#ON_FLOOR} / {@link VanillaMaterialConditions#ON_CEILING}.
      * <p>
      * We deliberately do <b>not</b> reference those keys through
-     * {@link SurfaceRules#getCondition(HolderGetter, ResourceKey)}, for two reasons:
+     * {@link MaterialRules#getCondition(HolderGetter, ResourceKey)}, for two reasons:
      * <ul>
-     * <li>Resolving a key needs a {@code HolderGetter<ConditionSource>}, which the builder simply does
+     * <li>Resolving a key needs a {@code HolderGetter<MaterialCondition>}, which the builder simply does
      * not have at {@link #surface(BlockState)} / {@link #floor(BlockState)} / {@link #ceil(BlockState)}
      * time - those methods build their rule eagerly and are routinely called outside any bootstrap.</li>
      * <li>A holder reference would make every rule we emit depend on a vanilla data file that a
@@ -37,20 +39,20 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * </ul>
      * The inline form is value-identical to vanilla's: {@code data/minecraft/worldgen/material_condition/on_floor.json}
      * is exactly {@code {"type":"minecraft:stone_depth","add_surface_depth":false,"offset":0,"secondary_depth_range":0,"surface_type":"floor"}},
-     * which is what {@link SurfaceRules#stoneDepthCheck(int, boolean, CaveSurface)} produces here, so
+     * which is what {@link MaterialRules#stoneDepthCheck(int, boolean, CaveSurface)} produces here, so
      * neither the generated JSON nor the generated terrain changes.
      */
-    private static final SurfaceRules.ConditionSource ON_FLOOR
-            = SurfaceRules.stoneDepthCheck(0, false, CaveSurface.FLOOR);
+    private static final MaterialCondition ON_FLOOR
+            = MaterialRules.stoneDepthCheck(0, false, CaveSurface.FLOOR);
 
     /**
      * The ceiling counterpart of {@link #ON_FLOOR}, equivalent to
      * {@link VanillaMaterialConditions#ON_CEILING}. See {@link #ON_FLOOR} for why this is inlined.
      */
-    private static final SurfaceRules.ConditionSource ON_CEILING
-            = SurfaceRules.stoneDepthCheck(0, false, CaveSurface.CEILING);
+    private static final MaterialCondition ON_CEILING
+            = MaterialRules.stoneDepthCheck(0, false, CaveSurface.CEILING);
 
-    private final PriorityLinkedList<SurfaceRules.RuleSource> rules;
+    private final PriorityLinkedList<MaterialRule> rules;
     protected ResourceKey<Biome> biomeKey;
     protected int sortPriority;
 
@@ -100,8 +102,8 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T surface(BlockState state) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(ON_FLOOR, rule);
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(ON_FLOOR, rule);
         rules.add(rule, TOP_SURFACE_PRIORITY);
 
         return (T) this;
@@ -116,8 +118,8 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T subsurface(BlockState state, int depth) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, CaveSurface.FLOOR), rule);
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(MaterialRules.stoneDepthCheck(depth, false, CaveSurface.FLOOR), rule);
         rules.add(rule, SUB_SURFACE_PRIORITY);
 
         return (T) this;
@@ -131,7 +133,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T filler(BlockState state) {
-        rules.add(SurfaceRules.state(state), FILLER_PRIORITY);
+        rules.add(MaterialRules.state(state), FILLER_PRIORITY);
         return (T) this;
     }
 
@@ -143,8 +145,8 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T floor(BlockState state) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(ON_FLOOR, rule);
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(ON_FLOOR, rule);
         rules.add(rule, FLOOR_PRIORITY);
         return (T) this;
     }
@@ -160,14 +162,14 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      */
     public T belowFloor(BlockState state, int height, NoiseCondition noise) {
 
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(
-                SurfaceRules.stoneDepthCheck(
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(
+                MaterialRules.stoneDepthCheck(
                         height,
                         false,
                         CaveSurface.FLOOR
                 ),
-                SurfaceRules.ifTrue(noise, rule)
+                MaterialRules.ifTrue(noise, rule)
         );
 
 
@@ -184,9 +186,9 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T belowFloor(BlockState state, int height) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(
-                SurfaceRules.stoneDepthCheck(
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(
+                MaterialRules.stoneDepthCheck(
                         height,
                         false,
                         CaveSurface.FLOOR
@@ -204,8 +206,8 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T ceil(BlockState state) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(ON_CEILING, rule);
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(ON_CEILING, rule);
         rules.add(rule, CEILING_PRIORITY);
         return (T) this;
     }
@@ -219,8 +221,8 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T aboveCeil(BlockState state, int height) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(height, false, CaveSurface.CEILING), rule);
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(MaterialRules.stoneDepthCheck(height, false, CaveSurface.CEILING), rule);
 
         rules.add(rule, ABOVE_CEILING_PRIORITY);
         return (T) this;
@@ -235,9 +237,9 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return
      */
     public T steep(BlockState state, int depth) {
-        SurfaceRules.RuleSource rule = SurfaceRules.state(state);
-        rule = SurfaceRules.ifTrue(SurfaceRules.stoneDepthCheck(depth, false, CaveSurface.FLOOR), rule);
-        rule = SurfaceRules.ifTrue(SurfaceRules.steep(), rule);
+        MaterialRule rule = MaterialRules.state(state);
+        rule = MaterialRules.ifTrue(MaterialRules.stoneDepthCheck(depth, false, CaveSurface.FLOOR), rule);
+        rule = MaterialRules.ifTrue(MaterialRules.steep(), rule);
 
         rules.add(rule, STEEP_SURFACE_PRIORITY);
         return (T) this;
@@ -247,10 +249,10 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * Allows to add custom rule.
      *
      * @param priority rule priority, lower values = higher priority (rule will be applied before others).
-     * @param rule     custom {@link SurfaceRules.RuleSource}.
+     * @param rule     custom {@link MaterialRule}.
      * @return same {@link SurfaceRuleBuilder} instance.
      */
-    public T rule(SurfaceRules.RuleSource rule, int priority) {
+    public T rule(MaterialRule rule, int priority) {
         rules.add(rule, priority);
         return (T) this;
     }
@@ -258,10 +260,10 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
     /**
      * Allows to add custom rule with default priority {@link PriorityLinkedList#DEFAULT_PRIORITY}.
      *
-     * @param rule custom {@link SurfaceRules.RuleSource}.
+     * @param rule custom {@link MaterialRule}.
      * @return same {@link SurfaceRuleBuilder} instance.
      */
-    public T rule(SurfaceRules.RuleSource rule) {
+    public T rule(MaterialRule rule) {
         rules.add(rule);
         return (T) this;
     }
@@ -289,16 +291,16 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      * @return same {@link SurfaceRuleBuilder} instance.
      */
     public T chancedFloor(BlockState surfaceBlockA, BlockState surfaceBlockB, NoiseCondition noise) {
-        SurfaceRules.RuleSource rule =
-                SurfaceRules.ifTrue(
+        MaterialRule rule =
+                MaterialRules.ifTrue(
                         ON_FLOOR,
-                        SurfaceRules.sequence(
-                                SurfaceRules.ifTrue(
+                        MaterialRules.sequence(
+                                MaterialRules.ifTrue(
                                         noise,
-                                        SurfaceRules.state(
+                                        MaterialRules.state(
                                                 surfaceBlockA)
                                 ),
-                                SurfaceRules.state(surfaceBlockB)
+                                MaterialRules.state(surfaceBlockB)
                         )
                 );
 
@@ -306,14 +308,14 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
         return (T) this;
     }
 
-    public T chancedFloor(BlockState surfaceBlockA, SurfaceRules.RuleSource surfaceBlockB, NoiseCondition noise) {
-        SurfaceRules.RuleSource rule =
-                SurfaceRules.ifTrue(
+    public T chancedFloor(BlockState surfaceBlockA, MaterialRule surfaceBlockB, NoiseCondition noise) {
+        MaterialRule rule =
+                MaterialRules.ifTrue(
                         ON_FLOOR,
-                        SurfaceRules.sequence(
-                                SurfaceRules.ifTrue(
+                        MaterialRules.sequence(
+                                MaterialRules.ifTrue(
                                         noise,
-                                        SurfaceRules.state(
+                                        MaterialRules.state(
                                                 surfaceBlockA)
                                 ),
                                 surfaceBlockB
@@ -338,7 +340,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
     /**
      * Finalise rule building process.
      * <p>
-     * Since Minecraft 26.3 {@link SurfaceRules#isBiome(HolderGetter, ResourceKey...)} resolves its biome
+     * Since Minecraft 26.3 {@link MaterialRules#isBiome(HolderGetter, ResourceKey...)} resolves its biome
      * keys into a {@link net.minecraft.core.HolderSet} instead of storing the raw keys, so building the
      * biome filter now needs a biome lookup. Inside a datapack registry bootstrap you get one from the
      * {@link BootstrapContext} ({@code ctx.lookup(Registries.BIOME)}); at runtime from the
@@ -346,23 +348,23 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
      *
      * @param biomes The lookup used to resolve {@link #biomeKey()}. Only consulted when a biome filter
      *               was actually set.
-     * @return {@link SurfaceRules.RuleSource}.
+     * @return {@link MaterialRule}.
      */
-    public SurfaceRules.RuleSource build(HolderGetter<Biome> biomes) {
-        SurfaceRules.RuleSource rule = getRuleSource();
+    public MaterialRule build(HolderGetter<Biome> biomes) {
+        MaterialRule rule = getRuleSource();
         if (biomeKey != null) {
-            rule = SurfaceRules.ifTrue(SurfaceRules.isBiome(biomes, biomeKey), rule);
+            rule = MaterialRules.ifTrue(MaterialRules.isBiome(biomes, biomeKey), rule);
         }
         return rule;
     }
 
     @NotNull
-    protected SurfaceRules.RuleSource getRuleSource() {
+    protected MaterialRule getRuleSource() {
         if (rules.size() == 1) {
             return rules.get(0);
         }
-        SurfaceRules.RuleSource[] ruleArray = rules.toArray(new SurfaceRules.RuleSource[rules.size()]);
-        SurfaceRules.RuleSource rule = SurfaceRules.sequence(ruleArray);
+        MaterialRule[] ruleArray = rules.toArray(new MaterialRule[rules.size()]);
+        MaterialRule rule = MaterialRules.sequence(ruleArray);
         return rule;
     }
 
@@ -374,7 +376,7 @@ public class SurfaceRuleBuilderImpl<T extends BaseSurfaceRuleBuilder<T>> impleme
          * @param ctx The {@link BootstrapContext} to register the rule with.
          * @param key The {@link ResourceKey} to register the rule with.
          * @return The {@link Holder} for the registry item.
-         * @see SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, SurfaceRules.RuleSource, int)
+         * @see SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, MaterialRule, int)
          */
 
         public Holder<AssignedSurfaceRule> register(

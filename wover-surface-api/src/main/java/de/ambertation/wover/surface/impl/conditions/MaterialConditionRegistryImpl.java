@@ -6,9 +6,9 @@ import de.ambertation.wover.surface.api.conditions.ConditionManager;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -24,16 +24,16 @@ import org.jetbrains.annotations.NotNull;
  * This class registers codecs, so it belongs on the {@code _TYPE} side.
  */
 public class MaterialConditionRegistryImpl {
-    public static final ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> THRESHOLD_CONDITION
+    public static final ResourceKey<MapCodec<? extends MaterialCondition>> THRESHOLD_CONDITION
             = ConditionManager.createKey(LibWoverSurface.C.id("threshold_condition"));
-    public static final ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> VOLUME_THRESHOLD_CONDITION
+    public static final ResourceKey<MapCodec<? extends MaterialCondition>> VOLUME_THRESHOLD_CONDITION
             = ConditionManager.createKey(LibWoverSurface.C.id("volume_threshold_condition"));
-    public static final ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> ROUGH_NOISE_CONDITION
+    public static final ResourceKey<MapCodec<? extends MaterialCondition>> ROUGH_NOISE_CONDITION
             = ConditionManager.createKey(LibWoverSurface.C.id("rough_noise_condition"));
 
-    public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> register(
-            ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> key,
-            MapCodec<? extends SurfaceRules.ConditionSource> codec
+    public static ResourceKey<MapCodec<? extends MaterialCondition>> register(
+            ResourceKey<MapCodec<? extends MaterialCondition>> key,
+            MapCodec<? extends MaterialCondition> codec
     ) {
         BuiltInRegistryManager.register(BuiltInRegistries.MATERIAL_CONDITION_TYPE, key, codec);
 
@@ -41,7 +41,7 @@ public class MaterialConditionRegistryImpl {
     }
 
     @NotNull
-    public static ResourceKey<MapCodec<? extends SurfaceRules.ConditionSource>> createKey(Identifier location) {
+    public static ResourceKey<MapCodec<? extends MaterialCondition>> createKey(Identifier location) {
         return ResourceKey.create(
                 BuiltInRegistries.MATERIAL_CONDITION_TYPE.key(),
                 location

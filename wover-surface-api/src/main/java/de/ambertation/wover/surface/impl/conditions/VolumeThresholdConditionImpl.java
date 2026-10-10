@@ -12,8 +12,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.FloatProviders;
-import net.minecraft.world.level.levelgen.SurfaceRules;
 import net.minecraft.world.level.levelgen.ThreadSafeLegacyRandomSource;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class VolumeThresholdConditionImpl extends VolumeNoiseCondition implement
     }
 
     @Override
-    public MapCodec<? extends SurfaceRules.ConditionSource> codec() {
+    public MapCodec<? extends MaterialCondition> codec() {
         return CODEC;
     }
 

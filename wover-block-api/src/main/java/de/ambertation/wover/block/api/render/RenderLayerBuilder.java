@@ -1,5 +1,6 @@
 package de.ambertation.wover.block.api.render;
 
+import de.ambertation.wover.block.api.render.BlockRenderTraits;
 import de.ambertation.wover.block.api.trait.BlockTrait;
 import de.ambertation.wover.core.api.ModCore;
 
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  * ({@code ModCore.isClient()}); on a dedicated server it returns {@code null}, so nothing is attached.
  */
 public final class RenderLayerBuilder {
-    /** Shared instance; also exposed on the client as {@code ClientBlockTraits.RENDER_LAYER}. */
+    /** Shared instance; also exposed on the client as {@code BlockRenderTraits.RENDER_LAYER}. */
     public static final RenderLayerBuilder BUILDER = new RenderLayerBuilder();
 
     private RenderLayerBuilder() {

@@ -41,7 +41,7 @@ public class BarkBlockBuilder extends AbstractBlockTraitBuilder.Generic implemen
 
     public @Nullable List<BlockTrait<?, ?>> with(BlockState strippedBlockState) {
         if (strippedBlockState == null) return withDefault();
-        return with(BlockStateProvider.simple(strippedBlockState));
+        return with(BlockStateProvider.of(strippedBlockState));
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockStateProvider strippedBlockState) {

@@ -12,8 +12,8 @@ import de.ambertation.wover.events.api.types.OnBootstrapRegistry;
 import de.ambertation.wover.events.impl.EventImpl;
 import de.ambertation.wover.surface.api.AssignedSurfaceRule;
 import de.ambertation.wover.surface.api.SurfaceRuleRegistry;
-import de.ambertation.wover.tag.api.TagManager;
 import de.ambertation.wover.tag.api.event.context.TagBootstrapContext;
+import de.ambertation.wover.tag.impl.TagManagerImpl;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -62,7 +62,9 @@ public class BiomeManagerImpl {
                 Event.DEFAULT_PRIORITY / 2
         );
 
-        TagManager.BIOMES.bootstrapEvent().subscribe(
+        // Not TagManager.BIOMES: this runs from RegistryDataLoader.<clinit>, which another mod can
+        // trigger while TagManager is still being initialized (see TagManagerImpl.biomes()).
+        TagManagerImpl.biomes().bootstrapEvent().subscribe(
                 BiomeManagerImpl::onBootstrapTags,
                 Event.DEFAULT_PRIORITY / 2
         );

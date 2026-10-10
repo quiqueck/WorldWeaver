@@ -1,20 +1,34 @@
 package de.ambertation.wover.block.api.trait;
 
 /**
- * Implemented by a {@link RuntimeBlockTrait} whose block should be compostable with a fixed chance that is
- * resolved <em>at runtime</em> - straight off the block via its attached runtime trait - rather than through
- * vanilla's static {@code ComposterBlock.COMPOSTABLES} map.
+ * Implemented by a {@link RuntimeBlockTrait} whose block should be compostable.
  * <p>
- * This lets consumers that must not depend on the concrete trait implementation read the composting chance
- * generically. In particular the {@code block_registrations.txt} datagen oracle reads it to report the
- * {@code compostable=} column for blocks whose chance never reaches the vanilla map, and a composter mixin
- * reads it to accept those blocks when a composter is filled.
+ * This lets consumers that must not depend on the concrete trait implementation read the composting rate
+ * generically: the {@code block_registrations.txt} datagen oracle reports the {@code compostable=} column
+ * from it, and {@code BlockDefinition} turns it into the block item's {@code minecraft:compostable} component
+ * at registration.
+ * <p>
+ * The chance is a legacy shape. 26.3 replaced the arbitrary {@code float} that
+ * {@code ComposterBlock#addItem} used to roll with a reference into the {@code number_provider} registry, so
+ * the rates an item can actually have are the finite set in {@link CompostTier}. Implementations keep
+ * declaring a chance and it is snapped, which is why {@link #compostTier()} - not {@link #compostChance()} -
+ * is what the game ends up using.
  */
 public interface CompostableTrait {
     /**
-     * The composting chance used when this block's item is placed into a composter.
+     * The composting chance requested for this block's item. Snapped to the nearest {@link CompostTier}
+     * before it reaches the game.
      *
      * @return the chance in {@code (0,1]}
      */
     float compostChance();
+
+    /**
+     * The tier this trait's item actually composts at.
+     *
+     * @return the tier nearest to {@link #compostChance()}
+     */
+    default CompostTier compostTier() {
+        return CompostTier.nearest(compostChance());
+    }
 }

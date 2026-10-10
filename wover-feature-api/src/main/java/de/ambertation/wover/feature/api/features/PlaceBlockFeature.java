@@ -34,7 +34,7 @@ public abstract class PlaceBlockFeature implements Feature {
      * @return the codec fragment for the {@code entries} field
      */
     protected static <T extends PlaceBlockFeature> RecordCodecBuilder<T, BlockStateProvider> blockStateCodec() {
-        return BlockStateProvider.CODEC
+        return BlockStateProvider.DIRECT_CODEC
                 .fieldOf("entries")
                 .forGetter((T o) -> o.stateProvider);
     }
@@ -85,7 +85,7 @@ public abstract class PlaceBlockFeature implements Feature {
      * @param state The state to place.
      */
     public PlaceBlockFeature(BlockState state) {
-        this(BlockStateProvider.simple(state));
+        this(BlockStateProvider.of(state));
     }
 
     /**

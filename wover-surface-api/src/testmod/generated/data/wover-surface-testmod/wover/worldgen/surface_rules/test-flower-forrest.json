@@ -28,9 +28,7 @@
           },
           "then_run": {
             "type": "minecraft:block",
-            "result_state": {
-              "Name": "minecraft:purple_concrete"
-            }
+            "result_state": "minecraft:purple_concrete"
           }
         }
       },
@@ -51,16 +49,12 @@
         },
         "then_run": {
           "type": "minecraft:block",
-          "result_state": {
-            "Name": "minecraft:light_blue_concrete"
-          }
+          "result_state": "minecraft:light_blue_concrete"
         }
       },
       {
         "type": "minecraft:block",
-        "result_state": {
-          "Name": "minecraft:white_concrete"
-        }
+        "result_state": "minecraft:white_concrete"
       }
     ]
   }

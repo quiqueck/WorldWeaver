@@ -12,7 +12,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Noises;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
 import net.minecraft.world.level.levelgen.placement.CaveSurface;
 
 import java.util.List;
@@ -69,8 +69,8 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
                 .rule(Rules.switchRules(
                         NumericProviders.randomInt(2),
                         List.of(
-                                SurfaceRules.state(Blocks.DEEPSLATE.defaultBlockState()),
-                                SurfaceRules.state(Blocks.BLACKSTONE.defaultBlockState())
+                                MaterialRules.state(Blocks.DEEPSLATE.defaultBlockState()),
+                                MaterialRules.state(Blocks.BLACKSTONE.defaultBlockState())
                         )
                 ))
                 .register(ctx, TEST_DESERT);
@@ -78,23 +78,23 @@ public class SurfaceRuleProvider extends WoverRegistryContentProvider<AssignedSu
         SurfaceRuleBuilder
                 .start()
                 .biome(Biomes.FLOWER_FOREST)
-                .rule(SurfaceRules.sequence(
-                        SurfaceRules.ifTrue(
+                .rule(MaterialRules.sequence(
+                        MaterialRules.ifTrue(
                                 // 26.3 removed SurfaceRules.ON_FLOOR; the equivalent condition now lives
                                 // in the minecraft:worldgen/material_condition datapack registry as
                                 // VanillaMaterialConditions.ON_FLOOR. This inline form is the exact same
                                 // value (see data/minecraft/worldgen/material_condition/on_floor.json).
-                                SurfaceRules.stoneDepthCheck(0, false, CaveSurface.FLOOR),
-                                SurfaceRules.ifTrue(
+                                MaterialRules.stoneDepthCheck(0, false, CaveSurface.FLOOR),
+                                MaterialRules.ifTrue(
                                         Conditions.roughNoise(Noises.NETHERRACK, 0.19),
-                                        SurfaceRules.state(Blocks.CONCRETE.pick(DyeColor.PURPLE).defaultBlockState())
+                                        MaterialRules.state(Blocks.CONCRETE.pick(DyeColor.PURPLE).defaultBlockState())
                                 )
                         ),
-                        SurfaceRules.ifTrue(
+                        MaterialRules.ifTrue(
                                 Conditions.NETHER_VOLUME_NOISE_LARGE,
-                                SurfaceRules.state(Blocks.CONCRETE.pick(DyeColor.LIGHT_BLUE).defaultBlockState())
+                                MaterialRules.state(Blocks.CONCRETE.pick(DyeColor.LIGHT_BLUE).defaultBlockState())
                         ),
-                        SurfaceRules.state(Blocks.CONCRETE.pick(DyeColor.WHITE).defaultBlockState())
+                        MaterialRules.state(Blocks.CONCRETE.pick(DyeColor.WHITE).defaultBlockState())
                 ))
                 .register(ctx, TEST_FLOWER_FORREST);
     }

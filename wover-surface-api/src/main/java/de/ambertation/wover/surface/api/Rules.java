@@ -3,9 +3,9 @@ package de.ambertation.wover.surface.api;
 import de.ambertation.wover.surface.api.noise.NumericProvider;
 import de.ambertation.wover.surface.impl.rules.SwitchRuleSource;
 
-import net.minecraft.world.level.levelgen.SurfaceRules;
 
 import java.util.List;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 /**
  * Helper class for registering surface rules sources in the builtin
@@ -37,9 +37,9 @@ public class Rules {
      * @param collection The collection of rules to switch between.
      * @return The rule source.
      */
-    public static SurfaceRules.RuleSource switchRules(
+    public static MaterialRule switchRules(
             NumericProvider provider,
-            List<SurfaceRules.RuleSource> collection
+            List<MaterialRule> collection
     ) {
         return new SwitchRuleSource(provider, collection);
     }

@@ -266,6 +266,26 @@ public final class ModCore implements Version.ModVersionProvider {
     }
 
     /**
+     * JVM system property that suppresses all interactive screens WorldWeaver (and mods built on it) would
+     * otherwise present on their own: the first-start welcome screen, the update notification, the world-fix
+     * confirmation screens and the experimental-settings warning (regardless of the
+     * {@code disable_experimental_warning} config option).
+     * <p>
+     * Meant for automated clients (MCP servers, agents, CI) that cannot click through those screens. Enable it with
+     * {@code -Dwover.suppressScreens=true}.
+     */
+    public static final String SUPPRESS_SCREENS_PROPERTY = "wover.suppressScreens";
+
+    /**
+     * Returns true if interactive screens should be suppressed (see {@link #SUPPRESS_SCREENS_PROPERTY}).
+     *
+     * @return true if the game was started with {@code -Dwover.suppressScreens=true}.
+     */
+    public static boolean suppressScreens() {
+        return Boolean.getBoolean(SUPPRESS_SCREENS_PROPERTY);
+    }
+
+    /**
      * Returns true if the game is currently running in a development environment.
      *
      * @return true if the game is currently running in a development environment.

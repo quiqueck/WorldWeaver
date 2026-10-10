@@ -13,7 +13,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetNameFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -81,7 +81,7 @@ public class TestModWoverLoot implements ModInitializer {
         LootTableAppenders.addPool(
                 C,
                 () -> LootPool.lootPool()
-                              .setRolls(ConstantValue.exactly(1.0f))
+                              .setRolls(ContextIntProviders.exactly(1))
                               .add(LootItem.lootTableItem(POOL_MARKER)
                                            .apply(SetNameFunction.setName(
                                                    Component.literal(POOL_MARKER_NAME),
@@ -103,7 +103,7 @@ public class TestModWoverLoot implements ModInitializer {
             table.addConditionToEveryPool(LootItemRandomChanceCondition.randomChance(0.0f));
             table.addPool(LootPool
                     .lootPool()
-                    .setRolls(ConstantValue.exactly(1.0f))
+                    .setRolls(ContextIntProviders.exactly(1))
                     .add(LootItem.lootTableItem(CONDITION_MARKER)
                                  .apply(SetNameFunction.setName(
                                          Component.literal(CONDITION_MARKER_NAME),

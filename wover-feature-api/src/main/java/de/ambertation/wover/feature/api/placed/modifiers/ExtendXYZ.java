@@ -15,6 +15,7 @@ import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 
@@ -106,7 +107,7 @@ public class ExtendXYZ implements PlacementModifier {
 
         @Override
         public @NotNull String getSerializedName() {
-            return this.name().toLowerCase();
+            return this.name().toLowerCase(Locale.ROOT);
         }
     }
 

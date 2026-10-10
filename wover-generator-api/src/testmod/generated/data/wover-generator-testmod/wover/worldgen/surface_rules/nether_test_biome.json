@@ -29,19 +29,12 @@
           },
           "then_run": {
             "type": "minecraft:block",
-            "result_state": {
-              "Name": "minecraft:farmland",
-              "Properties": {
-                "moisture": "0"
-              }
-            }
+            "result_state": "minecraft:farmland"
           }
         },
         {
           "type": "minecraft:block",
-          "result_state": {
-            "Name": "minecraft:dirt"
-          }
+          "result_state": "minecraft:dirt"
         }
       ]
     }

@@ -1,10 +1,15 @@
 package de.ambertation.wover.testmod.gametest;
 
+import de.ambertation.wover.testmod.entrypoint.TestModWoverRecipe;
+
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.triggers.RecipeUnlockedTrigger;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
@@ -13,12 +18,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import net.fabricmc.fabric.api.gametest.v1.GameTest;
 
@@ -233,6 +242,128 @@ public class RecipeGameTest {
             return;
         }
 
+        helper.succeed();
+    }
+
+    // Contributed by TestModWoverRecipe through RecipeBuilder.cookableFood. Each enabled device gets its own
+    // recipe, with the device name appended to the id.
+    private static final String COOKABLE_FOOD = "wover-recipe-testmod:test_cookable_food";
+
+    /**
+     * {@code RecipeBuilder.cookableFood} used to emit only the smoker and campfire recipes, so food made with
+     * it (BetterEnd's end fish, shadow berries, ...) could not be cooked in a plain furnace, unlike every
+     * vanilla food.
+     */
+    @GameTest
+    public void cookableFoodCooksInFurnaceSmokerAndCampfire(GameTestHelper helper) {
+        final RecipeManager recipeManager = helper.getLevel().recipeAccess();
+        final List<String> failures = new ArrayList<>();
+
+        checkCooking(recipeManager, COOKABLE_FOOD + "_smelting", RecipeType.SMELTING, 200, failures);
+        checkCooking(recipeManager, COOKABLE_FOOD + "_smoker", RecipeType.SMOKING, 100, failures);
+        checkCooking(recipeManager, COOKABLE_FOOD + "_campfire", RecipeType.CAMPFIRE_COOKING, 600, failures);
+
+        final RecipeHolder<?> smelting = recipeManager.byKey(
+                ResourceKey.create(Registries.RECIPE, Identifier.parse(COOKABLE_FOOD + "_smelting"))
+        ).orElse(null);
+        if (smelting != null
+                && smelting.value() instanceof AbstractCookingRecipe cooking
+                && cooking.category() != CookingBookCategory.FOOD) {
+            failures.add(COOKABLE_FOOD + "_smelting: expected the furnace recipe book category food, got "
+                    + cooking.category());
+        }
+
+        if (!failures.isEmpty()) {
+            helper.fail(Component.literal("cookableFood regression:\n - " + String.join("\n - ", failures)));
+            return;
+        }
+        helper.succeed();
+    }
+
+    private static void checkCooking(
+            RecipeManager recipeManager,
+            String id,
+            RecipeType<?> expectedType,
+            int expectedTime,
+            List<String> failures
+    ) {
+        final RecipeHolder<?> holder = recipeManager.byKey(
+                ResourceKey.create(Registries.RECIPE, Identifier.parse(id))
+        ).orElse(null);
+        if (holder == null) {
+            failures.add(id + ": missing");
+            return;
+        }
+        if (holder.value().getType() != expectedType) {
+            failures.add(id + ": expected type " + expectedType + ", got " + holder.value().getType());
+        }
+        if (!(holder.value() instanceof AbstractCookingRecipe cooking)) {
+            failures.add(id + ": not a cooking recipe (" + holder.value().getClass().getName() + ")");
+        } else if (cooking.cookingTime() != expectedTime) {
+            failures.add(id + ": expected cooking time " + expectedTime + ", got " + cooking.cookingTime());
+        }
+    }
+
+    /**
+     * Polymer's {@code FakeWorld} (used by every Polymer virtual entity, e.g. Universal Graves' grave model)
+     * builds its own {@link RecipeManager} over a minimal registry set: just the reloadable vanilla
+     * registries, without {@code minecraft:trim_pattern} and friends. Our
+     * runtime recipe injection used to run for every {@code RecipeManager} construction, so this crashed with
+     * "Missing registry: ... trim_pattern" and took the whole server down (and again on every rejoin, because
+     * the grave was saved).
+     * <p>
+     * Asserts that such a manager can be built, that it does not re-run the {@code BOOTSTRAP_RECIPES}
+     * contributors (runtime recipes belong to the server's resource reload only, as they did before 26.3),
+     * and that the server's own manager and advancements still carry the runtime contributions afterwards.
+     */
+    @GameTest
+    public void foreignRecipeManagerDoesNotRunRuntimeRecipes(GameTestHelper helper) {
+        final MinecraftServer server = helper.getLevel().getServer();
+        final List<String> failures = new ArrayList<>();
+        final int runsBefore = TestModWoverRecipe.BOOTSTRAP_RECIPE_RUNS.get();
+
+        // A registry set like the one Polymer's FakeWorld hands to its RecipeManager: the static registries
+        // (items, blocks, ...) and the recipes, but none of the world's data-driven registries - in particular
+        // no minecraft:trim_pattern, the registry the runtime recipe path tripped over in the reported crash.
+        final HolderLookup.Provider minimal = HolderLookup.Provider.create(Stream.concat(
+                RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY).listRegistries(),
+                Stream.of(server.reloadableRegistries().lookup().lookupOrThrow(Registries.RECIPE))
+        ));
+
+        RecipeManager foreign = null;
+        try {
+            foreign = new RecipeManager(minimal);
+        } catch (Throwable t) {
+            failures.add("constructing a RecipeManager over a minimal registry set threw " + t);
+        }
+
+        if (foreign != null) {
+            if (foreign.byKey(ResourceKey.create(Registries.RECIPE, Identifier.parse(INJECTED_RECIPE))).isPresent()) {
+                failures.add(INJECTED_RECIPE + ": runtime recipes were injected into a RecipeManager that does "
+                        + "not belong to the server's resource reload");
+            }
+            if (foreign.byKey(ResourceKey.create(Registries.RECIPE, Identifier.withDefaultNamespace("crafting_table"))).isEmpty()) {
+                failures.add("minecraft:crafting_table: the foreign RecipeManager lost its own datapack recipes");
+            }
+        }
+
+        final int runsAfter = TestModWoverRecipe.BOOTSTRAP_RECIPE_RUNS.get();
+        if (runsAfter != runsBefore) {
+            failures.add("BOOTSTRAP_RECIPES was emitted " + (runsAfter - runsBefore) + " time(s) for a foreign "
+                    + "RecipeManager");
+        }
+
+        if (!hasRecipe(server.getRecipeManager(), INJECTED_RECIPE)) {
+            failures.add(INJECTED_RECIPE + ": missing from the server's RecipeManager");
+        }
+        if (server.getAdvancements().get(Identifier.parse(UNLOCK_ADVANCEMENT)) == null) {
+            failures.add(UNLOCK_ADVANCEMENT + ": missing from the server's advancements");
+        }
+
+        if (!failures.isEmpty()) {
+            helper.fail(Component.literal("Foreign RecipeManager regression:\n - " + String.join("\n - ", failures)));
+            return;
+        }
         helper.succeed();
     }
 }

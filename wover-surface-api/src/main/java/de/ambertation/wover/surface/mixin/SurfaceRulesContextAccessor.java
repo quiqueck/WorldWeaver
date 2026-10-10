@@ -2,23 +2,22 @@ package de.ambertation.wover.surface.mixin;
 
 import de.ambertation.wover.surface.api.conditions.SurfaceRulesContext;
 
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.RandomState;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 /**
- * Note that {@link SurfaceRulesContext#getBiome()} is deliberately <b>not</b> declared here as an
- * {@code @Accessor}. Up to 26.1 the {@code biome} field held a {@code Supplier<Holder<Biome>>} that did
- * the lazy lookup itself, so reading the field was enough. In 26.3 the field is a plain
- * {@code Holder<Biome>} that stays {@code null} until {@code Context#getBiome()} populates it from
- * {@code biomeGetter}, so a field accessor would hand out nulls. We therefore widen the real
- * {@code getBiome()} method with the access widener instead and let it satisfy the interface.
+ * Backs {@link SurfaceRulesContext} with vanilla's {@link MaterialRuleContext}, which replaced
+ * {@code SurfaceRules.Context} in Minecraft 26.3.
+ * <p>
+ * {@link SurfaceRulesContext#getBiome()} is deliberately <b>not</b> declared here as an
+ * {@code @Accessor}: the {@code biome} field stays {@code null} until {@code MaterialRuleContext#getBiome()}
+ * populates it from the biome getter, so a field accessor would hand out nulls. The public vanilla
+ * {@code getBiome()} method has the exact signature of the interface method and satisfies it directly.
  */
-@Mixin(SurfaceRules.Context.class)
+@Mixin(MaterialRuleContext.class)
 public interface SurfaceRulesContextAccessor extends SurfaceRulesContext {
     @Accessor("blockX")
     int getBlockX();
@@ -28,10 +27,6 @@ public interface SurfaceRulesContextAccessor extends SurfaceRulesContext {
     int getBlockZ();
     @Accessor("surfaceDepth")
     int getSurfaceDepth();
-    @Accessor("chunk")
-    ChunkAccess getChunk();
-    @Accessor("noiseChunk")
-    NoiseChunk getNoiseChunk();
     @Accessor("stoneDepthAbove")
     int getStoneDepthAbove();
     @Accessor("stoneDepthBelow")
@@ -42,5 +37,4 @@ public interface SurfaceRulesContextAccessor extends SurfaceRulesContext {
     long getLastUpdateXZ();
     @Accessor("randomState")
     RandomState getRandomState();
-
 }

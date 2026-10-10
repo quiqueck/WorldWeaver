@@ -39,9 +39,8 @@ import net.minecraft.world.level.storage.loot.entries.UniformContainerBase;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.*;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -57,13 +56,13 @@ import org.jetbrains.annotations.Nullable;
  * <h2>26.3 migration notes</h2>
  * Two vanilla changes reach through this whole class:
  * <ul>
- *     <li><b>Number providers became a datapack registry</b> ({@code minecraft:number_provider}). Every place
- *     vanilla used to take a {@link NumberProvider} now takes a {@code Holder<NumberProvider>}, and the
- *     factories that produce them ({@link ConstantValue#exactly(float)},
- *     {@link UniformGenerator#between(float, float)}) return the holder directly. The {@code drop...(...)}
- *     helpers below follow vanilla rather than unwrapping, so their signatures changed accordingly - callers
- *     that already build their counts with {@code ConstantValue.exactly(...)} / {@code UniformGenerator.between(...)}
- *     need no change at all.</li>
+ *     <li><b>Number providers became a datapack registry</b>. In the 26.3 snapshots every place vanilla used to
+ *     take a {@code NumberProvider} took a {@code Holder<NumberProvider>}; the 26.3 release then split number
+ *     providers into integer and float providers ({@code minecraft:context_int_provider} /
+ *     {@code minecraft:context_float_provider}). Loot pool rolls and item counts are integer providers now, so
+ *     the {@code drop...(...)} helpers below take a {@code Holder<ContextIntProvider>}. Build them with
+ *     {@link ContextIntProviders#exactly(int)} / {@link ContextIntProviders#between(int, int)}, which return the
+ *     holder directly.</li>
  *     <li><b>Loot conditions became a reloadable registry</b> too, and vanilla moved its silk-touch/shears
  *     conditions into it as {@code minecraft:tool/can_silk_touch} and {@code minecraft:tool/can_shear}. See
  *     {@link WoverVanillaBlockLoot} for why we cannot let vanilla resolve them during datagen.</li>
@@ -104,7 +103,7 @@ public class LootLookupProvider {
      * @param item           The item to drop
      * @param numberProvider The number of items to drop
      */
-    public record DropInfo(ItemLike item, Holder<NumberProvider> numberProvider) {
+    public record DropInfo(ItemLike item, Holder<ContextIntProvider> numberProvider) {
         /**
          * Creates a drop with a fixed item count.
          *
@@ -112,7 +111,7 @@ public class LootLookupProvider {
          * @param count The fixed number of items to drop
          */
         public DropInfo(ItemLike item, int count) {
-            this(item, ConstantValue.exactly(count));
+            this(item, ContextIntProviders.exactly(count));
         }
     }
 
@@ -348,7 +347,7 @@ public class LootLookupProvider {
                 .lootTable()
                 .withPool(LootPool
                         .lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(block)));
     }
 
@@ -367,7 +366,7 @@ public class LootLookupProvider {
 //                .lootTable()
 //                .withPool(LootPool
 //                        .lootPool()
-//                        .setRolls(ConstantValue.exactly(1.0F))
+//                        .setRolls(ContextIntProviders.exactly(1))
 //                        .add(LootItem.lootTableItem(withSilkTouch).when(vanillaBlockLoot.hasSilkTouch()))
 //                );
     }
@@ -382,7 +381,7 @@ public class LootLookupProvider {
     public LootTable.Builder dropWithSilkTouchOrHoeOrShears(
             ItemLike withSilkTouch
     ) {
-        return dropWithSilkTouchOrHoeOrShears(withSilkTouch, ConstantValue.exactly(1.0f));
+        return dropWithSilkTouchOrHoeOrShears(withSilkTouch, ContextIntProviders.exactly(1));
     }
 
     /**
@@ -395,7 +394,7 @@ public class LootLookupProvider {
      */
     public LootTable.Builder dropWithSilkTouchOrHoeOrShears(
             ItemLike withSilkTouch,
-            Holder<NumberProvider> rolls
+            Holder<ContextIntProvider> rolls
     ) {
         return LootTable
                 .lootTable()
@@ -422,7 +421,7 @@ public class LootLookupProvider {
                 .withPool(LootPool
                         .lootPool()
                         .when(vanillaBlockLoot.hasShearsOrSilkTouch())
-                        .setRolls(ConstantValue.exactly(1.0f))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(withSilkTouch)));
     }
 
@@ -438,7 +437,7 @@ public class LootLookupProvider {
     public LootTable.Builder dropWithSilkTouch(
             Block withSilkTouch,
             ItemLike withoutSilkTouch,
-            Holder<NumberProvider> numberProvider
+            Holder<ContextIntProvider> numberProvider
     ) {
         return vanillaBlockLoot.createSingleItemTableWithSilkTouch(withSilkTouch, withoutSilkTouch, numberProvider);
     }
@@ -446,6 +445,11 @@ public class LootLookupProvider {
     /**
      * Builds a loot table that drops {@code withSilkTouch} itself when the tool used has Silk Touch, and
      * every entry in {@code withoutSilkTouch} (each with explosion decay applied) otherwise.
+     *
+     * <p>
+     * Only the first pool carries the Silk Touch self-drop; every further entry gets a pool of its own that is
+     * gated on the tool <i>not</i> having Silk Touch. Giving each pool its own self-drop alternative would make a
+     * Silk Touch tool yield the block once per entry.
      *
      * @param withSilkTouch    The block to drop when Silk Touch is used
      * @param withoutSilkTouch The items to drop otherwise, one pool per entry
@@ -458,6 +462,7 @@ public class LootLookupProvider {
         if (withoutSilkTouch.isEmpty()) return dropWithSilkTouch(withSilkTouch);
 
         var mainBuilder = LootTable.lootTable();
+        boolean first = true;
         for (DropInfo dropInfo : withoutSilkTouch) {
             // 26.3 renamed LootPoolSingletonContainer to UniformContainerBase (the "uniform" refers to the
             // weight/quality fields every single-entry container shares); LootItem.lootTableItem still returns
@@ -465,12 +470,21 @@ public class LootLookupProvider {
             UniformContainerBase.Builder<? extends UniformContainerBase.Builder<?>> item = LootItem
                     .lootTableItem(dropInfo.item)
                     .apply(SetItemCountFunction.setCount(dropInfo.numberProvider));
-            createSelfDropDispatchTable(
-                    mainBuilder,
-                    withSilkTouch,
-                    hasSilkTouch(),
-                    vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)
-            );
+            if (first) {
+                createSelfDropDispatchTable(
+                        mainBuilder,
+                        withSilkTouch,
+                        hasSilkTouch(),
+                        vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)
+                );
+                first = false;
+            } else {
+                mainBuilder.withPool(LootPool
+                        .lootPool()
+                        .setRolls(ContextIntProviders.exactly(1))
+                        .when(hasSilkTouch().invert())
+                        .add(vanillaBlockLoot.applyExplosionDecay(withSilkTouch, item)));
+            }
         }
 
         return mainBuilder;
@@ -493,7 +507,7 @@ public class LootLookupProvider {
     ) {
         tableBuilder.withPool(LootPool
                 .lootPool()
-                .setRolls(ConstantValue.exactly(1.0F))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(block).when(builder).otherwise(builder2)));
     }
 
@@ -539,7 +553,7 @@ public class LootLookupProvider {
      * @param numberProvider The base number of items to drop before the fortune bonus
      * @return The loot table builder
      */
-    public LootTable.Builder dropOre(Block oreBlock, Item ore, Holder<NumberProvider> numberProvider) {
+    public LootTable.Builder dropOre(Block oreBlock, Item ore, Holder<ContextIntProvider> numberProvider) {
         return vanillaBlockLoot.createSilkTouchDispatchTable(
                 oreBlock,
                 vanillaBlockLoot.applyExplosionDecay(
@@ -596,7 +610,7 @@ public class LootLookupProvider {
     public <T extends Comparable<T> & StringRepresentable> LootTable.Builder dropWithSilkTouchAndCondition(
             Block withSilkTouch,
             ItemLike withoutSilkTouch,
-            Holder<NumberProvider> numberProvider,
+            Holder<ContextIntProvider> numberProvider,
             Property<T> property,
             T comparable
     ) {
@@ -630,7 +644,7 @@ public class LootLookupProvider {
                 LootPool
                         .lootPool()
                         .when(hasSilkTouch())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(withSilkTouch)
                                      .when(hasBlockStateProperties(withSilkTouch, property, comparable))
                         )
@@ -695,7 +709,7 @@ public class LootLookupProvider {
      * @return The loot table builder
      */
     public LootTable.Builder dropPlant(Block plantBlock, ItemLike sapling) {
-        return dropPlant(plantBlock, sapling, 0.125F, ConstantValue.exactly(1), 2);
+        return dropPlant(plantBlock, sapling, 0.125F, ContextIntProviders.exactly(1), 2);
     }
 
     /**
@@ -713,7 +727,7 @@ public class LootLookupProvider {
             Block plantBlock,
             ItemLike sapling,
             float saplingChance,
-            Holder<NumberProvider> saplingCount,
+            Holder<ContextIntProvider> saplingCount,
             int fortuneBonus
     ) {
         return vanillaBlockLoot.createShearsDispatchTable(
@@ -753,9 +767,9 @@ public class LootLookupProvider {
         return this.dropPlant(
                 plantBlock,
                 fruit,
-                ConstantValue.exactly(1),
+                ContextIntProviders.exactly(1),
                 seed,
-                ConstantValue.exactly(1),
+                ContextIntProviders.exactly(1),
                 0.571f,
                 3,
                 property,
@@ -784,9 +798,9 @@ public class LootLookupProvider {
         return this.dropPlant(
                 plantBlock,
                 fruit,
-                ConstantValue.exactly(1),
+                ContextIntProviders.exactly(1),
                 seed,
-                ConstantValue.exactly(1),
+                ContextIntProviders.exactly(1),
                 0.571f,
                 3,
                 property,
@@ -814,9 +828,9 @@ public class LootLookupProvider {
     public <T extends Comparable<T> & StringRepresentable> LootTable.Builder dropPlant(
             Block plantBlock,
             ItemLike fruit,
-            Holder<NumberProvider> fruitCount,
+            Holder<ContextIntProvider> fruitCount,
             ItemLike seed,
-            Holder<NumberProvider> seedCount,
+            Holder<ContextIntProvider> seedCount,
             float probability,
             int extraRounds,
             Property<T> property,
@@ -844,9 +858,9 @@ public class LootLookupProvider {
     public LootTable.Builder dropPlant(
             Block plantBlock,
             ItemLike fruit,
-            Holder<NumberProvider> fruitCount,
+            Holder<ContextIntProvider> fruitCount,
             ItemLike seed,
-            Holder<NumberProvider> seedCount,
+            Holder<ContextIntProvider> seedCount,
             float probability,
             int extraRounds,
             IntegerProperty property,
@@ -875,9 +889,9 @@ public class LootLookupProvider {
     public LootTable.Builder dropPlant(
             Block plantBlock,
             ItemLike fruit,
-            Holder<NumberProvider> fruitCount,
+            Holder<ContextIntProvider> fruitCount,
             ItemLike seed,
-            Holder<NumberProvider> seedCount,
+            Holder<ContextIntProvider> seedCount,
             float probability,
             int extraRounds,
             LootItemCondition.Builder condition
@@ -972,7 +986,7 @@ public class LootLookupProvider {
             Block leaveBlock,
             ItemLike saplingBlock,
             @Nullable ItemLike stickBlock,
-            @Nullable Holder<NumberProvider> stickCount,
+            @Nullable Holder<ContextIntProvider> stickCount,
             int fortuneRate,
             int dropRate
     ) {
@@ -997,11 +1011,11 @@ public class LootLookupProvider {
                 );
         if (stickBlock != null) {
             if (stickCount == null) {
-                stickCount = UniformGenerator.between(1.0f, 2.0f);
+                stickCount = ContextIntProviders.between(1, 2);
             }
             baseBuilder = baseBuilder.withPool(
                     LootPool.lootPool()
-                            .setRolls(ConstantValue.exactly(1.0f))
+                            .setRolls(ContextIntProviders.exactly(1))
                             .when(vanillaBlockLoot.doesNotHaveShearsOrSilkTouch())
                             .add(vanillaBlockLoot
                                     .applyExplosionDecay(
@@ -1041,11 +1055,11 @@ public class LootLookupProvider {
     public LootTable.Builder dropDoublePlant(Block block) {
         return LootTable.lootTable().withPool(
                 LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(vanillaBlockLoot.applyExplosionCondition(
                                 block,
                                 LootItem.lootTableItem(block)
-                                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(2.0F)))
+                                        .apply(SetItemCountFunction.setCount(ContextIntProviders.exactly(2)))
                         ))
         );
     }

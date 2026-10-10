@@ -12,9 +12,7 @@
     },
     "then_run": {
       "type": "minecraft:block",
-      "result_state": {
-        "Name": "minecraft:acacia_planks"
-      }
+      "result_state": "minecraft:acacia_planks"
     }
   }
 }

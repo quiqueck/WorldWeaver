@@ -5,20 +5,20 @@ import de.ambertation.wover.surface.api.noise.NumericProvider;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.world.level.levelgen.SurfaceRules.Context;
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
-import net.minecraft.world.level.levelgen.SurfaceRules.SurfaceRule;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
+import net.minecraft.world.level.levelgen.material.rule.RuleEvaluator;
 
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 //
-public record SwitchRuleSource(NumericProvider selector, List<RuleSource> collection) implements RuleSource {
+public record SwitchRuleSource(NumericProvider selector, List<MaterialRule> collection) implements MaterialRule {
     public static final MapCodec<SwitchRuleSource> CODEC = RecordCodecBuilder
             .mapCodec(instance -> instance
                     .group(
                             NumericProvider.CODEC.fieldOf("selector").forGetter(SwitchRuleSource::selector),
-                            RuleSource.CODEC.listOf().fieldOf("collection").forGetter(SwitchRuleSource::collection)
+                            MaterialRule.CODEC.listOf().fieldOf("collection").forGetter(SwitchRuleSource::collection)
                     )
                     .apply(
                             instance,
@@ -26,17 +26,23 @@ public record SwitchRuleSource(NumericProvider selector, List<RuleSource> collec
                     ));
 
     @Override
-    public @NotNull MapCodec<? extends RuleSource> codec() {
+    public @NotNull MapCodec<? extends MaterialRule> codec() {
         return CODEC;
     }
 
     @Override
-    public SurfaceRule apply(Context context) {
-        return (x, y, z) -> {
-            final SurfaceRulesContext ctx = SurfaceRulesContext.class.cast(context);
-            int nr = Math.max(0, selector.getNumber(ctx)) % collection.size();
+    public RuleEvaluator compile(MaterialRuleContext context) {
+        // 26.3 compiles a rule once per chunk instead of applying it per block, so every candidate is
+        // compiled up front and the selector only picks which of the compiled evaluators runs.
+        final RuleEvaluator[] compiled = new RuleEvaluator[collection.size()];
+        for (int i = 0; i < compiled.length; i++) {
+            compiled[i] = collection.get(i).compile(context);
+        }
+        final SurfaceRulesContext ctx = SurfaceRulesContext.class.cast(context);
 
-            return collection.get(nr).apply(context).tryApply(x, y, z);
+        return (x, y, z) -> {
+            int nr = Math.max(0, selector.getNumber(ctx)) % compiled.length;
+            return compiled[nr].tryApply(x, y, z);
         };
     }
 }

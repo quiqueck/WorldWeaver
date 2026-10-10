@@ -15,9 +15,7 @@
         },
         "then_run": {
           "type": "minecraft:block",
-          "result_state": {
-            "Name": "minecraft:cherry_planks"
-          }
+          "result_state": "minecraft:cherry_planks"
         }
       },
       {
@@ -31,9 +29,7 @@
         },
         "then_run": {
           "type": "minecraft:block",
-          "result_state": {
-            "Name": "minecraft:white_concrete"
-          }
+          "result_state": "minecraft:white_concrete"
         }
       }
     ]

@@ -13,11 +13,13 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.FloatProvider;
 import net.minecraft.util.valueproviders.FloatProviders;
 import net.minecraft.util.valueproviders.UniformFloat;
-import net.minecraft.world.level.levelgen.SurfaceRules;
-import net.minecraft.world.level.levelgen.synth.NormalNoise;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.condition.ConditionEvaluator;
+import net.minecraft.world.level.levelgen.material.condition.MaterialCondition;
 import net.minecraft.world.level.levelgen.synth.Noise;
+import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
+public class RoughNoiseConditionImpl implements MaterialCondition {
     public static final MapCodec<RoughNoiseConditionImpl> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
             .group(
                     ResourceKey.codec(Registries.NOISE).fieldOf("noise").forGetter(o -> o.noise),
@@ -62,29 +64,27 @@ public class RoughNoiseConditionImpl implements SurfaceRules.ConditionSource {
     }
 
     @Override
-    public MapCodec<? extends SurfaceRules.ConditionSource> codec() {
+    public MapCodec<? extends MaterialCondition> codec() {
         return CODEC;
     }
 
     @Override
-    public SurfaceRules.Condition apply(final SurfaceRules.Context context2) {
+    public ConditionEvaluator compile(final MaterialRuleContext context2) {
         final SurfaceRulesContextAccessor ctx = SurfaceRulesContextAccessor.class.cast(context2);
         final Noise normalNoise = ctx.getRandomState().getOrCreateNoise(this.noise);
         final RandomSource roughnessSource = ctx.getRandomState()
                                                 .getOrCreateRandomFactory(NoiseParameterManager.ROUGHNESS_NOISE.identifier())
                                                 .fromHashOf(NoiseParameterManager.ROUGHNESS_NOISE.identifier());
 
-        class NoiseThresholdCondition extends SurfaceRules.LazyCondition {
+        // 26.3 dropped the generic SurfaceRules.LazyCondition. LazyYCondition is invalidated on every Y
+        // step and on every new column (MaterialRuleContext#updateXZ bumps both counters), which is the
+        // same per-block caching the old lastUpdateY + lastUpdateXZ key gave us.
+        class NoiseThresholdCondition extends MaterialRuleContext.LazyYCondition {
             NoiseThresholdCondition() {
                 super(context2);
             }
 
             @Override
-            protected long getContextLastUpdate() {
-                final SurfaceRulesContextAccessor ctx = SurfaceRulesContextAccessor.class.cast(this.context);
-                return ctx.getLastUpdateY() + ctx.getLastUpdateXZ();
-            }
-
             protected boolean compute() {
                 double d = normalNoise
                         .get(

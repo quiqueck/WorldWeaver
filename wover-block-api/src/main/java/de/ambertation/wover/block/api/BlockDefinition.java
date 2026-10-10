@@ -383,6 +383,20 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
                               DataComponents.COOKING_FUEL,
                               fuel.asCookingFuelComponent()
                       ));
+            // Same story for compostability, and for the same reason: 26.3 deleted
+            // ComposterBlock.COMPOSTABLES and made minecraft:compostable an item component, which has to be
+            // on Item.Properties before the BlockItem is built. Setting the real component (rather than
+            // resolving the trait at composter-use time through a mixin) is what makes every vanilla path
+            // work - the player's right-click, a dispenser, and the WorldlyContainer a hopper inserts
+            // through, which reads the component twice in code no ComposterBlock mixin can see.
+            BlockTrait.runtimeTraits(block)
+                      .filter(CompostableTrait.class::isInstance)
+                      .map(CompostableTrait.class::cast)
+                      .findFirst()
+                      .ifPresent(compostable -> blockitemDefinition.component(
+                              DataComponents.COMPOSTABLE,
+                              compostable.compostTier().asCompostableComponent()
+                      ));
             this.blockItem = blockitemDefinition.buildAndRegister();
         } else {
             this.blockItem = null;
@@ -984,7 +998,11 @@ public abstract class BlockDefinition<B extends Block, D extends BlockDefinition
      */
     @SuppressWarnings("unchecked")
     public D isViewBlocking(BlockBehaviour.StatePredicate predicate) {
-        queueProperty((properties) -> properties.isViewBlocking(predicate));
+        // 26.3 made the vanilla property a StateArgumentPredicate<AABB> that also receives the camera's
+        // near-plane box. Our predicates never looked at it, so the box is simply ignored.
+        queueProperty((properties) -> properties.isViewBlocking(
+                (state, level, pos, nearPlaneBox) -> predicate.test(state, level, pos)
+        ));
         return (D) this;
     }
 

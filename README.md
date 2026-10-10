@@ -50,3 +50,22 @@ WorldWeaver:
 ```
 
 In this example `26.300.0` is the WorldWeaver Version you are building against.
+
+## Automated clients (MCP servers, agents, CI)
+
+Start the game with the following JVM argument to suppress every screen that would otherwise wait for a click:
+
+```
+-Dwover.suppressScreens=true
+```
+
+When set:
+
+- the first-start welcome screen and the update notification are not shown (the welcome screen is not marked as
+  seen, so a regular start still shows it),
+- the experimental-settings warning is skipped when loading a world, regardless of the
+  `disable_experimental_warning` client config option,
+- BCLib applies pending world fixes without its backup/confirm and progress screens (the same way a dedicated
+  server does, i.e. without creating a backup).
+
+Mods can query the flag with `ModCore.suppressScreens()`.

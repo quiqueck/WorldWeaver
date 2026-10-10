@@ -21,10 +21,7 @@
   },
   "min_height": 3,
   "state": {
-    "type": "minecraft:simple_state_provider",
-    "state": {
-      "Name": "minecraft:lapis_block"
-    }
+    "id": "minecraft:lapis_block"
   },
   "transform": "size_increase"
 }

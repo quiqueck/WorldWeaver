@@ -32,8 +32,8 @@
               },
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 3,
+                "min": 1
               }
             },
             {
@@ -48,7 +48,7 @@
                   }
                 }
               },
-              "count": 1.0
+              "count": 1
             },
             {
               "type": "minecraft:apply_bonus",
@@ -99,7 +99,7 @@
           "name": "wover-block-testmod:test_block"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     },
     {
       "condition": {
@@ -140,8 +140,8 @@
               "type": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
-                "max": 3.0,
-                "min": 1.0
+                "max": 3,
+                "min": 1
               }
             },
             {
@@ -151,7 +151,7 @@
           "name": "wover-block-testmod:test_block"
         }
       ],
-      "rolls": 1.0
+      "rolls": 1
     }
   ]
 }

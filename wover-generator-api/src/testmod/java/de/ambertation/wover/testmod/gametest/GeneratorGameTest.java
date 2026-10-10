@@ -24,6 +24,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 
 import com.google.gson.JsonElement;
@@ -184,8 +185,8 @@ public class GeneratorGameTest {
             ),
             new ExpectedWoverData("wover-generator-testmod:wastes_sub_biome", 1.0f, 0, "minecraft:nether_wastes"),
             // main-module data shipped in the jar (src/main/generated/.../wover/worldgen/biome_data/)
-            new ExpectedWoverData("minecraft:end_highlands", 0.2f, 4, null),
-            new ExpectedWoverData("minecraft:the_end", 0.01f, 0, null)
+            new ExpectedWoverData("minecraft:end_highlands", 1.0f, 4, null),
+            new ExpectedWoverData("minecraft:the_end", 1.0f, 0, null)
     );
 
     /**
@@ -332,19 +333,20 @@ public class GeneratorGameTest {
 
     /**
      * The eight {@code noise_router} fields 26.3's {@link net.minecraft.world.level.levelgen.NoiseRouter}
-     * still has, and the seven it lost (four to {@code Aquifer.Config}, three to {@code OreVeinifier}).
+     * still has, and the seven it lost (four to {@code Aquifer.Config}, three to the {@code ore_vein} material rule).
+     * The 26.3 release also renamed {@code preliminary_surface_level} to {@code chunk_surface_level}.
      */
     private static final Set<String> EXPECTED_ROUTER_FIELDS = Set.of(
             "temperature", "vegetation", "continents", "erosion",
-            "depth", "ridges", "preliminary_surface_level", "final_density"
+            "depth", "ridges", "chunk_surface_level", "final_density"
     );
     private static final Set<String> REMOVED_ROUTER_FIELDS = Set.of(
             "barrier", "fluid_level_floodedness", "fluid_level_spread", "lava",
-            "vein_toggle", "vein_ridged", "vein_gap"
+            "vein_toggle", "vein_ridged", "vein_gap", "preliminary_surface_level"
     );
     // The router slots WoverChunkGenerator fills with DensityFunctions.zero().
     private static final Set<String> ZERO_ROUTER_FIELDS = Set.of(
-            "continents", "erosion", "depth", "ridges", "preliminary_surface_level"
+            "continents", "erosion", "depth", "ridges", "chunk_surface_level"
     );
 
     /**
@@ -353,7 +355,8 @@ public class GeneratorGameTest {
      * four aquifer noises, so {@code temperature} sat at index 5; it is now index 1), replaced
      * {@code surfaceRule} with a {@code Holder<RuleSource>} called {@code materialRule}, and replaced the
      * {@code aquifersEnabled}/{@code oreVeinsEnabled} booleans with {@code Optional<Aquifer.Config>} /
-     * {@code List<OreVeinifier>}.
+     * {@code List<OreVeinifier>} (in the 26.3 release ore veins moved on into the material rules, so the settings
+     * no longer carry them at all).
      * <p>
      * Every component of {@code NoiseRouter} has the same type, so getting the new order wrong compiles
      * cleanly and merely generates a subtly wrong Nether - {@code temperature} would silently become
@@ -385,10 +388,8 @@ public class GeneratorGameTest {
             failures.add("aquifers() is present, but the amplified nether generates with aquifers off "
                     + "(26.1: aquifersEnabled = false)");
         }
-        if (!settings.oreVeins().isEmpty()) {
-            failures.add("oreVeins() has " + settings.oreVeins().size() + " entries, but the amplified "
-                    + "nether generates with ore veins off (26.1: oreVeinsEnabled = false)");
-        }
+        // (26.3 release: ore veins are no longer a NoiseGeneratorSettings component but a material rule;
+        // the amplified nether references minecraft:nether, which has no ore_vein rule.)
 
         // --- the component that used to be an inline RuleSource ---
         final Identifier materialRule = settings
@@ -452,12 +453,16 @@ public class GeneratorGameTest {
             assertShiftedNoise(router, "vegetation", "minecraft:nether/vegetation", failures);
 
             if (router.has("final_density")) {
+                // Since the 26.3 release the beardifier is part of the router (vanilla's nether router is
+                // add(postProcess(slide), beardifier())), so the squeezed noise sits on the left of an add.
                 final JsonElement finalDensity = router.get("final_density");
-                if (!finalDensity.isJsonObject()
-                        || !"minecraft:squeeze".equals(
-                        finalDensity.getAsJsonObject().get("type").getAsString())) {
+                final boolean ok = finalDensity.isJsonObject()
+                        && "minecraft:add".equals(typeOf(finalDensity))
+                        && "minecraft:squeeze".equals(typeOf(finalDensity.getAsJsonObject().get("left")))
+                        && "minecraft:beardifier".equals(typeOf(finalDensity.getAsJsonObject().get("right")));
+                if (!ok) {
                     failures.add("noise_router.final_density is " + finalDensity
-                            + ", expected the minecraft:squeeze post-processed nether noise");
+                            + ", expected add(minecraft:squeeze post-processed nether noise, minecraft:beardifier)");
                 }
             }
         }
@@ -483,7 +488,7 @@ public class GeneratorGameTest {
      * {@code NoiseGeneratorSettingsProvider}. This build has no refmap and no mixin annotation processor, so
      * nothing checks that shadow at compile time, and a field-level mixin whose target was renamed or
      * retyped can still apply and simply hand out {@code null} at runtime (exactly what bit
-     * {@code wover-surface-api}'s {@code SurfaceRules.Context.biome} accessor in this same port).
+     * {@code wover-surface-api}'s {@code MaterialRuleContext.biome} accessor in this same port).
      * <p>
      * Booting the server does not catch it either: the only caller,
      * {@code WoverChunkGenerator#enforceGeneratorInWorldGenSettings}, runs only when another mod has
@@ -564,5 +569,11 @@ public class GeneratorGameTest {
                     + (obj.has("noise") ? obj.get("noise") : "<none>")
                     + ", expected " + expectedNoise + " - the NoiseRouter arguments are swapped");
         }
+    }
+
+    private static String typeOf(JsonElement element) {
+        if (element == null || !element.isJsonObject()) return null;
+        final JsonElement type = element.getAsJsonObject().get("type");
+        return type == null || !type.isJsonPrimitive() ? null : type.getAsString();
     }
 }

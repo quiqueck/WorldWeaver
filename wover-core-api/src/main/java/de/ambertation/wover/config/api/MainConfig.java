@@ -43,8 +43,15 @@ public class MainConfig extends ConfigFile {
     public final BooleanValue verboseLogging = new BooleanValue(
             LOG_CATEGORY,
             "verbose",
-            true
+            false
     ).setGroup(GENERAL_GROUP);
+
+    /**
+     * The first version in which {@link #verboseLogging} defaults to {@code false}. Earlier versions wrote the
+     * old default ({@code true}) into every config file, so a {@code true} saved by them is not a choice anybody
+     * made and is reset once.
+     */
+    private static final String VERBOSE_OFF_BY_DEFAULT_SINCE = "26.301.1";
 
     // Removed 2026-08-04: "server.force_default_world_preset". It made dedicated servers ignore
     // "level-type" and always generate with our default preset. A server that never configured a
@@ -57,5 +64,9 @@ public class MainConfig extends ConfigFile {
      */
     public MainConfig() {
         super(LibWoverCore.C, "main");
+
+        if (lastModifiedVersion().isLessThan(VERBOSE_OFF_BY_DEFAULT_SINCE) && verboseLogging.get()) {
+            verboseLogging.set(false);
+        }
     }
 }

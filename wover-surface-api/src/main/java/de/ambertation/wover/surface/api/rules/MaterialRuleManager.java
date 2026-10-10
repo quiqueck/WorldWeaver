@@ -3,9 +3,9 @@ package de.ambertation.wover.surface.api.rules;
 import de.ambertation.wover.surface.impl.rules.MaterialRuleRegistryImpl;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -21,9 +21,9 @@ public class MaterialRuleManager {
      * @param rule     The rule source.
      * @return The key for the rule source.
      */
-    public static ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> register(
+    public static ResourceKey<MapCodec<? extends MaterialRule>> register(
             Identifier location,
-            MapCodec<? extends SurfaceRules.RuleSource> rule
+            MapCodec<? extends MaterialRule> rule
     ) {
         return MaterialRuleRegistryImpl.register(MaterialRuleRegistryImpl.createKey(location), rule);
     }
@@ -35,9 +35,9 @@ public class MaterialRuleManager {
      * @param rule The rule source.
      * @return The key for the rule source.
      */
-    public static ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> register(
-            ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> key,
-            MapCodec<? extends SurfaceRules.RuleSource> rule
+    public static ResourceKey<MapCodec<? extends MaterialRule>> register(
+            ResourceKey<MapCodec<? extends MaterialRule>> key,
+            MapCodec<? extends MaterialRule> rule
     ) {
         return MaterialRuleRegistryImpl.register(key, rule);
     }
@@ -49,7 +49,7 @@ public class MaterialRuleManager {
      * @return The key for the rule source.
      */
     @NotNull
-    public static ResourceKey<MapCodec<? extends SurfaceRules.RuleSource>> createKey(Identifier location) {
+    public static ResourceKey<MapCodec<? extends MaterialRule>> createKey(Identifier location) {
         return MaterialRuleRegistryImpl.createKey(location);
     }
 

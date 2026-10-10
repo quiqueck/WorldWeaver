@@ -19,6 +19,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.ApiStatus;
 
 public class RecipeRuntimeProviderImpl {
@@ -43,6 +44,49 @@ public class RecipeRuntimeProviderImpl {
     private static volatile Contribution pendingAdvancements = null;
 
     private record Contribution(HolderLookup.Provider registries, List<AdvancementHolder> advancements) {
+    }
+
+    /**
+     * The registry provider of the server resource reload that is constructing its managers on this thread
+     * right now, or {@code null}. Set by {@code ReloadableServerResourcesMixin} around the
+     * {@code RecipeManager} and {@code ServerAdvancementManager} constructions, which is the only place vanilla
+     * builds either.
+     */
+    private static final ThreadLocal<HolderLookup.Provider> SERVER_RELOAD = new ThreadLocal<>();
+
+    /**
+     * Runs {@code construct} - the construction of one of the server's reloadable managers - with
+     * {@code registries} marked as the server's reload provider on this thread.
+     *
+     * @param registries the provider the manager is constructed from
+     * @param construct  the construction
+     * @param <T>        the manager type
+     * @return the constructed manager
+     */
+    @ApiStatus.Internal
+    public static <T> T inServerReload(HolderLookup.Provider registries, Supplier<T> construct) {
+        final HolderLookup.Provider previous = SERVER_RELOAD.get();
+        SERVER_RELOAD.set(registries);
+        try {
+            return construct.get();
+        } finally {
+            if (previous == null) SERVER_RELOAD.remove();
+            else SERVER_RELOAD.set(previous);
+        }
+    }
+
+    /**
+     * Whether a manager constructed from {@code registries} belongs to the server's resource reload. Runtime
+     * recipes and their unlock advancements are only contributed to those; a {@code RecipeManager} some other
+     * mod builds for itself (Polymer's {@code FakeWorld} does, over a minimal registry set) keeps exactly its
+     * datapack recipes, as it would without WorldWeaver.
+     *
+     * @param registries the provider the manager was constructed from
+     * @return {@code true} when it is the provider of the server reload running on this thread
+     */
+    @ApiStatus.Internal
+    public static boolean isServerReload(HolderLookup.Provider registries) {
+        return registries != null && SERVER_RELOAD.get() == registries;
     }
 
     /**
@@ -100,6 +144,8 @@ public class RecipeRuntimeProviderImpl {
      */
     @ApiStatus.Internal
     public static List<AdvancementHolder> takeContributedAdvancements(HolderLookup.Provider registries) {
+        // A ServerAdvancementManager built outside the server reload must not consume the parked contribution.
+        if (!isServerReload(registries)) return List.of();
         final Contribution contribution = pendingAdvancements;
         pendingAdvancements = null;
         if (contribution == null || contribution.registries() != registries) return List.of();

@@ -10,7 +10,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProvider;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
 
 /**
  * A behaviour trait that makes the block's item a furnace fuel with a fixed burn time.
@@ -19,7 +21,7 @@ import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
  * fixed burn time via Fabric's (now also removed) {@code FuelValueEvents.BUILD}. 26.3 replaced both the
  * Fabric event and vanilla's static burn-time map with a data-driven {@code minecraft:cooking_fuel} item
  * component ({@link CookingFuel}) whose {@code burnTime}/{@code speedMultiplier} are {@link ResourceKey}s
- * into the new {@code minecraft:number_provider} datapack registry, applied to {@code Item.Properties} at
+ * into the new number provider datapack registries ({@code minecraft:context_int_provider} for the burn time, {@code minecraft:context_float_provider} for the speed multiplier; a single {@code minecraft:number_provider} registry in the 26.3 snapshots), applied to {@code Item.Properties} at
  * item-construction time (see {@code BlockDefinition#buildAndRegister()}) rather than as a post-registration
  * event.
  * <p>
@@ -45,8 +47,8 @@ public class FuelBlockTrait extends BlockTraitImpl<Block, GenericBlockTrait> imp
      * furnace, {@code 2.0} in a blast furnace/smoker (so fuel is consumed twice as fast to match the
      * doubled cook speed).
      */
-    private static final ResourceKey<NumberProvider> SPEED_DEFAULT =
-            ResourceKey.create(Registries.NUMBER_PROVIDER, Identifier.withDefaultNamespace("cooking/speed_default"));
+    private static final ResourceKey<ContextFloatProvider> SPEED_DEFAULT =
+            ContextFloatProviders.COOKING_DEFAULT_SPEED_MULTIPLIER;
 
     /**
      * The burn time (in ticks).
@@ -72,7 +74,7 @@ public class FuelBlockTrait extends BlockTraitImpl<Block, GenericBlockTrait> imp
         DefaultFuelTicks(int mul, int div, String vanillaBurnTimeProvider) {
             this.trait = new FuelBlockTrait(
                     (DEFAULT_TICKS * mul) / div,
-                    ResourceKey.create(Registries.NUMBER_PROVIDER, Identifier.withDefaultNamespace(vanillaBurnTimeProvider))
+                    ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, Identifier.withDefaultNamespace(vanillaBurnTimeProvider))
             );
         }
     }
@@ -93,7 +95,7 @@ public class FuelBlockTrait extends BlockTraitImpl<Block, GenericBlockTrait> imp
      * @param ticks the burn time in ticks; must match one of {@link DefaultFuelTicks}' values
      * @return the fuel trait instance
      * @throws IllegalArgumentException if {@code ticks} doesn't match a known preset - 26.3's fuel value
-     *                                   must reference a registered {@code NumberProvider} and this trait
+     *                                   must reference a registered {@code ContextIntProvider} and this trait
      *                                   does not (yet) bootstrap custom ones
      */
     public static FuelBlockTrait withTicks(int ticks) {
@@ -101,14 +103,14 @@ public class FuelBlockTrait extends BlockTraitImpl<Block, GenericBlockTrait> imp
             if (preset.trait.ticks == ticks) return preset.trait;
         }
         throw new IllegalArgumentException(
-                "No vanilla NumberProvider is known for " + ticks
+                "No vanilla ContextIntProvider is known for " + ticks
                         + " fuel ticks; use one of the DefaultFuelTicks presets");
     }
 
     public final int ticks;
-    public final ResourceKey<NumberProvider> burnTime;
+    public final ResourceKey<ContextIntProvider> burnTime;
 
-    private FuelBlockTrait(int ticks, ResourceKey<NumberProvider> burnTime) {
+    private FuelBlockTrait(int ticks, ResourceKey<ContextIntProvider> burnTime) {
         this.ticks = ticks;
         this.burnTime = burnTime;
     }

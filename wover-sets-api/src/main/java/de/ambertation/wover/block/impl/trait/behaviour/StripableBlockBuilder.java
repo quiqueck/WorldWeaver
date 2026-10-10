@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.RuleBasedStateProvider;
 import net.minecraft.world.level.levelgen.feature.stateproviders.CopyPropertiesProvider;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, Stri
 
     public @Nullable StripableBlockTrait with(@Nullable Block strippedBlock) {
         if (strippedBlock == null) return null;
-        // Matches vanilla's own strippables (BlockTransformerMappings#getStrippableBlockData): the target's
+        // Matches vanilla's own strippables (BlockTransformers#axeStrippables): the target's
         // default state with every property it shares with the block being stripped copied over, which covers
         // RotatedPillarBlock.AXIS for logs/bark without needing to name it.
         return new Trait(new CopyPropertiesProvider(strippedBlock));
@@ -53,7 +54,7 @@ public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, Stri
 
     public @Nullable StripableBlockTrait with(@Nullable BlockState strippedBlock) {
         if (strippedBlock == null) return null;
-        return new Trait(BlockStateProvider.simple(strippedBlock));
+        return new Trait(BlockStateProvider.of(strippedBlock));
     }
 
     public @Nullable StripableBlockTrait with(@Nullable BlockStateProvider strippedBlock) {
@@ -67,25 +68,28 @@ public class StripableBlockBuilder extends AbstractBlockTraitBuilder<Block, Stri
     }
 
     /**
-     * Builds the {@link BlockTransformer.BlockTransformData} entry for every registered strippable block.
+     * Builds the {@link BlockTransformer.BlockTransformData} for the registered strippable blocks.
      * <p>
-     * Each entry is shaped exactly like vanilla's, i.e. {@code BlockPredicate.matchesBlocks(source)} paired
-     * with the trait's {@link BlockStateProvider} and the {@code minecraft:item.axe.strip} sound; every other
-     * field keeps the builder default (consume-on-use, one point of durability, neighbour update, no
-     * particle), which is what vanilla's strippables use too.
+     * Shaped exactly like vanilla's own strippables since the 26.3 release ({@code BlockTransformers#axeStrippables}):
+     * a single entry whose {@link RuleBasedStateProvider} pairs {@code BlockPredicate.matchesBlocks(source)} with
+     * the trait's {@link BlockStateProvider} for every block, in registration order (first match wins), and the
+     * {@code minecraft:item.axe.strip} sound. Every other field keeps the builder default, which is what
+     * vanilla's strippables use too. The rule-based provider yields no state for a block it has no rule for, so
+     * the transformer simply falls through to the next entry.
      *
-     * @return the transform data for all strippable blocks, in registration order
+     * @return the transform data for all strippable blocks (empty when there are none)
      */
     public static List<BlockTransformer.BlockTransformData> axeTransforms() {
-        final var result = new ArrayList<BlockTransformer.BlockTransformData>(STRIPABLE_BLOCKS.size());
+        if (STRIPABLE_BLOCKS.isEmpty()) return List.of();
+        final RuleBasedStateProvider.Builder rules = RuleBasedStateProvider.builder();
         for (var entry : STRIPABLE_BLOCKS.entrySet()) {
-            result.add(BlockTransformer.BlockTransformData
-                    .builder(BlockPredicate.matchesBlocks(entry.getKey()), entry.getValue().strippedBlock())
-                    .sound(SoundEvents.AXE_STRIP)
-                    .build()
-            );
+            rules.ifTrueThenProvide(BlockPredicate.matchesBlocks(entry.getKey()), entry.getValue().strippedBlock());
         }
-        return result;
+        return List.of(BlockTransformer.BlockTransformData
+                .builder(rules.build())
+                .sound(SoundEvents.AXE_STRIP)
+                .build()
+        );
     }
 
     class Trait extends BlockTraitImpl<Block, StripableBlockTrait> implements StripableBlockTrait, RuntimeBlockTrait<Block, StripableBlockTrait> {

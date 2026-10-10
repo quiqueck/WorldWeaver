@@ -18,6 +18,7 @@ public class TestEquipmentSet extends EquipmentSet {
         add(ToolSlot.SHOVEL_SLOT);
         add(ToolSlot.HOE_SLOT);
         add(ToolSlot.SWORD_SLOT);
+        add(ToolSlot.SPEAR_SLOT);
 
         add(ArmorSlot.HELMET_SLOT);
         add(ArmorSlot.CHESTPLATE_SLOT);

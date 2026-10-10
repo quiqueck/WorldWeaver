@@ -5,7 +5,7 @@ import de.ambertation.wover.entrypoint.LibWoverSurface;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,16 +16,16 @@ import org.spongepowered.asm.mixin.Shadow;
 public abstract class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider {
     /**
      * 26.3 renamed this record component from {@code surfaceRule} to {@code materialRule} and changed
-     * its type from a bare {@link SurfaceRules.RuleSource} to a {@link Holder} of one, because the rule
+     * its type from a bare {@link MaterialRule} to a {@link Holder} of one, because the rule
      * sources themselves now live in the {@code minecraft:worldgen/material_rule} datapack registry and
      * a noise settings file references them by id.
      */
     @Mutable
     @Final
     @Shadow
-    private Holder<SurfaceRules.RuleSource> materialRule;
+    private Holder<MaterialRule> materialRule;
 
-    public void wover_overwriteSurfaceRules(SurfaceRules.RuleSource surfaceRule) {
+    public void wover_overwriteSurfaceRules(MaterialRule surfaceRule) {
         if (surfaceRule == null || surfaceRule == this.materialRule.value()) return;
         if (this.wover_containsOverride) {
             LibWoverSurface.C.LOG.warn("Overwriting an overwritten set of Surface Rules.");
@@ -39,7 +39,7 @@ public abstract class NoiseGeneratorSettingsMixin implements SurfaceRuleProvider
         this.materialRule = Holder.direct(surfaceRule);
     }
 
-    public SurfaceRules.RuleSource wover_getOriginalSurfaceRules() {
+    public MaterialRule wover_getOriginalSurfaceRules() {
         return this.materialRule.value();
     }
 

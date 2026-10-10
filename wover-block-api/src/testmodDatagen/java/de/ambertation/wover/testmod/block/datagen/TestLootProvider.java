@@ -24,8 +24,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.AllOfCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.MatchBlock;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.function.BiConsumer;
 import org.jetbrains.annotations.NotNull;
@@ -94,16 +93,16 @@ public class TestLootProvider extends WoverLootTableProvider {
 
         final LootPool.Builder silkTouchPool = LootPool
                 .lootPool()
-                .setRolls(ConstantValue.exactly(1.0F))
+                .setRolls(ContextIntProviders.exactly(1))
                 .when(provider.hasSilkTouch())
                 .add(LootItem
                         .lootTableItem(block)
                         // count uniform 1..3 at the max age, otherwise a single item
                         .apply(SetItemCountFunction
-                                .setCount(UniformGenerator.between(1.0F, 3.0F))
+                                .setCount(ContextIntProviders.between(1, 3))
                                 .when(hasAge(provider, block, maxAge)))
                         .apply(SetItemCountFunction
-                                .setCount(ConstantValue.exactly(1.0F))
+                                .setCount(ContextIntProviders.exactly(1))
                                 .when(hasAge(provider, block, maxAge).invert()))
                         // fortune bonus curve, strongest at the max age
                         .apply(ApplyBonusCount
@@ -119,11 +118,11 @@ public class TestLootProvider extends WoverLootTableProvider {
 
         final LootPool.Builder noSilkTouchPool = LootPool
                 .lootPool()
-                .setRolls(ConstantValue.exactly(1.0F))
+                .setRolls(ContextIntProviders.exactly(1))
                 .when(AllOfCondition.allOf(provider.hasSilkTouch().invert(), hasAge(provider, block, maxAge)))
                 .add(LootItem
                         .lootTableItem(block)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 3.0F)))
+                        .apply(SetItemCountFunction.setCount(ContextIntProviders.between(1, 3)))
                         .apply(ApplyExplosionDecay.explosionDecay()));
 
         return LootTable.lootTable().withPool(silkTouchPool).withPool(noSilkTouchPool);

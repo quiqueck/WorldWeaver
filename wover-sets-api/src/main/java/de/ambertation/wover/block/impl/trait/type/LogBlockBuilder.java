@@ -41,7 +41,7 @@ public class LogBlockBuilder extends AbstractBlockTraitBuilder.Generic implement
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockState strippedBlockState) {
         if (strippedBlockState == null) return withDefault();
-        return with(BlockStateProvider.simple(strippedBlockState));
+        return with(BlockStateProvider.of(strippedBlockState));
     }
 
     public @Nullable List<BlockTrait<?, ?>> with(@Nullable BlockStateProvider strippedBlockState) {

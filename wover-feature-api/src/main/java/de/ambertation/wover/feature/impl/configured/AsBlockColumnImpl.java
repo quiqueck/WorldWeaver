@@ -4,6 +4,7 @@ import de.ambertation.wover.block.api.BlockProperties;
 import de.ambertation.wover.feature.api.configured.FeatureKey;
 import de.ambertation.wover.feature.api.configured.configurators.AsBlockColumn;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.Direction;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.Identifier;
@@ -40,12 +41,12 @@ public class AsBlockColumnImpl extends FeatureConfiguratorImpl implements de.amb
 
     @Override
     public AsBlockColumn add(int height, Block block) {
-        return add(ConstantInt.of(height), BlockStateProvider.simple(block));
+        return add(ConstantInt.of(height), BlockStateProvider.of(block));
     }
 
     @Override
     public AsBlockColumn add(int height, BlockState state) {
-        return add(ConstantInt.of(height), BlockStateProvider.simple(state));
+        return add(ConstantInt.of(height), BlockStateProvider.of(state));
     }
 
     @Override
@@ -67,17 +68,17 @@ public class AsBlockColumnImpl extends FeatureConfiguratorImpl implements de.amb
 
     @Override
     public AsBlockColumn add(IntProvider height, Block block) {
-        return add(height, BlockStateProvider.simple(block));
+        return add(height, BlockStateProvider.of(block));
     }
 
     @Override
     public AsBlockColumn add(IntProvider height, BlockState state) {
-        return add(height, BlockStateProvider.simple(state));
+        return add(height, BlockStateProvider.of(state));
     }
 
     @Override
     public AsBlockColumn add(IntProvider height, BlockStateProvider state) {
-        layers.add(new BlockColumnFeature.Layer(height, state));
+        layers.add(new BlockColumnFeature.Layer(height, Holder.direct(state)));
         return this;
     }
 

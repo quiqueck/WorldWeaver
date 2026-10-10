@@ -9,10 +9,11 @@ import de.ambertation.wover.loot.api.LootLookupProvider;
 import de.ambertation.wover.tag.api.predefined.CommonBlockTags;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +40,7 @@ public class BookshelfBlockBuilder extends AbstractBlockTraitBuilder.Generic imp
             Block block,
             LootLookupProvider provider
     ) {
-        return provider.dropWithSilkTouch(block, Items.BOOK, ConstantValue.exactly(3));
+        return provider.dropWithSilkTouch(block, Items.BOOK, ContextIntProviders.exactly(3));
     }
 
     private class Trait extends BlockTraitImpl.Generic {
@@ -50,7 +51,10 @@ public class BookshelfBlockBuilder extends AbstractBlockTraitBuilder.Generic imp
 
         @Override
         public void configure(BlockDefinition<Block, ? extends BlockDefinition<Block, ?>> definition) {
-            definition.addTags(CommonBlockTags.BOOKSHELVES);
+            // The vanilla tag is what EnchantingTableBlock.isValidBookShelf reads - and what every other mod
+            // that counts bookshelves reads. MAGIC_SOURCE alone only works through our mixin, which other
+            // mods never see and which (unlike vanilla) ignored #enchantment_power_transmitter.
+            definition.addTags(CommonBlockTags.BOOKSHELVES, BlockTags.ENCHANTMENT_POWER_PROVIDER);
         }
     }
 }

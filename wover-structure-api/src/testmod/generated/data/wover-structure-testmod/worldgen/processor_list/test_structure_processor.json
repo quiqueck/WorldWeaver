@@ -12,9 +12,7 @@
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
-          "output_state": {
-            "Name": "minecraft:red_concrete"
-          }
+          "output_state": "minecraft:red_concrete"
         }
       ]
     }

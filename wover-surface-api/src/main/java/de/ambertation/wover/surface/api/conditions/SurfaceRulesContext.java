@@ -2,12 +2,15 @@ package de.ambertation.wover.surface.api.conditions;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.RandomState;
 
 /**
  * This interface is used to provide access to the surface rule context.
+ * <p>
+ * Since Minecraft 26.3 it is backed by {@link net.minecraft.world.level.levelgen.material.MaterialRuleContext},
+ * which replaced {@code SurfaceRules.Context}. The new context no longer keeps a reference to the chunk or
+ * to the {@code NoiseChunk} it is evaluated for, so {@code getChunk()} and {@code getNoiseChunk()} were
+ * removed from this interface.
  */
 public interface SurfaceRulesContext {
     /**
@@ -46,18 +49,6 @@ public interface SurfaceRulesContext {
      * @return the biome
      */
     Holder<Biome> getBiome();
-    /**
-     * Returns the chunk for the evaluated block
-     *
-     * @return the chunk
-     */
-    ChunkAccess getChunk();
-    /**
-     * Returns the noise chunk for the evaluated block
-     *
-     * @return the noise chunk
-     */
-    NoiseChunk getNoiseChunk();
     /**
      * Returns the depth of the stone above the evaluated block
      *

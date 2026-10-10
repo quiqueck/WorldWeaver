@@ -21,7 +21,8 @@ import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.MaterialRuleContext;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -147,8 +148,8 @@ public class SurfaceRuleGameTest {
                 original.seaLevel(),
                 original.disableMobGeneration(),
                 original.aquifers(),
-                original.oreVeins(),
-                original.useLegacyRandomSource()
+                original.useLegacyRandomSource(),
+                original.debugFunctions()
         );
 
         if (!(((Object) settings) instanceof SurfaceRuleProvider provider)) {
@@ -159,7 +160,7 @@ public class SurfaceRuleGameTest {
             return;
         }
 
-        final SurfaceRules.RuleSource before = provider.wover_getOriginalSurfaceRules();
+        final MaterialRule before = provider.wover_getOriginalSurfaceRules();
         if (before == null) {
             helper.fail(Component.literal(
                     "wover_getOriginalSurfaceRules() returned null - the @Shadow of "
@@ -207,16 +208,16 @@ public class SurfaceRuleGameTest {
     }
 
     /**
-     * Guards {@code SurfaceRulesContextAccessor} plus the access widener behind it.
+     * Guards {@code SurfaceRulesContextAccessor}.
      * <p>
      * Nothing else in this module calls {@link SurfaceRulesContext} on a path a headless test reaches -
      * custom noise conditions only see a context while a noise-based generator is painting a surface,
-     * and the gametest world is flat. Yet every accessor here is a 26.3 risk: {@code Context}'s field set
-     * changed, and {@code getBiome()} in particular is no longer a field accessor at all (the {@code biome}
-     * field turned into a lazily filled {@code Holder<Biome>}), so it is served by an access-widened
-     * method instead. If either the mixin or the access widener silently failed, every one of these would
-     * throw {@link AbstractMethodError} or {@link IllegalAccessError} the first time a mod's condition ran
-     * during world generation - far away from anything that would point at the cause.
+     * and the gametest world is flat. Yet every accessor here is a 26.3 risk: the 26.3 release replaced
+     * {@code SurfaceRules.Context} with {@link MaterialRuleContext}, and {@code getBiome()} in particular is
+     * not a field accessor at all (the {@code biome} field is a lazily filled {@code Holder<Biome>}), so it
+     * is served by vanilla's public method instead. If the mixin silently failed, every one of these would
+     * throw {@link AbstractMethodError} the first time a mod's condition ran during world generation - far
+     * away from anything that would point at the cause.
      * <p>
      * Reflecting over the interface catches that immediately: {@link Class#getMethod} only finds
      * <em>public</em> methods, so it proves both that the interface was injected and that each member is
@@ -224,12 +225,12 @@ public class SurfaceRuleGameTest {
      */
     @GameTest
     public void surfaceRuleContextImplementsTheWholeAccessorInterface(GameTestHelper helper) {
-        final Class<?> context = SurfaceRules.Context.class;
+        final Class<?> context = MaterialRuleContext.class;
         final List<String> failures = new ArrayList<>();
 
         if (!SurfaceRulesContext.class.isAssignableFrom(context)) {
             helper.fail(Component.literal(
-                    "SurfaceRules.Context does not implement SurfaceRulesContext - "
+                    "MaterialRuleContext does not implement SurfaceRulesContext - "
                             + "SurfaceRulesContextAccessor did not apply."
             ));
             return;
@@ -239,19 +240,19 @@ public class SurfaceRuleGameTest {
             try {
                 final Method impl = context.getMethod(declared.getName(), declared.getParameterTypes());
                 if (Modifier.isAbstract(impl.getModifiers())) {
-                    failures.add(declared.getName() + "() is still abstract on SurfaceRules.Context");
+                    failures.add(declared.getName() + "() is still abstract on MaterialRuleContext");
                 } else if (!impl.getReturnType().equals(declared.getReturnType())) {
                     failures.add(declared.getName() + "() returns " + impl.getReturnType().getName()
                             + ", the API declares " + declared.getReturnType().getName());
                 }
             } catch (NoSuchMethodException e) {
-                failures.add(declared.getName() + "() has no public implementation on SurfaceRules.Context");
+                failures.add(declared.getName() + "() has no public implementation on MaterialRuleContext");
             }
         }
 
         if (!failures.isEmpty()) {
             helper.fail(Component.literal(
-                    "SurfaceRulesContext is not fully backed by SurfaceRules.Context:\n - "
+                    "SurfaceRulesContext is not fully backed by MaterialRuleContext:\n - "
                             + String.join("\n - ", failures)
             ));
             return;
@@ -260,8 +261,8 @@ public class SurfaceRuleGameTest {
         helper.succeed();
     }
 
-    private static String encode(RegistryOps<JsonElement> ops, SurfaceRules.RuleSource rules) {
-        return SurfaceRules.RuleSource.DIRECT_CODEC
+    private static String encode(RegistryOps<JsonElement> ops, MaterialRule rules) {
+        return MaterialRule.DIRECT_CODEC
                 .encodeStart(ops, rules)
                 .getOrThrow(msg -> new AssertionError("Could not re-serialize surface rules: " + msg))
                 .toString();

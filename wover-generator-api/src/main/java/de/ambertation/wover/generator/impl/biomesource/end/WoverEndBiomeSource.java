@@ -26,7 +26,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
-import net.minecraft.world.level.levelgen.DensityFunction;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -323,7 +322,7 @@ public class WoverEndBiomeSource extends WoverBiomeSource implements
 
         int x = (SectionPos.blockToSectionCoord(posX) * 2 + 1) * 8;
         int z = (SectionPos.blockToSectionCoord(posZ) * 2 + 1) * 8;
-        double d = sampler.erosion().compute(new DensityFunction.SinglePointContext(x, posY, z));
+        double d = sampler.erosion().sampleValue(x, posY, z);
         if (dist <= (long) config.innerVoidRadiusSquared) {
             suggestedType = CommonBiomeTags.IS_END_CENTER;
         } else {

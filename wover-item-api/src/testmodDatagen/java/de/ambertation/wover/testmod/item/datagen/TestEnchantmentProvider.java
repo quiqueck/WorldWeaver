@@ -18,7 +18,7 @@ import net.minecraft.world.item.enchantment.EnchantmentTarget;
 import net.minecraft.world.item.enchantment.LevelBasedValue;
 import net.minecraft.world.item.enchantment.effects.*;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-import net.minecraft.world.level.storage.loot.providers.number.EnchantmentLevelProvider;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
 
 public class TestEnchantmentProvider extends WoverEnchantmentProvider {
     public TestEnchantmentProvider(ModCore modCore) {
@@ -59,7 +59,7 @@ public class TestEnchantmentProvider extends WoverEnchantmentProvider {
                                         new Ignite(LevelBasedValue.constant(100.0F))
                                 ),
                                 LootItemRandomChanceCondition.randomChance(
-                                        EnchantmentLevelProvider.forEnchantmentLevel(LevelBasedValue.perLevel(0.25F))
+                                        ContextFloatProviders.forEnchantmentLevel(LevelBasedValue.perLevel(0.25F))
                                 )
                         )
                         .withEffect(

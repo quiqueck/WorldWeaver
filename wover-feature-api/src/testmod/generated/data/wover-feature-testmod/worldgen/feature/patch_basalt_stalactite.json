@@ -15,10 +15,7 @@
       },
       "min_height": 0,
       "state": {
-        "type": "minecraft:simple_state_provider",
-        "state": {
-          "Name": "minecraft:smooth_basalt"
-        }
+        "id": "minecraft:smooth_basalt"
       },
       "transform": "size_decrease"
     },

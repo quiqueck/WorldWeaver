@@ -12,9 +12,7 @@
     },
     "then_run": {
       "type": "minecraft:block",
-      "result_state": {
-        "Name": "minecraft:oak_planks"
-      }
+      "result_state": "minecraft:oak_planks"
     }
   }
 }

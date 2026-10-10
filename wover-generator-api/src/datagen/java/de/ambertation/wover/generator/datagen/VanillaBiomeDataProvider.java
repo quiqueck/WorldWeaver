@@ -20,67 +20,76 @@ public class VanillaBiomeDataProvider extends WoverBiomeProvider {
         super(modCore);
     }
 
+    /**
+     * The weight every Biome without WoVer data gets (see {@link de.ambertation.wover.biome.api.data.BiomeData#genChance()}),
+     * i.e. the weight a Biome of any other mod competes with. Vanilla top-level Biomes use the same weight, so
+     * neither vanilla nor other mods are preferred over each other.
+     */
+    private static final float DEFAULT_CHANCE = 1.0f;
+
     @Override
     protected void bootstrap(BiomeBootstrapContext context) {
         final var END_HIGHLANDS = WoverBiomeBuilder.wrappedKey(Biomes.END_HIGHLANDS);
         END_HIGHLANDS.bootstrap(context)
-                     .genChance(0.20f)
+                     .genChance(DEFAULT_CHANCE)
                      .edgeSize(4)
                      .isEndHighlandBiome()
                      .register();
 
+        // Midlands and barrens are sub-biomes of the highlands: their weight is relative to the highlands'
+        // own weight, so they keep the established 0.20 : 0.05 : 0.03 ratio (80% : 20% : 12%).
         WoverBiomeBuilder.wrappedKey(Biomes.END_MIDLANDS)
                          .bootstrap(context)
-                         .genChance(0.05f)
+                         .genChance(DEFAULT_CHANCE * 0.25f)
                          .isEndMidlandBiome(END_HIGHLANDS)
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.END_BARRENS)
                          .bootstrap(context)
-                         .genChance(0.03f)
+                         .genChance(DEFAULT_CHANCE * 0.15f)
                          .isEndBarrensBiome(END_HIGHLANDS)
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.THE_END)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isEndCenterIslandBiome()
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.SMALL_END_ISLANDS)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isEndSmallIslandBiome()
                          .register();
 
 
         WoverBiomeBuilder.wrappedKey(Biomes.NETHER_WASTES)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isNetherBiome()
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.SOUL_SAND_VALLEY)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isNetherBiome()
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.BASALT_DELTAS)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isNetherBiome()
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.CRIMSON_FOREST)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isNetherBiome()
                          .register();
 
         WoverBiomeBuilder.wrappedKey(Biomes.WARPED_FOREST)
                          .bootstrap(context)
-                         .genChance(0.01f)
+                         .genChance(DEFAULT_CHANCE)
                          .isNetherBiome()
                          .register();
     }

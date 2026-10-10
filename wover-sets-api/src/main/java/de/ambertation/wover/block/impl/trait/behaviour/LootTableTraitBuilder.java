@@ -18,9 +18,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
@@ -97,11 +96,11 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
 
     @Override
     public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise) {
-        return dropWithSilktouch(otherwise, ConstantValue.exactly(1.0F));
+        return dropWithSilktouch(otherwise, ContextIntProviders.exactly(1));
     }
 
     @Override
-    public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, Holder<NumberProvider> amount) {
+    public @Nullable LootTableTrait dropWithSilktouch(ItemLike otherwise, Holder<ContextIntProvider> amount) {
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider)
                 -> provider.dropWithSilkTouch(block, otherwise, amount)
@@ -117,7 +116,7 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
     }
 
     @Override
-    public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull Holder<NumberProvider> count) {
+    public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, @NotNull Holder<ContextIntProvider> count) {
         if (!ModCore.isDatagen()) return null;
         return new Trait((tableKey, blockKey, block, provider)
                 -> provider.dropOre(block, drop.get(), count)
@@ -126,7 +125,7 @@ public class LootTableTraitBuilder extends AbstractBlockTraitBuilder<Block, Loot
 
     @Override
     public @Nullable LootTableTrait dropOre(@NotNull Supplier<Item> drop, int min, int max) {
-        return dropOre(drop, UniformGenerator.between(min, max));
+        return dropOre(drop, ContextIntProviders.between(min, max));
     }
 
     @Override

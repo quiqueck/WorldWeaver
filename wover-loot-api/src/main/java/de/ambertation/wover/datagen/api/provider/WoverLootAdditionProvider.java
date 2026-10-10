@@ -49,7 +49,7 @@ import org.jetbrains.annotations.NotNull;
  *         final LootAdditionFile.Builder file = LootAdditionFile.builder();
  *         file.forTables(BuiltInLootTables.RUINED_PORTAL, BuiltInLootTables.NETHER_BRIDGE)
  *             .addPool(LootPool.lootPool()
- *                              .setRolls(UniformGenerator.between(0, 4))
+ *                              .setRolls(ContextIntProviders.between(0, 4))
  *                              .add(LootItem.lootTableItem(MyBlocks.SHINY.asItem()).setWeight(1))
  *                              .add(EmptyLootItem.emptyItem().setWeight(9)));
  *         consumer.accept(modCore.id("portal_chests"), file);

@@ -1,9 +1,9 @@
 package de.ambertation.wover.surface.api;
 
 import net.minecraft.data.worldgen.BootstrapContext;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 import org.jetbrains.annotations.ApiStatus;
 
@@ -12,14 +12,14 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * Instances of this class should never get created direct, they are built when a
  * SurfaceRule is added to the registry using
- * {@link SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, SurfaceRules.RuleSource)}
+ * {@link SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, MaterialRule)}
  * or {@link SurfaceRuleBuilder#register(BootstrapContext, ResourceKey)}
  */
 public class AssignedSurfaceRule {
     /**
      * The rule source of this rule.
      */
-    public final SurfaceRules.RuleSource ruleSource;
+    public final MaterialRule ruleSource;
     /**
      * The biome ID of this rule.
      */
@@ -36,11 +36,11 @@ public class AssignedSurfaceRule {
      * @param ruleSource The rule source of this rule.
      * @param biomeID    The biome ID of this rule.
      * @param priority   The priority of this rule. Rules with higher priority will be first in the sequence.
-     * @see SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, SurfaceRules.RuleSource)
+     * @see SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, MaterialRule)
      * @see SurfaceRuleBuilder#register(BootstrapContext, ResourceKey)
      */
     @ApiStatus.Internal
-    protected AssignedSurfaceRule(SurfaceRules.RuleSource ruleSource, Identifier biomeID, int priority) {
+    protected AssignedSurfaceRule(MaterialRule ruleSource, Identifier biomeID, int priority) {
         this.ruleSource = ruleSource;
         this.biomeID = biomeID;
         this.priority = priority;

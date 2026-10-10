@@ -10,7 +10,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -243,6 +245,84 @@ class ModMetadataIntegrityTest {
         assertTrue(
                 problems.isEmpty(),
                 "mixin configs list mixins whose class does not exist:\n  " + String.join("\n  ", problems)
+        );
+    }
+    /** Resolves a binary class name to its committed {@code .java} file, or {@code null}. */
+    private static Path sourceOf(Path repo, String binaryName) {
+        String relative = binaryName.split("\\$")[0].replace('.', '/') + ".java";
+        for (Path module : moduleRoots(repo)) {
+            for (String set : SOURCE_SETS) {
+                Path p = module.resolve("src").resolve(set).resolve("java").resolve(relative);
+                if (Files.isRegularFile(p)) return p;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Every class that defines a datapack registry through {@code DatapackRegistryBuilder.register(...)} has
+     * to be initialized from a {@code wover.datapack.registry} entrypoint, not (only) from a {@code main}
+     * entrypoint.
+     *
+     * <p>{@code RegistryDataLoader} captures its list of world registries once, in its static initializer,
+     * and our mixin pulls the {@code wover.datapack.registry} entrypoints in from exactly there. A
+     * {@code main} entrypoint, however, may run after that class was already loaded by another mod's
+     * {@code main} entrypoint - TerraBlender does so through Fabric's {@code DynamicRegistries.register}.
+     * A registry added that late is silently missing from every world. That is how
+     * {@code wover/world_preset_info} went missing whenever TerraBlender was installed ("WorldPresetInfoRegistry:
+     * Registry not read" on world creation, and the wrong per-dimension preset written to the world).
+     *
+     * <p>Checked structurally: the defining class's simple name must appear in the source of a class that is
+     * declared as a {@code wover.datapack.registry} entrypoint (or be that class itself).
+     */
+    @Test
+    void everyDatapackRegistryIsRegisteredFromTheDatapackRegistryEntrypoint() {
+        Path repo = repoRoot();
+        Set<Path> entrypointSources = new HashSet<>();
+        List<String> entrypointCode = new ArrayList<>();
+        for (Path json : modJsons(repo)) {
+            JsonObject root = read(json);
+            if (!root.has("entrypoints")) continue;
+            for (String raw : stringsOf(root.getAsJsonObject("entrypoints").get("wover.datapack.registry"))) {
+                Path src = sourceOf(repo, raw.split("::")[0].trim());
+                if (src == null) continue; // reported by everyFabricModJsonEntrypointResolvesToACommittedClass
+                entrypointSources.add(src);
+                try {
+                    entrypointCode.add(Files.readString(src));
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+        }
+        assertFalse(entrypointSources.isEmpty(), "found no wover.datapack.registry entrypoints");
+
+        List<String> problems = new ArrayList<>();
+        int checked = 0;
+        for (Path module : moduleRoots(repo)) {
+            for (String set : SOURCE_SETS) {
+                Path java = module.resolve("src").resolve(set).resolve("java");
+                if (!Files.isDirectory(java)) continue;
+                try (Stream<Path> s = Files.walk(java)) {
+                    for (Path file : s.filter(p -> p.toString().endsWith(".java")).toList()) {
+                        if (!Files.readString(file).contains("DatapackRegistryBuilder.register(")) continue;
+                        checked++;
+                        if (entrypointSources.contains(file)) continue;
+                        String simpleName = file.getFileName().toString().replace(".java", "");
+                        if (entrypointCode.stream().noneMatch(code -> code.contains(simpleName + "."))) {
+                            problems.add(repo.relativize(file).toString());
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+        }
+        assertTrue(checked > 0, "found no DatapackRegistryBuilder.register(...) calls - did the API move?");
+        assertTrue(
+                problems.isEmpty(),
+                "these classes define a datapack registry but are not initialized from a wover.datapack.registry "
+                        + "entrypoint, so the registry is lost whenever RegistryDataLoader is loaded before our main "
+                        + "entrypoint runs:\n  " + String.join("\n  ", problems)
         );
     }
 }

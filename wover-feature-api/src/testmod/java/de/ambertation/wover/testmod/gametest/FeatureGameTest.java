@@ -268,7 +268,7 @@ public class FeatureGameTest {
 
         // A deliberately tiny patch, so everything it writes stays inside the test structure.
         final Holder<PlacedFeature> inner = PlacementUtils.inlinePlaced(
-                new SimpleBlockFeature(BlockStateProvider.simple(Blocks.AMETHYST_BLOCK)),
+                new SimpleBlockFeature(BlockStateProvider.of(Blocks.AMETHYST_BLOCK)),
                 BlockPredicateFilter.forPredicate(BlockPredicate.ONLY_IN_AIR_PREDICATE)
         );
         final RandomPatchFeature patch = new RandomPatchFeature(24, 1, 0, inner);

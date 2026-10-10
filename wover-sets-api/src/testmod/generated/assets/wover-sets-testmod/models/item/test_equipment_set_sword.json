@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "wover-sets-testmod:item/test_equipment_set_sword"
+  }
+}

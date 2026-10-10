@@ -1,5 +1,6 @@
 package de.ambertation.wover.datagen.api.provider;
 
+import de.ambertation.wover.block.api.trait.CompostTier;
 import de.ambertation.wover.block.api.trait.CompostableTrait;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.datagen.api.WoverDataProvider;
@@ -18,9 +19,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Compostable;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
-import net.minecraft.world.level.storage.loot.providers.number.NumberProviders;
-import net.minecraft.world.level.storage.loot.providers.number.ResolvableNumber;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
@@ -30,10 +30,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.concurrent.CompletableFuture;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +50,7 @@ import org.jetbrains.annotations.NotNull;
  * <ul>
  *     <li>{@code compostable=<chance>} - resolved first from the item's vanilla {@code minecraft:compostable}
  *     data component (26.3's replacement for the removed {@code ComposterBlock.COMPOSTABLES} map, see
- *     {@link #VANILLA_COMPOST_CHANCES}) and, failing that, from a {@link CompostableTrait} runtime trait
+ *     {@link #COMPOST_CHANCES}) and, failing that, from a {@link CompostableTrait} runtime trait
  *     attached to the item directly (the mechanism modded items use, since they never carry the vanilla
  *     component); {@code -} when the item is not compostable by either source.</li>
  * </ul>
@@ -98,25 +100,25 @@ public class WoverItemRegistrationsProvider implements WoverDataProvider<DataPro
     }
 
     /**
-     * The five composting tiers vanilla ships, mapped back to the {@code 0..1} chance the old
-     * {@code ComposterBlock.COMPOSTABLES} map stored for them.
+     * The composting tiers, mapped back to the {@code 0..1} chance the old {@code ComposterBlock.COMPOSTABLES}
+     * map stored for them.
      * <p>
      * 26.3 removed that map entirely: composting is now data-driven through the {@code minecraft:compostable}
-     * item component, which references a {@code minecraft:number_provider} by key instead of storing a float.
-     * The five vanilla keys are built by {@code NumberProviders#bootstrap} from the very same percentages the
+     * item component, which references a {@code minecraft:context_int_provider} by key instead of storing a float.
+     * The five vanilla keys are built by {@code ContextIntProviders#bootstrap} from the very same percentages the
      * 26.1 map used ({@code LOW}=30, {@code LOW_MEDIUM}=50, {@code MEDIUM}=65, {@code MEDIUM_HIGH}=85,
      * {@code ALWAYS_ADD_ONE}=100), so translating back is exact rather than approximate - and it keeps the
      * {@code compostable=} column directly comparable against the committed 26.1 golden file, which is the
-     * whole point of this audit. A key outside this set (a modded or future tier) has no float equivalent and
-     * is emitted as its identifier instead, see {@link #compostable(Item)}.
+     * whole point of this audit.
+     * <p>
+     * Derived from {@link CompostTier} rather than written out again, so WoVer's own {@code very_low} tier is
+     * reported as {@code 0.1} like every other rate instead of leaking a registry id into the column. A key
+     * outside the set (a foreign or future tier) still has no float equivalent and is emitted as its
+     * identifier, see {@link #compostable(Map, Item)}.
      */
-    private static final Map<ResourceKey<NumberProvider>, Float> VANILLA_COMPOST_CHANCES = Map.of(
-            NumberProviders.COMPOSTABLE_LOW, 0.3f,
-            NumberProviders.COMPOSTABLE_LOW_MEDIUM, 0.5f,
-            NumberProviders.COMPOSTABLE_MEDIUM, 0.65f,
-            NumberProviders.COMPOSTABLE_MEDIUM_HIGH, 0.85f,
-            NumberProviders.COMPOSTABLE_ALWAYS_ADD_ONE, 1.0f
-    );
+    private static final Map<ResourceKey<ContextIntProvider>, Float> COMPOST_CHANCES = Arrays
+            .stream(CompostTier.values())
+            .collect(Collectors.toUnmodifiableMap(tier -> tier.layers, tier -> tier.chance));
 
     /**
      * The vanilla composting value of an item, read off its {@code minecraft:compostable} data component (26.3's
@@ -135,13 +137,13 @@ public class WoverItemRegistrationsProvider implements WoverDataProvider<DataPro
         if (components == null) return null;
         final Compostable compostable = components.get(DataComponents.COMPOSTABLE);
         if (compostable == null) return null;
-        final ResolvableNumber layers = compostable.layers();
-        // 26.3 turned Compostable#layers() into a ResolvableNumber - either a bare Constant chance or a
-        // Reference to a NumberProvider (what the vanilla tiers below are).
+        final ResolvableInt layers = compostable.layers();
+        // 26.3 turned Compostable#layers() into a ResolvableInt - either a bare Constant layer count or a
+        // Reference to a ContextIntProvider (what the vanilla tiers below are).
         // Locale-independent (Float.toString uses '.'), so the file is byte-identical across locales.
-        if (layers instanceof ResolvableNumber.Constant constant) return Float.toString(constant.value());
-        final ResourceKey<NumberProvider> key = ((ResolvableNumber.Reference) layers).key();
-        final Float chance = VANILLA_COMPOST_CHANCES.get(key);
+        if (layers instanceof ResolvableInt.Constant constant) return Float.toString((float) constant.value());
+        final ResourceKey<ContextIntProvider> key = ((ResolvableInt.Reference) layers).key();
+        final Float chance = COMPOST_CHANCES.get(key);
         if (chance != null) return Float.toString(chance);
         return key.identifier().toString();
     }

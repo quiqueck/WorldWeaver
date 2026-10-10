@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Rotation;
@@ -72,8 +73,8 @@ public class SingleEndPoolElement extends SinglePoolElement {
     ) {
         //in the end, we don't want to generate anything below y=5
         if (blockPos.getY() < 5) return false;
-        boolean hasEmptySpace = worldGenLevel.isEmptyBlock(blockPos.above(2)) || worldGenLevel.isEmptyBlock(blockPos);
-        if (!hasEmptySpace)
+        //don't place pieces that are buried inside the terrain (quiqueck/BetterEnd#246)
+        if (!hasEmptySpace(worldGenLevel, chunkGenerator, blockPos))
             return false;
 
         return super.place(
@@ -89,6 +90,25 @@ public class SingleEndPoolElement extends SinglePoolElement {
                 liquidSettings,
                 bl
         );
+    }
+
+    /**
+     * Whether the piece origin (or the block two above it) is air in the generated terrain.
+     * <p>
+     * A piece is placed chunk by chunk, and its origin can lie two chunks away from the chunk that is
+     * currently decorated (village streets are up to 22 blocks long). Reading the world there is outside
+     * the region worldgen may access, and since the world looks different depending on which chunk is
+     * being generated, the piece could be placed in some chunks and cut off in others. The base terrain
+     * column of the chunk generator is the same no matter which chunk asks, so the decision is too.
+     */
+    public static boolean hasEmptySpace(WorldGenLevel worldGenLevel, ChunkGenerator chunkGenerator, BlockPos blockPos) {
+        final NoiseColumn column = chunkGenerator.getBaseColumn(
+                blockPos.getX(),
+                blockPos.getZ(),
+                worldGenLevel,
+                worldGenLevel.getLevel().getChunkSource().randomState()
+        );
+        return column.getBlock(blockPos.getY() + 2).isAir() || column.getBlock(blockPos.getY()).isAir();
     }
 
     @Override

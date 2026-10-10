@@ -10,6 +10,8 @@ import de.ambertation.wover.entrypoint.LibWoverWorldGenerator;
 import de.ambertation.wover.generator.impl.biomesource.WoverBiomeSourceImpl;
 import de.ambertation.wover.state.api.WorldState;
 
+import net.minecraft.world.level.biome.Climate;
+import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -149,6 +151,27 @@ public abstract class WoverBiomeSource extends BiomeSource implements
      */
     protected boolean wasBound() {
         return didCreatePickers;
+    }
+
+    /**
+     * Picks the biome for a quart position.
+     * <p>
+     * Up to the 26.3 snapshots this overrode {@code BiomeSource#getNoiseBiome(int, int, int, Climate.Sampler)}.
+     * The 26.3 release replaced that method with {@link #createResolver(Climate.Sampler)}, which hands out a
+     * {@link BiomeResolver}; WorldWeaver's resolver simply delegates back here, so subclasses keep implementing
+     * this method.
+     *
+     * @param biomeX  the quart x position
+     * @param biomeY  the quart y position
+     * @param biomeZ  the quart z position
+     * @param sampler the climate sampler
+     * @return the biome at that position
+     */
+    public abstract Holder<Biome> getNoiseBiome(int biomeX, int biomeY, int biomeZ, Climate.Sampler sampler);
+
+    @Override
+    public BiomeResolver createResolver(Climate.Sampler sampler) {
+        return (biomeX, biomeY, biomeZ) -> getNoiseBiome(biomeX, biomeY, biomeZ, sampler);
     }
 
     /**
@@ -397,7 +420,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
 
         this.reloadBiomes();
         if (biomesAdded > 0) {
-            LibWoverWorldGenerator.C.log.info("Merged {} biomes to {} in {}", biomesAdded, toShortString(), sw);
+            LibWoverWorldGenerator.C.log.verbose("Merged {} biomes to {} in {}", biomesAdded, toShortString(), sw);
         }
         return this;
     }

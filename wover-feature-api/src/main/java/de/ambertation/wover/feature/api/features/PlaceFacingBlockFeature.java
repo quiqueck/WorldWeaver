@@ -59,7 +59,7 @@ public class PlaceFacingBlockFeature extends PlaceBlockFeature {
      * @param dir   The allowed directions to place the block in.
      */
     public PlaceFacingBlockFeature(BlockState state, List<Direction> dir) {
-        this(BlockStateProvider.simple(state), dir);
+        this(BlockStateProvider.of(state), dir);
     }
 
     /**

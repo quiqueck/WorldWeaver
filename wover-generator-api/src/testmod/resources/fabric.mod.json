@@ -18,6 +18,7 @@
   "entrypoints": {
     "main": [
       "de.ambertation.wover.testmod.entrypoint.TestModWoverWorldGenerator",
+      "de.ambertation.wover.test.api.gametest.CompatWorldgenBootCheck",
       "de.ambertation.wover.testmod.entrypoint.WorldPresetStickBootCheck"
     ],
     "fabric-datagen": [
@@ -28,15 +29,17 @@
     ],
     "fabric-gametest": [
       "de.ambertation.wover.testmod.gametest.GeneratorGameTest",
-      "de.ambertation.wover.testmod.gametest.NetherPresetGameTest"
+      "de.ambertation.wover.testmod.gametest.NetherPresetGameTest",
+      "de.ambertation.wover.testmod.gametest.BiomePickerOrderGameTest",
+      "de.ambertation.wover.testmod.gametest.DisabledBiomeGameTest",
+      "de.ambertation.wover.testmod.gametest.VanillaBiomeWeightGameTest"
     ]
   },
   "mixins": [],
   "depends": {
     "fabricloader": ">=0.19.0",
     "minecraft": [
-        "26.3",
-        "26.3-alpha.6"
+        "26.3"
     ],
     "java": ">=25",
     "fabric-api": ">=0.155.0"

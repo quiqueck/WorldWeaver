@@ -6,18 +6,11 @@
     "collection": [
       {
         "type": "minecraft:block",
-        "result_state": {
-          "Name": "minecraft:deepslate",
-          "Properties": {
-            "axis": "y"
-          }
-        }
+        "result_state": "minecraft:deepslate"
       },
       {
         "type": "minecraft:block",
-        "result_state": {
-          "Name": "minecraft:blackstone"
-        }
+        "result_state": "minecraft:blackstone"
       }
     ],
     "selector": {

@@ -234,7 +234,8 @@ public class VersionChecker implements Runnable {
 
                         boolean isNew = TEST_UPDATE_SCREEN || installedVersion.isLessThan(mod.v)
                                 && !installedVersion.equals("0.0.0");
-                        LibWoverUi.C.LOG.info(" - " + mod.n + ":" + mod.v + (isNew ? " (update available)" : ""));
+                        if (isNew) LibWoverUi.C.LOG.info(" - " + mod.n + ":" + mod.v + " (update available)");
+                        else LibWoverUi.C.LOG.verbose(" - " + mod.n + ":" + mod.v);
                         if (isNew)
                             NEW_VERSIONS.add(mod);
                     }

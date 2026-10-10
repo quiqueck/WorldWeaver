@@ -20,9 +20,7 @@
           },
           "then_run": {
             "type": "minecraft:block",
-            "result_state": {
-              "Name": "minecraft:orange_concrete"
-            }
+            "result_state": "minecraft:orange_concrete"
           }
         }
       },
@@ -37,9 +35,7 @@
         },
         "then_run": {
           "type": "minecraft:block",
-          "result_state": {
-            "Name": "minecraft:lime_concrete"
-          }
+          "result_state": "minecraft:lime_concrete"
         }
       }
     ]

@@ -8,7 +8,8 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.SurfaceRules.RuleSource;
+import net.minecraft.world.level.levelgen.material.MaterialRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * Simplifies surface rule building and registration.
  * <p>
  * If you do not want to use the surface Builder, you can use
- * {@link SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, RuleSource, int)}
+ * {@link SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, MaterialRule, int)}
  * directly to register arbitrary rule sources.
  */
 public interface SurfaceRuleBuilder extends BaseSurfaceRuleBuilder<SurfaceRuleBuilder> {
@@ -57,16 +58,16 @@ public interface SurfaceRuleBuilder extends BaseSurfaceRuleBuilder<SurfaceRuleBu
     /**
      * Finalise rule building process.
      * <p>
-     * Since Minecraft 26.3 {@link net.minecraft.world.level.levelgen.SurfaceRules#isBiome(HolderGetter, ResourceKey...)}
+     * Since Minecraft 26.3 {@link MaterialRules#isBiome(HolderGetter, ResourceKey...)}
      * resolves its biome keys into a {@link net.minecraft.core.HolderSet} rather than keeping the raw
      * keys, so composing the biome filter now requires a biome lookup. Inside a registry bootstrap use
      * {@code ctx.lookup(Registries.BIOME)}; at runtime use the {@link net.minecraft.core.RegistryAccess}.
      *
      * @param biomes The lookup used to resolve {@link #biomeKey()}. Only consulted when a biome filter
      *               was set on this builder.
-     * @return {@link RuleSource}.
+     * @return {@link MaterialRule}.
      */
-    RuleSource build(HolderGetter<Biome> biomes);
+    MaterialRule build(HolderGetter<Biome> biomes);
 
     /**
      * Register rule in the {@link SurfaceRuleRegistry} with the currently set sort priority (see {@link #sortPriority}).
@@ -74,7 +75,7 @@ public interface SurfaceRuleBuilder extends BaseSurfaceRuleBuilder<SurfaceRuleBu
      * @param ctx The {@link BootstrapContext} to register the rule with.
      * @param key The {@link ResourceKey} to register the rule with.
      * @return The {@link Holder} for the registry item.
-     * @see SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, RuleSource, int)
+     * @see SurfaceRuleRegistry#register(BootstrapContext, ResourceKey, ResourceKey, MaterialRule, int)
      */
 
     Holder<AssignedSurfaceRule> register(

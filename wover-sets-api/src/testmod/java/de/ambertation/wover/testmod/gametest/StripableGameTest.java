@@ -1,5 +1,8 @@
 package de.ambertation.wover.testmod.gametest;
 
+import net.minecraft.world.item.component.BlockTransformers;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Holder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.BlockTransformer;
@@ -60,16 +63,20 @@ public class StripableGameTest {
 
         // The transform is appended to the item's *default* components, so it has to be visible on a plain
         // stack. Checking this separately tells a failed strip apart from a missing component.
-        final BlockTransformer transformer = Items.DIAMOND_AXE.components().get(DataComponents.BLOCK_TRANSFORMER);
+        final Holder<BlockTransformer> transformer = Items.DIAMOND_AXE.components().get(DataComponents.BLOCK_TRANSFORMER);
+        // Since the 26.3 release the vanilla axe mapping lives in the minecraft:block_transformer registry.
+        final int vanillaAxeEntries = helper.getLevel().registryAccess()
+                                            .lookupOrThrow(Registries.BLOCK_TRANSFORMER)
+                                            .getOrThrow(BlockTransformers.AXE)
+                                            .value().transforms().size();
         if (transformer == null) {
             failures.add("minecraft:diamond_axe carries no minecraft:block_transformer component at all");
-        } else if (transformer.transforms().size()
-                <= net.minecraft.world.item.component.BlockTransformerMappings.AXE.transforms().size()) {
+        } else if (transformer.value().transforms().size() <= vanillaAxeEntries) {
             failures.add(
                     "minecraft:diamond_axe's block_transformer has "
-                            + transformer.transforms().size()
+                            + transformer.value().transforms().size()
                             + " entries, i.e. no more than vanilla's "
-                            + net.minecraft.world.item.component.BlockTransformerMappings.AXE.transforms().size()
+                            + vanillaAxeEntries
                             + " - StripableBlockTransformers never appended anything"
             );
         }

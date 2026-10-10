@@ -36,13 +36,13 @@ public class ForSimpleBlockImpl extends FeatureConfiguratorImpl implements ForSi
 
     @Override
     public ForSimpleBlock block(Block block) {
-        return block(BlockStateProvider.simple(block));
+        return block(BlockStateProvider.of(block));
     }
 
 
     @Override
     public ForSimpleBlock block(BlockState state) {
-        return block(BlockStateProvider.simple(state));
+        return block(BlockStateProvider.of(state));
     }
 
     /**
