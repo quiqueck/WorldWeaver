@@ -26,7 +26,8 @@
       "de.ambertation.wover.testmod.entrypoint.client.TestModWoverStructureClient"
     ],
     "fabric-gametest": [
-      "de.ambertation.wover.testmod.gametest.StructureGameTest"
+      "de.ambertation.wover.testmod.gametest.StructureGameTest",
+      "de.ambertation.wover.testmod.gametest.SingleEndPoolElementGameTest"
     ]
   },
   "mixins": [],

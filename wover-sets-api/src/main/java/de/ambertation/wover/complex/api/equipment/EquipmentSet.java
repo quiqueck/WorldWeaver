@@ -138,8 +138,8 @@ public abstract class EquipmentSet {
 
     /**
      * Registers the default item for {@code slot} (an {@link AxeItem}/{@link HoeItem}/{@link ShovelItem}/
-     * {@link ShearsItem}, or a plain digger {@link Item} for pickaxe/sword/hammer), with an auto-generated
-     * crafting recipe.
+     * {@link ShearsItem}, a plain digger {@link Item} for pickaxe/sword/hammer, or a plain {@link Item} without a
+     * tool component for the spear), with an auto-generated crafting recipe.
      *
      * @param slot the tool slot to register
      * @param <I>  unused type parameter, kept for API symmetry with the other overloads
@@ -190,11 +190,20 @@ public abstract class EquipmentSet {
                             commonToolProperties(definition.getProperties())),
                     recipeOverride
             );
+        } else if (slot == ToolSlot.SPEAR_SLOT) {
+            // Like vanilla's Item.Properties#spear: no minecraft:tool component. The spear's attack attributes,
+            // kinetic/piercing components and durability all come from the slot's ConfigureSpearItemTrait; a
+            // tool(...) call here would overwrite them and, as spear values carry no mining tag, add a tool rule
+            // backed by a HolderSet.Named without a tag key (quiqueck/BetterEnd#601).
+            add(
+                    slot, (definition, values) -> new Item(commonToolProperties(definition.getProperties())),
+                    recipeOverride
+            );
         } else add(
                 slot, (definition, values) -> new Item(
                         commonToolProperties(definition.getProperties()).tool(
                                 this.toolTier.toolMaterial,
-                                values.minableWithTag(),
+                                ToolTier.requireMinableTag(slot, this.toolTier, values),
                                 values.attackDamage(), values.attackSpeed(), values.disableBlockingForSeconds()
                         )),
                 recipeOverride

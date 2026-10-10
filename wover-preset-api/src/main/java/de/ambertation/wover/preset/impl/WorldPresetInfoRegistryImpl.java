@@ -23,8 +23,18 @@ public class WorldPresetInfoRegistryImpl {
         BOOTSTRAP_WORLD_PRESET_INFO_REGISTRY.emit(c -> c.bootstrap(ctx));
     }
 
+    private static boolean didInit = false;
+
+    /**
+     * Registers the datapack registry. Called from the {@code wover.datapack.registry} entrypoint (see
+     * {@link de.ambertation.wover.entrypoint.PresetDatapackRegistryEntrypoint} for why that one is the
+     * one that matters) and again from the {@code main} entrypoint, so it has to be idempotent.
+     */
     @ApiStatus.Internal
     public static void initialize() {
+        if (didInit) return;
+        didInit = true;
+
         DatapackRegistryBuilder.register(
                 WorldPresetInfoRegistry.WORLD_PRESET_INFO_REGISTRY,
                 WorldPresetInfoImpl.CODEC,

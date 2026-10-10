@@ -28,7 +28,7 @@ body:
     attributes:
       label: WorldWeaver (Wover)
       description: What version of WorldWeaver are you running?
-      placeholder: 26.101.2
+      placeholder: 26.101.3
     validations:
       required: true
   - type: input

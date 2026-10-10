@@ -100,12 +100,25 @@ public class DatapackRegistryBuilderImpl {
             throw new IllegalStateException("Registry with id " + key.identifier() + " was already registered!");
         }
 
+        if (didCaptureRegistryList) {
+            // RegistryDataLoader captures the registry list once, in its static initializer. Anything added
+            // after that is never loaded, and every lookup of it fails later on with a much less obvious
+            // error. Register from the wover.datapack.registry entrypoint instead of a main entrypoint.
+            LibWoverCore.C.log.error(
+                    "Dynamic registry " + key.identifier() + " was registered after the world registry list was "
+                            + "built and will not be loaded. Register it from the 'wover.datapack.registry' entrypoint."
+            );
+        }
+
         LibWoverCore.C.log.debug("Adding dynamic registry: " + key.identifier());
         REGISTRIES.add(new Entry<>(key, elementCodec, bootstrap), priority);
     }
 
+    private static boolean didCaptureRegistryList = false;
+
     public static void forEach(BiConsumer<ResourceKey<? extends Registry<?>>, Codec<?>> consumer) {
         initEntrypoints();
+        didCaptureRegistryList = true;
         REGISTRIES.forEach(entry -> {
             consumer.accept(entry.key, entry.elementCodec);
         });

@@ -1,6 +1,6 @@
 package de.ambertation.wover.ui.impl.client;
 
-import de.ambertation.wunderlib.ui.ColorHelper;
+import de.ambertation.wunderlib.utils.ColorUtilARGB32;
 import de.ambertation.wunderlib.ui.layout.components.*;
 import de.ambertation.wunderlib.ui.layout.values.Size;
 import de.ambertation.wover.config.api.client.ClientConfigs;
@@ -34,7 +34,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
         content.addSpacer(16);
         HorizontalStack headerRow = content.addRow(fit(), fit()).setDebugName("title bar").centerHorizontal();
 
-        headerRow.addText(fit(), fit(), title).centerHorizontal().setColor(ColorHelper.WHITE).setDebugName("title");
+        headerRow.addText(fit(), fit(), title).centerHorizontal().setColor(ColorUtilARGB32.WHITE).setDebugName("title");
         headerRow.addImage(fixed(178 / 2), fixed(40 / 2), BETTERX_LOCATION, Size.of(178, 40)).setDebugName("betterx");
         content.addSpacer(16);
 
@@ -63,7 +63,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
                         fit(),
                         translatable("description.config.wover.client.general.check_for_new_versions")
                 )
-                .setColor(ColorHelper.GRAY);
+                .setColor(ColorUtilARGB32.GRAY);
         dscBox.addSpacer(8);
 
         // Hide Experimental Dialog
@@ -82,7 +82,7 @@ public class WelcomeScreen extends WoverLayoutScreen {
                       fit(),
                       translatable("description.config.wover.client.loading.disable_experimental_warning")
               )
-              .setColor(ColorHelper.GRAY);
+              .setColor(ColorUtilARGB32.GRAY);
         dscBox.addSpacer(8);
 
         // Use BetterX WorldType
@@ -100,32 +100,52 @@ public class WelcomeScreen extends WoverLayoutScreen {
                       translatable("warning.config.wover.client.general.force_betterx_world_type")
                               .setStyle(Style.EMPTY
                                       .withBold(true)
-                                      .withColor(ColorHelper.RED)
+                                      .withColor(ColorUtilARGB32.RED)
                               )
                               .append(translatable(
                                       "description.config.wover.client.general.force_betterx_world_type").setStyle(
                                       Style.EMPTY
                                               .withBold(false)
-                                              .withColor(ColorHelper.GRAY))
+                                              .withColor(ColorUtilARGB32.GRAY))
                               )
               )
-              .setColor(ColorHelper.GRAY);
+              .setColor(ColorUtilARGB32.GRAY);
         dscBox.addSpacer(8);
 
         innerContent.addSpacer(16);
         innerContent.addButton(fit(), fit(), CommonComponents.GUI_PROCEED).onPress((bt) -> {
-            ClientConfigs.CLIENT.didPresentWelcomeScreen.set(true);
             ClientConfigs.CLIENT.checkForNewVersions.set(check.isChecked());
             ClientConfigs.CLIENT.disableExperimentalWarning.set(experimental.isChecked());
             ClientConfigs.CLIENT.forceBetterXPreset.set(betterx.isChecked());
-            ClientConfigs.CLIENT.save();
-
-            ClientWorldLifecycleImpl.AFTER_WELCOME_SCREEN.emit(c -> c.didPresent());
-
-            VersionChecker.startCheck(true);
             onClose();
         }).alignRight();
         return VerticalScroll.create(fill(), fill(), content).setScrollerPadding(0);
+    }
+
+    /**
+     * Every way of leaving the screen counts as having seen it - not just "Proceed", but also Escape. Before,
+     * only "Proceed" saved, and closing the screen any other way brought it back on the next start (#31).
+     */
+    @Override
+    public void onClose() {
+        markPresented();
+        super.onClose();
+    }
+
+    /**
+     * Records that the welcome screen was presented and persists the client config (the checkboxes write their
+     * state through as they are toggled, so the choices made so far are saved as well). Does nothing once the
+     * flag is set, so closing the screen twice does not emit {@code AFTER_WELCOME_SCREEN} twice.
+     */
+    static void markPresented() {
+        if (ClientConfigs.CLIENT.didPresentWelcomeScreen.get()) return;
+
+        ClientConfigs.CLIENT.didPresentWelcomeScreen.set(true);
+        ClientConfigs.CLIENT.save();
+
+        ClientWorldLifecycleImpl.AFTER_WELCOME_SCREEN.emit(c -> c.didPresent());
+
+        VersionChecker.startCheck(ClientConfigs.CLIENT.checkForNewVersions.get());
     }
 
     private void addSeparator(VerticalStack innerContent, Identifier image) {

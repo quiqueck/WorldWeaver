@@ -1,20 +1,14 @@
 package de.ambertation.wover.structure.api.structures.nbt;
 
-import de.ambertation.wover.block.api.BlockHelper;
 import de.ambertation.wover.structure.impl.StructureManagerImpl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.StructureManager;
-import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
@@ -22,15 +16,10 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.BlockIgnorePr
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
-import com.google.common.collect.ImmutableList;
-
-import java.util.List;
-
 /**
  * The {@link TemplateStructurePiece} placed by {@link de.ambertation.wover.structure.api.structures.nbt.RandomNbtStructure}.
- * It behaves like a normal template piece, but additionally marks its four bounding-box corners and its
- * pivot with oxidized copper/amethyst/netherite debug blocks during {@link #postProcess} (useful while
- * tuning a {@link de.ambertation.wover.structure.api.structures.StructurePlacement}).
+ * It behaves like a normal template piece; the rotation, mirror, pivot and keep-air flag are persisted
+ * with the piece so it can be re-placed identically after a reload.
  */
 public class RandomNbtStructurePiece extends TemplateStructurePiece {
     private final boolean keepAir;
@@ -162,45 +151,5 @@ public class RandomNbtStructurePiece extends TemplateStructurePiece {
             BoundingBox boundingBox
     ) {
 
-    }
-
-    @Override
-    public void postProcess(
-            WorldGenLevel worldGenLevel,
-            StructureManager structureManager,
-            ChunkGenerator chunkGenerator,
-            RandomSource randomSource,
-            BoundingBox writableBounds,
-            ChunkPos chunkPos,
-            BlockPos blockPos
-    ) {
-        super.postProcess(
-                worldGenLevel,
-                structureManager,
-                chunkGenerator,
-                randomSource,
-                writableBounds,
-                chunkPos,
-                blockPos
-        );
-        List<BlockPos> list2 = ImmutableList.of(
-                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.minZ()),
-                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.minZ()),
-                new BlockPos(writableBounds.minX(), blockPos.getY(), writableBounds.maxZ()),
-                new BlockPos(writableBounds.maxX(), blockPos.getY(), writableBounds.maxZ())
-        );
-
-        list2.forEach(pos -> worldGenLevel.setBlock(
-                pos,
-                Blocks.OXIDIZED_COPPER.defaultBlockState(),
-                BlockHelper.SET_SILENT
-        ));
-
-        worldGenLevel.setBlock(templatePosition, Blocks.AMETHYST_BLOCK.defaultBlockState(), BlockHelper.SET_SILENT);
-        worldGenLevel.setBlock(
-                templatePosition.offset(this.placeSettings.getRotationPivot()),
-                Blocks.NETHERITE_BLOCK.defaultBlockState(),
-                BlockHelper.SET_SILENT
-        );
     }
 }

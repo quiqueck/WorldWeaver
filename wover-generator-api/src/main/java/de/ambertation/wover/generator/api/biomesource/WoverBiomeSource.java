@@ -397,7 +397,7 @@ public abstract class WoverBiomeSource extends BiomeSource implements
 
         this.reloadBiomes();
         if (biomesAdded > 0) {
-            LibWoverWorldGenerator.C.log.info("Merged {} biomes to {} in {}", biomesAdded, toShortString(), sw);
+            LibWoverWorldGenerator.C.log.verbose("Merged {} biomes to {} in {}", biomesAdded, toShortString(), sw);
         }
         return this;
     }

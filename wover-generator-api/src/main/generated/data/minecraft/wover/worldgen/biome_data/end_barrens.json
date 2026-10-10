@@ -2,7 +2,7 @@
   "type": "wover:wover_data",
   "parent": "minecraft:end_highlands",
   "biome": "minecraft:end_barrens",
-  "genChance": 0.03,
+  "genChance": 0.15,
   "generation_data": {
     "intended_placement": "wover:is_end/barrens"
   }
