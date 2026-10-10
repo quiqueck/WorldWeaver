@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "wover-preset",
-    "version": "21.800.1",
+    "version": "21.800.2",
     "name": "WorldWeaver - World Preset API",
     "description": "",
     "authors": [
@@ -24,6 +24,9 @@
         ],
         "fabric-datagen": [
             "de.ambertation.wover.preset.datagen.WoverWorldPresetDatagen"
+        ],
+        "wover.datapack.registry": [
+            "de.ambertation.wover.entrypoint.PresetDatapackRegistryEntrypoint"
         ]
     },
     "mixins": [

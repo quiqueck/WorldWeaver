@@ -1,5 +1,6 @@
 package de.ambertation.wover.complex.api.equipment;
 
+import de.ambertation.wover.block.api.model.ModelTraitLibrary;
 import de.ambertation.wover.entrypoint.LibWoverRecipe;
 import de.ambertation.wover.item.api.ItemDefinition;
 import de.ambertation.wover.item.api.ToolItemDefinition;
@@ -50,6 +51,11 @@ public class ToolTier {
             ToolTier.ToolValues values = this.tier.getValues(slot);
             if (values == null)
                 throw new IllegalArgumentException("No values for slot " + slot + " in tier " + this.tier);
+
+            // Without this, the tool would fall back to whatever flat item model its mod's model provider
+            // generates, and render billboarded in-hand instead of at a tool's grip. Slots that supply their
+            // own binding or are flat in vanilla (shears) opt out via ToolSlot#handheldModel.
+            if (slot.handheldModel) definition.addTrait(ModelTraitLibrary.handheld());
 
             configure(definition, values);
         }

@@ -1,5 +1,6 @@
 package de.ambertation.wover.block.api.render;
 
+import de.ambertation.wover.block.api.render.BlockRenderTraits;
 import de.ambertation.wover.block.api.trait.BlockTrait;
 
 import net.minecraft.world.level.block.Block;
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 
 /**
  * Builder for {@link TintBinding}, exposed as {@code BlockRenderTraits.TINT} (and aliased as
- * {@code ClientBlockTraits.TINT}). Mirrors {@link RenderLayerBuilder}: the factories return {@code null} when
+ * {@code BlockRenderTraits.TINT}). Mirrors {@link RenderLayerBuilder}: the factories return {@code null} when
  * the binding is not needed, so they can be passed straight to {@code addTrait(...)} from common block-creation
  * code.
  * <p>
@@ -23,7 +24,7 @@ import java.util.function.Supplier;
  * attached to any number of blocks.
  */
 public final class TintBuilder {
-    /** Shared instance; also exposed on the client as {@code ClientBlockTraits.TINT}. */
+    /** Shared instance; also exposed on the client as {@code BlockRenderTraits.TINT}. */
     public static final TintBuilder BUILDER = new TintBuilder();
 
     private TintBuilder() {

@@ -45,6 +45,18 @@ public class CommonItemTags {
      */
     public static final TagKey<Item> FABRIC_SHEAR_TOOLS = TagManager.ITEMS.makeCommonTag("tools/shear");
     /**
+     * {@code c:tools/melee_weapon} - the Fabric convention tag for melee weapons. Fabric populates it with
+     * every vanilla sword and axe (plus mace and trident) directly, not through
+     * {@code #minecraft:swords} and friends, so modded swords/axes have to be added explicitly.
+     */
+    public static final TagKey<Item> MELEE_WEAPON_TOOLS = TagManager.ITEMS.makeCommonTag("tools/melee_weapon");
+    /**
+     * {@code c:tools/mining_tool} - the Fabric convention tag for mining tools. Fabric populates it with
+     * every vanilla pickaxe directly, not through {@code #minecraft:pickaxes}, so modded pickaxes have to
+     * be added explicitly.
+     */
+    public static final TagKey<Item> MINING_TOOL_TOOLS = TagManager.ITEMS.makeCommonTag("tools/mining_tool");
+    /**
      * {@code wover:furnaces}
      */
     public static final TagKey<Item> FURNACES = TagManager.ITEMS.makeWorldWeaverTag("furnaces");

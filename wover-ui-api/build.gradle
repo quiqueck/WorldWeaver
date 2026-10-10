@@ -14,3 +14,20 @@ loom {
 }
 
 moduleDependencies(project, ['wover-core-api', 'wover-event-api'])
+
+dependencies {
+    // ClientConfigRoundTripTest exercises the client-only ClientConfig
+    testImplementation sourceSets.client.output
+}
+
+// fabric-loader-junit resolves FabricLoader#getConfigDir() against the working directory. Run the tests in a
+// throw-away folder so config round-trip tests can never touch run/config.
+def unitTestRunDir = layout.buildDirectory.dir("unit-test-run")
+tasks.named('test') {
+    workingDir = unitTestRunDir.get().asFile
+    doFirst {
+        def dir = unitTestRunDir.get().asFile
+        project.delete(dir)
+        dir.mkdirs()
+    }
+}

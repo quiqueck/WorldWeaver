@@ -206,6 +206,8 @@ public class BlockTagProvider extends WoverTagProvider.ForBlocks {
                 Blocks.BAMBOO_SAPLING,
                 Blocks.MANGROVE_PROPAGULE
         );
+        // wover:vegetation/plant references this tag, so it must exist even when no other mod adds to it
+        ctx.add(CommonBlockTags.VINE, Blocks.VINE, Blocks.TWISTING_VINES, Blocks.WEEPING_VINES);
         ctx.add(CommonBlockTags.PLANT, CommonBlockTags.SAPLINGS, CommonBlockTags.VINE);
         ctx.add(
                 CommonBlockTags.PLANT,

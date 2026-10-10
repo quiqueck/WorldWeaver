@@ -108,6 +108,8 @@ public class WoverBiomePicker {
            .stream()
            .map(Map.Entry::getValue)
            .filter(data -> data instanceof WoverBiomeData b && sourceBiome.isSame(b.parent))
+           // genChance <= 0 means the sub-biome is disabled (RandomizedWeightedList rejects such weights)
+           .filter(data -> data.genChance() > 0)
            .sorted(BY_BIOME_ID)
            .forEach(data -> {
                final WoverBiomeData b = (WoverBiomeData) data;
@@ -117,7 +119,9 @@ public class WoverBiomePicker {
 
     private boolean isAllowed(BiomeData biomeData) {
         if (biomeData == null) return false;
-        return true;
+        // a genChance of 0 (or less) disables a Biome: it is never picked, and an edge with that
+        // chance is dropped, leaving its parent without an edge
+        return biomeData.genChance() > 0;
     }
 
     private BiomeData nullIfNotAllowed(BiomeData biomeData) {
@@ -142,7 +146,8 @@ public class WoverBiomePicker {
     /**
      * Adds a Biome to this picker.
      *
-     * @param biome the Biome's data. Ignored if {@code null}.
+     * @param biome the Biome's data. Ignored if {@code null} or if its {@link BiomeData#genChance()} is
+     *              {@code <= 0} (i.e. the Biome is disabled).
      */
     public void addBiome(BiomeData biome) {
         if (isAllowed(biome))
@@ -269,7 +274,9 @@ public class WoverBiomePicker {
             this.subbiomes = new RandomizedWeightedList<>();
 
             if (biomeData instanceof WoverBiomeData wData) {
-                subbiomes.add(this, wData.genChance);
+                // a disabled Biome is still wrapped when it is the parent of a sub-biome, it just never
+                // competes with its own sub-biomes (and is never picked itself, see isAllowed)
+                if (wData.genChance > 0) subbiomes.add(this, wData.genChance);
                 edge = create(nullIfNotAllowed(wData.getEdgeData()));
                 parent = create(wData.getParentData());
                 edgeSize = wData.edgeSize;

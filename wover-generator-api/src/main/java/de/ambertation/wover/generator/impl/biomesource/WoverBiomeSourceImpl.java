@@ -96,7 +96,11 @@ public class WoverBiomeSourceImpl {
                                pair.second
                        );
 
-                       if (data != null && data.isPickable()) {
+                       if (data != null && data.genChance() <= 0) {
+                           // disabled: the pickers reject it, and neither sub-biome nor edge lookups
+                           // will hand it out, so it can never generate
+                           isPossible = false;
+                       } else if (data != null && data.isPickable()) {
                            isPossible = pickerAdder.add(data, mapper.tag(), mapper.picker());
                        } else {
                            isPossible = true;

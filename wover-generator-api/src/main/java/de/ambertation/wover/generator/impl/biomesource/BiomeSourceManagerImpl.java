@@ -73,6 +73,10 @@ public class BiomeSourceManagerImpl {
     private static void didLoadBiomeData(ResourceKey<BiomeData> biomeDataKey, BiomeData biomeData) {
         if (biomeDataKey.location().getNamespace().equals("minecraft")) return;
 
+        // genChance <= 0 disables the Biome. Fabric's TheEndBiomes rejects such weights, and it would be odd
+        // to have a disabled Biome generate in the vanilla Nether either.
+        if (biomeData.genChance() <= 0) return;
+
         final ResourceKey<Biome> biomeKey = BiomeDataRegistry.createBiomeKey(biomeDataKey);
         if (!FABRIC_EXCLUDES.contains(biomeKey.location())) {
             if (biomeData.isIntendedFor(BiomeTags.IS_NETHER)) {

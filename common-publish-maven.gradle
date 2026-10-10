@@ -41,14 +41,18 @@ publishing {
         }
     }
     repositories {
-        maven {
-            def slurper = new groovy.json.JsonSlurper()
-            def apiKey = slurper.parseText(new File(projectDir, "../AMBER_TOKEN").text)
-            name = "Ambertation"
-            url = "https://maven.ambertation.de/releases/"
-            credentials {
-                username = apiKey.username
-                password = apiKey.token
+        def tokenFile = new File(projectDir, "../AMBER_TOKEN")
+        // builds from a plain clone have no token; they just can't publish
+        if (tokenFile.exists()) {
+            maven {
+                def slurper = new groovy.json.JsonSlurper()
+                def apiKey = slurper.parseText(tokenFile.text)
+                name = "Ambertation"
+                url = "https://maven.ambertation.de/releases/"
+                credentials {
+                    username = apiKey.username
+                    password = apiKey.token
+                }
             }
         }
     }

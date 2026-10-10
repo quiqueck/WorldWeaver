@@ -22,6 +22,7 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -118,7 +119,7 @@ public enum StructurePlacement implements StringRepresentable {
 
     @Override
     public @NotNull String getSerializedName() {
-        return name == null ? this.name().toLowerCase() : this.name.toLowerCase();
+        return name == null ? this.name().toLowerCase(Locale.ROOT) : this.name.toLowerCase(Locale.ROOT);
     }
 
 

@@ -2,7 +2,7 @@ package de.ambertation.wover.item.api.render;
 
 /**
  * Common catalogue of ready-made client-render item traits (boat renderer). Produces common-safe bindings; the
- * client source set performs the real renderer registration at client init. {@code ClientBlockTraits.BOAT_RENDERER}
+ * client source set performs the real renderer registration at client init. {@code ItemRenderTraits.BOAT_RENDERER}
  * remains as a client-side alias for source compatibility.
  */
 public class ItemRenderTraits {

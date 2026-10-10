@@ -166,8 +166,8 @@ public class RecipeBuilder {
     }
 
     /**
-     * Starts building a cooking recipe for both the campfire and the smoker, matching how vanilla food items
-     * are usually cookable.
+     * Starts building a cooking recipe for the furnace, the campfire and the smoker, matching how vanilla food
+     * items are cookable.
      *
      * @param id     The recipe id.
      * @param output The recipe's output item.
@@ -177,7 +177,7 @@ public class RecipeBuilder {
             ResourceLocation id,
             ItemLike output
     ) {
-        return new CookingRecipeBuilderImpl(id, output, false, true, true, false);
+        return new CookingRecipeBuilderImpl(id, output, false, true, true, true);
     }
 
     /**

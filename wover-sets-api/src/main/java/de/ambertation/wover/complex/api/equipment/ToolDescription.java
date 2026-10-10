@@ -34,11 +34,18 @@ public record ToolDescription<I extends Item>(I item, ResourceKey<Item> itemKey,
     @SuppressWarnings("unchecked")
     private static TagKey<Item>[] getTagKey(ToolSlot slot) {
         return switch (slot) {
-            case PICKAXE_SLOT -> new TagKey[]{ItemTags.PICKAXES, ToolTags.FABRIC_PICKAXES};
-            case AXE_SLOT -> new TagKey[]{ItemTags.AXES, ToolTags.FABRIC_AXES};
+            // Besides the primary tag, every tag vanilla (or Fabric's convention tags) lists the vanilla
+            // counterparts in *by item* rather than through the primary tag - those never reach a modded
+            // tool on their own. E.g. #minecraft:cluster_max_harvestables is what makes amethyst clusters
+            // drop their full yield to a pickaxe.
+            case PICKAXE_SLOT -> new TagKey[]{
+                    ItemTags.PICKAXES, ToolTags.FABRIC_PICKAXES,
+                    ItemTags.CLUSTER_MAX_HARVESTABLES, CommonItemTags.MINING_TOOL_TOOLS
+            };
+            case AXE_SLOT -> new TagKey[]{ItemTags.AXES, ToolTags.FABRIC_AXES, CommonItemTags.MELEE_WEAPON_TOOLS};
             case SHOVEL_SLOT -> new TagKey[]{ItemTags.SHOVELS, ToolTags.FABRIC_SHOVELS};
             case HOE_SLOT -> new TagKey[]{ItemTags.HOES, ToolTags.FABRIC_HOES};
-            case SWORD_SLOT -> new TagKey[]{ItemTags.SWORDS, ToolTags.FABRIC_SWORDS};
+            case SWORD_SLOT -> new TagKey[]{ItemTags.SWORDS, ToolTags.FABRIC_SWORDS, CommonItemTags.MELEE_WEAPON_TOOLS};
             case SHEARS_SLOT -> new TagKey[]{CommonItemTags.SHEARS, ToolTags.FABRIC_SHEARS};
             case HAMMER_SLOT -> new TagKey[]{CommonItemTags.HAMMERS};
             default -> new TagKey[0];

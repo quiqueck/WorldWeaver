@@ -9,17 +9,18 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.datafix.DataFixTypes;
+import net.minecraft.util.datafix.DataFixers;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
-
-import com.google.common.collect.Maps;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,6 +32,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -87,7 +89,9 @@ public class StructureNBT {
         return Mirror.values()[random.nextInt(3)];
     }
 
-    private static final Map<ResourceLocation, StructureNBT> STRUCTURE_CACHE = Maps.newHashMap();
+    // ConcurrentHashMap, not HashMap: templates are loaded from worldgen threads, and computeIfAbsent on
+    // a plain HashMap is not safe there.
+    private static final Map<ResourceLocation, StructureNBT> STRUCTURE_CACHE = new ConcurrentHashMap<>();
 
     /**
      * Gets (or lazily loads and caches) the {@link StructureNBT} for the given {@link ResourceLocation}.
@@ -163,7 +167,8 @@ public class StructureNBT {
         return pos.offset(-blockpos2.getX() >> 1, 0, -blockpos2.getZ() >> 1);
     }
 
-    private static final Map<ResourceLocation, StructureTemplate> READER_CACHE = Maps.newHashMap();
+    // See STRUCTURE_CACHE above - same concurrency requirement.
+    private static final Map<ResourceLocation, StructureTemplate> READER_CACHE = new ConcurrentHashMap<>();
 
     private static StructureTemplate readStructureFromJar(ResourceLocation resource) {
         return READER_CACHE.computeIfAbsent(resource, r -> _readStructureFromJar(r));
@@ -174,9 +179,12 @@ public class StructureNBT {
     }
 
     private static StructureTemplate _readStructureFromJar(ResourceLocation resource) {
-        try {
-            InputStream inputstream = MinecraftServer.class.getResourceAsStream("/" + getStructurePath(resource) + ".nbt");
-            return readStructureFromStream(inputstream);
+        try (InputStream inputstream = MinecraftServer.class.getResourceAsStream("/" + getStructurePath(resource) + ".nbt")) {
+            if (inputstream == null) {
+                LibWoverStructure.C.log.error("Unable to find Structure " + resource);
+                return null;
+            }
+            return readTemplate(inputstream);
         } catch (IOException e) {
             LibWoverStructure.C.log.error("Unable to load Structure " + resource, e);
         }
@@ -184,14 +192,59 @@ public class StructureNBT {
         return null;
     }
 
-    private static StructureTemplate readStructureFromStream(InputStream stream) throws IOException {
+    /**
+     * Reads the template for {@code location} from {@code data/<namespace>/structure/<path>.nbt} on the
+     * classpath, upgraded to the current data version. Templates are cached and shared, so the returned
+     * instance must not be modified.
+     * <p>
+     * This is the one place the mods read template files from their jars. Keep it that way: when BCLib
+     * still had loaders of its own, a fix for 26.3's palette change reached only one of three copies.
+     *
+     * @param location The location of the {@code .nbt} file, without the {@code .nbt} extension
+     * @return The template, or {@code null} if it does not exist or could not be read
+     */
+    @Nullable
+    public static StructureTemplate readTemplate(ResourceLocation location) {
+        return readStructureFromJar(location);
+    }
+
+    /**
+     * Reads a gzip-compressed template from {@code stream}, upgraded to the current data version with
+     * Minecraft's {@code STRUCTURE} DataFixer - the same pass vanilla's template loader applies. Not
+     * cached.
+     *
+     * @param stream The {@code .nbt} file's content
+     * @return The loaded template
+     * @throws IOException If the stream cannot be read
+     */
+    public static StructureTemplate readTemplate(InputStream stream) throws IOException {
         CompoundTag nbttagcompound = NbtIo.readCompressed(stream, NbtAccounter.unlimitedHeap());
 
         StructureTemplate template = new StructureTemplate();
 
-        template.load(BuiltInRegistries.BLOCK, nbttagcompound);
+        // Upgrade older templates the same way vanilla's TemplateSource does. 26.3 renamed the palette
+        // fields (Name/Properties -> id/properties), so an un-fixed legacy template loads as all air.
+        final int version = NbtUtils.getDataVersion(nbttagcompound, 500);
+        template.load(
+                BuiltInRegistries.BLOCK,
+                DataFixTypes.STRUCTURE.updateToCurrentVersion(DataFixers.getDataFixer(), nbttagcompound, version)
+        );
 
         return template;
+    }
+
+    /**
+     * The loaded template, or {@code null} if it could not be read. Shared with every other user of the
+     * same location, so it must not be modified.
+     * <p>
+     * Exposed so callers can inspect what a template actually contains - block infos, block entity
+     * data - without placing it into a level.
+     *
+     * @return The template, or {@code null}
+     */
+    @Nullable
+    public StructureTemplate getTemplate() {
+        return structure;
     }
 
     /**

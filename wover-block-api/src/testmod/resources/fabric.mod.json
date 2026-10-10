@@ -26,6 +26,7 @@
       "de.ambertation.wover.testmod.entrypoint.client.TestModWoverBlockAndItemClient"
     ],
     "fabric-gametest": [
+      "de.ambertation.wover.testmod.gametest.BedHomePoiGameTest",
       "de.ambertation.wover.testmod.gametest.CallOrderGameTest",
       "de.ambertation.wover.testmod.gametest.TraitPropertyGameTest"
     ]

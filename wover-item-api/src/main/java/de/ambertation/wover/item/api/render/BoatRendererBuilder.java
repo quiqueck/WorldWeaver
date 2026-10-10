@@ -1,5 +1,6 @@
 package de.ambertation.wover.item.api.render;
 
+import de.ambertation.wover.item.api.render.ItemRenderTraits;
 import de.ambertation.wover.core.api.ModCore;
 import de.ambertation.wover.item.api.trait.ItemTrait;
 
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * it); only on the client ({@code ModCore.isClient()}), matching the old behaviour.
  */
 public final class BoatRendererBuilder {
-    /** Shared instance; also exposed on the client as {@code ClientBlockTraits.BOAT_RENDERER}. */
+    /** Shared instance; also exposed on the client as {@code ItemRenderTraits.BOAT_RENDERER}. */
     public static final BoatRendererBuilder BUILDER = new BoatRendererBuilder();
 
     private BoatRendererBuilder() {

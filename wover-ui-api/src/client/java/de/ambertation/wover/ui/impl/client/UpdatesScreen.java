@@ -1,6 +1,6 @@
 package de.ambertation.wover.ui.impl.client;
 
-import de.ambertation.wunderlib.ui.ColorHelper;
+import de.ambertation.wunderlib.utils.ColorUtilARGB32;
 import de.ambertation.wunderlib.ui.layout.components.HorizontalStack;
 import de.ambertation.wunderlib.ui.layout.components.LayoutComponent;
 import de.ambertation.wunderlib.ui.layout.components.VerticalStack;
@@ -81,14 +81,14 @@ public class UpdatesScreen extends WoverLayoutScreen {
             }
             if (nfo != null) {
                 row.addText(fit(), fit(), Component.literal(nfo.getMetadata().getName()))
-                   .setColor(ColorHelper.WHITE);
+                   .setColor(ColorUtilARGB32.WHITE);
             } else {
-                row.addText(fit(), fit(), Component.literal(mod)).setColor(ColorHelper.WHITE);
+                row.addText(fit(), fit(), Component.literal(mod)).setColor(ColorUtilARGB32.WHITE);
             }
             row.addSpacer(4);
             row.addText(fit(), fit(), Component.literal(cur));
             row.addText(fit(), fit(), Component.literal(" -> "));
-            row.addText(fit(), fit(), Component.literal(updated)).setColor(ColorHelper.GREEN);
+            row.addText(fit(), fit(), Component.literal(updated)).setColor(ColorUtilARGB32.GREEN);
             row.addFiller();
             boolean createdDownloadLink = false;
             if (nfo != null

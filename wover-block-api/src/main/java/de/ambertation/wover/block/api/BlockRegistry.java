@@ -15,11 +15,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -344,11 +348,30 @@ public abstract class BlockRegistry {
             int burn,
             int spread
     ) {
-        if (block.defaultBlockState().ignitedByLava()
-                && FlammableBlockRegistry.getDefaultInstance()
-                                         .get(block)
-                                         .getBurnChance() == 0) {
+        if (block.defaultBlockState().ignitedByLava() && !isAlreadyFlammable(block)) {
             FlammableBlockRegistry.getDefaultInstance().add(block, burn, spread);
+            REGISTERED_AS_FLAMMABLE.add(block);
         }
+    }
+
+    /**
+     * Blocks this class added to the {@link FlammableBlockRegistry}. Used to answer "is it already
+     * flammable?" before tags are loaded, when Fabric's registry can't be queried.
+     */
+    private static final Set<Block> REGISTERED_AS_FLAMMABLE = Collections.newSetFromMap(new IdentityHashMap<>());
+    private static volatile boolean tagsLoaded = false;
+
+    static {
+        CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> tagsLoaded = true);
+    }
+
+    private static boolean isAlreadyFlammable(Block block) {
+        // Fabric's FlammableBlockRegistry#get resolves every tag-based entry another mod registered, which
+        // throws "Tags not bound" during mod initialization (blocks are registered long before tags load).
+        // Until then, tag membership is unknowable anyway, so only our own block-level entries count.
+        if (!tagsLoaded) {
+            return REGISTERED_AS_FLAMMABLE.contains(block);
+        }
+        return FlammableBlockRegistry.getDefaultInstance().get(block).getBurnChance() != 0;
     }
 }

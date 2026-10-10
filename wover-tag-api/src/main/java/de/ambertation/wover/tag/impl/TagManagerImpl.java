@@ -89,6 +89,23 @@ public class TagManagerImpl {
         return (TagRegistryImpl<Item, ItemTagBootstrapContext>) TYPES.computeIfAbsent(type.directory, (dir) -> type);
     }
 
+    /**
+     * Cycle-safe access to {@link #BIOMES}.
+     * <p>
+     * The static initializer of this class calls into vanilla ({@code Registries.tagsDirPath}) while
+     * building the tag registries. Other mods may hook that and force-initialize further classes
+     * (e.g. Nyf's Quivers reflects over static fields and thereby runs {@code RegistryDataLoader.<clinit>},
+     * which processes our datapack registry entrypoints). Code reached that way sees this class - and
+     * {@code TagManager} - half initialized, with {@code BIOMES} still {@code null}. Because
+     * {@link #registerBiome()} is idempotent, the instance is created on demand here; the static
+     * initializer later receives the very same object.
+     */
+    @ApiStatus.Internal
+    public static BiomeTagRegistryImpl biomes() {
+        final BiomeTagRegistryImpl biomes = BIOMES;
+        return biomes != null ? biomes : registerBiome();
+    }
+
     static BiomeTagRegistryImpl registerBiome() {
         return (BiomeTagRegistryImpl) TYPES.computeIfAbsent(
                 "tags/worldgen/biome",

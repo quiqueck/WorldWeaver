@@ -18,7 +18,8 @@
   "entrypoints": {
     "main": [
       "de.ambertation.wover.testmod.entrypoint.TestModWoverWorldGenerator",
-      "de.ambertation.wover.testmod.entrypoint.WorldPresetStickBootCheck"
+      "de.ambertation.wover.testmod.entrypoint.WorldPresetStickBootCheck",
+      "de.ambertation.wover.test.api.gametest.CompatWorldgenBootCheck"
     ],
     "fabric-datagen": [
       "de.ambertation.wover.testmod.generator.datagen.TestModWoverWorldGeneratorDatagen"
@@ -28,7 +29,10 @@
     ],
     "fabric-gametest": [
       "de.ambertation.wover.testmod.gametest.GeneratorGameTest",
-      "de.ambertation.wover.testmod.gametest.NetherPresetGameTest"
+      "de.ambertation.wover.testmod.gametest.NetherPresetGameTest",
+      "de.ambertation.wover.testmod.gametest.BiomePickerOrderGameTest",
+      "de.ambertation.wover.testmod.gametest.DisabledBiomeGameTest",
+      "de.ambertation.wover.testmod.gametest.VanillaBiomeWeightGameTest"
     ]
   },
   "mixins": [],
