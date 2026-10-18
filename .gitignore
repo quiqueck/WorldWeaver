@@ -40,3 +40,4 @@ node_modules/
 /public/img/icon.png
 /wover-block-api/minecraft/
 /wover-sets-api/src/testmod/resources/assets/wover-sets-testmod/textures/
+.fabric/processedMods/placeholder-api-3.0.0+26.1-f7ebeec72fe1b2b1.jar
