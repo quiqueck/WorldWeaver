@@ -4,12 +4,16 @@ import de.ambertation.wover.state.api.WorldState;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 
 /**
@@ -152,10 +156,26 @@ public class EnchantmentUtils {
 
         return lookup
                 .get(enchantment)
-                .map(e -> {
-                    stack.enchant(e, level);
-                    return true;
-                })
+                .map(e -> upgradeEnchantment(stack, e, level))
                 .orElse(false);
+    }
+
+    /**
+     * Same as {@link ItemStack#enchant(Holder, int)}, but writes the enchantment component directly instead of
+     * going through {@link EnchantmentHelper#updateEnchantments}. Item setup also runs on the client (creative tab,
+     * recipe book), and other mods hook {@code updateEnchantments} with code that is only safe on the server thread
+     * (e.g. replacing disabled enchantments using the server level's random).
+     */
+    private static boolean upgradeEnchantment(ItemStack stack, Holder<Enchantment> enchantment, int level) {
+        final DataComponentType<ItemEnchantments> type = stack.is(Items.ENCHANTED_BOOK)
+                ? DataComponents.STORED_ENCHANTMENTS
+                : DataComponents.ENCHANTMENTS;
+        final ItemEnchantments current = stack.get(type);
+        if (current == null) return false;
+
+        final ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(current);
+        enchantments.upgrade(enchantment, level);
+        stack.set(type, enchantments.toImmutable());
+        return true;
     }
 }
