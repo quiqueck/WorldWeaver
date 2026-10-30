@@ -59,6 +59,17 @@ public class FlammableBlockBuilder extends AbstractBlockTraitBuilder<Block, Gene
             BlockRegistry.registerAsFlammable(block, this.burn, this.speed);
         }
 
+        /**
+         * Only the most recent burn/spread chance for a block counts. Without this both traits stayed on the
+         * definition and {@link BlockRegistry#registerAsFlammable(Block, int, int)}, which registers a block
+         * only once, kept the first: a set that refines the {@code FLAMMABLE.withDefault()} bundled in
+         * {@code WOOD_BLOCK} (e.g. planks at 5/20) silently stayed at 5/5.
+         */
+        @Override
+        public boolean keepLatestOnly() {
+            return true;
+        }
+
         @Override
         public int burn() {
             return this.burn;

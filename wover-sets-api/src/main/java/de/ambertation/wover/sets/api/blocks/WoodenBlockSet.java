@@ -191,10 +191,10 @@ public class WoodenBlockSet<S extends WoodenBlockSet<S>> extends BlockSet<S> {
      * burn/spread chance of 5 shared by every slot, matching this class's previous behaviour.
      * <p>
      * Override to give specific slots a different, vanilla-matching burn/spread chance (e.g. logs vs.
-     * planks-derived parts). Do this here rather than by adding a second {@code FLAMMABLE} trait after the
-     * fact: {@link de.ambertation.wover.block.api.BlockRegistry#registerAsFlammable(net.minecraft.world.level.block.Block, int, int)}
-     * only registers a block once (it no-ops if the block is already registered as flammable), so a later
-     * trait with a different value would silently be dropped instead of overriding the earlier one.
+     * planks-derived parts). The returned trait is added after {@code WOOD_BLOCK.withDefault()}, which bundles
+     * {@code FLAMMABLE.withDefault()}; {@code FLAMMABLE} is
+     * {@link de.ambertation.wover.block.api.trait.BlockTrait#keepLatestOnly() keepLatestOnly}, so this value
+     * replaces the bundled default instead of being dropped.
      *
      * @param slot the slot being configured
      * @return the flammable trait to apply to this slot

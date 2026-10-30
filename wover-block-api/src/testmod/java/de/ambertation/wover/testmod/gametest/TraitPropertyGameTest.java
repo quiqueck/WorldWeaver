@@ -44,10 +44,12 @@ public class TraitPropertyGameTest {
     public void flammableTraitRegistersBlocks(GameTestHelper helper) {
         final List<String> failures = new ArrayList<>();
 
-        // All three testmod blocks carry FlammableBlockBuilder.BUILDER.withDefault() -> 5/5.
+        // TEST_BLOCK and TEST_DOOR carry FlammableBlockBuilder.BUILDER.withDefault() -> 5/5.
         expectFlammable(failures, "TEST_BLOCK", TestBlockRegistry.TEST_BLOCK, DEFAULT_FLAMMABLE_CHANCE, DEFAULT_FLAMMABLE_CHANCE);
         expectFlammable(failures, "TEST_DOOR", TestBlockRegistry.TEST_DOOR, DEFAULT_FLAMMABLE_CHANCE, DEFAULT_FLAMMABLE_CHANCE);
-        expectFlammable(failures, "TEST_WALL", TestBlockRegistry.TEST_WALL, DEFAULT_FLAMMABLE_CHANCE, DEFAULT_FLAMMABLE_CHANCE);
+        // TEST_WALL adds withDefault() and then with(5, 20): FLAMMABLE is keepLatestOnly, so the later one
+        // applies. Before that the first registration won and the block stayed at 5/5.
+        expectFlammable(failures, "TEST_WALL", TestBlockRegistry.TEST_WALL, DEFAULT_FLAMMABLE_CHANCE, 20);
 
         if (!failures.isEmpty()) {
             helper.fail(Component.literal(

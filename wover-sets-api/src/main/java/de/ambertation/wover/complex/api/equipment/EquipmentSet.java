@@ -5,6 +5,15 @@ import de.ambertation.wover.item.api.ArmorItemDefinition;
 import de.ambertation.wover.item.api.ToolItemDefinition;
 import de.ambertation.wover.item.api.trait.ItemRecipeTrait;
 
+import net.minecraft.core.HolderGetter;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 
@@ -190,6 +199,16 @@ public abstract class EquipmentSet {
                             commonToolProperties(definition.getProperties())),
                     recipeOverride
             );
+        } else if (slot == ToolSlot.SWORD_SLOT) {
+            add(
+                    slot, (definition, values) -> new Item(
+                            swordProperties(
+                                    commonToolProperties(definition.getProperties()),
+                                    this.toolTier.toolMaterial,
+                                    ToolTier.requireMinableTag(slot, this.toolTier, values)
+                            )),
+                    recipeOverride
+            );
         } else if (slot == ToolSlot.SPEAR_SLOT) {
             // Like vanilla's Item.Properties#spear: no minecraft:tool component. The spear's attack attributes,
             // kinetic/piercing components and durability all come from the slot's ConfigureSpearItemTrait; a
@@ -207,6 +226,37 @@ public abstract class EquipmentSet {
                                 values.attackDamage(), values.attackSpeed(), values.disableBlockingForSeconds()
                         )),
                 recipeOverride
+        );
+    }
+
+    /**
+     * A sword's tool component is vanilla's sword component ({@code ToolMaterial#applySwordProperties}: cobweb
+     * mines fast, bamboo etc. are efficient, 2 durability per mined block, {@code Weapon(1)} from the slot's
+     * {@code ConfigureSwordItemTrait}), extended with the material's regular rules for the sword's mining tag
+     * ({@code #wover:mineable/sword}). Like vanilla's swords it must not let the player break blocks in creative
+     * mode (quiqueck/BetterEnd#621). {@code Item.Properties#tool} would replace all of this
+     * (quiqueck/BetterEnd#621 follow-up: cobweb took ~20 s).
+     */
+    private static Item.Properties swordProperties(
+            Item.Properties properties,
+            ToolMaterial material,
+            TagKey<Block> minesEfficiently
+    ) {
+        final HolderGetter<Block> blocks = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
+        return properties.component(
+                DataComponents.TOOL,
+                new Tool(
+                        List.of(
+                                Tool.Rule.minesAndDrops(HolderSet.direct(Blocks.COBWEB.builtInRegistryHolder()), 15.0F),
+                                Tool.Rule.overrideSpeed(blocks.getOrThrow(BlockTags.SWORD_INSTANTLY_MINES), Float.MAX_VALUE),
+                                Tool.Rule.deniesDrops(blocks.getOrThrow(material.incorrectBlocksForDrops())),
+                                Tool.Rule.minesAndDrops(blocks.getOrThrow(minesEfficiently), material.speed()),
+                                Tool.Rule.overrideSpeed(blocks.getOrThrow(BlockTags.SWORD_EFFICIENT), 1.5F)
+                        ),
+                        1.0F,
+                        2,
+                        false
+                )
         );
     }
 

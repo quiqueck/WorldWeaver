@@ -42,6 +42,9 @@ public class TestBlockRegistry {
     public static final TestWall TEST_WALL = R
             .defineDefaultBlockWithProps("test_wall", TestWall::new)
             .addTrait(FlammableBlockBuilder.BUILDER.withDefault())
+            // A second, later FLAMMABLE (as a wood set does on top of WOOD_BLOCK's bundled default): the
+            // later value must win, see TraitPropertyGameTest#flammableTraitRegistersBlocks.
+            .addTrait(FlammableBlockBuilder.BUILDER.with(5, 20))
             .addTags(BlockTags.WALLS)
             .addItemTags(ItemTags.WALLS)
             .forceSolidOn()
