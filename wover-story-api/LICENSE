@@ -1,0 +1,51 @@
+WorldWeaver - Story API (wover-story-api)
+Copyright (c) 2026 Quiqueck. All rights reserved.
+Effective 2026-10-30.
+
+This module is NOT covered by the MIT License of the rest of the WorldWeaver
+repository. The rest of WorldWeaver remains under the MIT License; see the
+file LICENSE in the repository root.
+
+1. ALL RIGHTS RESERVED
+
+All rights in this module (source code, compiled code, data, assets and
+documentation in this directory) are reserved. Without our written permission
+you may not copy, redistribute, re-upload or publish it, in whole or in part,
+in source or binary form, on its own or bundled with other things, whether
+unmodified or modified. This includes re-uploads to which only minor additions
+or changes have been made. The size of an addition or change does not matter.
+
+2. WHAT IS ALLOWED
+
+You may:
+ * use the official release files of Team BetterX for this module (the .jar files published by
+   us on Modrinth, CurseForge, GitHub Releases or our Maven repository at
+   maven.ambertation.de), unmodified, in modpacks,
+   server packs and on servers, including commercial and monetized ones, as
+   long as they are distributed or used as the official files, bundled with our
+   mods and libraries;
+ * write mods and data packs that depend on this module (also through our Maven repository) and use its public
+   API or its data formats, and publish them under any license you like, as long as
+   they do not contain or redistribute code or assets of this module (declare it
+   as a dependency instead);
+ * show, record, stream and take screenshots of the module in the game, including
+   what it displays (dialogs, images and so on), and publish and monetize the
+   results on any platform without asking;
+ * read the source code and use it to understand and debug the module, and file
+   issues and pull requests for it.
+
+3. CONTRIBUTIONS
+
+If you submit a contribution to this module, you grant us a perpetual,
+worldwide, irrevocable license to use, modify, sublicense and distribute it
+as part of this module under any terms.
+
+4. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,0 +1,130 @@
+name: Report a Glimmerwild Story-Pack Bug
+description: File a bug report for the Across the Glimmerwild story pack
+title: "[Glimmerwild] "
+labels: [ "bug", "glimmerwild" ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a Bug in the **Across the Glimmerwild** story pack!
+
+        Please use this form for problems with the pack's story, quests, dialogs, characters or the
+        Glimmerwild dimension. For bugs in WorldWeaver itself, use *Report a Bug* instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see!
+      value: "A bug happened!"
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: What kind of problem is it?
+      options:
+        - Story/quest is stuck or can not be completed
+        - Wrong, missing or broken dialog
+        - Character (NPC) behaves wrongly
+        - Dimension, biome, structure or world generation
+        - Blocks, items or textures
+        - Crash
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where in the story?
+      description: Which chapter, quest, character or location were you at? Spoilers are fine here.
+      placeholder: "e.g. talking to Winnie after returning the first crystal"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do right before the problem showed up? Does it happen every time?
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+  - type: dropdown
+    id: game_type
+    attributes:
+      label: Singleplayer or Multiplayer?
+      options:
+        - Singleplayer
+        - Multiplayer (I'm a player)
+        - Multiplayer (I'm the server owner)
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        ## Versions
+
+        Minecraft versions marked *legacy* still receive critical fixes only,
+        versions marked *end of life* are no longer maintained.
+  - type: input
+    id: glimmerwild_version
+    attributes:
+      label: Across the Glimmerwild
+      description: What version of Across the Glimmerwild are you running?
+      placeholder: 1.1.2
+    validations:
+      required: true
+  - type: input
+    id: wover_version
+    attributes:
+      label: WorldWeaver (Wover)
+      description: What version of WorldWeaver are you running?
+      placeholder: 26.302.2
+    validations:
+      required: true
+  - type: input
+    id: fabric_api_version
+    attributes:
+      label: Fabric API
+      description: What version of Fabric API is installed
+      placeholder: 0.156.x
+    validations:
+      required: false
+  - type: input
+    id: fabric_loader_version
+    attributes:
+      label: Fabric Loader
+      description: What version of Fabric Loader do you use
+      placeholder: 0.19.x
+    validations:
+      required: false
+  - type: dropdown
+    id: mc_version
+    attributes:
+      label: Minecraft
+      description: What version of Minecraft is installed?
+      options:
+        - "26.3"
+        - "Other"
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ## Additional Information
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Drag and drop screenshots here, they often explain more than words.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: textarea
+    id: other_mods
+    attributes:
+      label: Other Mods
+      description: If you can, please supply a list of installed Mods (besides Across the Glimmerwild and WorldWeaver). This information may already be included in the log above.
+      render: shell
