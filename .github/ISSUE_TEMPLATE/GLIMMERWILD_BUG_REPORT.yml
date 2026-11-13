@@ -1,7 +1,7 @@
 name: Report a Glimmerwild Story-Pack Bug
 description: File a bug report for the Across the Glimmerwild story pack
 title: "[Glimmerwild] "
-labels: [ "bug", "glimmerwild" ]
+labels: [ "🔥 bug", "Glimmerwild" ]
 body:
   - type: markdown
     attributes:
